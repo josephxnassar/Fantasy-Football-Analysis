@@ -8,7 +8,7 @@ The [`NDPDepthChart`](../source/depth_chart/ndp.py) class provides functionality
 
 - [Initialization](#initialization)
 - [Methods](#methods)
-  - [`_load_data() -> pd.DataFrame`](#_load_data---pddataframe)
+  - [`_load() -> pd.DataFrame`](#_load---pddataframe)
   - [`_group_players_by_position(group: pd.DataFrame) -> dict`](#_group_players_by_positiongroup-pddataframe---dict)
   - [`_build_position_rows(position_players: dict) -> list`](#_build_position_rowsposition_players-dict---list)
   - [`run() -> None`](#run---None)
@@ -30,7 +30,7 @@ NDPDepthChart(seasons: list, week: int)
 
 ## Methods
 
-### `_load_data() -> pd.DataFrame`
+### `_load() -> pd.DataFrame`
 
 Loads and filters the offensive depth chart data for the given seasons and week, then processes it by adding a `full_name` column.
 
@@ -73,7 +73,7 @@ Generates structured depth charts for all teams by grouping and transforming the
 
 ```python
 from source.depth_chart.ndp import NDPDepthChart
-from source.database import Excel
+from source.database.excel import Excel
 
 ndp = NDPDepthChart([2023], 1)
 excel = Excel("output_file.xlsm")

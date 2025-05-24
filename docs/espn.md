@@ -8,7 +8,7 @@ The [`ESPNDepthChart`](../source/depth_chart/espn.py) class scrapes *updated* te
 
 - [Initialization](#initialization)
 - [Methods](#methods)
-  - [`_get_soup(team: str)`](#_get_soupteam-str)
+  - [`_load(team: str)`](#_loadteam-str)
   - [`_parse_soup(soup: BeautifulSoup) -> tuple`](#_parse_soupsoup-beautifulsoup---tuple)
   - [`_create_depth_chart(positions: list, players: list) -> pd.DataFrame`](#_create_depth_chartpositions-list-players-list---pddataframe)
   - [`run() -> dict`](#run---dict)
@@ -29,7 +29,7 @@ ESPNDepthChart()
 
 ## Methods
 
-### `_get_soup(team: str)`
+### `_load(team: str)`
 
 Sends an HTTP GET request to the ESPN depth chart page for a given team and returns a BeautifulSoup of the HTML.
 
@@ -79,7 +79,7 @@ Constructs depth charts for all NFL teams defined in `self.teams`.
 
 ```python
 from source.depth_chart.espn import ESPNDepthChart
-from source.database import Excel
+from source.database.excel import Excel
 
 espn = ESPNDepthChart()
 excel = Excel("output_file.xlsm")

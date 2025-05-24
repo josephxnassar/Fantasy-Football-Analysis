@@ -1,6 +1,6 @@
 # `Statistics` Class
 
-The [`Statistics`](../source/statistics.py) class provides functionality for importing, processing, and analyzing NFL seasonal data. It performs key operations such as loading player data, partitioning by player positions, filtering statistics columns, and creating player ratings based on fantasy points using different rating models.
+The [`Statistics`](../source/statistics/statistics.py) class provides functionality for importing, processing, and analyzing NFL seasonal data. It performs key operations such as loading player data, partitioning by player positions, filtering statistics columns, and creating player ratings based on fantasy points using different rating models.
 
 ---
 
@@ -9,7 +9,7 @@ The [`Statistics`](../source/statistics.py) class provides functionality for imp
 - [Initialization](#initialization)  
 - [Methods](#methods)  
   - [`_load_key() -> dict`](#_load_key---dict)  
-  - [`_load_data() -> pd.DataFrame`](#_load_data---pddataframe)  
+  - [`_load() -> pd.DataFrame`](#_load---pddataframe)  
   - [`_partition() -> dict`](#_partition---dict)  
   - [`_filter_df(df: pd.DataFrame) -> pd.DataFrame`](#_filter_dfdf-pddataframe---pddataframe)  
   - [`_create_ratings(df: pd.DataFrame, model_type: str) -> pd.DataFrame`](#_create_ratingsdf-pddataframe-model_type-str---pddataframe)
@@ -51,7 +51,7 @@ Loads seasonal rosters using `nfl.import_seasonal_rosters()` and builds a dictio
 
 ---
 
-### `_load_data() -> pd.DataFrame`
+### `_load() -> pd.DataFrame`
 
 Loads seasonal player data from [`nfl.import_seasonal_data()`](./import_seasonal_data.md).
 
@@ -133,8 +133,8 @@ Generates ratings for each position by:
 ## Example Usage
 
 ```python
-from source import Statistics
-from source.database import Excel
+from source.statistics.statistics import Statistics
+from source.database.excel import Excel
 
 stats = Statistics([2024])
 excel = Excel("output_file.xlsm")

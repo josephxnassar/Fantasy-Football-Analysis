@@ -1,7 +1,7 @@
 
 # Schedules Class
 
-The [`Schedules`](../source/schedules.py) class provides functionality for importing and organizing NFL schedule data for given seasons. It extracts regular season matchups and partitions them by team, filling in bye weeks as needed.
+The [`Schedules`](../source/schedules/schedules.py) class provides functionality for importing and organizing NFL schedule data for given seasons. It extracts regular season matchups and partitions them by team, filling in bye weeks as needed.
 
 ---
 
@@ -9,9 +9,9 @@ The [`Schedules`](../source/schedules.py) class provides functionality for impor
 
 - [Initialization](#initialization)  
 - [Methods](#methods)  
-  - [`_load_data() -> pd.DataFrame`](#_load_data---pddataframe)  
-  - [`_split_schedules_by_team() -> dict[str, pd.DataFrame]`](#_split_schedules_by_team---dictstr-pddataframe)  
-  - [`_fill_bye_weeks(df: pd.DataFrame, team: str) -> pd.DataFrame`](#_fill_bye_weeksdf-pddataframe-team-str---pddataframe)  
+  - [`_load() -> pd.DataFrame`](#_load---pddataframe)  
+  - [`_fill_bye_weeks(df: pd.DataFrame, team: str) -> pd.DataFrame`](#_fill_bye_weeksdf-pddataframe-team-str---pddataframe) 
+  - [`_create_combined_schedule() -> pd.DataFrame`](#_create_combined_schedule---pddataframe)  
   - [`run() -> None`](#run---None)  
 - [Example Usage](#example-usage)
 
@@ -33,7 +33,7 @@ Schedules(seasons: list[int])
 
 ## Methods
 
-### `_load_data() -> pd.DataFrame`
+### `_load() -> pd.DataFrame`
 
 Fetches NFL regular season schedules for the specified seasons using `import_schedules()` from the `nfl_data_py` API. Filters the data to only include regular season games (`game_type == 'REG'`), returning the columns `week`, `away_team`, and `home_team`.
 
@@ -42,22 +42,6 @@ Fetches NFL regular season schedules for the specified seasons using `import_sch
 
 #### Raises:
 - `Exception`: If the data loading fails, the error is logged and the exception is raised.
-
----
-
-### `_split_schedules_by_team() -> dict[str, pd.DataFrame]`
-
-Creates a dictionary mapping each team abbreviation to their schedule DataFrame.
-
-- Home and away games are combined, with columns renamed to `Team` and `Opponent` accordingly.
-- Each team's schedule is indexed by week and sorted.
-- Errors for individual teams during processing are logged but do not stop the entire operation.
-
-#### Returns:
-- `dict[str, pd.DataFrame]`: Mapping from team abbreviation to their weekly opponent schedule.
-
-#### Raises:
-- `Exception`: If the splitting process fails, the error is logged and the exception is raised.
 
 ---
 
@@ -77,6 +61,18 @@ Fills missing weeks in a team's schedule DataFrame with "BYE" to represent bye w
 
 ---
 
+### `_create_combined_schedule() -> pd.DataFrame`
+
+Home and away games are combined, with columns renamed to `Team` and `Opponent` accordingly.
+
+#### Returns:
+- `pd.DataFrame`: Combined schedules for all teams.
+
+#### Raises:
+- `Exception`: If the splitting process fails, the error is logged and the exception is raised.
+
+---
+
 ### `run() -> None`
 
 Generates the complete schedules for each team including bye weeks by combining the splitting and filling steps.
@@ -86,8 +82,8 @@ Generates the complete schedules for each team including bye weeks by combining 
 ## Example Usage
 
 ```python
-from source import Schedules
-from source.database import Excel
+from source.schedules.schedules import Schedules
+from source.database.excel import Excel
 
 schedule = Schedules([2024])
 team_schedules = schedule.run()

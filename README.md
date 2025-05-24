@@ -6,25 +6,19 @@ This project provides a suite of tools to collect, process, and analyze NFL play
 
 ## 📂 Modules
 
-### 1. [`Statistics`](./source/statistics.py)
+### 1. [`Statistics`](./source/statistics/statistics.py)
 Processes NFL seasonal data by organizing into position and running a regression algorithm.
 
-### 2. [`Ridge`](./source/ratings/regression/ridge.py)
-Handles the ridge regression model used to calculate player or team ratings based on statistical input data.
-
-### 3. [`Schedules`](./source/schedules.py)
+### 2. [`Schedules`](./source/schedules/schedules.py)
 Processes NFL schedule data by inserting bye weeks where games are missing from the schedule.
 
-### 4. [`NDPDepthChart`](./source/depth_chart/ndpdepthchart.py)
+### 3. [`NDPDepthChart`](./source/depth_chart/ndp.py)
 Retrieves offensive player depth charts from `nfl_data_py`.  
 > ⚠️ This data is programmatically accessible and can be run frequently but may not be up-to-date.
 
-### 5. [`ESPNDepthChart`](./source/depth_chart/espndepthchart.py)
+### 4. [`ESPNDepthChart`](./source/depth_chart/espn.py)
 Scrapes player depth chart information directly from ESPN’s website.  
 > ⚠️ More up-to-date, but web scraping is less stable and slower due to rate limiting.
-
-### 6. [`Excel`](./source/database/excel.py)
-Handles structured output of pandas DataFrames to formatted Excel files using the `xlwings` library.
 
 ---
 
@@ -61,11 +55,10 @@ source/
 ├── depth_chart/
 ├────── ndpdepthchart.py
 ├────── espndepthchart.py
-├── ratings/
-├────── regression/
-├──────────── ridge.py
-├── statistics.py
-├── schedules.py
+├── schedules/
+├────── schedules.py
+├── statistics/
+├────── statistics.py
 main.py
 ```
 
@@ -74,8 +67,8 @@ main.py
 To pull and output depth charts from ESPN:
 
 ```python
-from source.depth_chart import ESPNDepthChart
-from source.database import Excel
+from source.depth_chart.espn import ESPNDepthChart
+from source.database.excel import Excel
 
 espn = ESPNDepthChart()
 excel = Excel("output_file.xlsm")
@@ -86,8 +79,8 @@ excel.close()
 To calculate nnd sort statistics by rating:
 
 ```python
-from source import Statistics
-from database.database import Excel
+from source.statistics.statistics import Statistics
+from source.database.excel import Excel
 
 stats = Statistics([2024])
 excel = Excel("output_file.xlsm")
@@ -102,11 +95,9 @@ excel.close()
 Each module's documentation can be found in the respective Markdown files:
 
 - [`statistics.md`](./docs/statistics.md)
-- [`regression.md`](./docs/regression.md)
 - [`schedules.md`](./docs/schedules.md)
-- [`espndepthchart.md`](./docs/espndepthchart.md)
-- [`ndpdepthchart.md`](./docs/ndpdepthchart.md)
-- [`excel.md`](./docs/excel.md)
+- [`ndpdepthchart.md`](./docs/ndp.md)
+- [`espndepthchart.md`](./docs/espn.md)
 
 ---
 

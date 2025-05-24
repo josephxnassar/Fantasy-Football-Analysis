@@ -123,7 +123,7 @@ Closes the workbook.
 ## Example Usage
 
 ```python
-from source.database import Excel
+from source.database.excel import Excel
 
 excel = Excel("output_file.xlsm")
 excel.output_dfs(dataframes_dict, "output_sheet")
