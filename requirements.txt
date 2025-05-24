@@ -1,0 +1,9 @@
+numpy==1.23.5
+pandas==1.5.3
+nfl_data_py
+scikit-learn
+beautifulsoup4
+requests
+xlwings
+pytest
+pytest-mock
