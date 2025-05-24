@@ -8,11 +8,7 @@ from source import constants
 from .ratings import *
 from source.base_source import BaseSource
 
-
 logger = logging.getLogger(__name__)
-
-RATING_METHODS = {"linear": LinearRegression,
-                   "ridge": RidgeRegression}
 
 class Statistics(BaseSource):
     def __init__(self, seasons: list, method: str = "ridge"):
@@ -65,8 +61,7 @@ class Statistics(BaseSource):
         try:
             y = df["fantasy_points_ppr"]
             X = df.drop(columns=["fantasy_points", "fantasy_points_ppr"])
-            model = RATING_METHODS[method](X, y)
-            model.fit()
+            model = Regression(X, y, method).fit()
             return model.get_ratings()
         except Exception as e:
             logger.error(f"Error creating ratings using '{method}': {e}")

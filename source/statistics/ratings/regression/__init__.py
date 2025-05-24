@@ -1,4 +1,3 @@
-from .linear import LinearRegression
-from .ridge import RidgeRegression
+from .regression import Regression
 
-__all__ = ['LinearRegression', 'RidgeRegression']
+__all__ = ['Regression']
