@@ -83,15 +83,10 @@ class ESPNDepthChart(BaseSource):
         self.set_cache(depth_charts)
 
 # ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
-    
-    def _get_tables(self):
-        for team, df in self.cache.items():
-            table_name = f"espn_depth_chart_{team}"
-            yield table_name, df
 
     def _get_keys(self) -> list:
         return constants.TEAMS
 
-    def _get_name(self, key, **kwargs) -> str:
+    def _get_name(self, key) -> str:
         return f"espn_depth_chart_{key}"
     

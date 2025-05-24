@@ -15,9 +15,9 @@ RATING_METHODS = {"linear": LinearRegression,
                    "ridge": RidgeRegression}
 
 class Statistics(BaseSource):
-    def __init__(self, seasons: list, methods: list[str] = ["ridge"]):
+    def __init__(self, seasons: list, method: str = "ridge"):
         super().__init__(seasons)
-        self.rating_methods = methods
+        self.ratings_method = method
         self.key = self._load_key()
         self.seasonal_data = self._load()
 
@@ -48,7 +48,7 @@ class Statistics(BaseSource):
                         position_data[position].append([player_name] + row.tolist()[1:])
                 except Exception as e:
                     logger.error(f"Failed to process player_id '{row.player_id}': {e}")
-            return {pos: pd.DataFrame(data, columns=cols).set_index('player_name') for pos, data in position_data.items()}
+            return {pos: pd.DataFrame(data, columns=cols).set_index('player_name').rename_axis(pos) for pos, data in position_data.items()}
         except Exception as e:
             logger.error(f"Error partitioning data: {e}")
             raise
@@ -73,31 +73,20 @@ class Statistics(BaseSource):
             raise
 
     def run(self) -> None:
-        stats = defaultdict(dict)
+        stats = {}
         for pos, df in self._partition().items():
             try:
                 filtered_df = self._filter_df(df)
-                for ratings_method in self.rating_methods:
-                    stats[ratings_method][pos] = self._create_ratings(filtered_df, ratings_method)
+                stats[pos] = self._create_ratings(filtered_df, self.ratings_method)
             except Exception as e:
                 logger.error(f"Failed to process position '{pos}': {e}")
         self.set_cache(stats)
 
 # ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
 
-    def _get_tables(self):
-        for ratings_method in self.rating_methods:
-            for pos, df in self.cache[ratings_method].items():
-                table_name = f"stats_{pos}_{ratings_method}"
-                yield table_name, df
-
     def _get_keys(self) -> list:
         return constants.POSITIONS
 
-    def _get_name(self, key, **kwargs) -> str:
-        method = kwargs.get('method', 'ridge')
-        return f"stats_{key}_{method}"
-
-    def _set_index(self, df, key) -> pd.DataFrame:
-        return df.set_index('player_name')
+    def _get_name(self, key) -> str:
+        return f"statistics_{key}_{self.ratings_method}"
     

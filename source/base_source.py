@@ -28,46 +28,31 @@ class BaseSource(ABC):
 
 # ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
 
-# ╔═══════════════════════ START SAVE ═══════════════════════╗
+    @abstractmethod
+    def _get_name(self, key) -> str:
+        pass
 
     @abstractmethod
-    def _get_tables(self):
+    def _get_keys(self) -> list:
         pass
 
     def save_to_db(self, db: 'SQLiteCacheManager') -> None:
         if self.cache is None:
             logger.warning(f"No cached data to save — call run() first.")
             return
-        for table_name, df in self._get_tables():
+        for key, df in self.cache.items():
+            table_name = self._get_name(key)
             db.save_table(table_name, df)
 
-# ╚════════════════════════ END SAVE ════════════════════════╝
-
-# ╔═══════════════════════ START LOAD ═══════════════════════╗
-
-    @abstractmethod
-    def _get_keys(self) -> list:
-        pass
-
-    @abstractmethod
-    def _get_name(self, key, **kwargs) -> str:
-        pass
-
-    def _set_index(self, df, key) -> pd.DataFrame:
-        return df.set_index(key)
-
-    def load_from_db(self, db: 'SQLiteCacheManager', **kwargs) -> None:
+    def load_from_db(self, db: SQLiteCacheManager) -> None:
         data = {}
         for key in self._get_keys():
-            table_name = self._get_name(key, **kwargs)
+            table_name = self._get_name(key)
             if db.table_exists(table_name):
                 try:
-                    df = db.load_table(table_name)
-                    data[key] = self._set_index(df, key)
+                    data[key] = db.load_table(table_name).set_index(key)
                 except Exception as e:
                     logger.error(f"Error loading table '{table_name}': {e}")
             else:
                 logger.warning(f"Table '{table_name}' does not exist in database.")
         self.set_cache(data)
-
-# ╚════════════════════════ END LOAD ════════════════════════╝

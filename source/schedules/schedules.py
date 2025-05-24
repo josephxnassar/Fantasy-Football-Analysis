@@ -49,15 +49,10 @@ class Schedules(BaseSource):
         self.set_cache(schedules)
 
 # ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
-    
-    def _get_tables(self):
-        for team, df in self.cache.items():
-            table_name = f"schedule_{team}"
-            yield table_name, df
 
     def _get_keys(self) -> list:
         return constants.TEAMS
 
-    def _get_name(self, key, **kwargs) -> str:
+    def _get_name(self, key) -> str:
         return f"schedule_{key}"
     

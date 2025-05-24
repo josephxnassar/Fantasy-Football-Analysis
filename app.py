@@ -4,16 +4,16 @@ class App:
     def __init__(self, initialize: bool):
         self.initialize = initialize
 
+        espn = ESPNDepthChart()
+
         if self.initialize:
-            espn = ESPNDepthChart()
             ndp = NDPDepthChart([2024])
             schedules = Schedules([2025])
-            statistics = Statistics([2024])
         else:
-            espn = ESPNDepthChart()
             ndp = NDPDepthChart.__new__(NDPDepthChart)
             schedules = Schedules.__new__(Schedules)
-            statistics = Statistics.__new__(Statistics)
+
+        statistics = Statistics([2024])
 
         self.data = [espn, ndp, schedules, statistics]
 
