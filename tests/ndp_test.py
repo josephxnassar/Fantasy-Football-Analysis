@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 
 from source.depth_chart.ndp import NDPDepthChart
 
-def test_load_data(mocker: MockerFixture):
+def test_load(mocker: MockerFixture):
     df = pd.DataFrame({"week":          [ 1,         1        ],
                        "formation":     ["Offense", "Offense" ],
                        "football_name": ["Noah",    "Patrick" ],
@@ -20,7 +20,7 @@ def test_load_data(mocker: MockerFixture):
                                 "position":   ["QB",              "TE"           ],
                                 "full_name":  ["Patrick Mahomes", "Noah Gray"    ]})
 
-    ndp = NDPDepthChart([2024], 1)
+    ndp = NDPDepthChart([2024])
     mock_depth.assert_called_once()
     pd.testing.assert_frame_equal(ndp.master_depth_chart.reset_index(drop=True), expected_df)
 
