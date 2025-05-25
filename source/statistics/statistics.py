@@ -61,8 +61,7 @@ class Statistics(BaseSource):
         try:
             y = df["fantasy_points_ppr"]
             X = df.drop(columns=["fantasy_points", "fantasy_points_ppr"])
-            model = Regression(X, y, method).fit()
-            return model.get_ratings()
+            return Regression(X, y, method).fit().get_ratings()
         except Exception as e:
             logger.error(f"Error creating ratings using '{method}': {e}")
             raise
