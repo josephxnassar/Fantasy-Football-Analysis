@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class ESPNDepthChart(BaseSource):
     def __init__(self):
         super().__init__([2025])
+        self.table_keys = constants.TEAMS
 
     def _load(self, team: str):
         try:
@@ -73,7 +74,7 @@ class ESPNDepthChart(BaseSource):
 
     def run(self) -> None:
         depth_charts = {}
-        for team in constants.TEAMS:
+        for team in self.table_keys:
             try:
                 soup = self._load(team)
                 positions, players = self._parse_soup(soup)
@@ -81,12 +82,4 @@ class ESPNDepthChart(BaseSource):
             except Exception as e:
                 logger.error(f"Failed to process team '{team}': {e}")
         self.set_cache(depth_charts)
-
-# ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
-
-    def _get_keys(self) -> list:
-        return constants.TEAMS
-
-    def _get_name(self, key) -> str:
-        return f"espn_depth_chart_{key}"
     

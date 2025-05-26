@@ -1,7 +1,7 @@
-from .database.DAO import *
+from .database.service import *
 from .depth_chart import *
 from .output import *
 from .statistics import *
 from .schedules import *
 
-__all__ = ['Excel', 'SQLiteCacheManager', 'NDPDepthChart', 'ESPNDepthChart', 'Statistics', 'Schedules']
+__all__ = ['Excel', 'SQLService', 'NDPDepthChart', 'ESPNDepthChart', 'Statistics', 'Schedules']

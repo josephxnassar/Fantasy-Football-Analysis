@@ -2,11 +2,7 @@ import config # Required
 from app import App
 
 def main():
-    app = App(False)
-    # app.run()
-    # app.save()
-    app.load()
-    app.output()
+    pass
 
 if __name__ == '__main__':
     main()

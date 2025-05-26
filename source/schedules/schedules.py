@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class Schedules(BaseSource):
     def __init__(self, seasons: list[int]):
         super().__init__(seasons)
+        self.table_keys = constants.TEAMS
         self.master_schedule = self._load()
 
     def _load(self) -> pd.DataFrame:
@@ -47,12 +48,3 @@ class Schedules(BaseSource):
             except Exception as e:
                 logger.error(f"Failed to process team '{team}': {e}")
         self.set_cache(schedules)
-
-# ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
-
-    def _get_keys(self) -> list:
-        return constants.TEAMS
-
-    def _get_name(self, key) -> str:
-        return f"schedule_{key}"
-    

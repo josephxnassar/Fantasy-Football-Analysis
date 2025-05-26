@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class NDPDepthChart(BaseSource):
     def __init__(self, seasons: list):
         super().__init__(seasons)
+        self.table_keys = constants.TEAMS
         self.master_depth_chart = self._load()
 
     def _load(self) -> pd.DataFrame:
@@ -55,12 +56,4 @@ class NDPDepthChart(BaseSource):
             except Exception as e:
                 logger.error(f"Failed to process team '{team}': {e}")
         self.set_cache(depth_charts)
-
-# ═══════════════════ ❖  DATABASE OPERATIONS  ❖ ═══════════════════
-    
-    def _get_keys(self) -> list:
-        return constants.TEAMS
-
-    def _get_name(self, key) -> str:
-        return f"ndp_depth_chart_{key}"
     
