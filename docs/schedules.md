@@ -83,7 +83,7 @@ Generates the complete schedules for each team including bye weeks by combining 
 
 ```python
 from source.schedules.schedules import Schedules
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 schedule = Schedules([2024])
 team_schedules = schedule.run()

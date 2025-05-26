@@ -73,7 +73,7 @@ Generates structured depth charts for all teams by grouping and transforming the
 
 ```python
 from source.depth_chart.ndp import NDPDepthChart
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 ndp = NDPDepthChart([2023], 1)
 excel = Excel("output_file.xlsm")

@@ -3,22 +3,22 @@ from unittest.mock import MagicMock
 
 from pytest_mock import MockerFixture
 
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 filename = "test.xlsx"
 
 def test_load_existing_file(mocker: MockerFixture):
-    mock_exists = mocker.patch("source.database.excel.os.path.exists", return_value=True)
-    mock_book = mocker.patch("source.database.excel.xw.Book")
+    mock_exists = mocker.patch("source.output.excel.os.path.exists", return_value=True)
+    mock_book = mocker.patch("source.output.excel.xw.Book")
 
     Excel(filename)
     mock_exists.assert_called_once_with(filename)
     mock_book.assert_called_once_with(filename)
 
 def test_load_new_file(mocker: MockerFixture):
-    mock_exists = mocker.patch("source.database.excel.os.path.exists", return_value = False)
+    mock_exists = mocker.patch("source.output.excel.os.path.exists", return_value = False)
     mock_instance = mocker.Mock()
-    mocker.patch("source.database.excel.xw.Book", return_value = mock_instance)
+    mocker.patch("source.output.excel.xw.Book", return_value = mock_instance)
 
     Excel(filename)
     mock_exists.assert_called_once_with(filename)
@@ -64,7 +64,7 @@ def test_find_next_column():
 
 def test_generate_lookup(mocker: MockerFixture):
     stats = Excel.__new__(Excel)
-    mock_find = mocker.patch("source.database.excel.Excel._find_next_column", return_value = "E")
+    mock_find = mocker.patch("source.output.excel.Excel._find_next_column", return_value = "E")
 
     dfs = {"QB": pd.DataFrame(columns=["a", "b"]),
            "RB": pd.DataFrame(columns=["a", "b"]),
@@ -112,10 +112,10 @@ def test_output_dfs(mocker: MockerFixture):
     mock_sheet = mocker.Mock()
     mock_lookup = {"QB": "B2", "RB": "B10"}
 
-    mocker.patch("source.database.excel.Excel._prepare_sheet", return_value = mock_sheet)
-    mocker.patch("source.database.excel.Excel._generate_lookup", return_value = mock_lookup)
-    mock_output = mocker.patch("source.database.excel.Excel._output_table")
-    mock_format = mocker.patch("source.database.excel.Excel._format_sheet")
+    mocker.patch("source.output.excel.Excel._prepare_sheet", return_value = mock_sheet)
+    mocker.patch("source.output.excel.Excel._generate_lookup", return_value = mock_lookup)
+    mock_output = mocker.patch("source.output.excel.Excel._output_table")
+    mock_format = mocker.patch("source.output.excel.Excel._format_sheet")
 
     stats = Excel.__new__(Excel)
     stats.output_dfs(dfs, "Stats")

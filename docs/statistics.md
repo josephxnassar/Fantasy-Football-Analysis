@@ -134,7 +134,7 @@ Generates ratings for each position by:
 
 ```python
 from source.statistics.statistics import Statistics
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 stats = Statistics([2024])
 excel = Excel("output_file.xlsm")

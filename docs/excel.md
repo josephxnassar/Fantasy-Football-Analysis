@@ -1,6 +1,6 @@
 # `Excel` Class
 
-The [`Excel`](../source/database/excel.py) class provides an interface to output pandas DataFrames to an Excel workbook using the `xlwings` library. Each instance of this class represents one Excel file.
+The [`Excel`](../source/output/excel.py) class provides an interface to output pandas DataFrames to an Excel workbook using the `xlwings` library. Each instance of this class represents one Excel file.
 
 ---
 
@@ -123,7 +123,7 @@ Closes the workbook.
 ## Example Usage
 
 ```python
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 excel = Excel("output_file.xlsm")
 excel.output_dfs(dataframes_dict, "output_sheet")

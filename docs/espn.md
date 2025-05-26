@@ -79,7 +79,7 @@ Constructs depth charts for all NFL teams defined in `self.teams`.
 
 ```python
 from source.depth_chart.espn import ESPNDepthChart
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 espn = ESPNDepthChart()
 excel = Excel("output_file.xlsm")

@@ -14,11 +14,9 @@ Processes NFL schedule data by inserting bye weeks where games are missing from 
 
 ### 3. [`NDPDepthChart`](./source/depth_chart/ndp.py)
 Retrieves offensive player depth charts from `nfl_data_py`.  
-> ⚠️ This data is programmatically accessible and can be run frequently but may not be up-to-date.
 
 ### 4. [`ESPNDepthChart`](./source/depth_chart/espn.py)
 Scrapes player depth chart information directly from ESPN’s website.  
-> ⚠️ More up-to-date, but web scraping is less stable and slower due to rate limiting.
 
 ---
 
@@ -50,11 +48,12 @@ Your codebase should be structured something like:
 ```
 source/
 ├── database/
-├────── excel.py
 ├────── sqlite.py
 ├── depth_chart/
 ├────── ndpdepthchart.py
 ├────── espndepthchart.py
+├── output/
+├────── excel.py
 ├── schedules/
 ├────── schedules.py
 ├── statistics/
@@ -68,7 +67,7 @@ To pull and output depth charts from ESPN:
 
 ```python
 from source.depth_chart.espn import ESPNDepthChart
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 espn = ESPNDepthChart()
 excel = Excel("output_file.xlsm")
@@ -80,7 +79,7 @@ To calculate nnd sort statistics by rating:
 
 ```python
 from source.statistics.statistics import Statistics
-from source.database.excel import Excel
+from source.output.excel import Excel
 
 stats = Statistics([2024])
 excel = Excel("output_file.xlsm")
