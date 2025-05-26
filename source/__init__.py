@@ -1,4 +1,4 @@
-from .database import *
+from .database.DAO import *
 from .depth_chart import *
 from .output import *
 from .statistics import *

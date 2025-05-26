@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from abc import ABC, abstractmethod
-from .database.sqlite import SQLiteCacheManager
+from .database.DAO.sqlite_DAO import SQLiteCacheManager
 
 logger = logging.getLogger(__name__)
 
