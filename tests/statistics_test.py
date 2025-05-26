@@ -14,8 +14,8 @@ def test_load_key(mocker: MockerFixture):
     
     stats = Statistics([2024], ["ridge"])
     mock_key.assert_called_once()
-    assert stats.key == {"00-0031234": ("Patrick Mahomes", "QB"),
-                         "00-0035678": ("Travis Kelce",    "TE")}
+    assert stats.id_to_player == {"00-0031234": ("Patrick Mahomes", "QB"),
+                                  "00-0035678": ("Travis Kelce",    "TE")}
 
 def test_load_data(mocker: MockerFixture):
     df = pd.DataFrame({'player_id':   ['12345', '67890'], 'season':      [2024, 2024],
