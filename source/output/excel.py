@@ -7,7 +7,7 @@ import xlwings as xw
 logger = logging.getLogger(__name__)
 
 class Excel:
-    def __init__(self, filename: str = "nfl.xlsm"):
+    def __init__(self, filename: str = "output.xlsm"):
         self.filename = filename
         self.wb = self._load()
 

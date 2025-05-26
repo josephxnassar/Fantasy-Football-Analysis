@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 import nfl_data_py as nfl
 
-from source.util import constants
 from source.base_source import BaseSource
 
 logger = logging.getLogger(__name__)
@@ -11,7 +10,6 @@ logger = logging.getLogger(__name__)
 class Schedules(BaseSource):
     def __init__(self, seasons: list[int]):
         super().__init__(seasons)
-        self.table_keys = constants.TEAMS
         self.master_schedule = self._load()
 
     def _load(self) -> pd.DataFrame:

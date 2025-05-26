@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from abc import ABC, abstractmethod
-from .database.DAO.sqlite_DAO import SQLiteCacheManager
+from source.util import constants
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,9 @@ class BaseSource(ABC):
 
     def set_cache(self, cache: dict) -> None:
         self.cache = cache
+
+    def get_keys(self) -> list:
+        return constants.TEAMS
 
     @abstractmethod
     def _load(self) -> pd.DataFrame:

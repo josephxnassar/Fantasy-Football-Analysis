@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class NDPDepthChart(BaseSource):
     def __init__(self, seasons: list):
         super().__init__(seasons)
-        self.table_keys = constants.TEAMS
         self.master_depth_chart = self._load()
 
     def _load(self) -> pd.DataFrame:

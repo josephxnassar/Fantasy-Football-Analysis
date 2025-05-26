@@ -14,9 +14,11 @@ class Statistics(BaseSource):
     def __init__(self, seasons: list, method: str = "ridge"):
         super().__init__(seasons)
         self.ratings_method = method
-        self.table_keys = constants.POSITIONS
         self.id_to_player = self._load_key()
         self.seasonal_data = self._load()
+
+    def get_keys(self) -> list:
+        return constants.POSITIONS
 
     def _load_key(self) -> dict:
         try:
@@ -41,7 +43,7 @@ class Statistics(BaseSource):
             for _, row in self.seasonal_data.iterrows():
                 try:
                     player_name, position = self.id_to_player[row.player_id]
-                    if position in self.table_keys:
+                    if position in constants.POSITIONS:
                         position_data[position].append([player_name] + row.tolist()[1:])
                 except Exception as e:
                     logger.error(f"Failed to process player_id '{row.player_id}': {e}")

@@ -9,7 +9,7 @@ class SQLService:
         self.db = SQLiteCacheManager()
 
     def save_to_db(self, cache: dict, cls_name: str) -> None:
-        if self.cache is None:
+        if cache is None:
             logger.warning(f"No cached data to save — call run() first.")
             return
         for key, df in cache.items():

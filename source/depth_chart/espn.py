@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class ESPNDepthChart(BaseSource):
     def __init__(self):
         super().__init__([2025])
-        self.table_keys = constants.TEAMS
 
     def _load(self, team: str):
         try:
@@ -74,7 +73,7 @@ class ESPNDepthChart(BaseSource):
 
     def run(self) -> None:
         depth_charts = {}
-        for team in self.table_keys:
+        for team in constants.TEAMS:
             try:
                 soup = self._load(team)
                 positions, players = self._parse_soup(soup)
