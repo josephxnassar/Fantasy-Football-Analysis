@@ -5,8 +5,8 @@ import pandas as pd
 import nfl_data_py as nfl
 
 from source.util import constants
-from .ratings import *
 from source.base_source import BaseSource
+from source.statistics.ratings import *
 
 logger = logging.getLogger(__name__)
 
