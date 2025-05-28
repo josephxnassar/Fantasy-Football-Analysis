@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 
 from source.depth_chart.espn import ESPNDepthChart
 
-def test_load_success(mocker: MockerFixture):
+def test_get_soup_success(mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.status_code = 200
     mock_response.text = "<html></html>"
@@ -14,7 +14,7 @@ def test_load_success(mocker: MockerFixture):
     mock_get = mocker.patch("source.depth_chart.espn.requests.get", return_value = mock_response)
 
     chart = ESPNDepthChart()
-    soup = chart._load("KC")
+    soup = chart._get_soup("KC")
 
     mock_get.assert_called_once()
     assert isinstance(soup, BeautifulSoup)
@@ -78,8 +78,8 @@ def test_run(mocker: MockerFixture):
                        "3rd":     ["QB3"    ],
                        "4th":     ["QB4"    ]}, index=["QB"])
 
-    mocker.patch("source.depth_chart.espn.ESPNDepthChart._load", return_value=mock_soup)
-    mocker.patch("source.depth_chart.espn.ESPNDepthChart._parse_soup", return_value=(["QB"], ["Mahomes", "QB2", "QB3", "QB4"]))
+    mocker.patch("source.depth_chart.espn.ESPNDepthChart._get_soup", return_value = mock_soup)
+    mocker.patch("source.depth_chart.espn.ESPNDepthChart._parse_soup", return_value = (["QB"], ["Mahomes", "QB2", "QB3", "QB4"]))
     mocker.patch("source.depth_chart.espn.ESPNDepthChart._create_depth_chart", return_value = df)
 
     mock_chart.run()

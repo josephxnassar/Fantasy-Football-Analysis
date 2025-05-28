@@ -13,7 +13,10 @@ class ESPNDepthChart(BaseSource):
     def __init__(self):
         super().__init__([2025])
 
-    def _load(self, team: str):
+    def _load(self) -> pd.DataFrame:
+        pass
+
+    def _get_soup(self, team: str) -> BeautifulSoup:
         try:
             url = f"https://www.espn.com/nfl/team/depth/_/name/{team}"
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"}
@@ -75,7 +78,7 @@ class ESPNDepthChart(BaseSource):
         depth_charts = {}
         for team in constants.TEAMS:
             try:
-                soup = self._load(team)
+                soup = self._get_soup(team)
                 positions, players = self._parse_soup(soup)
                 depth_charts[team] = self._create_depth_chart(positions, players).rename_axis(team)
             except Exception as e:

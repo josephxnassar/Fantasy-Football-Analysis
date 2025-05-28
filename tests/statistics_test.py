@@ -71,7 +71,7 @@ def test_create_ratings(mocker: MockerFixture):
     mock_instance.get_ratings.return_value = pd.DataFrame({'player': ['Player A', 'Player B', 'Player C'],
                                                            'rating': [ 0.9,        0.85,       0.8      ]})
 
-    mock_regression = mocker.patch("source.statistics.statistics.Regression", return_value=mock_instance)
+    mock_regression = mocker.patch("source.statistics.statistics.Regression", return_value = mock_instance)
 
     stats = Statistics.__new__(Statistics)
     result = stats._create_ratings(df, "ridge")

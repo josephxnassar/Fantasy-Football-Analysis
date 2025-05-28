@@ -8,7 +8,7 @@ from source.output.excel import Excel
 filename = "test.xlsx"
 
 def test_load_existing_file(mocker: MockerFixture):
-    mock_exists = mocker.patch("source.output.excel.os.path.exists", return_value=True)
+    mock_exists = mocker.patch("source.output.excel.os.path.exists", return_value = True)
     mock_book = mocker.patch("source.output.excel.xw.Book")
 
     Excel(filename)

@@ -1,5 +1,5 @@
 import config # Required
-from app import App
+from source.app import App
 
 def main():
     a = App()
