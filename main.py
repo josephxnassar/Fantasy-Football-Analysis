@@ -3,8 +3,8 @@ from source.app import App
 
 def main():
     a = App()
-    # a.run()
-    # a.save()
+    a.run()
+    a.save()
     a.load()
     a.output()
 
