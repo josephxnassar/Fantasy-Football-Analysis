@@ -1,189 +1,203 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <i class="bi bi-people-fill me-2"></i>NFL Depth Charts
-                </h2>
-                <a href="/" class="btn btn-outline-secondary mb-3">
-                    <i class="bi bi-arrow-left"></i> Back to Home
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">NFL Depth Charts</h1>
+                <p class="lead text-muted mb-0">Explore team rosters and player positions for the current season</p>
+            </div>
+            <div>
+                <a href="/" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Home
                 </a>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="teamFilter" class="form-label">Filter by Team</label>
+                        <select class="form-select" id="teamFilter">
+                            <option value="">All Teams</option>
+                            {% for team in team_names %}
+                            <option value="{{ team }}">{{ team }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="positionFilter" class="form-label">Filter by Position</label>
+                        <select class="form-select" id="positionFilter">
+                            <option value="">All Positions</option>
+                            <option value="QB">Quarterback</option>
+                            <option value="RB">Running Back</option>
+                            <option value="WR">Wide Receiver</option>
+                            <option value="TE">Tight End</option>
+                            <option value="OL">Offensive Line</option>
+                            <option value="DL">Defensive Line</option>
+                            <option value="LB">Linebacker</option>
+                            <option value="DB">Defensive Back</option>
+                            <option value="ST">Special Teams</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label">Search Players</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Search players...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
                 
-                <!-- Team Selection Tabs -->
-                <ul class="nav nav-tabs mb-4" id="teamTabs" role="tablist">
-                    {% for team in team_names %}
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link {% if loop.first %}active{% endif %}" 
-                                id="{{ team }}-tab" 
-                                data-bs-toggle="tab" 
-                                data-bs-target="#{{ team }}" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="{{ team }}"
-                                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
-                            {{ team }}
-                        </button>
-                    </li>
-                    {% endfor %}
-                </ul>
+                <!-- Team Selection -->
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="h4 mb-0">Team Rosters</h2>
+                </div>
                 
-                <!-- Team Content Tabs -->
-                <div class="tab-content" id="teamTabsContent">
+                <!-- Team Grid -->
+                <div id="teamGrid" class="row g-4">
                     {% for team, players in teams_data.items() %}
-                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
-                         id="{{ team }}" 
-                         role="tabpanel" 
-                         aria-labelledby="{{ team }}-tab">
-                        
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h4 class="mb-0">{{ team }} Depth Chart</h4>
+                    <div class="col-xl-3 col-lg-4 col-md-6 team-card" data-team="{{ team }}">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">{{ team }}</h3>
+                                <span class="badge bg-primary rounded-pill">{{ players|length }} players</span>
                             </div>
                             <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover align-middle mb-0">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th style="width: 15%;">Position</th>
-                                                <th style="width: 21.25%;">Starter</th>
-                                                <th style="width: 21.25%;">Backup</th>
-                                                <th style="width: 21.25%;">Third String</th>
-                                                <th style="width: 21.25%;">Fourth String</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% set position_groups = {
-                                                'Quarterbacks': ['QB'],
-                                                'Running Backs': ['RB', 'FB'],
-                                                'Wide Receivers': ['WR1', 'WR2', 'WR3', 'WR'],
-                                                'Tight Ends': ['TE'],
-                                                'Offensive Line': ['LT', 'LG', 'C', 'RG', 'RT', 'OL'],
-                                                'Defensive Line': ['LDE', 'RDE', 'NT', 'DT', 'LDT', 'RDT', 'DE'],
-                                                'Linebackers': ['LOLB', 'MLB', 'ROLB', 'ILB', 'OLB', 'LB'],
-                                                'Cornerbacks': ['LCB', 'RCB', 'CB', 'DB'],
-                                                'Safeties': ['SS', 'FS', 'S'],
-                                                'Special Teams': ['K', 'P', 'LS', 'H', 'PR', 'KR']
-                                            } %}
-
-                                            {% for group_name, group_positions in position_groups.items() %}
-                                                {% set group_players = [] %}
-                                                {% for pos in group_positions %}
-                                                    {% for player in players if player.position == pos %}
-                                                        {% set _ = group_players.append(player) %}
+                                <ul class="list-group list-group-flush">
+                                    {% set position_groups = {
+                                        'QB': 'Quarterback',
+                                        'RB': 'Running Back',
+                                        'WR': 'Wide Receiver',
+                                        'TE': 'Tight End',
+                                        'OL': 'Offensive Line',
+                                        'DL': 'Defensive Line',
+                                        'LB': 'Linebacker',
+                                        'DB': 'Defensive Back',
+                                        'ST': 'Special Teams'
+                                    } %}
+                                    
+                                    {% for pos_code, pos_name in position_groups.items() %}
+                                        {% set pos_players = players|selectattr('position', 'equalto', pos_code)|list %}
+                                        {% if pos_players|length > 0 %}
+                                            <li class="list-group-item bg-transparent position-relative">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold small text-uppercase text-muted">{{ pos_name }}</span>
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">{{ pos_players|length }}</span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    {% for player in pos_players|sort(attribute='depth_team') %}
+                                                        <div class="d-flex align-items-center py-1 player-row" data-position="{{ pos_code }}">
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ player.depth_team }}</span>
+                                                            <div class="d-flex align-items-center flex-grow-1">
+                                                                <a href="{{ url_for('player_stats', player_name=player.full_name) }}" class="text-decoration-underline fw-medium text-primary">
+                                                                    {{ player.full_name }}
+                                                                    <i class="bi bi-box-arrow-up-right ms-1 small text-muted"></i>
+                                                                </a>
+                                                                {% if player.jersey_number %}
+                                                                    <small class="text-muted ms-auto">#{{ player.jersey_number }}</small>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
                                                     {% endfor %}
-                                                {% endfor %}
-
-                                                {% if group_players|length > 0 %}
-                                                    <tr class="table-group-divider">
-                                                        <td colspan="5" class="bg-light fw-bold">{{ group_name }}</td>
-                                                    </tr>
-                                                    
-                                                    {% for pos in group_positions %}
-                                                        {% set pos_players = players|selectattr('position', 'equalto', pos)|list %}
-                                                        {% if pos_players|length > 0 %}
-                                                            <tr>
-                                                                <td class="fw-bold">
-                                                                    {% if pos in ['WR1', 'WR2', 'WR3'] %}
-                                                                        {{ {'WR1': 'WR1 (X)', 'WR2': 'WR2 (Z)', 'WR3': 'WR3 (Slot)'}[pos] }}
-                                                                    {% else %}
-                                                                        {{ pos }}
-                                                                        {% if pos in ['LT', 'LG', 'C', 'RG', 'RT'] %}
-                                                                            <small class="text-muted d-block">{{ {'LT': 'Left Tackle', 'LG': 'Left Guard', 'C': 'Center', 'RG': 'Right Guard', 'RT': 'Right Tackle'}[pos] }}</small>
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                </td>
-                                                                {% for depth in [1, 2, 3, 4] %}
-                                                                    {% set player_found = false %}
-                                                                    <td>
-                                                                        {% for player in pos_players %}
-                                                                            {% if player.depth_team == depth %}
-                                                                                <div class="d-flex align-items-center">
-                                                                                    {{ player.full_name }}
-                                                                                    {% if player.jersey_number %}
-                                                                                        <span class="text-muted ms-1">#{{ player.jersey_number }}</span>
-                                                                                    {% endif %}
-                                                                                    {% if player.source_display and 'NDP' in player.source_display %}
-                                                                                        <span class="badge bg-warning ms-2" 
-                                                                                              style="font-size: 0.6rem;"
-                                                                                              data-bs-toggle="tooltip" 
-                                                                                              title="This player's data is from NDP (fallback source)">
-                                                                                            NDP
-                                                                                        </span>
-                                                                                    {% endif %}
-                                                                                </div>
-                                                                                {% set player_found = true %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                        {% if not player_found %}
-                                                                            <span class="text-muted"></span>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                {% endfor %}
-                                                            </tr>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
                             </div>
+
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-            </div>
-        </div>
+                
+
+                
+
     </div>
 </div>
 {% endblock %}
 
-{% block styles %}
-<style>
-    .badge {
-        font-weight: 500;
-    }
-    .badge.bg-warning {
-        color: #000;
-    }
-    .table th, .table td {
-        vertical-align: middle;
-        padding: 0.5rem;
-    }
-    .table-group-divider {
-        border-top: 2px solid #dee2e6;
-    }
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-    .badge {
-        font-weight: 500;
-    }
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.025);
-    }
-</style>
-{% endblock %}
-
 {% block scripts %}
 <script>
-    $(document).ready(function() {
-        // Disable DataTables for the depth chart as it breaks the layout
-        // $('table').DataTable({
-        //     "paging": false,
-        //     "searching": false,
-        //     "info": false,
-        //     "ordering": false,
-        //     "responsive": true,
-        //     "dom": 't',
-        //     "columnDefs": [
-        //         { "orderable": true, "targets": [0, 1] },
-        //         { "orderable": false, "targets": "_all" }
-        //     ]
-        // });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Team filtering functionality
+        const teamFilter = document.getElementById('teamFilter');
+        const positionFilter = document.getElementById('positionFilter');
+        const searchInput = document.getElementById('searchInput');
+        const teamCards = document.querySelectorAll('.team-card');
+        const playerRows = document.querySelectorAll('.player-row');
+        
+        // Function to filter teams based on filters
+        function filterTeams() {
+            const selectedTeam = teamFilter.value.toLowerCase();
+            const selectedPosition = positionFilter.value;
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            teamCards.forEach(card => {
+                const teamName = card.getAttribute('data-team').toLowerCase();
+                let teamMatches = !selectedTeam || teamName.includes(selectedTeam);
+                
+                // Check if any player in the team matches the position and search term
+                const playerElements = card.querySelectorAll('.player-row');
+                
+                playerElements.forEach(playerEl => {
+                    const position = playerEl.getAttribute('data-position');
+                    const playerName = playerEl.textContent.toLowerCase();
+                    
+                    const positionMatch = !selectedPosition || position === selectedPosition;
+                    const searchMatch = !searchTerm || playerName.includes(searchTerm);
+                    
+                    if (positionMatch && searchMatch) {
+                        playerEl.style.display = 'flex';
+                    } else {
+                        playerEl.style.display = 'none';
+                    }
+                });
+                
+                // Show/hide position groups based on visible players
+                const positionGroups = card.querySelectorAll('.list-group-item');
+                positionGroups.forEach(group => {
+                    const visiblePlayers = group.querySelectorAll('.player-row[style="display: flex;"]').length;
+                    if (visiblePlayers > 0) {
+                        group.style.display = 'block';
+                    } else {
+                        group.style.display = 'none';
+                    }
+                });
+                
+                // Show/hide team card based on filters
+                const hasVisiblePositionGroups = Array.from(card.querySelectorAll('.list-group-item'))
+                    .some(el => el.style.display !== 'none');
+                
+                if (teamMatches && (hasVisiblePositionGroups || (!selectedPosition && !searchTerm))) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        teamFilter.addEventListener('change', filterTeams);
+        positionFilter.addEventListener('change', filterTeams);
+        searchInput.addEventListener('input', filterTeams);
+        
+
     });
 </script>
 {% endblock %}

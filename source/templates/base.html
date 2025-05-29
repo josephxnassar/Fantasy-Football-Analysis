@@ -1,89 +1,507 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fantasy Football Analysis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    
     <style>
-        body {
-            padding: 20px;
-            background-color: #f8f9fa;
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --body-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-hover: #334155;
+            --text-muted: #94a3b8;
         }
+        
+        [data-bs-theme="light"] {
+            --body-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-hover: #f8fafc;
+            --dark: #1e293b;
+            --text-muted: #64748b;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--body-bg);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
-        }
-        .table-container {
-            background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-top: 20px;
         }
-        h1 {
-            color: #0d6efd;
-            margin-bottom: 30px;
+        
+        .navbar {
+            background: rgba(30, 41, 59, 0.8) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-radius: 16px;
+            padding: 0.5rem 1rem;
         }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-link {
+            position: relative;
+            margin: 0 0.5rem;
+            font-weight: 500;
+            color: #e2e8f0 !important;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #4cc9f0 !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 80%;
+        }
+        
         .card {
-            margin-bottom: 20px;
-            transition: transform 0.2s;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            backdrop-filter: blur(10px);
         }
+        
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(67, 97, 238, 0.3);
         }
+        
+        .card-body {
+            padding: 1.75rem;
+        }
+        
         .card-title {
-            color: #0d6efd;
+            color: #f8f9fa;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .card-text {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #4361ee;
+            color: #4361ee;
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #4361ee;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .theme-switch {
+            width: 50px;
+            height: 26px;
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+        }
+        
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #334155;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4cc9f0;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .slider i {
+            position: absolute;
+            top: 3px;
+            font-size: 1rem;
+            color: white;
+        }
+        
+        .slider .bi-sun {
+            left: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .slider .bi-moon {
+            right: 5px;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        
+        input:checked + .slider .bi-sun {
+            opacity: 1;
+        }
+        
+        input:checked + .slider .bi-moon {
+            opacity: 0;
+        }
+        
+        footer {
+            margin-top: auto;
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4cc9f0;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a9ec4;
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+            
+            .card-body {
+                padding: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h1>Fantasy Football Analysis</h1>
-                <div>
-                    <a href="/" class="btn btn-outline-primary">Home</a>
-                </div>
-            </div>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded">
-                <div class="container-fluid">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/depth_chart">Depth Charts</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/statistics">Player Stats</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/schedules">Schedules</a>
-                            </li>
-                        </ul>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <i class="bi bi-graph-up-arrow me-2"></i>FF Analysis
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'active' if request.path == '/depth_chart' else '' }}" 
+                               href="{{ url_for('depth_chart') }}">
+                                <i class="bi bi-people-fill me-1"></i>Depth Charts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'active' if request.path == '/statistics' else '' }}" 
+                               href="{{ url_for('statistics') }}">
+                                <i class="bi bi-graph-up me-1"></i>Player Stats
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'active' == '/schedules' }}" 
+                               href="{{ url_for('schedules') }}">
+                                <i class="bi bi-calendar3 me-1"></i>Schedules
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="theme-switch-wrapper">
+                            <label class="theme-switch" for="theme-toggle">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="slider round">
+                                    <i class="bi bi-sun"></i>
+                                    <i class="bi bi-moon"></i>
+                                </span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </nav>
-        </header>
+            </div>
+        </nav>
         
-        <main>
+        <!-- Main Content -->
+        <main class="fade-in">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             {% block content %}{% endblock %}
         </main>
         
-        <footer class="mt-5 text-center text-muted">
-            <p>Data last updated: {{ current_time }}</p>
+        <!-- Footer -->
+        <footer class="mt-5">
+            <div class="text-center">
+                <p class="mb-1">© 2024 Fantasy Football Analysis. All rights reserved.</p>
+                <p class="small text-muted">Data last updated: {{ current_time }}</p>
+                <div class="mt-2">
+                    <a href="#" class="text-muted me-2"><i class="bi bi-github"></i></a>
+                    <a href="#" class="text-muted me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-muted"><i class="bi bi-discord"></i></a>
+                </div>
+            </div>
         </footer>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Initialize AOS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Theme Toggle Functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            
+            // Check for saved user preference, if any, on load and set toggle
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                htmlElement.setAttribute('data-bs-theme', 'light');
+                themeToggle.checked = true;
+            }
+            
+            // Toggle theme on button click
+            themeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    htmlElement.setAttribute('data-bs-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    htmlElement.setAttribute('data-bs-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+            
+            // Add smooth scrolling to all links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Add loading animation
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingScreen = document.createElement('div');
+                loadingScreen.id = 'loading-screen';
+                loadingScreen.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: var(--body-bg);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    transition: opacity 0.5s ease, visibility 0.5s ease;
+                `;
+                
+                const spinner = document.createElement('div');
+                spinner.style.cssText = `
+                    width: 50px;
+                    height: 50px;
+                    border: 5px solid rgba(67, 97, 238, 0.2);
+                    border-radius: 50%;
+                    border-top-color: #4361ee;
+                    animation: spin 1s ease-in-out infinite;
+                `;
+                
+                loadingScreen.appendChild(spinner);
+                document.body.appendChild(loadingScreen);
+                
+                // Hide loading screen when page is fully loaded
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        loadingScreen.style.opacity = '0';
+                        loadingScreen.style.visibility = 'hidden';
+                        document.body.style.overflow = 'auto';
+                    }, 500);
+                });
+                
+                // Show loading screen when navigating away
+                window.addEventListener('beforeunload', function() {
+                    loadingScreen.style.opacity = '1';
+                    loadingScreen.style.visibility = 'visible';
+                });
+            });
+            
+            // Add keyframe animation for spinner
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>

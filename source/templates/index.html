@@ -1,73 +1,255 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">Fantasy Football Analysis Dashboard</h2>
-                <p class="card-text">Welcome to your Fantasy Football Analysis dashboard. Use the navigation above or the quick links below to access different sections.</p>
-            </div>
+<!-- Hero Section -->
+<section class="hero-section text-center py-5 mb-5" data-aos="fade-up">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-4 gradient-text">Fantasy Football Analysis</h1>
+        <p class="lead text-muted mb-5">Gain the competitive edge with advanced analytics and insights for your fantasy football team</p>
+        <div class="hero-buttons">
+            <a href="#features" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="bi bi-graph-up-arrow me-2"></i>Explore Features
+            </a>
         </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
-                <h3 class="card-title">Depth Charts</h3>
-                <p class="card-text">View the latest depth charts for all NFL teams with player positions and depth rankings.</p>
-                <a href="{{ url_for('depth_chart') }}" class="btn btn-primary">View Depth Charts</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-graph-up fs-1 text-success mb-3"></i>
-                <h3 class="card-title">Player Statistics</h3>
-                <p class="card-text">Explore detailed player statistics and performance metrics for fantasy analysis.</p>
-                <a href="{{ url_for('statistics') }}" class="btn btn-success">View Player Stats</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-calendar-event fs-1 text-info mb-3"></i>
-                <h3 class="card-title">Team Schedules</h3>
-                <p class="card-text">Check out the NFL team schedules and plan your fantasy matchups.</p>
-                <a href="{{ url_for('schedules') }}" class="btn btn-info text-white">View Schedules</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Raw Data Tables</h3>
-                <p class="card-text">Access the raw data tables for advanced analysis.</p>
-                
-                <div class="row mt-3">
-                    {% for table in tables %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ table }}</h5>
-                                <a href="{{ url_for('show_table', table_name=table) }}" class="btn btn-outline-primary">View Table</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
+        <div class="mt-5">
+            <div class="d-flex justify-content-center gap-4">
+                <div class="text-center">
+                    <div class="display-5 fw-bold text-primary mb-1" id="teamsCount">32</div>
+                    <div class="text-uppercase small text-muted">Teams</div>
+                </div>
+                <div class="vr"></div>
+                <div class="text-center">
+                    <div class="display-5 fw-bold text-primary mb-1" id="playersCount">1,696</div>
+                    <div class="text-uppercase small text-muted">Players</div>
+                </div>
+                <div class="vr"></div>
+                <div class="text-center">
+                    <div class="display-5 fw-bold text-primary mb-1" id="seasonsCount">1</div>
+                    <div class="text-uppercase small text-muted">Season</div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5 mb-5" data-aos="fade-up" data-aos-delay="100">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Power Up Your Fantasy Game</h2>
+            <p class="lead text-muted">Access the tools and insights used by top fantasy football players</p>
+            <div class="divider mx-auto my-4"></div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card hover-lift">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon mx-auto mb-4">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Depth Charts</h3>
+                        <p class="text-muted mb-4">Get up-to-date depth charts for all NFL teams with detailed player positions and depth rankings to make informed roster decisions.</p>
+                        <a href="{{ url_for('depth_chart') }}" class="btn btn-outline-primary stretched-link">
+                            Explore Depth Charts <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card hover-lift">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon mx-auto mb-4">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Player Statistics</h3>
+                        <p class="text-muted mb-4">Dive deep into comprehensive player statistics, advanced metrics, and performance analytics to identify sleepers and busts.</p>
+                        <a href="{{ url_for('statistics') }}" class="btn btn-outline-primary stretched-link">
+                            View Player Stats <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="col-lg-4 col-md-6 mx-auto">
+                <div class="card h-100 feature-card hover-lift">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon mx-auto mb-4">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Team Schedules</h3>
+                        <p class="text-muted mb-4">Plan your fantasy football season with our comprehensive NFL team schedules, including bye weeks and matchup analysis.</p>
+                        <a href="{{ url_for('schedules') }}" class="btn btn-outline-primary stretched-link">
+                            Check Schedules <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize counters animation
+        animateValue('teamsCount', 0, 32, 2000);
+        animateValue('playersCount', 0, 1696, 2000);
+        animateValue('seasonsCount', 0, 1, 1500);
+        
+        // Counter animation function
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = value.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    });
+</script>
+{% endblock %}
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%), 
+                    url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1605&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 16px;
+        padding: 6rem 0;
+        margin-top: -1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 70%, rgba(76, 201, 240, 0.1) 0%, transparent 40%);
+        z-index: 1;
+    }
+    
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .gradient-text {
+        background: linear-gradient(90deg, #4cc9f0, #4361ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    /* Feature Cards */
+    .feature-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px) !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+        border-color: rgba(67, 97, 238, 0.3) !important;
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: #4361ee;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-buttons {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #4361ee, #4cc9f0);
+        border-radius: 2px;
+    }
+    
+    .vr {
+        width: 2px;
+        background: rgba(255, 255, 255, 0.15);
+        margin: 0.5rem 0;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 4rem 0;
+            margin-top: 0;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .display-4 {
+            font-size: 2.5rem;
+        }
+    }
+    
+    /* Animation for cards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    /* Custom scrollbar for tables container */
+    .tables-container {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    /* Custom checkbox */
+    .form-check-input:checked {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+    
+    /* Custom input focus */
+    .form-control:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+</style>

@@ -5,10 +5,22 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title">Player Statistics</h2>
-                <a href="/" class="btn btn-outline-secondary mb-3">
-                    &larr; Back to Home
-                </a>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="card-title mb-0">Player Statistics</h2>
+                    <div>
+                        <a href="{{ url_for('all_statistics') }}" class="btn btn-primary">
+                            <i class="bi bi-table"></i> View All Statistics
+                        </a>
+                        <a href="/" class="btn btn-outline-secondary">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Select a position to view detailed statistics or search for a specific player.
+                </div>
                 
                 <ul class="nav nav-tabs" id="positionTabs" role="tablist">
                     {% for position in positions_data.keys() %}
@@ -28,6 +40,7 @@
                 </ul>
                 
                 <div class="tab-content p-3 border border-top-0 rounded-bottom" id="positionTabsContent">
+                    {% if positions_data %}
                     {% for position, players in positions_data.items() %}
                     <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
                          id="{{ position }}" 
@@ -47,8 +60,16 @@
                                 <tbody>
                                     {% for player in players %}
                                         <tr>
-                                            {% for value in player.values() %}
-                                                <td>{{ value }}</td>
+                                            {% for key, value in player.items() %}
+                                                <td>
+                                                    {% if key.lower() == 'player' or key.lower() == 'name' %}
+                                                        <a href="{{ url_for('player_stats', player_name=value) }}" class="text-decoration-none">
+                                                            {{ value }}
+                                                        </a>
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </td>
                                             {% endfor %}
                                         </tr>
                                     {% endfor %}
@@ -57,7 +78,20 @@
                         </div>
                     </div>
                     {% endfor %}
-                </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-people display-1 text-muted"></i>
+                        </div>
+                        <h3>No Statistics Loaded</h3>
+                        <p class="text-muted">
+                            Player statistics are not currently loaded. Please check back later or contact support.
+                        </p>
+                        <a href="{{ url_for('all_statistics') }}" class="btn btn-primary mt-3">
+                            <i class="bi bi-arrow-repeat"></i> Try Loading Statistics
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -66,27 +100,42 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Initialize DataTables for each position table
-        {% for position in positions_data.keys() %}
-            $('#{{ position }}Table').DataTable({
-                "pageLength": 25,
-                "order": [],
-                "responsive": true,
-                "dom": '<"top"f>rt<"bottom"lip><"clear">',
-                "language": {
-                    "search": "Filter:",
-                    "lengthMenu": "Show _MENU_ entries per page",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                    "infoEmpty": "No entries found",
-                    "infoFiltered": "(filtered from _MAX_ total entries)",
-                    "paginate": {
-                        "previous": "&laquo;",
-                        "next": "&raquo;"
+        const positionsData = {{ positions_data|tojson|safe if positions_data else '{}' }};
+        
+        if (Object.keys(positionsData).length > 0) {
+            Object.keys(positionsData).forEach(function(position) {
+                const tableId = position + 'Table';
+                const tableElement = document.getElementById(tableId);
+                
+                if (tableElement) {
+                    // Destroy existing DataTable if it exists
+                    if ($.fn.DataTable.isDataTable('#' + tableId)) {
+                        $('#' + tableId).DataTable().destroy();
                     }
+                    
+                    // Initialize new DataTable
+                    $('#' + tableId).DataTable({
+                        "pageLength": 25,
+                        "order": [],
+                        "responsive": true,
+                        "dom": '<"top"f>rt<"bottom"lip><"clear">',
+                        "language": {
+                            "search": "Filter:",
+                            "lengthMenu": "Show _MENU_ entries per page",
+                            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                            "infoEmpty": "No entries found",
+                            "infoFiltered": "(filtered from _MAX_ total entries)",
+                            "paginate": {
+                                "previous": "&laquo;",
+                                "next": "&raquo;"
+                            }
+                        }
+                    });
                 }
             });
-        {% endfor %}
+        }
     });
 </script>
 {% endblock %}

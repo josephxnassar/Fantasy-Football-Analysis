@@ -17,10 +17,8 @@ app_data.load()
 
 @app.route('/')
 def index():
-    """Main page that lists all available data tables"""
-    tables = list(app_data.caches.keys())
-    return render_template('index.html', 
-                         tables=tables,
+    """Main page for the Fantasy Football Analysis Tool"""
+    return render_template('index.html',
                          current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 import json
@@ -341,6 +339,45 @@ def depth_chart():
 @app.route('/statistics')
 def statistics():
     """Display player statistics"""
+    return render_template('statistics.html',
+                         positions_data={},
+                         available_positions=[],
+                         current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+@app.route('/player/<player_name>')
+def player_stats(player_name):
+    """Display statistics for a specific player"""
+    if 'Statistics' not in app_data.caches:
+        return "Statistics data not available", 404
+    
+    stats_data = app_data.caches['Statistics']
+    player_data = {}
+    
+    # Search for player in all positions
+    for pos, df in stats_data.items():
+        if df is not None and not df.empty:
+            # Convert index to string and search for player name (case insensitive)
+            player_match = df.index[df.index.str.contains(player_name, case=False, na=False)]
+            if not player_match.empty:
+                player_name = player_match[0]  # Get the actual player name with correct case
+                player_stats = df.loc[[player_name]].to_dict('records')[0]
+                player_data = {
+                    'name': player_name,
+                    'position': pos,
+                    'stats': player_stats
+                }
+                break
+    
+    if not player_data:
+        return f"No statistics found for player: {player_name}", 404
+    
+    return render_template('player_stats.html',
+                         player_data=player_data,
+                         current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+@app.route('/statistics/all')
+def all_statistics():
+    """Display all player statistics"""
     if 'Statistics' not in app_data.caches:
         return "Statistics data not available", 404
     
@@ -384,47 +421,6 @@ def schedules():
                          teams_schedule=teams_schedule,
                          current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-@app.route('/table/<table_name>')
-def show_table(table_name):
-    """Generic table view for other data"""
-    if table_name not in app_data.caches:
-        return f"Table {table_name} not found", 404
-    
-    data = app_data.caches[table_name]
-    
-    # Handle different data structures
-    if hasattr(data, 'to_dict'):
-        records = data.to_dict('records')
-        headers = list(data.columns) if hasattr(data, 'columns') else []
-    elif isinstance(data, dict) and data:
-        # For dictionary of DataFrames, combine them
-        all_records = []
-        for key, df in data.items():
-            if hasattr(df, 'to_dict'):
-                df_records = df.reset_index().to_dict('records')
-                for record in df_records:
-                    record['_source'] = str(key)
-                all_records.extend(df_records)
-        
-        if all_records:
-            headers = list(all_records[0].keys())
-            # Move _source to the beginning if it exists
-            if '_source' in headers:
-                headers.remove('_source')
-                headers.insert(0, '_source')
-            records = all_records
-        else:
-            records = []
-            headers = []
-    else:
-        records = []
-        headers = []
-    
-    return render_template('table.html',
-                         table_name=table_name,
-                         headers=headers,
-                         data=records,
-                         current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 @app.route('/api/<endpoint>')
 def api_endpoint(endpoint):
