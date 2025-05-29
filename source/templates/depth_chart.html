@@ -1,6 +1,54 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% set team_fullnames = {
+    'ARI': 'Arizona Cardinals',
+    'ATL': 'Atlanta Falcons',
+    'BAL': 'Baltimore Ravens',
+    'BUF': 'Buffalo Bills',
+    'CAR': 'Carolina Panthers',
+    'CHI': 'Chicago Bears',
+    'CIN': 'Cincinnati Bengals',
+    'CLE': 'Cleveland Browns',
+    'DAL': 'Dallas Cowboys',
+    'DEN': 'Denver Broncos',
+    'DET': 'Detroit Lions',
+    'GB': 'Green Bay Packers',
+    'HOU': 'Houston Texans',
+    'IND': 'Indianapolis Colts',
+    'JAX': 'Jacksonville Jaguars',
+    'KC': 'Kansas City Chiefs',
+    'LV': 'Las Vegas Raiders',
+    'LAC': 'Los Angeles Chargers',
+    'LAR': 'Los Angeles Rams',
+    'MIA': 'Miami Dolphins',
+    'MIN': 'Minnesota Vikings',
+    'NE': 'New England Patriots',
+    'NO': 'New Orleans Saints',
+    'NYG': 'New York Giants',
+    'NYJ': 'New York Jets',
+    'PHI': 'Philadelphia Eagles',
+    'PIT': 'Pittsburgh Steelers',
+    'SF': 'San Francisco 49ers',
+    'SEA': 'Seattle Seahawks',
+    'TB': 'Tampa Bay Buccaneers',
+    'TEN': 'Tennessee Titans',
+    'WSH': 'Washington Commanders'
+} %}
+<style>
+    .team-logo {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+    .team-fullname {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+</style>
 <div class="container-fluid py-4">
     <!-- Page Header -->
     <div class="page-header mb-4">
@@ -67,9 +115,22 @@
                     {% for team, players in teams_data.items() %}
                     <div class="col-xl-3 col-lg-4 col-md-6 team-card" data-team="{{ team }}">
                         <div class="card h-100 shadow-sm">
-                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25 d-flex justify-content-between align-items-center">
-                                <h3 class="h5 mb-0">{{ team }}</h3>
-                                <span class="badge bg-primary rounded-pill">{{ players|length }} players</span>
+                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center">
+                                        {% set team_name = team_fullnames.get(team, team).replace(' ', '_') %}
+                                        <img src="{{ url_for('static', filename='images/teams/' + team_name + '_logo.svg') }}" 
+                                             alt="{{ team }} logo" 
+                                             class="team-logo me-2"
+                                             data-fallback-src="{{ url_for('static', filename='images/teams/default_logo.svg') }}"
+                                             onerror="this.onerror=null; this.src=this.dataset.fallbackSrc">
+                                        <h3 class="h5 mb-0">{{ team }}</h3>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ players|length }} players</span>
+                                </div>
+                                <div class="team-fullname small text-muted">
+                                    {{ team_fullnames.get(team, team) }}
+                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <ul class="list-group list-group-flush">
