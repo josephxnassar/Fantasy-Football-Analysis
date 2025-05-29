@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-people-fill me-2"></i>NFL Depth Charts
+                </h2>
+                <a href="/" class="btn btn-outline-secondary mb-3">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+                
+                <!-- Team Selection Tabs -->
+                <ul class="nav nav-tabs mb-4" id="teamTabs" role="tablist">
+                    {% for team in team_names %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                id="{{ team }}-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#{{ team }}" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="{{ team }}"
+                                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                            {{ team }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <!-- Team Content Tabs -->
+                <div class="tab-content" id="teamTabsContent">
+                    {% for team, players in teams_data.items() %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                         id="{{ team }}" 
+                         role="tabpanel" 
+                         aria-labelledby="{{ team }}-tab">
+                        
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">{{ team }} Depth Chart</h4>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th style="width: 15%;">Position</th>
+                                                <th style="width: 21.25%;">Starter</th>
+                                                <th style="width: 21.25%;">Backup</th>
+                                                <th style="width: 21.25%;">Third String</th>
+                                                <th style="width: 21.25%;">Fourth String</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% set position_groups = {
+                                                'Quarterbacks': ['QB'],
+                                                'Running Backs': ['RB', 'FB'],
+                                                'Wide Receivers': ['WR1', 'WR2', 'WR3', 'WR'],
+                                                'Tight Ends': ['TE'],
+                                                'Offensive Line': ['LT', 'LG', 'C', 'RG', 'RT', 'OL'],
+                                                'Defensive Line': ['LDE', 'RDE', 'NT', 'DT', 'LDT', 'RDT', 'DE'],
+                                                'Linebackers': ['LOLB', 'MLB', 'ROLB', 'ILB', 'OLB', 'LB'],
+                                                'Cornerbacks': ['LCB', 'RCB', 'CB', 'DB'],
+                                                'Safeties': ['SS', 'FS', 'S'],
+                                                'Special Teams': ['K', 'P', 'LS', 'H', 'PR', 'KR']
+                                            } %}
+
+                                            {% for group_name, group_positions in position_groups.items() %}
+                                                {% set group_players = [] %}
+                                                {% for pos in group_positions %}
+                                                    {% for player in players if player.position == pos %}
+                                                        {% set _ = group_players.append(player) %}
+                                                    {% endfor %}
+                                                {% endfor %}
+
+                                                {% if group_players|length > 0 %}
+                                                    <tr class="table-group-divider">
+                                                        <td colspan="5" class="bg-light fw-bold">{{ group_name }}</td>
+                                                    </tr>
+                                                    
+                                                    {% for pos in group_positions %}
+                                                        {% set pos_players = players|selectattr('position', 'equalto', pos)|list %}
+                                                        {% if pos_players|length > 0 %}
+                                                            <tr>
+                                                                <td class="fw-bold">
+                                                                    {% if pos in ['WR1', 'WR2', 'WR3'] %}
+                                                                        {{ {'WR1': 'WR1 (X)', 'WR2': 'WR2 (Z)', 'WR3': 'WR3 (Slot)'}[pos] }}
+                                                                    {% else %}
+                                                                        {{ pos }}
+                                                                        {% if pos in ['LT', 'LG', 'C', 'RG', 'RT'] %}
+                                                                            <small class="text-muted d-block">{{ {'LT': 'Left Tackle', 'LG': 'Left Guard', 'C': 'Center', 'RG': 'Right Guard', 'RT': 'Right Tackle'}[pos] }}</small>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                </td>
+                                                                {% for depth in [1, 2, 3, 4] %}
+                                                                    {% set player_found = false %}
+                                                                    <td>
+                                                                        {% for player in pos_players %}
+                                                                            {% if player.depth_team == depth %}
+                                                                                <div class="d-flex align-items-center">
+                                                                                    {{ player.full_name }}
+                                                                                    {% if player.jersey_number %}
+                                                                                        <span class="text-muted ms-1">#{{ player.jersey_number }}</span>
+                                                                                    {% endif %}
+                                                                                    {% if player.source_display and 'NDP' in player.source_display %}
+                                                                                        <span class="badge bg-warning ms-2" 
+                                                                                              style="font-size: 0.6rem;"
+                                                                                              data-bs-toggle="tooltip" 
+                                                                                              title="This player's data is from NDP (fallback source)">
+                                                                                            NDP
+                                                                                        </span>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                                {% set player_found = true %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        {% if not player_found %}
+                                                                            <span class="text-muted"></span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .badge {
+        font-weight: 500;
+    }
+    .badge.bg-warning {
+        color: #000;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+        padding: 0.5rem;
+    }
+    .table-group-divider {
+        border-top: 2px solid #dee2e6;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.025);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Disable DataTables for the depth chart as it breaks the layout
+        // $('table').DataTable({
+        //     "paging": false,
+        //     "searching": false,
+        //     "info": false,
+        //     "ordering": false,
+        //     "responsive": true,
+        //     "dom": 't',
+        //     "columnDefs": [
+        //         { "orderable": true, "targets": [0, 1] },
+        //         { "orderable": false, "targets": "_all" }
+        //     ]
+        // });
+    });
+</script>
+{% endblock %}

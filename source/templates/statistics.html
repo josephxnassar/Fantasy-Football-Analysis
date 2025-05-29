@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Player Statistics</h2>
+                <a href="/" class="btn btn-outline-secondary mb-3">
+                    &larr; Back to Home
+                </a>
+                
+                <ul class="nav nav-tabs" id="positionTabs" role="tablist">
+                    {% for position in positions_data.keys() %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                id="{{ position }}-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#{{ position }}" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="{{ position }}"
+                                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                            {{ position }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <div class="tab-content p-3 border border-top-0 rounded-bottom" id="positionTabsContent">
+                    {% for position, players in positions_data.items() %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                         id="{{ position }}" 
+                         role="tabpanel" 
+                         aria-labelledby="{{ position }}-tab">
+                        <div class="table-responsive">
+                            <table id="{{ position }}Table" class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        {% if players %}
+                                            {% for key in players[0].keys() %}
+                                                <th>{{ key }}</th>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for player in players %}
+                                        <tr>
+                                            {% for value in player.values() %}
+                                                <td>{{ value }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTables for each position table
+        {% for position in positions_data.keys() %}
+            $('#{{ position }}Table').DataTable({
+                "pageLength": 25,
+                "order": [],
+                "responsive": true,
+                "dom": '<"top"f>rt<"bottom"lip><"clear">',
+                "language": {
+                    "search": "Filter:",
+                    "lengthMenu": "Show _MENU_ entries per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "No entries found",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "paginate": {
+                        "previous": "&laquo;",
+                        "next": "&raquo;"
+                    }
+                }
+            });
+        {% endfor %}
+    });
+</script>
+{% endblock %}

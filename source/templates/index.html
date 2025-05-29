@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Fantasy Football Analysis Dashboard</h2>
+                <p class="card-text">Welcome to your Fantasy Football Analysis dashboard. Use the navigation above or the quick links below to access different sections.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
+                <h3 class="card-title">Depth Charts</h3>
+                <p class="card-text">View the latest depth charts for all NFL teams with player positions and depth rankings.</p>
+                <a href="{{ url_for('depth_chart') }}" class="btn btn-primary">View Depth Charts</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up fs-1 text-success mb-3"></i>
+                <h3 class="card-title">Player Statistics</h3>
+                <p class="card-text">Explore detailed player statistics and performance metrics for fantasy analysis.</p>
+                <a href="{{ url_for('statistics') }}" class="btn btn-success">View Player Stats</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-event fs-1 text-info mb-3"></i>
+                <h3 class="card-title">Team Schedules</h3>
+                <p class="card-text">Check out the NFL team schedules and plan your fantasy matchups.</p>
+                <a href="{{ url_for('schedules') }}" class="btn btn-info text-white">View Schedules</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Raw Data Tables</h3>
+                <p class="card-text">Access the raw data tables for advanced analysis.</p>
+                
+                <div class="row mt-3">
+                    {% for table in tables %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ table }}</h5>
+                                <a href="{{ url_for('show_table', table_name=table) }}" class="btn btn-outline-primary">View Table</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
