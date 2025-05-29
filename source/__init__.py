@@ -1,7 +1,7 @@
 from .database.service import *
 from .depth_chart import *
 from .output import *
-from .statistics import *
 from .schedules import *
+from .statistics import *
 
-__all__ = ['Excel', 'SQLService', 'NDPDepthChart', 'ESPNDepthChart', 'Statistics', 'Schedules']
+__all__ = ['SQLService', 'Excel', 'ESPNDepthChart', 'NDPDepthChart', 'Schedules', 'Statistics']

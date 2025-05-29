@@ -1,3 +1,3 @@
-from .sqlite_DAO import SQLiteCacheManager
+from .sqlite_dao import SQLiteCacheManager
 
 __all__ = ['SQLiteCacheManager']
