@@ -2,6 +2,9 @@ import logging
 from flask import Flask, render_template, jsonify, request
 from source.app import App
 from source.util import constants
+from source.util.teams import TEAM_FULLNAMES
+from source.util.team_colors import TEAM_COLORS
+from source.util.team_colors import get_team_colors
 import pandas as pd
 from datetime import datetime
 
@@ -318,11 +321,19 @@ def depth_chart():
         for team, source in team_sources.items():
             print(f"{team}: {source}")
         
+        # Prepare team colors data
+        team_colors = {team: TEAM_COLORS.get(team, {
+            'primary': '#343a40',
+            'secondary': '#6c757d',
+            'accent': '#ffffff'
+        }) for team in all_teams_data.keys()}
+        
         return render_template('depth_chart.html',
                             teams_data=all_teams_data,
                             positions=positions,
                             team_names=team_names,
                             team_sources=team_sources,
+                            team_colors=team_colors,
                             current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
     except Exception as e:
@@ -334,6 +345,7 @@ def depth_chart():
                             positions=[], 
                             team_names=[],
                             team_sources={},
+                            team_colors={},
                             current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 @app.route('/statistics')
@@ -347,29 +359,144 @@ def statistics():
 @app.route('/player/<player_name>')
 def player_stats(player_name):
     """Display statistics for a specific player"""
+    print("\n" + "="*80)
+    print(f"PLAYER STATS REQUEST: {player_name}")
+    print("="*80)
+    
     if 'Statistics' not in app_data.caches:
+        print("ERROR: Statistics data not found in caches")
         return "Statistics data not available", 404
     
     stats_data = app_data.caches['Statistics']
+    
+    # Try to get depth chart data from both possible cache keys
+    depth_chart_data = {}
+    if 'DepthChart' in app_data.caches:
+        depth_chart_data = app_data.caches['DepthChart']
+        print("Found DepthChart in caches")
+    elif 'ESPNDepthChart' in app_data.caches:
+        depth_chart_data = app_data.caches['ESPNDepthChart']
+        print("Using ESPNDepthChart as fallback")
+    else:
+        print("No depth chart data found in any cache")
+    
+    # Debug: Print the structure of the depth chart data
+    print("\n=== DEPTH CHART DATA STRUCTURE ===")
+    if isinstance(depth_chart_data, dict):
+        print(f"Depth chart data type: dict with {len(depth_chart_data)} teams")
+        if depth_chart_data:
+            first_team = next(iter(depth_chart_data.items()))
+            print(f"First team: {first_team[0]} (type: {type(first_team[1])})")
+            if isinstance(first_team[1], dict):
+                print(f"  Positions: {list(first_team[1].keys())}")
+                if first_team[1]:
+                    first_pos = next(iter(first_team[1].items()))
+                    print(f"  First position: {first_pos[0]} (type: {type(first_pos[1])})")
+                    if isinstance(first_pos[1], list) and first_pos[1]:
+                        print(f"    First player: {first_pos[1][0]}")
+    else:
+        print(f"Unexpected depth chart data type: {type(depth_chart_data)}")
     player_data = {}
     
-    # Search for player in all positions
+    print(f"\n=== DEBUG: Looking for player: {player_name} ===")
+    print(f"Available caches: {list(app_data.caches.keys())}")
+    
+    # Debug: Print first few players from each position
+    print("\nSample players from each position:")
     for pos, df in stats_data.items():
         if df is not None and not df.empty:
+            print(f"  {pos}: {df.index.tolist()[:5]}...")
+    
+    # Search for player in all positions
+    player_found = False
+    for pos, df in stats_data.items():
+        if df is not None and not df.empty:
+            print(f"\nSearching in {pos}...")
             # Convert index to string and search for player name (case insensitive)
-            player_match = df.index[df.index.str.contains(player_name, case=False, na=False)]
-            if not player_match.empty:
+            player_match = [name for name in df.index if str(name).lower() == player_name.lower()]
+            if not player_match:
+                # Try partial match if exact match not found
+                player_match = [name for name in df.index if player_name.lower() in str(name).lower()]
+            
+            if player_match:
                 player_name = player_match[0]  # Get the actual player name with correct case
+                print(f"  Found match: {player_name}")
                 player_stats = df.loc[[player_name]].to_dict('records')[0]
+                print(f"\n=== PLAYER STATS STRUCTURE ===")
+                print(f"Player: {player_name}")
+                print("Available stats:")
+                for key, value in player_stats.items():
+                    print(f"  {key}: {value}")
+                print("="*40)
                 player_data = {
                     'name': player_name,
                     'position': pos,
-                    'stats': player_stats
+                    'stats': player_stats,
+                    'team': None,
+                    'team_logo': None
                 }
+                player_found = True
+                print(f"  Player data: {player_data}")
                 break
     
-    if not player_data:
+    if not player_found:
+        print(f"\nERROR: Could not find player '{player_name}' in any position")
         return f"No statistics found for player: {player_name}", 404
+    
+    # If we found the player, try to find their team from depth chart
+    if depth_chart_data:
+        print("\nSearching depth chart data for team...")
+        print(f"Depth chart data structure: {type(depth_chart_data)}")
+        
+        for team, team_df in depth_chart_data.items():
+            if not isinstance(team_df, pd.DataFrame):
+                print(f"Skipping team {team}: not a DataFrame")
+                continue
+                
+            # Check if this is the player's team by looking for their name in the DataFrame
+            for _, row in team_df.iterrows():
+                for col in team_df.columns:  # Check each depth level column
+                    player_info = row[col]
+                    if pd.isna(player_info) or not player_info:
+                        continue
+                        
+                    # Extract player name from the cell (format might be "1. Player Name" or just "Player Name")
+                    player_str = str(player_info).split('. ')[-1].strip()
+                    
+                    # Simple name comparison (case insensitive)
+                    if player_name.lower() == player_str.lower():
+                        player_data['team'] = team
+                        team_fullname = TEAM_FULLNAMES.get(team, team).replace(' ', '_')
+                        player_data['team_logo'] = f"static/images/teams/{team_fullname}_logo.svg"
+                        # Add team colors to player data
+                        colors = get_team_colors(team)
+                        player_data['team_colors'] = colors
+                        print(f"\nFOUND TEAM MATCH!")
+                        print(f"  Player: {player_name}")
+                        print(f"  Team: {team}")
+                        print(f"  Colors: {colors}")
+                        
+                        # Debug: Print the exact values being used
+                        print("\n=== DEBUG: Team Colors ===")
+                        print(f"Primary: {colors['primary']}")
+                        print(f"Secondary: {colors['secondary']}")
+                        print(f"Accent: {colors['accent']}")
+                        break
+                        
+                if player_data.get('team'):
+                    break
+                    
+            if player_data.get('team'):
+                break
+    else:
+        print("\nNo depth chart data available")
+    
+    print("\n" + "="*80)
+    print(f"FINAL PLAYER DATA:")
+    print(f"  Name: {player_data.get('name')}")
+    print(f"  Team: {player_data.get('team', 'Not found')}")
+    print(f"  Logo: {player_data.get('team_logo', 'Not found')}")
+    print("="*80 + "\n")
     
     return render_template('player_stats.html',
                          player_data=player_data,

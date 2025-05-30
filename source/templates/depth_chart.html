@@ -47,6 +47,26 @@
     }
     .card-header {
         padding: 0.75rem 1rem;
+        color: white;
+        border: none;
+        box-shadow: none;
+        position: relative;
+        overflow: hidden;
+    }
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, var(--team-primary) 0%, var(--team-secondary) 100%);
+        z-index: 0;
+        opacity: 0.9;
+    }
+    .card-header > * {
+        position: relative;
+        z-index: 1;
     }
 </style>
 <div class="container-fluid py-4">
@@ -115,7 +135,7 @@
                     {% for team, players in teams_data.items() %}
                     <div class="col-xl-3 col-lg-4 col-md-6 team-card" data-team="{{ team }}">
                         <div class="card h-100 shadow-sm">
-                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
+                            <div class="card-header" style="--team-primary: {{ team_colors[team].primary }}; --team-secondary: {{ team_colors[team].secondary }}; background: linear-gradient(90deg, {{ team_colors[team].primary }} 0%, {{ team_colors[team].secondary }} 100%);">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div class="d-flex align-items-center">
                                         {% set team_name = team_fullnames.get(team, team).replace(' ', '_') %}
@@ -124,12 +144,12 @@
                                              class="team-logo me-2"
                                              data-fallback-src="{{ url_for('static', filename='images/teams/default_logo.svg') }}"
                                              onerror="this.onerror=null; this.src=this.dataset.fallbackSrc">
-                                        <h3 class="h5 mb-0">{{ team }}</h3>
+                                        <div>
+                                            <div class="team-fullname fw-medium">{{ team_fullnames.get(team, team) }}</div>
+                                            <div class="text-white-50 small">{{ team }}</div>
+                                        </div>
                                     </div>
-                                    <span class="badge bg-primary rounded-pill">{{ players|length }} players</span>
-                                </div>
-                                <div class="team-fullname small text-muted">
-                                    {{ team_fullnames.get(team, team) }}
+                                    <span class="badge bg-white text-dark rounded-pill">{{ players|length }} players</span>
                                 </div>
                             </div>
                             <div class="card-body p-0">
