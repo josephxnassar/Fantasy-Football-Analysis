@@ -12,14 +12,14 @@ class BaseSource(ABC):
         self.cache = {}
         self.seasons = seasons
 
+    def get_keys(self) -> list:
+        return constants.TEAMS
+
     def get_cache(self) -> dict:
         return self.cache
 
     def set_cache(self, cache: dict) -> None:
         self.cache = cache
-
-    def get_keys(self) -> list:
-        return constants.TEAMS
 
     @abstractmethod
     def _load(self) -> pd.DataFrame:
