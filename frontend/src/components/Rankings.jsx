@@ -8,16 +8,15 @@ export default function Rankings() {
   const [error, setError] = useState(null);
   const [format, setFormat] = useState('redraft');
   const [position, setPosition] = useState(null);
-  const [model, setModel] = useState('ridge');
 
   useEffect(() => {
     fetchRankings();
-  }, [format, position, model]);
+  }, [format, position]);
 
   const fetchRankings = async () => {
     try {
       setLoading(true);
-      const response = await getRankings(format, position, model);
+      const response = await getRankings(format, position, 'ridge');
       setRankings(response.data);
       setError(null);
     } catch (err) {
@@ -53,15 +52,6 @@ export default function Rankings() {
             <option value="RB">RB</option>
             <option value="WR">WR</option>
             <option value="TE">TE</option>
-          </select>
-        </div>
-
-        <div className="control-group">
-          <label>Model:</label>
-          <select value={model} onChange={(e) => setModel(e.target.value)}>
-            <option value="linear">Linear</option>
-            <option value="ridge">Ridge</option>
-            <option value="lasso">Lasso</option>
           </select>
         </div>
       </div>
