@@ -6,23 +6,38 @@ This project provides a suite of tools to collect, process, and analyze NFL play
 
 ## 📂 Modules
 
-### 1. [`Statistics`](./source/statistics/statistics.py)
+### 1. [`Statistics`](./backend/statistics/statistics.py)
 Processes NFL seasonal data by organizing into position and running a regression algorithm.
 
-### 2. [`Schedules`](./source/schedules/schedules.py)
+### 2. [`Schedules`](./backend/schedules/schedules.py)
 Processes NFL schedule data by inserting bye weeks where games are missing from the schedule.
 
-### 3. [`NDPDepthChart`](./source/depth_chart/ndp.py)
+### 3. [`NDPDepthChart`](./backend/depth_chart/ndp.py)
 Retrieves offensive player depth charts from `nfl_data_py`.  
 
-### 4. [`ESPNDepthChart`](./source/depth_chart/espn.py)
+### 4. [`ESPNDepthChart`](./backend/depth_chart/espn.py)
 Scrapes player depth chart information directly from ESPN’s website.  
 
 ---
 
 ## ▶️ Running the Program
 
-To successfully run the project, follow these steps:
+### Quick Start (All-in-One)
+
+Run both backend and frontend servers simultaneously:
+
+**Windows (PowerShell):**
+```powershell
+.\dev-startup.ps1
+```
+
+This will open two terminal windows:
+- Backend API on `http://localhost:8000`
+- Frontend on `http://localhost:3000`
+
+### Manual Setup
+
+To run each component individually:
 
 ### 1. 📦 Install Dependencies
 Install required Python packages using `pip`:
