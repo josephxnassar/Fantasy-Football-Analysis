@@ -1,0 +1,13 @@
+# Ignore dependencies
+node_modules/
+.DS_Store
+*.log
+
+# Build output
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
