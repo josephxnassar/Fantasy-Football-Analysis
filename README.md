@@ -75,7 +75,7 @@ excel.output_dfs(espn.run(), "output_sheet")
 excel.close()
 ```
 
-To calculate nnd sort statistics by rating:
+To calculate and sort statistics by rating:
 
 ```python
 from source.statistics.statistics import Statistics

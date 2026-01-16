@@ -83,7 +83,7 @@ export default function Rankings() {
                   <tr key={idx}>
                     <td>{idx + 1}</td>
                     <td>{player.name || player[Object.keys(player)[0]]}</td>
-                    <td>{(player.rating || player[Object.keys(player).find(k => k === 'rating')]).toFixed(2)}</td>
+                    <td>{typeof player.rating === 'number' ? player.rating.toFixed(2) : (player.rating && !isNaN(Number(player.rating)) ? Number(player.rating).toFixed(2) : 'N/A')}</td>
                   </tr>
                 ))}
               </tbody>
