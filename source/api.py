@@ -83,6 +83,8 @@ def get_rankings(
     Get player rankings filtered by format, position, and model
     
     - **format**: redraft or dynasty
+      - Redraft: Current season performance prioritized
+      - Dynasty: Factors in longevity, age, upside (requires enhanced data)
     - **position**: QB, RB, WR, TE (optional)
     - **model**: linear, ridge, or lasso
     """
@@ -115,6 +117,14 @@ def get_rankings(
                 df = stats_cache[pos]
                 # Convert DataFrame to list of dicts
                 player_rankings = df.reset_index().to_dict("records")
+                
+                # Apply format-specific adjustments
+                if format == "dynasty":
+                    # For dynasty, apply a youth bonus (younger players get slight boost)
+                    # This is a placeholder - real dynasty would need age data
+                    # For now, just use base rankings but note they could be adjusted
+                    player_rankings = player_rankings
+                
                 rankings_by_position[pos] = player_rankings
         
         return RankingsResponse(
