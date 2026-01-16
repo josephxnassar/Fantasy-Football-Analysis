@@ -130,25 +130,6 @@ export default function PlayerSearch() {
                       ))}
                     </div>
                   </div>
-
-                  {playerDetails.schedule && playerDetails.schedule.length > 0 && (
-                    <div className="schedule-section">
-                      <h3>Upcoming Schedule</h3>
-                      <div className="schedule-list">
-                        {playerDetails.schedule.map((game, idx) => (
-                          <div key={idx} className="schedule-item">
-                            <span className="week">Week {game.week}</span>
-                            <span className="opponent">vs {game.opponent}</span>
-                            {game.matchup_quality && (
-                              <span className={`matchup-quality quality-${game.matchup_quality}`}>
-                                {game.matchup_quality.toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </>
             )}

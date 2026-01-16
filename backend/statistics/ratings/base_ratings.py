@@ -14,12 +14,3 @@ class BaseRatings(ABC):
     @abstractmethod
     def get_ratings(self) -> pd.Series:
         pass
-
-    def evaluate(self, X_test: pd.DataFrame, y_test: pd.Series) -> float:
-        if self.model is None:
-            raise RuntimeError("Model has not been trained yet.")
-        if hasattr(self.model, "score"):
-            return self.model.score(X_test, y_test)
-        else:
-            raise NotImplementedError("Evaluation not implemented for this model.")
-        

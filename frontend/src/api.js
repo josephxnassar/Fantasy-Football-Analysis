@@ -9,9 +9,9 @@ const api = axios.create({
   },
 });
 
-export const getRankings = (format = 'redraft', position = null, model = 'ridge') => {
+export const getRankings = (format = 'redraft', position = null) => {
   return api.get('/rankings', {
-    params: { format, position, model },
+    params: { format, position },
   });
 };
 

@@ -19,7 +19,7 @@ export default function Rankings() {
   const fetchRankings = async () => {
     try {
       setLoading(true);
-      const response = await getRankings(format, position, 'ridge');
+      const response = await getRankings(format, position);
       setRankings(response.data);
       setError(null);
     } catch (err) {

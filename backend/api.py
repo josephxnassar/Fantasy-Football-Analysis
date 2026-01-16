@@ -29,12 +29,6 @@ app = App()
 app.load()  # Load cached data
 
 
-@api.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
-    """Handle HTTP exceptions with proper response format"""
-    return {"error": exc.detail}
-
-
 @api.get("/")
 def read_root():
     """Root endpoint - API status"""

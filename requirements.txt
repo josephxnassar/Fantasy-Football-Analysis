@@ -4,7 +4,6 @@ nfl_data_py
 scikit-learn
 beautifulsoup4
 requests
-xlwings
 pytest
 pytest-mock
 fastapi

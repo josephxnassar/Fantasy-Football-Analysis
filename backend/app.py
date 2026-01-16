@@ -11,7 +11,7 @@ class App:
         for instance in instances:
             instance.run()
             self.caches[instance.__class__.__name__] = instance.get_cache()
-        
+    
     def save(self):
         for name, cache in self.caches.items():
             self.db.save_to_db(cache, name)
@@ -22,11 +22,3 @@ class App:
         for instance in instances:
             name = instance.__class__.__name__
             self.caches[name] = self.db.load_from_db(instance.get_keys(), name)
-
-    def output(self):
-        excel = Excel()
-
-        for name, cache in self.caches.items():
-            excel.output_dfs(cache, name)
-
-        excel.close()
