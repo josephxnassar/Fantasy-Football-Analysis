@@ -49,7 +49,6 @@ pip install -r requirements.txt
 
 Required Python packages:
 - `pandas`
-- `xlwings`
 - `scikit-learn`
 - `beautifulsoup4`
 - `requests`
@@ -58,14 +57,16 @@ Required Python packages:
 - `uvicorn`
 - `pydantic`
 
-*Note: `xlwings` may require Microsoft Excel to be installed locally.*
-
 #### 2. 🎨 Install Frontend Dependencies
+
+**Requirements:** Node.js 16+ and npm (comes with Node.js)
 
 ```bash
 cd frontend
 npm install
 ```
+
+This will install React 18.2, Vite, Axios, and all other frontend dependencies.
 
 #### 3. 🚀 Start Backend API
 
@@ -100,7 +101,7 @@ backend/              # Backend Python code (FastAPI)
 │   └── espn.py
 ├── statistics/      # Player rating calculations
 │   └── ratings/
-├── schedules/       # Schedule processing
+├── schedules/       # Ussing
 ├── database/        # SQLite cache layer
 │   ├── DAO/
 │   └── service/
@@ -180,7 +181,6 @@ Each module's detailed documentation:
 - [`schedules.md`](./docs/schedules.md) - Schedule data processing
 - [`ndpdepthchart.md`](./docs/ndp.md) - NFL Data Py depth chart integration
 - [`espndepthchart.md`](./docs/espn.md) - ESPN depth chart scraping
-- [`excel.md`](./docs/excel.md) - Excel export functionality
 - [`import_seasonal_data.md`](./docs/import_seasonal_data.md) - Data import guide
 
 ---
