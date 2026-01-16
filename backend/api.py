@@ -81,26 +81,22 @@ def read_root():
 def get_rankings(
     format: str = "redraft",  # redraft or dynasty
     position: str = None,      # QB, RB, WR, TE or None for all
-    model: str = "ridge"       # linear, ridge, or lasso
+    model: str = "ridge"       # ridge regression (default, optimal model)
 ):
     """
-    Get player rankings filtered by format, position, and model
+    Get player rankings filtered by format and position
     
     - **format**: redraft or dynasty
       - Redraft: Current season performance prioritized
       - Dynasty: Factors in longevity, age, upside (requires enhanced data)
     - **position**: QB, RB, WR, TE (optional)
-    - **model**: linear, ridge, or lasso
     """
     # Validate inputs
     valid_formats = ["redraft", "dynasty"]
     valid_positions = ["QB", "RB", "WR", "TE"]
-    valid_models = ["linear", "ridge", "lasso"]
     
     if format not in valid_formats:
         raise HTTPException(status_code=400, detail=f"Invalid format. Must be one of: {', '.join(valid_formats)}")
-    if model not in valid_models:
-        raise HTTPException(status_code=400, detail=f"Invalid model. Must be one of: {', '.join(valid_models)}")
     if position and position not in valid_positions:
         raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
     

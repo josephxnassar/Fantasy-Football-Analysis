@@ -140,7 +140,7 @@ requirements.txt     # Python dependencies
 
 Base URL: `http://localhost:8000`
 
-- `GET /rankings` - Get player rankings with filters (format, position, model)
+- `GET /rankings` - Get player rankings with filters (format, position)
 - `GET /player/{player_id}` - Get detailed player info
 - `GET /schedule/{team}` - Get team schedule
 - `GET /search?q=query` - Search players by name
@@ -155,7 +155,7 @@ All endpoints support CORS for frontend integration.
 
 ### Features
 
-- **Rankings**: View player rankings with customizable filters (format, position, model)
+- **Rankings**: View player rankings with customizable filters (format, position)
 - **Player Search**: Search and view detailed player statistics and schedules
 - **Streaming Recommendations**: Weekly suggestions by position based on defense matchups
 - **Defense Analysis**: Tier-based opponent strength visualization
