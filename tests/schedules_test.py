@@ -2,7 +2,7 @@ import pandas as pd
 
 from pytest_mock import MockerFixture
 
-from source.schedules.schedules import Schedules
+from backend.schedules.schedules import Schedules
 
 def test_load(mocker):
     df = pd.DataFrame({'game_type': ['REG', 'REG'],

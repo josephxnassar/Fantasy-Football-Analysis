@@ -2,7 +2,7 @@ import pandas as pd
 
 from pytest_mock import MockerFixture
 
-from source.depth_chart.ndp import NDPDepthChart
+from backend.depth_chart.ndp import NDPDepthChart
 
 def test_load(mocker: MockerFixture):
     df = pd.DataFrame({"week":          [ 1,         1        ],

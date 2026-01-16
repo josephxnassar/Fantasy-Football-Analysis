@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 from pytest_mock import MockerFixture
 
-from source.output.excel import Excel
+from backend.output.excel import Excel
 
 filename = "test.xlsx"
 

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 from pytest_mock import MockerFixture
 
-from source.depth_chart.espn import ESPNDepthChart
+from backend.depth_chart.espn import ESPNDepthChart
 
 def test_get_soup_success(mocker: MockerFixture):
     mock_response = mocker.Mock()

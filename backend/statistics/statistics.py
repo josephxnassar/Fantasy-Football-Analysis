@@ -4,9 +4,9 @@ from collections import defaultdict
 import pandas as pd
 import nfl_data_py as nfl
 
-from source.util import constants
-from source.base_source import BaseSource
-from source.statistics.ratings import *
+from backend.util import constants
+from backend.base_source import BaseSource
+from backend.statistics.ratings import *
 
 logger = logging.getLogger(__name__)
 

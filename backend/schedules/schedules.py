@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import nfl_data_py as nfl
 
-from source.base_source import BaseSource
+from backend.base_source import BaseSource
 
 logger = logging.getLogger(__name__)
 

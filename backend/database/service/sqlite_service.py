@@ -1,6 +1,6 @@
 import logging
 
-from source.database.DAO import SQLiteCacheManager
+from backend.database.DAO import SQLiteCacheManager
 
 logger = logging.getLogger(__name__)
 

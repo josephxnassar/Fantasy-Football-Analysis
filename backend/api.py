@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from source.app import App
-from source.models import (
+from backend.app import App
+from backend.models import (
     RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse,
     SearchResponse, StreamingRecommendation
 )
@@ -277,7 +277,7 @@ def search_players(q: str, position: str = None):
         # Sort by rating descending
         results.sort(key=lambda x: x["rating"], reverse=True)
         
-        from source.models import SearchResponse
+        from backend.models import SearchResponse
         return SearchResponse(
             query=q,
             results=results[:20],  # Limit to 20 results
@@ -313,7 +313,7 @@ def get_streaming_recommendations(position: str, week: int = 1):
         
         recommendation = f"Start all {position.upper()}s against {', '.join(elite_opponents[:2] if elite_opponents else ['none'])} | Avoid vs {', '.join(bad_opponents[:2] if bad_opponents else ['none'])}"
         
-        from source.models import StreamingRecommendation
+        from backend.models import StreamingRecommendation
         return StreamingRecommendation(
             week=week,
             position=position.upper(),

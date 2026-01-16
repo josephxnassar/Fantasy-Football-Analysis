@@ -4,8 +4,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from source.util import constants
-from source.base_source import BaseSource
+from backend.util import constants
+from backend.base_source import BaseSource
 
 logger = logging.getLogger(__name__)
 

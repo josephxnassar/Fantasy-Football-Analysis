@@ -2,7 +2,7 @@ import pandas as pd
 
 from pytest_mock import MockerFixture
 
-from source.statistics.statistics import Statistics
+from backend.statistics.statistics import Statistics
 
 def test_load_key(mocker: MockerFixture):
     df = pd.DataFrame({"player_id":            ["00-0031234",      "00-0035678"  ],

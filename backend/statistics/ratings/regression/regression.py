@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from source.statistics.ratings.base_ratings import BaseRatings
+from backend.statistics.ratings.base_ratings import BaseRatings
 
 logger = logging.getLogger(__name__)
 

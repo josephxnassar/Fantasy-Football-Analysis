@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from abc import ABC, abstractmethod
-from source.util import constants
+from backend.util import constants
 
 logger = logging.getLogger(__name__)
 
