@@ -128,3 +128,33 @@ class ErrorResponse(BaseModel):
                 "detail": "Player 'Unknown Player' does not exist in the database"
             }
         }
+
+
+class MatchupQuality(BaseModel):
+    """Matchup quality rating for a position vs opponent"""
+    opponent: str = Field(..., description="Opponent team abbreviation")
+    quality: str = Field(..., description="Matchup quality: elite, good, neutral, bad, worst")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "opponent": "LAR",
+                "quality": "elite"
+            }
+        }
+
+
+class GameMatchupDetailed(BaseModel):
+    """Single game matchup with quality rating"""
+    week: int = Field(..., description="Week number")
+    opponent: str = Field(..., description="Opponent team abbreviation or 'BYE'")
+    matchup_quality: Optional[str] = Field(None, description="Matchup quality rating: elite, good, neutral, bad, worst")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "week": 1,
+                "opponent": "LAR",
+                "matchup_quality": "elite"
+            }
+        }

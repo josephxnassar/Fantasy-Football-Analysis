@@ -1,0 +1,34 @@
+{
+  "2025": {
+    "week_1": {
+      "QB": {
+        "elite_matchups": ["LAR", "NO", "TB", "JAX"],
+        "good_matchups": ["CIN", "ATL", "CHI", "LV"],
+        "neutral_matchups": ["KC", "BUF", "PIT", "HOU"],
+        "bad_matchups": ["SF", "DAL", "GB", "NYG"],
+        "worst_matchups": ["BLT", "DEN", "MIN"]
+      },
+      "RB": {
+        "elite_matchups": ["NO", "CHI", "NYJ", "LAC"],
+        "good_matchups": ["ATL", "TB", "TEN", "JAX"],
+        "neutral_matchups": ["PHI", "KC", "MIA", "HOU"],
+        "bad_matchups": ["DET", "SF", "BUF"],
+        "worst_matchups": ["BAL", "PIT"]
+      },
+      "WR": {
+        "elite_matchups": ["LAR", "NO", "TB", "CIN"],
+        "good_matchups": ["ATL", "JAX", "NYJ", "ARZ"],
+        "neutral_matchups": ["PHI", "DAL", "KC", "MIA"],
+        "bad_matchups": ["SF", "DEN", "BAL"],
+        "worst_matchups": ["BUF", "MIN"]
+      },
+      "TE": {
+        "elite_matchups": ["LAR", "CHI", "NO", "JAX"],
+        "good_matchups": ["ATL", "TB", "NYJ", "TEN"],
+        "neutral_matchups": ["PHI", "KC", "DET", "HOU"],
+        "bad_matchups": ["SF", "BAL", "MIA"],
+        "worst_matchups": ["BUF", "DEN"]
+      }
+    }
+  }
+}

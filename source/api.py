@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from source.app import App
 from source.models import RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse
 import logging
+import json
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +27,34 @@ api.add_middleware(
 # Initialize the data app
 app = App()
 app.load()  # Load cached data
+
+# Load defense tiers
+defense_tiers_path = os.path.join(os.path.dirname(__file__), "data", "defense_tiers.json")
+defense_tiers = {}
+if os.path.exists(defense_tiers_path):
+    with open(defense_tiers_path, 'r') as f:
+        defense_tiers = json.load(f)
+
+
+def get_matchup_quality(position: str, opponent: str, week: int = 1, season: int = 2025) -> str:
+    """
+    Get matchup quality rating for a position vs opponent
+    
+    Returns: 'elite', 'good', 'neutral', 'bad', 'worst', or None if not found
+    """
+    try:
+        season_tiers = defense_tiers.get(str(season), {})
+        week_key = f"week_{week}"
+        week_tiers = season_tiers.get(week_key, {})
+        position_tiers = week_tiers.get(position, {})
+        
+        for quality, opponents in position_tiers.items():
+            if opponent in opponents:
+                return quality.replace("_matchups", "")
+        return "neutral"
+    except Exception as e:
+        logger.warning(f"Error getting matchup quality for {position} vs {opponent}: {e}")
+        return None
 
 
 @api.exception_handler(HTTPException)
@@ -139,8 +169,15 @@ def get_player(player_name: str):
             schedules = app.caches.get("Schedules", {})
             if player_team in schedules:
                 team_schedule = schedules[player_team]
-                # Convert schedule to list format
-                schedule_data = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
+                # Convert schedule to list format with matchup quality
+                raw_schedule = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
+                for game in raw_schedule:
+                    matchup_quality = get_matchup_quality(player_position, game.get('Opponent'), game.get('week', 1))
+                    schedule_data.append({
+                        'week': game.get('week'),
+                        'opponent': game.get('Opponent'),
+                        'matchup_quality': matchup_quality
+                    })
         
         return PlayerResponse(
             name=player_name,
