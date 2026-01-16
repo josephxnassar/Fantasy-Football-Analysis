@@ -89,7 +89,7 @@ export default function Rankings() {
         <div className="control-group">
           <label>Position:</label>
           <select value={position || ''} onChange={(e) => setPosition(e.target.value || null)}>
-            <option value="">All Positions</option>
+            <option value="">Overall</option>
             <option value="QB">QB</option>
             <option value="RB">RB</option>
             <option value="WR">WR</option>
@@ -99,36 +99,89 @@ export default function Rankings() {
       </div>
 
       <div className="rankings-table">
-        {rankings.rankings && Object.entries(rankings.rankings).map(([pos, players]) => (
-          <div key={pos} className="position-section">
-            <h2>{pos}</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Player</th>
-                  <th>Percentile</th>
-                </tr>
-              </thead>
-              <tbody>
-                {players.map((player, idx) => (
-                  <tr key={idx}>
-                    <td>{idx + 1}</td>
-                    <td>
-                      <span 
-                        className="player-name-link"
-                        onClick={() => handlePlayerClick(player.name || player[Object.keys(player)[0]])}
-                      >
-                        {player.name || player[Object.keys(player)[0]]}
-                      </span>
-                    </td>
-                    <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
+        {rankings.rankings && (() => {
+          // If a specific position is selected, show separate tables
+          if (position) {
+            return Object.entries(rankings.rankings).map(([pos, players]) => (
+              <div key={pos} className="position-section">
+                <h2>{pos}</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Player</th>
+                      <th>Percentile</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {players.map((player, idx) => (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>
+                          <span 
+                            className="player-name-link"
+                            onClick={() => handlePlayerClick(player.name || player[Object.keys(player)[0]])}
+                          >
+                            {player.name || player[Object.keys(player)[0]]}
+                          </span>
+                        </td>
+                        <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ));
+          }
+          
+          // Overall view: combine all positions into one table
+          const allPlayers = [];
+          Object.entries(rankings.rankings).forEach(([pos, players]) => {
+            players.forEach(player => {
+              allPlayers.push({
+                ...player,
+                position: pos,
+                playerName: player.name || player[Object.keys(player)[0]]
+              });
+            });
+          });
+          
+          // Sort by percentile descending
+          allPlayers.sort((a, b) => (b.percentile || 0) - (a.percentile || 0));
+          
+          return (
+            <div className="position-section">
+              <h2>Overall Rankings</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>Percentile</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
+                </thead>
+                <tbody>
+                  {allPlayers.map((player, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>
+                        <span 
+                          className="player-name-link"
+                          onClick={() => handlePlayerClick(player.playerName)}
+                        >
+                          {player.playerName}
+                        </span>
+                      </td>
+                      <td>{player.position}</td>
+                      <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
       </div>
 
       {playerDetails && (
