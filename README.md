@@ -31,6 +31,14 @@ Install required Python packages using `pip`:
 pip install -r requirements.txt
 ```
 
+### 1.5 🎨 Frontend Dependencies (Optional)
+If running the React frontend, install Node.js dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
 Ensure the following are included with the correct versions stated inside requirements.txt:
 - `pandas`
 - `xlwings`
@@ -89,7 +97,45 @@ excel.close()
 
 ---
 
-## 📘 Documentation
+## � Backend API
+
+A FastAPI server is available in [`run_api.py`](./run_api.py) with the following endpoints:
+
+- `GET /rankings` - Get player rankings with filters
+- `GET /player/{player_id}` - Get player details
+- `GET /schedule/{team}` - Get team schedule
+- `GET /search?q=query` - Search players
+- `GET /streaming` - Get streaming recommendations
+- `GET /defense-tiers` - Get defense matchup tiers
+
+To run the backend:
+
+```bash
+python run_api.py
+```
+
+The API runs on `http://localhost:8000` with CORS enabled for frontend integration.
+
+---
+
+## 🎨 React Frontend
+
+A React + Vite frontend is available in the [`frontend/`](./frontend/) directory.
+
+**Note:** This project uses **Vite**, not Create React App. Environment variables use the `VITE_` prefix.
+
+To run the frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend runs on `http://localhost:3000` and proxies API requests to the backend on port 8000.
+
+---
+
+## �📘 Documentation
 
 Each module's documentation can be found in the respective Markdown files:
 
