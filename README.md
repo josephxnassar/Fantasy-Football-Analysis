@@ -27,6 +27,9 @@ Scrapes player depth chart information directly from ESPN's website.
 Run both backend and frontend servers with one command:
 
 **Windows (PowerShell):**
+
+First, navigate to the project root directory:
+
 ```powershell
 .\dev-startup.ps1
 ```
