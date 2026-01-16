@@ -19,10 +19,6 @@ export const getPlayer = (playerName) => {
   return api.get(`/player/${playerName}`);
 };
 
-export const getSchedule = (team) => {
-  return api.get(`/schedule/${team}`);
-};
-
 export const searchPlayers = (query, position = null) => {
   return api.get('/search', {
     params: { q: query, position },

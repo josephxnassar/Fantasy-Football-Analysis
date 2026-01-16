@@ -43,45 +43,12 @@ class RankingsResponse(BaseModel):
         }
 
 
-class PlayerStats(BaseModel):
-    """Player statistical data"""
-    completions: Optional[float] = None
-    attempts: Optional[float] = None
-    passing_yards: Optional[float] = None
-    passing_touchdowns: Optional[float] = None
-    carries: Optional[float] = None
-    rushing_yards: Optional[float] = None
-    rushing_touchdowns: Optional[float] = None
-    receiving_yards: Optional[float] = None
-    receiving_touchdowns: Optional[float] = None
-    receptions: Optional[float] = None
-    rating: Optional[float] = None
-    
-    class Config:
-        extra = "allow"  # Allow additional stats fields
-
-
-class GameMatchup(BaseModel):
-    """Single game matchup in schedule"""
-    week: int = Field(..., description="Week number")
-    opponent: str = Field(..., description="Opponent team abbreviation or 'BYE'")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "week": 1,
-                "opponent": "LAR"
-            }
-        }
-
-
 class PlayerResponse(BaseModel):
     """Response for individual player details"""
     name: str = Field(..., description="Player name")
     position: str = Field(..., description="Player position: QB, RB, WR, TE")
     team: Optional[str] = Field(None, description="Team abbreviation")
     stats: Dict[str, Any] = Field(..., description="Player statistics")
-    schedule: List[Dict[str, Any]] = Field(..., description="Upcoming schedule matchups")
     
     class Config:
         json_schema_extra = {
@@ -89,11 +56,7 @@ class PlayerResponse(BaseModel):
                 "name": "Ja'Marr Chase",
                 "position": "WR",
                 "team": "CIN",
-                "stats": {"rating": 401.52, "receptions": 127.0},
-                "schedule": [
-                    {"week": 1, "opponent": "LAR"},
-                    {"week": 2, "opponent": "NO"}
-                ]
+                "stats": {"rating": 401.52, "receptions": 127.0}
             }
         }
 

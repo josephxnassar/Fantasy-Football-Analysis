@@ -16,7 +16,7 @@ Processes NFL schedule data by inserting bye weeks where games are missing from 
 Retrieves offensive player depth charts from `nfl_data_py`.  
 
 ### 4. [`ESPNDepthChart`](./backend/depth_chart/espn.py)
-Scrapes player depth chart information directly from ESPN's website.  
+Scrapes player depth chart information directly from ESPN's website.
 
 ---
 
@@ -104,7 +104,7 @@ backend/              # Backend Python code (FastAPI)
 │   └── espn.py
 ├── statistics/      # Player rating calculations
 │   └── ratings/
-├── schedules/       # Ussing
+├── schedules/       # NFL schedule data processing
 ├── database/        # SQLite cache layer
 │   ├── DAO/
 │   └── service/
@@ -140,12 +140,10 @@ requirements.txt     # Python dependencies
 
 Base URL: `http://localhost:8000`
 
-- `GET /rankings` - Get player rankings with filters (format, position)
-- `GET /player/{player_id}` - Get detailed player info
-- `GET /schedule/{team}` - Get team schedule
-- `GET /search?q=query` - Search players by name
-- `GET /streaming/{position}/{week}` - Get streaming recommendations by position
-- `GET /defense-tiers` - Get defense matchup tier data
+- `GET /api/rankings` - Get player rankings with filters (format, position)
+- `GET /api/player/{player_name}` - Get detailed player stats and position/team info
+- `GET /api/search?q=query` - Search players by name
+- `GET /api/streaming/{position}/{week}` - Get streaming recommendations by position and week
 
 All endpoints support CORS for frontend integration.
 
@@ -156,9 +154,9 @@ All endpoints support CORS for frontend integration.
 ### Features
 
 - **Rankings**: View player rankings with customizable filters (format, position)
-- **Player Search**: Search and view detailed player statistics and schedules
+- **Player Details**: Click any player name to see detailed stats and team information
+- **Player Search**: Search and view player statistics by position
 - **Streaming Recommendations**: Weekly suggestions by position based on defense matchups
-- **Defense Analysis**: Tier-based opponent strength visualization
 
 ### Tech Stack
 
