@@ -65,7 +65,8 @@ export default function Rankings() {
                 <tr>
                   <th>Rank</th>
                   <th>Player</th>
-                  <th>Rating</th>
+                  <th>Tier</th>
+                  <th>Percentile</th>
                 </tr>
               </thead>
               <tbody>
@@ -73,7 +74,8 @@ export default function Rankings() {
                   <tr key={idx}>
                     <td>{idx + 1}</td>
                     <td>{player.name || player[Object.keys(player)[0]]}</td>
-                    <td>{typeof player.rating === 'number' ? player.rating.toFixed(2) : (player.rating && !isNaN(Number(player.rating)) ? Number(player.rating).toFixed(2) : 'N/A')}</td>
+                    <td><strong>{player.tier || 'N/A'}</strong></td>
+                    <td>{typeof player.percentile === 'number' ? `${player.percentile.toFixed(1)}%` : 'N/A'}</td>
                   </tr>
                 ))}
               </tbody>

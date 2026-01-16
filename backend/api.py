@@ -100,6 +100,19 @@ def get_rankings(
     if position and position not in valid_positions:
         raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
     
+    def get_tier(percentile: float) -> str:
+        """Assign tier based on percentile ranking"""
+        if percentile >= 90:
+            return "Elite"
+        elif percentile >= 75:
+            return "Very Good"
+        elif percentile >= 50:
+            return "Good"
+        elif percentile >= 25:
+            return "Average"
+        else:
+            return "Below Average"
+    
     try:
         # Get statistics from cache
         stats_cache = app.caches.get("Statistics", {})
@@ -115,6 +128,12 @@ def get_rankings(
         for pos in positions_to_fetch:
             if pos in stats_cache:
                 df = stats_cache[pos]
+                
+                # Calculate percentile and tier for each player
+                rating_col = 'rating' if 'rating' in df.columns else df.columns[0]
+                df['percentile'] = df[rating_col].rank(pct=True) * 100
+                df['tier'] = df['percentile'].apply(get_tier)
+                
                 # Convert DataFrame to list of dicts
                 player_rankings = df.reset_index().to_dict("records")
                 
