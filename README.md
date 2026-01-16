@@ -143,7 +143,6 @@ Base URL: `http://localhost:8000`
 - `GET /api/rankings` - Get player rankings with filters (format, position)
 - `GET /api/player/{player_name}` - Get detailed player stats and position/team info
 - `GET /api/search?q=query` - Search players by name
-- `GET /api/streaming/{position}/{week}` - Get streaming recommendations by position and week
 
 All endpoints support CORS for frontend integration.
 
@@ -156,7 +155,6 @@ All endpoints support CORS for frontend integration.
 - **Rankings**: View player rankings with customizable filters (format, position)
 - **Player Details**: Click any player name to see detailed stats and team information
 - **Player Search**: Search and view player statistics by position
-- **Streaming Recommendations**: Weekly suggestions by position based on defense matchups
 
 ### Tech Stack
 

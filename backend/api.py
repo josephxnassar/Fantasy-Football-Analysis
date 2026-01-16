@@ -2,11 +2,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app import App
 from backend.models import (
-    RankingsResponse, PlayerResponse, SearchResponse, StreamingRecommendation
+    RankingsResponse, PlayerResponse, SearchResponse
 )
 import logging
-import pandas as pd
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +48,7 @@ def read_root():
 @api.get("/api/rankings", response_model=RankingsResponse)
 def get_rankings(
     format: str = "redraft",  # redraft or dynasty
-    position: str = None,      # QB, RB, WR, TE or None for all
-    model: str = "ridge"       # ridge regression (default, optimal model)
+    position: str = None       # QB, RB, WR, TE or None for all
 ):
     """
     Get player rankings filtered by format and position
@@ -70,19 +67,6 @@ def get_rankings(
     if position and position not in valid_positions:
         raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
     
-    def get_tier(percentile: float) -> str:
-        """Assign tier based on percentile ranking"""
-        if percentile >= 90:
-            return "Elite"
-        elif percentile >= 75:
-            return "Very Good"
-        elif percentile >= 50:
-            return "Good"
-        elif percentile >= 25:
-            return "Average"
-        else:
-            return "Below Average"
-    
     try:
         # Get statistics from cache
         stats_cache = app.caches.get("Statistics", {})
@@ -99,27 +83,19 @@ def get_rankings(
             if pos in stats_cache:
                 df = stats_cache[pos]
                 
-                # Calculate percentile and tier for each player
+                # Calculate percentile for each player
                 rating_col = 'rating' if 'rating' in df.columns else df.columns[0]
                 df['percentile'] = df[rating_col].rank(pct=True) * 100
-                df['tier'] = df['percentile'].apply(get_tier)
                 
                 # Convert DataFrame to list of dicts
                 player_rankings = df.reset_index().to_dict("records")
-                
-                # Apply format-specific adjustments
-                if format == "dynasty":
-                    # For dynasty, apply a youth bonus (younger players get slight boost)
-                    # This is a placeholder - real dynasty would need age data
-                    # For now, just use base rankings but note they could be adjusted
-                    player_rankings = player_rankings
                 
                 rankings_by_position[pos] = player_rankings
         
         return RankingsResponse(
             format=format,
             position=position,
-            model=model,
+            model="ridge",
             rankings=rankings_by_position
         )
     except HTTPException:
@@ -132,7 +108,7 @@ def get_rankings(
 @api.get("/api/player/{player_name}", response_model=PlayerResponse)
 def get_player(player_name: str):
     """
-    Get detailed player information including stats and upcoming schedule
+    Get detailed player information including stats and team
     
     - **player_name**: The player's name (e.g., "Ja'Marr Chase")
     """
@@ -159,12 +135,11 @@ def get_player(player_name: str):
         # Search through each team's depth chart
         for team, dc_data in depth_charts.items():
             try:
-                if isinstance(dc_data, pd.DataFrame):
-                    # Check if player name appears in any column of this team's depth chart
-                    for col in dc_data.columns:
-                        if player_name in dc_data[col].values:
-                            player_team = team
-                            break
+                # Check if player name appears in any column of this team's depth chart
+                for col in dc_data.columns:
+                    if player_name in dc_data[col].values:
+                        player_team = team
+                        break
                 if player_team:
                     break
             except Exception as e:
@@ -210,7 +185,7 @@ def search_players(q: str, position: str = None):
                     results.append({
                         "name": player_name,
                         "position": pos,
-                        "rating": row.get("rating", 0) if hasattr(row, 'get') else row["rating"]
+                        "rating": row["rating"] if "rating" in df.columns else 0
                     })
         
         # Sort by rating descending
@@ -226,33 +201,6 @@ def search_players(q: str, position: str = None):
     except Exception as e:
         logger.error(f"Error searching for players: {e}")
         raise HTTPException(status_code=500, detail="Failed to search players")
-
-
-@api.get("/api/streaming/{position}/{week}", response_model=StreamingRecommendation)
-def get_streaming_recommendations(position: str, week: int = 1):
-    """
-    Get streaming recommendations for a position in a given week
-    
-    - **position**: QB, RB, WR, or TE
-    - **week**: Week number (default: 1)
-    """
-    valid_positions = ["QB", "RB", "WR", "TE"]
-    if position.upper() not in valid_positions:
-        raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
-    
-    if week < 1 or week > 18:
-        raise HTTPException(status_code=400, detail="Week must be between 1 and 18")
-    
-    try:
-        # Generic streaming recommendation (can be enhanced with defense tier data if available)
-        return StreamingRecommendation(
-            week=week,
-            position=position.upper(),
-            recommendation=f"Analyze {position.upper()} matchups for week {week} based on opponent defense strength"
-        )
-    except Exception as e:
-        logger.error(f"Error getting streaming recommendations: {e}")
-        raise HTTPException(status_code=500, detail="Failed to get streaming recommendations")
 
 
 if __name__ == "__main__":

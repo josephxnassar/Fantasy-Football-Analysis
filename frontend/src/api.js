@@ -25,8 +25,4 @@ export const searchPlayers = (query, position = null) => {
   });
 };
 
-export const getStreamingRecommendations = (position, week = 1) => {
-  return api.get(`/streaming/${position}/${week}`);
-};
-
 export default api;

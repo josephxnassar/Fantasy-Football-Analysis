@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 import Rankings from './components/Rankings';
 import PlayerSearch from './components/PlayerSearch';
-import StreamingRecs from './components/StreamingRecs';
 
 function App() {
   const [activeTab, setActiveTab] = useState('rankings');
@@ -13,8 +12,6 @@ function App() {
         return <Rankings />;
       case 'search':
         return <PlayerSearch />;
-      case 'streaming':
-        return <StreamingRecs />;
       default:
         return <Rankings />;
     }
@@ -40,12 +37,6 @@ function App() {
             onClick={() => setActiveTab('search')}
           >
             Player Search
-          </button>
-          <button
-            className={`nav-button ${activeTab === 'streaming' ? 'active' : ''}`}
-            onClick={() => setActiveTab('streaming')}
-          >
-            Streaming Advice
           </button>
         </div>
       </nav>

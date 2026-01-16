@@ -158,21 +158,3 @@ class SearchResponse(BaseModel):
         }
 
 
-class StreamingRecommendation(BaseModel):
-    """Streaming recommendation for a week"""
-    week: int = Field(..., description="Week number")
-    position: str = Field(..., description="Position")
-    recommendation: str = Field(..., description="Recommendation message")
-    elite_opponents: List[str] = Field(..., description="Teams with elite matchups")
-    bad_opponents: List[str] = Field(..., description="Teams with bad matchups")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "week": 1,
-                "position": "WR",
-                "recommendation": "Start all WRs against LAR, avoid vs BUF",
-                "elite_opponents": ["LAR", "NO", "TB"],
-                "bad_opponents": ["BUF", "MIN"]
-            }
-        }
