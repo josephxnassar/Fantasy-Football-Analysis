@@ -8,6 +8,7 @@ from backend.models import (
 import logging
 import json
 import os
+import pandas as pd
 from typing import List
 
 logger = logging.getLogger(__name__)
@@ -182,15 +183,24 @@ def get_player(player_name: str):
         if not player_data:
             raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
         
-        # Get player's schedule if they have a team (from depth charts)
+        # Get player's team from depth charts
         depth_charts = app.caches.get("ESPNDepthChart", {})
         player_team = None
         
-        # Try to find team from depth charts
+        # Search through each team's depth chart
         for team, dc_data in depth_charts.items():
-            if isinstance(dc_data, dict) and player_name in str(dc_data):
-                player_team = team
-                break
+            try:
+                if isinstance(dc_data, pd.DataFrame):
+                    # Check if player name appears in any column of this team's depth chart
+                    for col in dc_data.columns:
+                        if player_name in dc_data[col].values:
+                            player_team = team
+                            break
+                if player_team:
+                    break
+            except Exception as e:
+                logger.warning(f"Error searching depth chart for team {team}: {e}")
+                continue
         
         # Get upcoming schedule for the team
         schedule_data = []

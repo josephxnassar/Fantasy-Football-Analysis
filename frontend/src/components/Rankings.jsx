@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRankings } from '../api';
+import { getRankings, getPlayer } from '../api';
 import './Rankings.css';
 
 export default function Rankings() {
@@ -8,6 +8,9 @@ export default function Rankings() {
   const [error, setError] = useState(null);
   const [format, setFormat] = useState('redraft');
   const [position, setPosition] = useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [playerDetails, setPlayerDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
     fetchRankings();
@@ -27,6 +30,27 @@ export default function Rankings() {
     }
   };
 
+  const handlePlayerClick = async (playerName) => {
+    try {
+      setLoadingDetails(true);
+      setSelectedPlayer(playerName);
+      console.log('Clicked player:', playerName);
+      const response = await getPlayer(playerName);
+      console.log('Player details response:', response.data);
+      setPlayerDetails(response.data);
+    } catch (err) {
+      console.error('Error loading player:', err);
+      setError(`Failed to load player details: ${err.message}`);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const closeDetails = () => {
+    setPlayerDetails(null);
+    setSelectedPlayer(null);
+  };
+
   if (loading) return <div className="loading">Loading rankings...</div>;
   if (error) return <div className="error">Error: {error}</div>;
   if (!rankings) return <div className="error">No data available</div>;
@@ -34,27 +58,6 @@ export default function Rankings() {
   return (
     <div className="rankings-container">
       <h1>Player Rankings</h1>
-      
-      <div className="methodology-explanation">
-        <h3>How Ratings Are Calculated</h3>
-        <p>
-          Player ratings are generated using <strong>Ridge Regression</strong>, a machine learning model trained on historical performance data. 
-          The model identifies key statistical patterns that correlate with fantasy success and assigns each player a rating score based on these patterns.
-        </p>
-        <ul>
-          <li><strong>Rating Score:</strong> A numerical score derived from statistical patterns in 2024 season data</li>
-          <li><strong>Percentile:</strong> Shows where each player ranks relative to others (0-100%, where 100% = best)</li>
-          <li><strong>Tier:</strong> Visual categorization based on percentile:
-            <ul>
-              <li>🟢 <strong>Elite</strong> (90%+) - Top tier performers</li>
-              <li>🔵 <strong>Very Good</strong> (75-89%) - Strong performers</li>
-              <li>🟡 <strong>Good</strong> (50-74%) - Above average</li>
-              <li>🟠 <strong>Average</strong> (25-49%) - Average performers</li>
-              <li>🔴 <strong>Below Average</strong> (&lt;25%) - Lower tier</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
       
       <div className="controls">
         <div className="control-group">
@@ -86,7 +89,6 @@ export default function Rankings() {
                 <tr>
                   <th>Rank</th>
                   <th>Player</th>
-                  <th>Tier</th>
                   <th>Percentile</th>
                 </tr>
               </thead>
@@ -94,9 +96,15 @@ export default function Rankings() {
                 {players.map((player, idx) => (
                   <tr key={idx}>
                     <td>{idx + 1}</td>
-                    <td>{player.name || player[Object.keys(player)[0]]}</td>
-                    <td><strong>{player.tier || 'N/A'}</strong></td>
-                    <td>{typeof player.percentile === 'number' ? `${player.percentile.toFixed(1)}%` : 'N/A'}</td>
+                    <td>
+                      <span 
+                        className="player-name-link"
+                        onClick={() => handlePlayerClick(player.name || player[Object.keys(player)[0]])}
+                      >
+                        {player.name || player[Object.keys(player)[0]]}
+                      </span>
+                    </td>
+                    <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -104,6 +112,67 @@ export default function Rankings() {
           </div>
         ))}
       </div>
+
+      {playerDetails && (
+        <div className="modal-overlay" onClick={closeDetails}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={closeDetails}>×</button>
+            
+            {loadingDetails ? (
+              <div className="loading">Loading player details...</div>
+            ) : (
+              <>
+                <h2>{playerDetails.name}</h2>
+                <div className="player-details">
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <span className="label">Position:</span>
+                      <span className="value">{playerDetails.position}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Team:</span>
+                      <span className="value">{playerDetails.team || 'N/A'}</span>
+                    </div>
+                  </div>
+
+                  <div className="stats-section">
+                    <h3>Stats</h3>
+                    <div className="stats-grid">
+                      {Object.entries(playerDetails.stats).map(([key, value]) => (
+                        <div key={key} className="stat-item">
+                          <span className="stat-label">{key}:</span>
+                          <span className="stat-value">
+                            {typeof value === 'number' ? value.toFixed(2) : value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {playerDetails.schedule && playerDetails.schedule.length > 0 && (
+                    <div className="schedule-section">
+                      <h3>Upcoming Schedule</h3>
+                      <div className="schedule-list">
+                        {playerDetails.schedule.map((game, idx) => (
+                          <div key={idx} className="schedule-item">
+                            <span className="week">Week {game.week}</span>
+                            <span className="opponent">vs {game.opponent}</span>
+                            {game.matchup_quality && (
+                              <span className={`matchup-quality quality-${game.matchup_quality}`}>
+                                {game.matchup_quality.toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
