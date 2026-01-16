@@ -1,10 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from source.app import App
-from source.models import RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse
+from source.models import (
+    RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse,
+    SearchResponse, StreamingRecommendation
+)
 import logging
 import json
 import os
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -240,6 +244,88 @@ def get_schedule(team: str):
     except Exception as e:
         logger.error(f"Error fetching schedule for {team}: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch schedule")
+
+
+@api.get("/api/search")
+def search_players(q: str, position: str = None):
+    """
+    Search for players by name
+    
+    - **q**: Search query (player name or partial name)
+    - **position**: Filter by position (QB, RB, WR, TE) (optional)
+    """
+    if not q or len(q) < 2:
+        raise HTTPException(status_code=400, detail="Search query must be at least 2 characters")
+    
+    try:
+        stats_cache = app.caches.get("Statistics", {})
+        query_lower = q.lower()
+        results = []
+        
+        for pos, df in stats_cache.items():
+            if position and pos != position:
+                continue
+            
+            for player_name, row in df.iterrows():
+                if query_lower in player_name.lower():
+                    results.append({
+                        "name": player_name,
+                        "position": pos,
+                        "rating": row.get("rating", 0) if hasattr(row, 'get') else row["rating"]
+                    })
+        
+        # Sort by rating descending
+        results.sort(key=lambda x: x["rating"], reverse=True)
+        
+        from source.models import SearchResponse
+        return SearchResponse(
+            query=q,
+            results=results[:20],  # Limit to 20 results
+            count=len(results)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error searching for players: {e}")
+        raise HTTPException(status_code=500, detail="Failed to search players")
+
+
+@api.get("/api/streaming/{position}/{week}")
+def get_streaming_recommendations(position: str, week: int = 1):
+    """
+    Get streaming recommendations for a position in a given week
+    
+    - **position**: QB, RB, WR, or TE
+    - **week**: Week number (default: 1)
+    """
+    valid_positions = ["QB", "RB", "WR", "TE"]
+    if position.upper() not in valid_positions:
+        raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
+    
+    try:
+        season_tiers = defense_tiers.get("2025", {})
+        week_key = f"week_{week}"
+        week_tiers = season_tiers.get(week_key, {})
+        position_tiers = week_tiers.get(position.upper(), {})
+        
+        elite_opponents = position_tiers.get("elite_matchups", [])
+        bad_opponents = position_tiers.get("worst_matchups", [])
+        
+        recommendation = f"Start all {position.upper()}s against {', '.join(elite_opponents[:2] if elite_opponents else ['none'])} | Avoid vs {', '.join(bad_opponents[:2] if bad_opponents else ['none'])}"
+        
+        from source.models import StreamingRecommendation
+        return StreamingRecommendation(
+            week=week,
+            position=position.upper(),
+            recommendation=recommendation,
+            elite_opponents=elite_opponents,
+            bad_opponents=bad_opponents
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting streaming recommendations: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get streaming recommendations")
 
 
 if __name__ == "__main__":

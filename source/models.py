@@ -158,3 +158,58 @@ class GameMatchupDetailed(BaseModel):
                 "matchup_quality": "elite"
             }
         }
+
+
+class PlayerSearchResult(BaseModel):
+    """Player search result"""
+    name: str = Field(..., description="Player name")
+    position: str = Field(..., description="Player position")
+    rating: float = Field(..., description="Player rating")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Ja'Marr Chase",
+                "position": "WR",
+                "rating": 401.52
+            }
+        }
+
+
+class SearchResponse(BaseModel):
+    """Response for player search"""
+    query: str = Field(..., description="Search query")
+    results: List[PlayerSearchResult] = Field(..., description="Search results")
+    count: int = Field(..., description="Number of results")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "chase",
+                "results": [
+                    {"name": "Ja'Marr Chase", "position": "WR", "rating": 401.52},
+                    {"name": "JK Dobbins", "position": "RB", "rating": 250.0}
+                ],
+                "count": 2
+            }
+        }
+
+
+class StreamingRecommendation(BaseModel):
+    """Streaming recommendation for a week"""
+    week: int = Field(..., description="Week number")
+    position: str = Field(..., description="Position")
+    recommendation: str = Field(..., description="Recommendation message")
+    elite_opponents: List[str] = Field(..., description="Teams with elite matchups")
+    bad_opponents: List[str] = Field(..., description="Teams with bad matchups")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "week": 1,
+                "position": "WR",
+                "recommendation": "Start all WRs against LAR, avoid vs BUF",
+                "elite_opponents": ["LAR", "NO", "TB"],
+                "bad_opponents": ["BUF", "MIN"]
+            }
+        }
