@@ -35,6 +35,27 @@ export default function Rankings() {
     <div className="rankings-container">
       <h1>Player Rankings</h1>
       
+      <div className="methodology-explanation">
+        <h3>How Ratings Are Calculated</h3>
+        <p>
+          Player ratings are generated using <strong>Ridge Regression</strong>, a machine learning model trained on historical performance data. 
+          The model identifies key statistical patterns that correlate with fantasy success and assigns each player a rating score based on these patterns.
+        </p>
+        <ul>
+          <li><strong>Rating Score:</strong> A numerical score derived from statistical patterns in 2024 season data</li>
+          <li><strong>Percentile:</strong> Shows where each player ranks relative to others (0-100%, where 100% = best)</li>
+          <li><strong>Tier:</strong> Visual categorization based on percentile:
+            <ul>
+              <li>🟢 <strong>Elite</strong> (90%+) - Top tier performers</li>
+              <li>🔵 <strong>Very Good</strong> (75-89%) - Strong performers</li>
+              <li>🟡 <strong>Good</strong> (50-74%) - Above average</li>
+              <li>🟠 <strong>Average</strong> (25-49%) - Average performers</li>
+              <li>🔴 <strong>Below Average</strong> (&lt;25%) - Lower tier</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      
       <div className="controls">
         <div className="control-group">
           <label>Format:</label>
