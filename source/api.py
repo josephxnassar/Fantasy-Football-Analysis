@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from source.app import App
+from source.models import RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def read_root():
     }
 
 
-@api.get("/api/rankings")
+@api.get("/api/rankings", response_model=RankingsResponse)
 def get_rankings(
     format: str = "redraft",  # redraft or dynasty
     position: str = None,      # QB, RB, WR, TE or None for all
@@ -56,16 +57,16 @@ def get_rankings(
         valid_models = ["linear", "ridge", "lasso"]
         
         if format not in valid_formats:
-            return {"error": f"format must be one of {valid_formats}"}, 400
+            raise ValueError(f"format must be one of {valid_formats}")
         if model not in valid_models:
-            return {"error": f"model must be one of {valid_models}"}, 400
+            raise ValueError(f"model must be one of {valid_models}")
         if position and position not in valid_positions:
-            return {"error": f"position must be one of {valid_positions}"}, 400
+            raise ValueError(f"position must be one of {valid_positions}")
         
         # Get statistics from cache
         stats_cache = app.caches.get("Statistics", {})
         if not stats_cache:
-            return {"error": "Statistics data not loaded"}, 500
+            raise ValueError("Statistics data not loaded")
         
         # Build rankings response
         rankings_by_position = {}
@@ -77,22 +78,24 @@ def get_rankings(
             if pos in stats_cache:
                 df = stats_cache[pos]
                 # Convert DataFrame to list of dicts, sorted by rating (descending)
-                # Assuming the dataframe is already sorted by rating from the model
                 player_rankings = df.reset_index().to_dict("records")
                 rankings_by_position[pos] = player_rankings
         
-        return {
-            "format": format,
-            "position": position,
-            "model": model,
-            "rankings": rankings_by_position
-        }
+        return RankingsResponse(
+            format=format,
+            position=position,
+            model=model,
+            rankings=rankings_by_position
+        )
+    except ValueError as e:
+        logger.warning(f"Validation error in rankings endpoint: {e}")
+        raise
     except Exception as e:
         logger.error(f"Error fetching rankings: {e}")
-        return {"error": str(e)}, 500
+        raise
 
 
-@api.get("/api/player/{player_name}")
+@api.get("/api/player/{player_name}", response_model=PlayerResponse)
 def get_player(player_name: str):
     """
     Get detailed player information including stats and upcoming schedule
@@ -113,7 +116,7 @@ def get_player(player_name: str):
                 break
         
         if not player_data:
-            return {"error": f"Player '{player_name}' not found"}, 404
+            raise ValueError(f"Player '{player_name}' not found")
         
         # Get player's schedule if they have a team (from depth charts)
         depth_charts = app.caches.get("ESPNDepthChart", {})
@@ -134,19 +137,19 @@ def get_player(player_name: str):
                 # Convert schedule to list format
                 schedule_data = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
         
-        return {
-            "name": player_name,
-            "position": player_position,
-            "team": player_team,
-            "stats": player_data,
-            "schedule": schedule_data
-        }
+        return PlayerResponse(
+            name=player_name,
+            position=player_position,
+            team=player_team,
+            stats=player_data,
+            schedule=schedule_data
+        )
+    except ValueError as e:
+        logger.warning(f"Player not found: {e}")
+        raise
     except Exception as e:
         logger.error(f"Error fetching player {player_name}: {e}")
-        return {"error": str(e)}, 500
-
-
-@api.get("/api/schedule/{team}")
+        raise, response_model=ScheduleResponse)
 def get_schedule(team: str):
     """
     Get team schedule with bye weeks and opponents
@@ -161,23 +164,29 @@ def get_schedule(team: str):
         
         team_upper = team.upper()
         if team_upper not in valid_teams:
-            return {"error": f"Invalid team: {team}. Must be valid NFL team abbreviation."}, 400
+            raise ValueError(f"Invalid team: {team}. Must be valid NFL team abbreviation.")
         
         # Get team schedule from cache
         schedules = app.caches.get("Schedules", {})
         
         if team_upper not in schedules:
-            return {"error": f"Schedule not found for team {team_upper}"}, 404
+            raise ValueError(f"Schedule not found for team {team_upper}")
         
         team_schedule = schedules[team_upper]
         
         # Convert to list of dicts
         schedule_list = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
         
-        return {
-            "team": team_upper,
-            "schedule": schedule_list
-        }
+        return ScheduleResponse(
+            team=team_upper,
+            schedule=schedule_list
+        )
+    except ValueError as e:
+        logger.warning(f"Invalid schedule request: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching schedule for {team}: {e}")
+        raise
     except Exception as e:
         logger.error(f"Error fetching schedule for {team}: {e}")
         return {"error": str(e)}, 500
