@@ -50,38 +50,99 @@ def get_rankings(
     - **model**: linear, ridge, or lasso
     """
     try:
-        # TODO: Implement ranking logic
-        # Pull from app.caches['Statistics'] and filter based on parameters
+        # Validate inputs
+        valid_formats = ["redraft", "dynasty"]
+        valid_positions = ["QB", "RB", "WR", "TE"]
+        valid_models = ["linear", "ridge", "lasso"]
+        
+        if format not in valid_formats:
+            return {"error": f"format must be one of {valid_formats}"}, 400
+        if model not in valid_models:
+            return {"error": f"model must be one of {valid_models}"}, 400
+        if position and position not in valid_positions:
+            return {"error": f"position must be one of {valid_positions}"}, 400
+        
+        # Get statistics from cache
+        stats_cache = app.caches.get("Statistics", {})
+        if not stats_cache:
+            return {"error": "Statistics data not loaded"}, 500
+        
+        # Build rankings response
+        rankings_by_position = {}
+        
+        # Determine which positions to include
+        positions_to_fetch = [position] if position else valid_positions
+        
+        for pos in positions_to_fetch:
+            if pos in stats_cache:
+                df = stats_cache[pos]
+                # Convert DataFrame to list of dicts, sorted by rating (descending)
+                # Assuming the dataframe is already sorted by rating from the model
+                player_rankings = df.reset_index().to_dict("records")
+                rankings_by_position[pos] = player_rankings
+        
         return {
             "format": format,
             "position": position,
             "model": model,
-            "rankings": []  # Placeholder
+            "rankings": rankings_by_position
         }
     except Exception as e:
         logger.error(f"Error fetching rankings: {e}")
         return {"error": str(e)}, 500
 
 
-@api.get("/api/player/{player_id}")
-def get_player(player_id: str):
+@api.get("/api/player/{player_name}")
+def get_player(player_name: str):
     """
     Get detailed player information including stats and upcoming schedule
     
-    - **player_id**: The player's ID
+    - **player_name**: The player's name (e.g., "Ja'Marr Chase")
     """
     try:
-        # TODO: Implement player detail logic
-        # Combine data from depth charts, stats, and schedule
+        # Search for player in Statistics cache
+        stats_cache = app.caches.get("Statistics", {})
+        player_data = None
+        player_position = None
+        
+        # Find player across all positions
+        for position, df in stats_cache.items():
+            if player_name in df.index:
+                player_data = df.loc[player_name].to_dict()
+                player_position = position
+                break
+        
+        if not player_data:
+            return {"error": f"Player '{player_name}' not found"}, 404
+        
+        # Get player's schedule if they have a team (from depth charts)
+        depth_charts = app.caches.get("ESPNDepthChart", {})
+        player_team = None
+        
+        # Try to find team from depth charts
+        for team, dc_data in depth_charts.items():
+            if isinstance(dc_data, dict) and player_name in str(dc_data):
+                player_team = team
+                break
+        
+        # Get upcoming schedule for the team
+        schedule_data = []
+        if player_team:
+            schedules = app.caches.get("Schedules", {})
+            if player_team in schedules:
+                team_schedule = schedules[player_team]
+                # Convert schedule to list format
+                schedule_data = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
+        
         return {
-            "player_id": player_id,
-            "name": None,
-            "position": None,
-            "stats": {},
-            "schedule": []
+            "name": player_name,
+            "position": player_position,
+            "team": player_team,
+            "stats": player_data,
+            "schedule": schedule_data
         }
     except Exception as e:
-        logger.error(f"Error fetching player {player_id}: {e}")
+        logger.error(f"Error fetching player {player_name}: {e}")
         return {"error": str(e)}, 500
 
 
@@ -90,14 +151,32 @@ def get_schedule(team: str):
     """
     Get team schedule with bye weeks and opponents
     
-    - **team**: Team abbreviation (e.g., KC, SF)
+    - **team**: Team abbreviation (e.g., KC, SF, LAR, WSH)
     """
     try:
-        # TODO: Implement schedule logic
-        # Pull from app.caches['Schedules']
+        # Validate team
+        valid_teams = ["KC", "SF", "DAL", "PHI", "NYE", "GB", "MIN", "DET", "TB", "NO", "ATL", "CAR",
+                       "NYG", "WAS", "LAR", "SEA", "ARI", "CHI", "BAL", "PIT", "CLE", "BUF", "MIA",
+                       "NE", "IND", "HOU", "TEN", "JAX", "LAC", "LV", "DEN"]
+        
+        team_upper = team.upper()
+        if team_upper not in valid_teams:
+            return {"error": f"Invalid team: {team}. Must be valid NFL team abbreviation."}, 400
+        
+        # Get team schedule from cache
+        schedules = app.caches.get("Schedules", {})
+        
+        if team_upper not in schedules:
+            return {"error": f"Schedule not found for team {team_upper}"}, 404
+        
+        team_schedule = schedules[team_upper]
+        
+        # Convert to list of dicts
+        schedule_list = team_schedule.reset_index().to_dict("records") if hasattr(team_schedule, 'reset_index') else []
+        
         return {
-            "team": team,
-            "schedule": []  # Placeholder
+            "team": team_upper,
+            "schedule": schedule_list
         }
     except Exception as e:
         logger.error(f"Error fetching schedule for {team}: {e}")
