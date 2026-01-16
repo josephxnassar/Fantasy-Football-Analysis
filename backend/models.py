@@ -80,5 +80,3 @@ class SearchResponse(BaseModel):
                 "count": 2
             }
         }
-
-

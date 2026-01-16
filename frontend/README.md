@@ -20,10 +20,9 @@ Environment variables are defined in `vite.config.js`:
 
 ## Features
 
-- **Rankings** - Player rankings with format/position/model filtering
-- **Player Search** - Search players and view detailed stats
-- **Streaming Recommendations** - Weekly suggestions by position
-- **Defense Matchups** - Tier-based opponent analysis
+- **Rankings** - Player rankings with format and position filters
+- **Player Search** - Search players and view statistics
+- **Player Details** - Click any player to see detailed stats and team information
 
 ## Development
 

@@ -1,6 +1,6 @@
 # NFL Fantasy Football Analysis Tool
 
-Full-stack analysis tool for collecting, processing, and analyzing NFL player depth charts and statistics. Features both a Python backend API (FastAPI) and a React frontend for interactive player rankings and streaming recommendations.
+Full-stack analysis tool for collecting, processing, and analyzing NFL player depth charts and statistics. Features both a Python backend API (FastAPI) and a React frontend for interactive player rankings with detailed stats.
 
 ---
 
@@ -108,7 +108,6 @@ backend/              # Backend Python code (FastAPI)
 ├── database/        # SQLite cache layer
 │   ├── DAO/
 │   └── service/
-├── output/          # Excel export utilities
 ├── util/            # Constants and helpers
 ├── data/            # Static data files
 └── base_source.py   # Base class for data sources
@@ -120,8 +119,9 @@ frontend/            # React + Vite frontend
 │   ├── App.css      # Global styles
 │   └── components/  # Page components
 │       ├── Rankings.jsx
+│       ├── Rankings.css
 │       ├── PlayerSearch.jsx
-│       └── StreamingRecs.jsx
+│       └── PlayerSearch.css
 ├── vite.config.js   # Vite config with API proxy
 └── package.json
 
