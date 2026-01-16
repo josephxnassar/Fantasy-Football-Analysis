@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from source.app import App
 from source.models import RankingsResponse, PlayerResponse, ScheduleResponse, ErrorResponse
@@ -27,6 +27,12 @@ app = App()
 app.load()  # Load cached data
 
 
+@api.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    """Handle HTTP exceptions with proper response format"""
+    return {"error": exc.detail}
+
+
 @api.get("/")
 def read_root():
     """Root endpoint - API status"""
@@ -51,12 +57,11 @@ def get_rankings(
     - **model**: linear, ridge, or lasso
     """
     try:
-        # Validate inputs
-        valid_formats = ["redraft", "dynasty"]
-        valid_positions = ["QB", "RB", "WR", "TE"]
-        valid_models = ["linear", "ridge", "lasso"]
-        
-        if format not in valid_formats:
+        raise HTTPException(status_code=400, detail=f"Invalid format. Must be one of: {', '.join(valid_formats)}")
+    if model not in valid_models:
+        raise HTTPException(status_code=400, detail=f"Invalid model. Must be one of: {', '.join(valid_models)}")
+    if position and position not in valid_positions:
+        raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")if format not in valid_formats:
             raise ValueError(f"format must be one of {valid_formats}")
         if model not in valid_models:
             raise ValueError(f"model must be one of {valid_models}")
@@ -67,7 +72,7 @@ def get_rankings(
         stats_cache = app.caches.get("Statistics", {})
         if not stats_cache:
             raise ValueError("Statistics data not loaded")
-        
+        HTTPException(status_code=503, detail=
         # Build rankings response
         rankings_by_position = {}
         
@@ -87,12 +92,11 @@ def get_rankings(
             model=model,
             rankings=rankings_by_position
         )
-    except ValueError as e:
-        logger.warning(f"Validation error in rankings endpoint: {e}")
+    except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error fetching rankings: {e}")
-        raise
+        raise HTTPException(status_code=500, detail="Failed to fetch rankings")
 
 
 @api.get("/api/player/{player_name}", response_model=PlayerResponse)
@@ -117,7 +121,7 @@ def get_player(player_name: str):
         
         if not player_data:
             raise ValueError(f"Player '{player_name}' not found")
-        
+        HTTPException(status_code=404, detail=
         # Get player's schedule if they have a team (from depth charts)
         depth_charts = app.caches.get("ESPNDepthChart", {})
         player_team = None
@@ -145,12 +149,11 @@ def get_player(player_name: str):
             schedule=schedule_data
         )
     except ValueError as e:
-        logger.warning(f"Player not found: {e}")
+        logHTTPException:
         raise
     except Exception as e:
         logger.error(f"Error fetching player {player_name}: {e}")
-        raise, response_model=ScheduleResponse)
-def get_schedule(team: str):
+        raise HTTPException(status_code=500, detail="Failed to fetch player details")ule(team: str):
     """
     Get team schedule with bye weeks and opponents
     
@@ -166,12 +169,12 @@ def get_schedule(team: str):
         if team_upper not in valid_teams:
             raise ValueError(f"Invalid team: {team}. Must be valid NFL team abbreviation.")
         
-        # Get team schedule from cache
+        # Get teamHTTPException(status_code=400, detail=f"Invalid team abbreviation: {team}. Must be a valid NFL team
         schedules = app.caches.get("Schedules", {})
         
         if team_upper not in schedules:
             raise ValueError(f"Schedule not found for team {team_upper}")
-        
+        HTTPException(status_code=404, detail=
         team_schedule = schedules[team_upper]
         
         # Convert to list of dicts
@@ -182,12 +185,11 @@ def get_schedule(team: str):
             schedule=schedule_list
         )
     except ValueError as e:
-        logger.warning(f"Invalid schedule request: {e}")
+        logHTTPException:
         raise
     except Exception as e:
         logger.error(f"Error fetching schedule for {team}: {e}")
-        raise
-    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch schedule")ception as e:
         logger.error(f"Error fetching schedule for {team}: {e}")
         return {"error": str(e)}, 500
 
