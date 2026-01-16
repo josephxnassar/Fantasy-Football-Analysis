@@ -1,13 +1,13 @@
-# NFL Data Analysis Tool
+# NFL Fantasy Football Analysis Tool
 
-This project provides a suite of tools to collect, process, and analyze NFL player depth charts and statistics from multiple sources. It integrates data from **nfl_data_py**, ESPN, and performs rating calculations via ridge regression. It also provides the ability to export processed data to Excel.
+Full-stack analysis tool for collecting, processing, and analyzing NFL player depth charts and statistics. Features both a Python backend API (FastAPI) and a React frontend for interactive player rankings and streaming recommendations.
 
 ---
 
 ## 📂 Modules
 
 ### 1. [`Statistics`](./backend/statistics/statistics.py)
-Processes NFL seasonal data by organizing into position and running a regression algorithm.
+Processes NFL seasonal data by organizing into position and running ridge regression for rating calculations.
 
 ### 2. [`Schedules`](./backend/schedules/schedules.py)
 Processes NFL schedule data by inserting bye weeks where games are missing from the schedule.
@@ -16,15 +16,15 @@ Processes NFL schedule data by inserting bye weeks where games are missing from 
 Retrieves offensive player depth charts from `nfl_data_py`.  
 
 ### 4. [`ESPNDepthChart`](./backend/depth_chart/espn.py)
-Scrapes player depth chart information directly from ESPN’s website.  
+Scrapes player depth chart information directly from ESPN's website.  
 
 ---
 
 ## ▶️ Running the Program
 
-### Quick Start (All-in-One)
+### Quick Start (Recommended)
 
-Run both backend and frontend servers simultaneously:
+Run both backend and frontend servers with one command:
 
 **Windows (PowerShell):**
 ```powershell
@@ -32,135 +32,159 @@ Run both backend and frontend servers simultaneously:
 ```
 
 This will open two terminal windows:
-- Backend API on `http://localhost:8000`
-- Frontend on `http://localhost:3000`
+- **Backend API**: `http://localhost:8000` (FastAPI with hot-reload)
+- **Frontend**: `http://localhost:3000` (React + Vite dev server)
 
-### Manual Setup
+**To stop:** Press `Ctrl+C` in each terminal.
 
-To run each component individually:
+---
 
-### 1. 📦 Install Dependencies
-Install required Python packages using `pip`:
+### Manual Setup (If needed)
+
+#### 1. 📦 Install Backend Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 1.5 🎨 Frontend Dependencies (Optional)
-If running the React frontend, install Node.js dependencies:
-
-```bash
-cd frontend
-npm install
-```
-
-Ensure the following are included with the correct versions stated inside requirements.txt:
+Required Python packages:
 - `pandas`
 - `xlwings`
 - `scikit-learn`
 - `beautifulsoup4`
 - `requests`
 - `nfl_data_py`
+- `fastapi`
+- `uvicorn`
+- `pydantic`
 
-Additionally, `xlwings` may require Microsoft Excel to be installed locally.
+*Note: `xlwings` may require Microsoft Excel to be installed locally.*
 
-### 2. 🧩 Structure the Codebase
+#### 2. 🎨 Install Frontend Dependencies
 
-Your codebase should be structured something like:
-
-```
-source/
-├── database/
-├────── sqlite.py
-├── depth_chart/
-├────── ndpdepthchart.py
-├────── espndepthchart.py
-├── output/
-├────── excel.py
-├── schedules/
-├────── schedules.py
-├── statistics/
-├────── statistics.py
-main.py
+```bash
+cd frontend
+npm install
 ```
 
-### 3. 🚀 Example Execution
-
-To pull and output depth charts from ESPN:
-
-```python
-from source.depth_chart.espn import ESPNDepthChart
-from source.output.excel import Excel
-
-espn = ESPNDepthChart()
-excel = Excel("output_file.xlsm")
-excel.output_dfs(espn.run(), "output_sheet")
-excel.close()
-```
-
-To calculate and sort statistics by rating:
-
-```python
-from source.statistics.statistics import Statistics
-from source.output.excel import Excel
-
-stats = Statistics([2024])
-excel = Excel("output_file.xlsm")
-excel.output_dfs(stats.run(), "output_sheet")
-excel.close()
-```
-
----
-
-## � Backend API
-
-A FastAPI server is available in [`run_api.py`](./run_api.py) with the following endpoints:
-
-- `GET /rankings` - Get player rankings with filters
-- `GET /player/{player_id}` - Get player details
-- `GET /schedule/{team}` - Get team schedule
-- `GET /search?q=query` - Search players
-- `GET /streaming` - Get streaming recommendations
-- `GET /defense-tiers` - Get defense matchup tiers
-
-To run the backend:
+#### 3. 🚀 Start Backend API
 
 ```bash
 python run_api.py
 ```
 
-The API runs on `http://localhost:8000` with CORS enabled for frontend integration.
+Backend will run on `http://localhost:8000` with auto-reload enabled.
 
----
+#### 4. 🎨 Start Frontend Dev Server
 
-## 🎨 React Frontend
-
-A React + Vite frontend is available in the [`frontend/`](./frontend/) directory.
-
-**Note:** This project uses **Vite**, not Create React App. Environment variables use the `VITE_` prefix.
-
-To run the frontend:
+In a new terminal, from the project root:
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-The frontend runs on `http://localhost:3000` and proxies API requests to the backend on port 8000.
+Frontend will run on `http://localhost:3000`.
 
 ---
 
-## �📘 Documentation
+## 📁 Project Structure
 
-Each module's documentation can be found in the respective Markdown files:
+```
+backend/              # Backend Python code (FastAPI)
+├── api.py           # FastAPI app with all endpoints
+├── app.py           # Core App class
+├── models.py        # Pydantic response schemas
+├── depth_chart/     # Player depth chart sources
+│   ├── ndp.py
+│   └── espn.py
+├── statistics/      # Player rating calculations
+│   └── ratings/
+├── schedules/       # Schedule processing
+├── database/        # SQLite cache layer
+│   ├── DAO/
+│   └── service/
+├── output/          # Excel export utilities
+├── util/            # Constants and helpers
+├── data/            # Static data files
+└── base_source.py   # Base class for data sources
 
-- [`statistics.md`](./docs/statistics.md)
-- [`schedules.md`](./docs/schedules.md)
-- [`ndpdepthchart.md`](./docs/ndp.md)
-- [`espndepthchart.md`](./docs/espn.md)
+frontend/            # React + Vite frontend
+├── src/
+│   ├── api.js       # Axios HTTP client
+│   ├── App.jsx      # Main component
+│   ├── App.css      # Global styles
+│   └── components/  # Page components
+│       ├── Rankings.jsx
+│       ├── PlayerSearch.jsx
+│       └── StreamingRecs.jsx
+├── vite.config.js   # Vite config with API proxy
+└── package.json
+
+config/              # Logging configuration
+tests/               # Python unit tests
+dev-startup.ps1      # One-command startup script
+run_api.py           # FastAPI server entry point
+requirements.txt     # Python dependencies
+```
+
+---
+
+## 💻 Backend API
+
+### Endpoints
+
+Base URL: `http://localhost:8000`
+
+- `GET /rankings` - Get player rankings with filters (format, position, model)
+- `GET /player/{player_id}` - Get detailed player info
+- `GET /schedule/{team}` - Get team schedule
+- `GET /search?q=query` - Search players by name
+- `GET /streaming/{position}/{week}` - Get streaming recommendations by position
+- `GET /defense-tiers` - Get defense matchup tier data
+
+All endpoints support CORS for frontend integration.
+
+---
+
+## 🎨 React Frontend
+
+### Features
+
+- **Rankings**: View player rankings with customizable filters (format, position, model)
+- **Player Search**: Search and view detailed player statistics and schedules
+- **Streaming Recommendations**: Weekly suggestions by position based on defense matchups
+- **Defense Analysis**: Tier-based opponent strength visualization
+
+### Tech Stack
+
+- **React 18.2** - UI framework
+- **Vite 5.0** - Build tool with dev server
+- **Axios** - HTTP client for API calls
+- **CSS Grid/Flexbox** - Responsive layouts
+
+### Environment Variables
+
+The frontend uses Vite's environment system (`VITE_` prefix):
+- `VITE_API_URL` - Backend API base URL (default: `http://localhost:8000`)
+
+Configured in `frontend/vite.config.js` with API proxy for development.
+
+---
+
+## 📚 Documentation
+
+Each module's detailed documentation:
+
+- [`statistics.md`](./docs/statistics.md) - Statistics processor and rating algorithms
+- [`schedules.md`](./docs/schedules.md) - Schedule data processing
+- [`ndpdepthchart.md`](./docs/ndp.md) - NFL Data Py depth chart integration
+- [`espndepthchart.md`](./docs/espn.md) - ESPN depth chart scraping
+- [`excel.md`](./docs/excel.md) - Excel export functionality
+- [`import_seasonal_data.md`](./docs/import_seasonal_data.md) - Data import guide
 
 ---
 
 ## 👨‍💻 Author
 
-Created by Joseph Nassar, 2025  
+Created by Joseph Nassar, 2025
