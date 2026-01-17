@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { searchPlayers, getPlayer } from '../api';
+import PlayerDetailsModal from './PlayerDetailsModal';
 import './PlayerSearch.css';
 
 export default function PlayerSearch() {
@@ -74,9 +75,9 @@ export default function PlayerSearch() {
             <h3>Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
-                {searchResults.results.map((player, idx) => (
+                {searchResults.results.map((player) => (
                   <div
-                    key={idx}
+                    key={player.name}
                     className="player-card"
                     onClick={() => handlePlayerClick(player.name)}
                   >
@@ -95,46 +96,12 @@ export default function PlayerSearch() {
         )}
       </div>
 
-      {playerDetails && (
-        <div className="modal-overlay" onClick={closeDetails}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={closeDetails}>×</button>
-            
-            {loadingDetails ? (
-              <div className="loading">Loading player details...</div>
-            ) : (
-              <>
-                <h2>{playerDetails.name}</h2>
-                <div className="player-details">
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <span className="label">Position:</span>
-                      <span className="value">{playerDetails.position}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="label">Team:</span>
-                      <span className="value">{playerDetails.team || 'N/A'}</span>
-                    </div>
-                  </div>
-
-                  <div className="stats-section">
-                    <h3>Stats</h3>
-                    <div className="stats-grid">
-                      {Object.entries(playerDetails.stats).map(([key, value]) => (
-                        <div key={key} className="stat-item">
-                          <span className="stat-label">{key}:</span>
-                          <span className="stat-value">
-                            {typeof value === 'number' ? value.toFixed(2) : value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+      {(playerDetails || loadingDetails) && (
+        <PlayerDetailsModal 
+          playerDetails={playerDetails}
+          loading={loadingDetails}
+          onClose={closeDetails}
+        />
       )}
     </div>
   );

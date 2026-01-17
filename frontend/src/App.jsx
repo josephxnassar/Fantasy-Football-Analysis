@@ -6,17 +6,6 @@ import PlayerSearch from './components/PlayerSearch';
 function App() {
   const [activeTab, setActiveTab] = useState('rankings');
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'rankings':
-        return <Rankings />;
-      case 'search':
-        return <PlayerSearch />;
-      default:
-        return <Rankings />;
-    }
-  };
-
   return (
     <div className="App">
       <header className="app-header">
@@ -42,7 +31,7 @@ function App() {
       </nav>
 
       <main>
-        {renderContent()}
+        {activeTab === 'rankings' ? <Rankings /> : <PlayerSearch />}
       </main>
     </div>
   );

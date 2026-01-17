@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getRankings, getPlayer } from '../api';
+import PlayerDetailsModal from './PlayerDetailsModal';
 import './Rankings.css';
 
 export default function Rankings() {
@@ -12,11 +13,7 @@ export default function Rankings() {
   const [playerDetails, setPlayerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  useEffect(() => {
-    fetchRankings();
-  }, [format, position]);
-
-  const fetchRankings = async () => {
+  const fetchRankings = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getRankings(format, position);
@@ -28,7 +25,11 @@ export default function Rankings() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [format, position]);
+
+  useEffect(() => {
+    fetchRankings();
+  }, [fetchRankings]);
 
   const handlePlayerClick = async (playerName) => {
     try {
@@ -115,7 +116,7 @@ export default function Rankings() {
                   </thead>
                   <tbody>
                     {players.map((player, idx) => (
-                      <tr key={idx}>
+                      <tr key={player.name || player[Object.keys(player)[0]]}>
                         <td>{idx + 1}</td>
                         <td>
                           <span 
@@ -163,7 +164,7 @@ export default function Rankings() {
                 </thead>
                 <tbody>
                   {allPlayers.map((player, idx) => (
-                    <tr key={idx}>
+                    <tr key={player.playerName}>
                       <td>{idx + 1}</td>
                       <td>
                         <span 
@@ -184,46 +185,12 @@ export default function Rankings() {
         })()}
       </div>
 
-      {playerDetails && (
-        <div className="modal-overlay" onClick={closeDetails}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={closeDetails}>×</button>
-            
-            {loadingDetails ? (
-              <div className="loading">Loading player details...</div>
-            ) : (
-              <>
-                <h2>{playerDetails.name}</h2>
-                <div className="player-details">
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <span className="label">Position:</span>
-                      <span className="value">{playerDetails.position}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="label">Team:</span>
-                      <span className="value">{playerDetails.team || 'N/A'}</span>
-                    </div>
-                  </div>
-
-                  <div className="stats-section">
-                    <h3>Stats</h3>
-                    <div className="stats-grid">
-                      {Object.entries(playerDetails.stats).map(([key, value]) => (
-                        <div key={key} className="stat-item">
-                          <span className="stat-label">{key}:</span>
-                          <span className="stat-value">
-                            {typeof value === 'number' ? value.toFixed(2) : value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+      {(playerDetails || loadingDetails) && (
+        <PlayerDetailsModal 
+          playerDetails={playerDetails}
+          loading={loadingDetails}
+          onClose={closeDetails}
+        />
       )}
     </div>
   );
