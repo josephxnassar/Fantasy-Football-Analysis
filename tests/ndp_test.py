@@ -13,7 +13,7 @@ def test_load(mocker: MockerFixture):
                        "depth_team":    [ 2,         1        ],
                        "position":      ["TE",      "QB"      ]})
     
-    mock_depth = mocker.patch("source.depth_chart.ndp.nfl.import_depth_charts", return_value = df)
+    mock_depth = mocker.patch("backend.depth_chart.ndp.nfl.import_depth_charts", return_value = df)
 
     expected_df = pd.DataFrame({"club_code":  ["KC",              "KC"           ],
                                 "depth_team": [ 1,                 2             ],

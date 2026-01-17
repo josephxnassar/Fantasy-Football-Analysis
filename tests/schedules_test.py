@@ -10,7 +10,7 @@ def test_load(mocker):
                        'away_team': ['NYG', 'DAL'],
                        'home_team': ['PHI', 'WSH']})
     
-    mock_schedule = mocker.patch("source.schedules.schedules.nfl.import_schedules", return_value = df)
+    mock_schedule = mocker.patch("backend.schedules.schedules.nfl.import_schedules", return_value = df)
     
     sched = Schedules([2024])
     mock_schedule.assert_called_once()
@@ -31,7 +31,7 @@ def test_create_combined_schedule_only(mocker: MockerFixture):
                        'home_team': ['PHI', 'WAS', 'WAS', 'DAL'],
                        'game_type': ['REG', 'REG', 'REG', 'REG']})
     
-    mocker.patch("source.schedules.schedules.Schedules._load", return_value = df.drop(columns='game_type'))
+    mocker.patch("backend.schedules.schedules.Schedules._load", return_value = df.drop(columns='game_type'))
 
     sched = Schedules([2024])
     result = sched._create_combined_schedule()
@@ -49,10 +49,10 @@ def test_run(mocker: MockerFixture):
     
     filled_df = pd.DataFrame({'Opponent': ['Team1', 'Team2']}, index=pd.Index([1, 2], name='Team'))
     
-    mocker.patch("source.schedules.schedules.Schedules._load", return_value = pd.DataFrame())
-    mock_combined = mocker.patch("source.schedules.schedules.Schedules._create_combined_schedule", return_value = df)
-    mock_bye = mocker.patch("source.schedules.schedules.Schedules._fill_bye_weeks", return_value = filled_df)
-    mock_cache = mocker.patch("source.schedules.schedules.Schedules.set_cache")
+    mocker.patch("backend.schedules.schedules.Schedules._load", return_value = pd.DataFrame())
+    mock_combined = mocker.patch("backend.schedules.schedules.Schedules._create_combined_schedule", return_value = df)
+    mock_bye = mocker.patch("backend.schedules.schedules.Schedules._fill_bye_weeks", return_value = filled_df)
+    mock_cache = mocker.patch("backend.schedules.schedules.Schedules.set_cache")
 
     sched = Schedules([2024])
     sched.run()

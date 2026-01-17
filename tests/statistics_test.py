@@ -9,8 +9,8 @@ def test_load_key(mocker: MockerFixture):
                        "player_name":          ["Patrick Mahomes", "Travis Kelce"],
                        "depth_chart_position": ["QB",              "TE"          ]})
     
-    mock_key = mocker.patch("source.statistics.statistics.nfl.import_seasonal_rosters", return_value = df)
-    mocker.patch("source.statistics.statistics.nfl.import_seasonal_data")
+    mock_key = mocker.patch("backend.statistics.statistics.nfl.import_seasonal_rosters", return_value = df)
+    mocker.patch("backend.statistics.statistics.nfl.import_seasonal_data")
     
     stats = Statistics([2024], ["ridge"])
     mock_key.assert_called_once()
@@ -21,8 +21,8 @@ def test_load_data(mocker: MockerFixture):
     df = pd.DataFrame({'player_id':   ['12345', '67890'], 'season':      [2024, 2024],
                        'season_type': ['REG',   'REG'  ], 'completions': [300,  275 ]})
     
-    mocker.patch("source.statistics.statistics.nfl.import_seasonal_rosters")
-    mock_load_data = mocker.patch("source.statistics.statistics.Statistics._load", return_value = df)
+    mocker.patch("backend.statistics.statistics.nfl.import_seasonal_rosters")
+    mock_load_data = mocker.patch("backend.statistics.statistics.Statistics._load", return_value = df)
 
     stats = Statistics([2024], ["ridge"])
     mock_load_data.assert_called_once()
@@ -71,7 +71,7 @@ def test_create_ratings(mocker: MockerFixture):
     mock_instance.get_ratings.return_value = pd.DataFrame({'player': ['Player A', 'Player B', 'Player C'],
                                                            'rating': [ 0.9,        0.85,       0.8      ]})
 
-    mock_regression = mocker.patch("source.statistics.statistics.Regression", return_value = mock_instance)
+    mock_regression = mocker.patch("backend.statistics.statistics.Regression", return_value = mock_instance)
 
     stats = Statistics.__new__(Statistics)
     result = stats._create_ratings(df, "ridge")
@@ -102,9 +102,9 @@ def test_run(mocker: MockerFixture):
     mock_ratings_df = pd.DataFrame({'player': ['Player A', 'Player B'],
                                     'rating': [0.95, 0.90]})
 
-    mock_partition = mocker.patch("source.statistics.statistics.Statistics._partition", return_value = fake_partition)
-    mock_filter_df = mocker.patch("source.statistics.statistics.Statistics._filter_df", return_value = mock_filtered_df)
-    mock_create_ratings = mocker.patch("source.statistics.statistics.Statistics._create_ratings", return_value = mock_ratings_df)
+    mock_partition = mocker.patch("backend.statistics.statistics.Statistics._partition", return_value = fake_partition)
+    mock_filter_df = mocker.patch("backend.statistics.statistics.Statistics._filter_df", return_value = mock_filtered_df)
+    mock_create_ratings = mocker.patch("backend.statistics.statistics.Statistics._create_ratings", return_value = mock_ratings_df)
 
     stats = Statistics.__new__(Statistics)
     stats.ratings_method = "ridge"
