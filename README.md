@@ -10,6 +10,10 @@ Full-stack analysis tool for collecting, processing, and analyzing NFL player de
   - Download from [nodejs.org](https://nodejs.org/)
   - npm comes bundled with Node.js
 
+**Why Virtual Environment?**
+
+This project uses a Python virtual environment (venv) because `nfl_data_py` requires specific versions of pandas (1.5.3) and numpy (1.23.5). Using venv keeps these dependencies isolated from your system Python, preventing version conflicts with other projects.
+
 ---
 
 ## 📂 Modules
@@ -54,7 +58,30 @@ This will open two terminal windows:
 
 ### Manual Setup (If needed)
 
-#### 1. 📦 Install Backend Dependencies
+#### 1. � Create Virtual Environment (Recommended)
+
+Create and activate a Python virtual environment to isolate project dependencies:
+
+**Windows (PowerShell):**
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+**macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+You'll see `(venv)` in your terminal prompt when activated. To deactivate later, simply run:
+```bash
+deactivate
+```
+
+#### 2. 📦 Install Backend Dependencies
+
+With your virtual environment activated:
 
 ```bash
 pip install -r requirements.txt
@@ -70,7 +97,9 @@ Required Python packages:
 - `uvicorn`
 - `pydantic`
 
-#### 2. 🎨 Install Frontend Dependencies
+**Note:** Always activate your virtual environment before installing dependencies or running the backend.
+
+#### 3. 🎨 Install Frontend Dependencies
 
 **⚠️ REQUIRED:** You must have **Node.js 16+** installed to run the frontend.
 - Download from [nodejs.org](https://nodejs.org/) if not already installed
@@ -84,7 +113,9 @@ npm install
 
 This will install React 18.2, Vite, Axios, and all other frontend dependencies.
 
-#### 3. 🚀 Start Backend API
+#### 4. 🚀 Start Backend API
+
+Ensure your virtual environment is activated, then:
 
 ```bash
 python run_api.py
@@ -92,7 +123,7 @@ python run_api.py
 
 Backend will run on `http://localhost:8000` with auto-reload enabled.
 
-#### 4. 🎨 Start Frontend Dev Server
+#### 5. 🎨 Start Frontend Dev Server
 
 In a new terminal, from the project root:
 
