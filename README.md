@@ -2,6 +2,14 @@
 
 Full-stack analysis tool for collecting, processing, and analyzing NFL player depth charts and statistics. Features both a Python backend API (FastAPI) and a React frontend for interactive player rankings with detailed stats.
 
+## ⚙️ Prerequisites
+
+**Required Software:**
+- **Python 3.8+** - Backend API and data processing
+- **Node.js 16+** - Frontend development and build tooling
+  - Download from [nodejs.org](https://nodejs.org/)
+  - npm comes bundled with Node.js
+
 ---
 
 ## 📂 Modules
@@ -23,6 +31,8 @@ Scrapes player depth chart information directly from ESPN's website.
 ## ▶️ Running the Program
 
 ### Quick Start (Recommended)
+
+**⚠️ Prerequisites:** Ensure you have **Node.js 16+** and **Python 3.8+** installed before proceeding.
 
 Run both backend and frontend servers with one command:
 
@@ -62,7 +72,10 @@ Required Python packages:
 
 #### 2. 🎨 Install Frontend Dependencies
 
-**Requirements:** Node.js 16+ and npm (comes with Node.js)
+**⚠️ REQUIRED:** You must have **Node.js 16+** installed to run the frontend.
+- Download from [nodejs.org](https://nodejs.org/) if not already installed
+- npm is included automatically with Node.js
+- Verify installation: `node --version` and `npm --version`
 
 ```bash
 cd frontend
