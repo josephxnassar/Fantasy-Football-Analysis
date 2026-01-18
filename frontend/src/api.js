@@ -15,8 +15,10 @@ export const getRankings = (format = 'redraft', position = null) => {
   });
 };
 
-export const getPlayer = (playerName) => {
-  return api.get(`/player/${playerName}`);
+export const getPlayer = (playerName, season = null) => {
+  return api.get(`/player/${playerName}`, {
+    params: season ? { season } : {},
+  });
 };
 
 export const searchPlayers = (query, position = null) => {

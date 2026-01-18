@@ -12,8 +12,11 @@ export default function PlayerSearch() {
   
   const { 
     playerDetails, 
-    loadingDetails, 
-    handlePlayerClick, 
+    loadingDetails,
+    availableSeasons,
+    currentSeason,
+    handlePlayerClick,
+    handleSeasonChange,
     closeDetails 
   } = usePlayerDetails();
 
@@ -87,6 +90,9 @@ export default function PlayerSearch() {
           playerDetails={playerDetails}
           loading={loadingDetails}
           onClose={closeDetails}
+          availableSeasons={availableSeasons}
+          currentSeason={currentSeason}
+          onSeasonChange={handleSeasonChange}
         />
       )}
     </div>

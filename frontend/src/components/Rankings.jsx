@@ -13,8 +13,11 @@ export default function Rankings() {
   
   const { 
     playerDetails, 
-    loadingDetails, 
-    handlePlayerClick, 
+    loadingDetails,
+    availableSeasons,
+    currentSeason,
+    handlePlayerClick,
+    handleSeasonChange,
     closeDetails 
   } = usePlayerDetails();
 
@@ -134,8 +137,8 @@ export default function Rankings() {
             });
           });
           
-          // Sort by percentile descending
-          allPlayers.sort((a, b) => (b.percentile || 0) - (a.percentile || 0));
+          // Sort by Rating descending (not percentile)
+          allPlayers.sort((a, b) => (b.Rating || 0) - (a.Rating || 0));
           
           return (
             <div className="position-section">
@@ -177,6 +180,9 @@ export default function Rankings() {
           playerDetails={playerDetails}
           loading={loadingDetails}
           onClose={closeDetails}
+          availableSeasons={availableSeasons}
+          currentSeason={currentSeason}
+          onSeasonChange={handleSeasonChange}
         />
       )}
     </div>

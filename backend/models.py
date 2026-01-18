@@ -35,6 +35,7 @@ class PlayerResponse(BaseModel):
     position: str = Field(..., description="Player position: QB, RB, WR, TE")
     team: Optional[str] = Field(None, description="Team abbreviation")
     stats: Dict[str, Any] = Field(..., description="Player statistics")
+    available_seasons: List[int] = Field(default_factory=list, description="Seasons where player has data")
     
     class Config:
         json_schema_extra = {
@@ -42,7 +43,8 @@ class PlayerResponse(BaseModel):
                 "name": "Ja'Marr Chase",
                 "position": "WR",
                 "team": "CIN",
-                "stats": {"rating": 401.52, "receptions": 127.0}
+                "stats": {"rating": 401.52, "receptions": 127.0},
+                "available_seasons": [2021, 2022, 2023, 2024]
             }
         }
 

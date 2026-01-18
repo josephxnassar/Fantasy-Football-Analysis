@@ -39,6 +39,25 @@ app = App()
 app.load()  # Load cached data
 
 
+def _find_player_in_cache(player_name: str, cache_data: dict) -> tuple:
+    """Helper to find player and return (data, position). Returns (None, None) if not found."""
+    for position, df in cache_data.items():
+        if player_name in df.index:
+            return df.loc[player_name].to_dict(), position
+    return None, None
+
+
+def _get_player_available_seasons(player_name: str, by_year_stats: dict) -> list:
+    """Get list of seasons where player has data."""
+    seasons = []
+    for season, season_data in by_year_stats.items():
+        for position, df in season_data.items():
+            if player_name in df.index:
+                seasons.append(season)
+                break
+    return seasons
+
+
 @api.get("/")
 def read_root():
     """Root endpoint - API status"""
@@ -77,6 +96,9 @@ def get_rankings(
         if not stats_cache:
             raise HTTPException(status_code=503, detail="Statistics data not loaded")
         
+        # Get averaged stats (with ratings) from new cache structure
+        averaged_stats = stats_cache.get('averaged', stats_cache)  # Fallback to old structure
+        
         # Build rankings response
         rankings_by_position = {}
         
@@ -84,8 +106,8 @@ def get_rankings(
         positions_to_fetch = [position] if position else valid_positions
         
         for pos in positions_to_fetch:
-            if pos in stats_cache:
-                df = stats_cache[pos].copy()  # Make a copy to avoid modifying cached data
+            if pos in averaged_stats:
+                df = averaged_stats[pos].copy()  # Make a copy to avoid modifying cached data
                 
                 # Calculate percentile for each player
                 rating_col = 'Rating' if 'Rating' in df.columns else df.columns[0]
@@ -110,27 +132,37 @@ def get_rankings(
 
 
 @api.get("/api/player/{player_name}", response_model=PlayerResponse)
-def get_player(player_name: str):
+def get_player(player_name: str, season: int = None):
     """
     Get detailed player information including stats and team
     
     - **player_name**: The player's name (e.g., "Ja'Marr Chase")
+    - **season**: Optional season year (e.g., 2024). If not provided, returns averaged stats with rating.
     """
     try:
-        # Search for player in Statistics cache
         stats_cache = app.caches.get("Statistics", {})
-        player_data = None
-        player_position = None
         
-        # Find player across all positions
-        for position, df in stats_cache.items():
-            if player_name in df.index:
-                player_data = df.loc[player_name].to_dict()
-                player_position = position
-                break
+        # Determine which data source to use and get player data
+        if season is not None:
+            by_year_stats = stats_cache.get('by_year', {})
+            season_stats = by_year_stats.get(season, {})
+            
+            if not season_stats:
+                raise HTTPException(status_code=404, detail=f"No data available for season {season}")
+            
+            player_data, player_position = _find_player_in_cache(player_name, season_stats)
+        else:
+            averaged_stats = stats_cache.get('averaged', stats_cache)
+            player_data, player_position = _find_player_in_cache(player_name, averaged_stats)
         
         if not player_data:
             raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
+        
+        # Get available seasons for this player (only if showing averaged data)
+        player_seasons = []
+        if season is None:
+            by_year_stats = stats_cache.get('by_year', {})
+            player_seasons = _get_player_available_seasons(player_name, by_year_stats)
         
         # Filter out stats with 0 or near-0 values (keep only meaningful stats)
         filtered_stats = {
@@ -147,10 +179,8 @@ def get_player(player_name: str):
         depth_charts = app.caches.get("ESPNDepthChart", {})
         player_team = None
         
-        # Search through each team's depth chart
         for team, dc_data in depth_charts.items():
             try:
-                # Check if player name appears in any column of this team's depth chart
                 for col in dc_data.columns:
                     if player_name in dc_data[col].values:
                         player_team = team
@@ -161,12 +191,12 @@ def get_player(player_name: str):
                 logger.warning(f"Error searching depth chart for team {team}: {e}")
                 continue
         
-        
         return PlayerResponse(
             name=player_name,
             position=player_position,
             team=player_team,
-            stats=filtered_stats
+            stats=filtered_stats,
+            available_seasons=player_seasons
         )
     except HTTPException:
         raise
@@ -188,10 +218,11 @@ def search_players(q: str, position: str = None):
     
     try:
         stats_cache = app.caches.get("Statistics", {})
+        averaged_stats = stats_cache.get('averaged', stats_cache)
         query_lower = q.lower()
         results = []
         
-        for pos, df in stats_cache.items():
+        for pos, df in averaged_stats.items():
             if position and pos != position:
                 continue
             

@@ -1,4 +1,5 @@
 from backend import *
+from backend.util import constants
 
 class App:
     def __init__(self):
@@ -6,7 +7,12 @@ class App:
        self.caches = {}
     
     def run(self):
-        instances = [ESPNDepthChart(), NDPDepthChart([2024]), Schedules([2025]), Statistics([2022, 2023, 2024])]
+        instances = [
+            ESPNDepthChart(), 
+            NDPDepthChart([2024]), 
+            Schedules([2025]), 
+            Statistics(constants.STATISTICS_SEASONS)
+        ]
 
         for instance in instances:
             instance.run()

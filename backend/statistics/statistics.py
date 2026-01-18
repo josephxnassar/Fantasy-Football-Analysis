@@ -88,7 +88,9 @@ class Statistics(BaseSource):
         super().__init__(seasons)
         self.ratings_method = method
         self.id_to_player = self._load_key()
-        self.seasonal_data = self._load()
+        self.raw_seasonal_data = self._load()  # Load once via abstract method
+        self.seasonal_data = self._compute_averaged_data()  # Averaged data for ratings
+        self.seasonal_data_by_year = self._split_by_year()  # Individual season data
 
     def get_keys(self) -> list:
         return constants.POSITIONS
@@ -102,18 +104,40 @@ class Statistics(BaseSource):
             raise
 
     def _load(self) -> pd.DataFrame:
+        """Load raw seasonal data once (implements abstract method from BaseSource)"""
         try:
-            sd = nfl.import_seasonal_data(self.seasons)
-            return sd.drop(columns=['season', 'season_type']).groupby('player_id').mean().reset_index().dropna()
+            return nfl.import_seasonal_data(self.seasons)
         except Exception as e:
             logger.error(f"Error loading seasonal data: {e}")
             raise
-
-    def _partition(self) -> dict:
+    
+    def _compute_averaged_data(self) -> pd.DataFrame:
+        """Compute averaged data from raw seasonal data"""
         try:
-            cols = ['player_name'] + self.seasonal_data.columns.tolist()[1:]
+            return self.raw_seasonal_data.drop(columns=['season', 'season_type']).groupby('player_id').mean().reset_index().dropna()
+        except Exception as e:
+            logger.error(f"Error computing averaged data: {e}")
+            raise
+    
+    def _split_by_year(self) -> dict:
+        """Split raw data by year"""
+        try:
+            seasonal_dict = {}
+            for season in self.seasons:
+                season_data = self.raw_seasonal_data[self.raw_seasonal_data['season'] == season].copy()
+                season_data = season_data.drop(columns=['season', 'season_type']).dropna()
+                seasonal_dict[season] = season_data
+            return seasonal_dict
+        except Exception as e:
+            logger.error(f"Error splitting data by year: {e}")
+            raise
+
+    def _partition_data(self, data: pd.DataFrame) -> dict:
+        """Partition data by position (works for both averaged and seasonal data)"""
+        try:
+            cols = ['player_name'] + data.columns.tolist()[1:]
             position_data = defaultdict(list)
-            for _, row in self.seasonal_data.iterrows():
+            for _, row in data.iterrows():
                 try:
                     player_name, position = self.id_to_player[row.player_id]
                     if position in constants.POSITIONS:
@@ -153,13 +177,30 @@ class Statistics(BaseSource):
             raise
 
     def run(self) -> None:
+        # Process averaged data with ratings
         stats = {}
-        for pos, df in self._partition().items():
+        for pos, df in self._partition_data(self.seasonal_data).items():
             try:
                 filtered_df = self._filter_df(df)
                 ratings_df = self._create_ratings(filtered_df, self.ratings_method)
-                # Rename columns to presentable names
                 stats[pos] = self._rename_columns(ratings_df)
             except Exception as e:
                 logger.error(f"Failed to process position '{pos}': {e}")
-        self.set_cache(stats)
+        
+        # Process individual season data (no ratings, just renamed columns)
+        stats_by_year = {}
+        for season, season_data in self.seasonal_data_by_year.items():
+            season_stats = {}
+            for pos, df in self._partition_data(season_data).items():
+                try:
+                    season_stats[pos] = self._rename_columns(df)
+                except Exception as e:
+                    logger.error(f"Failed to process position '{pos}' for season {season}: {e}")
+            stats_by_year[season] = season_stats
+        
+        # Store both in cache
+        self.set_cache({
+            'averaged': stats,
+            'by_year': stats_by_year,
+            'available_seasons': self.seasons
+        })
