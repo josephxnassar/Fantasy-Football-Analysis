@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getRankings } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
+import { getPlayerName, formatPercentile } from '../utils/helpers';
 import './Rankings.css';
 
 export default function Rankings() {
@@ -42,6 +43,72 @@ export default function Rankings() {
   if (loading) return <div className="loading">Loading rankings...</div>;
   if (error) return <div className="error">Error: {error}</div>;
   if (!rankings) return <div className="error">No data available</div>;
+
+  const renderPlayerRow = (player, idx, showPosition = false) => {
+    const playerName = showPosition ? player.playerName : getPlayerName(player);
+    return (
+      <tr key={playerName}>
+        <td>{idx + 1}</td>
+        <td>
+          <span className="player-name-link" onClick={() => handlePlayerClick(playerName)}>
+            {playerName}
+          </span>
+        </td>
+        {showPosition && <td>{player.position}</td>}
+        <td>{formatPercentile(player.percentile)}</td>
+      </tr>
+    );
+  };
+
+  const renderPositionTables = () => 
+    Object.entries(rankings.rankings).map(([pos, players]) => (
+      <div key={pos} className="position-section">
+        <h2>{pos}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Percentile</th>
+            </tr>
+          </thead>
+          <tbody>
+            {players.map((player, idx) => renderPlayerRow(player, idx))}
+          </tbody>
+        </table>
+      </div>
+    ));
+
+  const renderOverallTable = () => {
+    const allPlayers = Object.entries(rankings.rankings).flatMap(([pos, players]) =>
+      players.map(player => ({
+        ...player,
+        position: pos,
+        playerName: getPlayerName(player)
+      }))
+    );
+    
+    allPlayers.sort((a, b) => (b.Rating || 0) - (a.Rating || 0));
+    
+    return (
+      <div className="position-section">
+        <h2>Overall Rankings</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Position</th>
+              <th>Percentile</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allPlayers.map((player, idx) => renderPlayerRow(player, idx, true))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
     <div className="rankings-container">
@@ -90,89 +157,7 @@ export default function Rankings() {
       </div>
 
       <div className="rankings-table">
-        {rankings.rankings && (() => {
-          // If a specific position is selected, show separate tables
-          if (position) {
-            return Object.entries(rankings.rankings).map(([pos, players]) => (
-              <div key={pos} className="position-section">
-                <h2>{pos}</h2>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Rank</th>
-                      <th>Player</th>
-                      <th>Percentile</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {players.map((player, idx) => (
-                      <tr key={player.name || player[Object.keys(player)[0]]}>
-                        <td>{idx + 1}</td>
-                        <td>
-                          <span 
-                            className="player-name-link"
-                            onClick={() => handlePlayerClick(player.name || player[Object.keys(player)[0]])}
-                          >
-                            {player.name || player[Object.keys(player)[0]]}
-                          </span>
-                        </td>
-                        <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ));
-          }
-          
-          // Overall view: combine all positions into one table
-          const allPlayers = [];
-          Object.entries(rankings.rankings).forEach(([pos, players]) => {
-            players.forEach(player => {
-              allPlayers.push({
-                ...player,
-                position: pos,
-                playerName: player.name || player[Object.keys(player)[0]]
-              });
-            });
-          });
-          
-          // Sort by Rating descending (not percentile)
-          allPlayers.sort((a, b) => (b.Rating || 0) - (a.Rating || 0));
-          
-          return (
-            <div className="position-section">
-              <h2>Overall Rankings</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Position</th>
-                    <th>Percentile</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allPlayers.map((player, idx) => (
-                    <tr key={player.playerName}>
-                      <td>{idx + 1}</td>
-                      <td>
-                        <span 
-                          className="player-name-link"
-                          onClick={() => handlePlayerClick(player.playerName)}
-                        >
-                          {player.playerName}
-                        </span>
-                      </td>
-                      <td>{player.position}</td>
-                      <td>{typeof player.percentile === 'number' ? `${Math.round(player.percentile)}%` : 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })()}
+        {position ? renderPositionTables() : renderOverallTable()}
       </div>
 
       {(playerDetails || loadingDetails) && (

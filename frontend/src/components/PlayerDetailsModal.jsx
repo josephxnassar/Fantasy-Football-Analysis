@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getStatDefinition, isKeyStat, groupStatsByCategory } from '../statDefinitions';
+import { formatStatValue } from '../utils/helpers';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ 
@@ -12,8 +13,35 @@ export default function PlayerDetailsModal({
 }) {
   if (!playerDetails && !loading) return null;
 
-  // Extract the rating from player details to keep it constant
   const rating = playerDetails?.stats?.Rating;
+
+  const renderStatCategories = (details) => {
+    const groupedStats = groupStatsByCategory(details.stats);
+    
+    return Object.entries(groupedStats).map(([category, stats]) => {
+      const filteredStats = Object.entries(stats).filter(([key]) => key !== 'Rating');
+      
+      if (filteredStats.length === 0 || category === 'Core') return null;
+      
+      return (
+        <div key={category} className="stat-category">
+          <h4 className="category-title">{category}</h4>
+          <div className="stats-grid">
+            {filteredStats.map(([key, value]) => (
+              <div 
+                key={key} 
+                className={`stat-item ${isKeyStat(key, details.position) ? 'key-stat' : ''}`}
+                title={getStatDefinition(key)}
+              >
+                <span className="stat-label">{key}</span>
+                <span className="stat-value">{formatStatValue(value)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -69,38 +97,7 @@ export default function PlayerDetailsModal({
 
               <div className="stats-section">
                 <h3>Statistics {currentSeason ? `(${currentSeason} Season)` : '(Career Average)'}</h3>
-                {(() => {
-                  const groupedStats = groupStatsByCategory(playerDetails.stats);
-                  return Object.entries(groupedStats).map(([category, stats]) => {
-                    // Filter out Rating from stats
-                    const filteredStats = Object.entries(stats).filter(([key]) => key !== 'Rating');
-                    
-                    // Skip empty categories or Core category (since we show Rating separately)
-                    if (filteredStats.length === 0 || category === 'Core') return null;
-                    
-                    return (
-                      <div key={category} className="stat-category">
-                        <h4 className="category-title">{category}</h4>
-                        <div className="stats-grid">
-                          {filteredStats.map(([key, value]) => (
-                            <div 
-                              key={key} 
-                              className={`stat-item ${isKeyStat(key, playerDetails.position) ? 'key-stat' : ''}`}
-                              title={getStatDefinition(key)}
-                            >
-                              <span className="stat-label">{key}</span>
-                              <span className="stat-value">
-                                {typeof value === 'number' 
-                                  ? (Number.isInteger(value) ? value : value.toFixed(2))
-                                  : value}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  });
-                })()}
+                {renderStatCategories(playerDetails)}
               </div>
             </div>
           </>
