@@ -8,6 +8,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Stats that should be displayed as whole numbers (counts, yards, TDs)
+INTEGER_STATS = {
+    'Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 
+    'Sack Fum', 'Sack Fum Lost', 'Air Yds', 'YAC', 'Pass 1st', 'Pass 2PT',
+    'Carries', 'Rush Yds', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush 2PT',
+    'Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Rec Fum', 'Rec Fum Lost', 
+    'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'ST TD',
+    'Fantasy Pts', 'PPR Pts'
+}
+
 # Initialize FastAPI app
 api = FastAPI(
     title="Fantasy Football API",
@@ -122,6 +132,17 @@ def get_player(player_name: str):
         if not player_data:
             raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
         
+        # Filter out stats with 0 or near-0 values (keep only meaningful stats)
+        filtered_stats = {
+            stat: value for stat, value in player_data.items() 
+            if not (isinstance(value, (int, float)) and abs(value) < 0.01)
+        }
+        
+        # Convert appropriate stats to whole numbers
+        for stat in filtered_stats:
+            if stat in INTEGER_STATS and isinstance(filtered_stats[stat], (int, float)):
+                filtered_stats[stat] = int(round(filtered_stats[stat]))
+        
         # Get player's team from depth charts
         depth_charts = app.caches.get("ESPNDepthChart", {})
         player_team = None
@@ -145,7 +166,7 @@ def get_player(player_name: str):
             name=player_name,
             position=player_position,
             team=player_team,
-            stats=player_data
+            stats=filtered_stats
         )
     except HTTPException:
         raise

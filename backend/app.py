@@ -6,7 +6,7 @@ class App:
        self.caches = {}
     
     def run(self):
-        instances = [ESPNDepthChart(), NDPDepthChart([2024]), Schedules([2025]), Statistics([2024])]
+        instances = [ESPNDepthChart(), NDPDepthChart([2024]), Schedules([2025]), Statistics([2022, 2023, 2024])]
 
         for instance in instances:
             instance.run()

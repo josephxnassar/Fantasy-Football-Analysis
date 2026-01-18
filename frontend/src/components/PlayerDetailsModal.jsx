@@ -1,4 +1,5 @@
 import React from 'react';
+import { getStatDefinition } from '../statDefinitions';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ playerDetails, loading, onClose }) {
@@ -30,7 +31,7 @@ export default function PlayerDetailsModal({ playerDetails, loading, onClose }) 
                 <h3>Stats</h3>
                 <div className="stats-grid">
                   {Object.entries(playerDetails.stats).map(([key, value]) => (
-                    <div key={key} className="stat-item">
+                    <div key={key} className="stat-item" title={getStatDefinition(key)}>
                       <span className="stat-label">{key}:</span>
                       <span className="stat-value">
                         {typeof value === 'number' ? value.toFixed(2) : value}
