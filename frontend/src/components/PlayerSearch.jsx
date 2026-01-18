@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { searchPlayers, getPlayer } from '../api';
+import { searchPlayers } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
+import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import './PlayerSearch.css';
 
 export default function PlayerSearch() {
@@ -8,9 +9,13 @@ export default function PlayerSearch() {
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [playerDetails, setPlayerDetails] = useState(null);
-  const [loadingDetails, setLoadingDetails] = useState(false);
+  
+  const { 
+    playerDetails, 
+    loadingDetails, 
+    handlePlayerClick, 
+    closeDetails 
+  } = usePlayerDetails();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -30,25 +35,6 @@ export default function PlayerSearch() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlePlayerClick = async (playerName) => {
-    try {
-      setLoadingDetails(true);
-      setSelectedPlayer(playerName);
-      const response = await getPlayer(playerName);
-      setPlayerDetails(response.data);
-    } catch (err) {
-      setError(`Failed to load player details: ${err.message}`);
-      console.error('Error loading player:', err);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
-  const closeDetails = () => {
-    setPlayerDetails(null);
-    setSelectedPlayer(null);
   };
 
   return (

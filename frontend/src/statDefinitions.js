@@ -72,3 +72,60 @@ export const STAT_DEFINITIONS = {
 export function getStatDefinition(statName) {
   return STAT_DEFINITIONS[statName] || 'No definition available';
 }
+
+// Key stats to highlight for each position
+export const KEY_STATS_BY_POSITION = {
+  'QB': ['Pass Yds', 'Pass TD', 'INT', 'Comp', 'Att', 'PPR Pts', 'Rating'],
+  'RB': ['Rush Yds', 'Rush TD', 'Carries', 'Rec', 'Rec Yds', 'PPR Pts', 'Rating'],
+  'WR': ['Rec', 'Rec Yds', 'Rec TD', 'Tgt', 'Rec YAC', 'PPR Pts', 'Rating'],
+  'TE': ['Rec', 'Rec Yds', 'Rec TD', 'Tgt', 'Rec YAC', 'PPR Pts', 'Rating'],
+};
+
+export function isKeyStat(statName, position) {
+  const keyStats = KEY_STATS_BY_POSITION[position] || [];
+  return keyStats.includes(statName);
+}
+
+// Stat categories for grouping
+export const STAT_CATEGORIES = {
+  'Core': ['Fantasy Pts', 'PPR Pts', 'Rating'],
+  'Passing': ['Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Air Yds', 'YAC', 'Pass 1st', 'Pass EPA', 'Pass 2PT', 'PACR'],
+  'Rushing': ['Carries', 'Rush Yds', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush EPA', 'Rush 2PT'],
+  'Receiving': ['Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Rec Fum', 'Rec Fum Lost', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec EPA', 'Rec 2PT'],
+  'Market Share': ['Tgt %', 'Air Yds %', 'YAC %', 'Rec Yds %', 'Rec TD %', 'Rec 1st %', 'TD+1st %', 'PPR %'],
+  'Advanced': ['RACR', 'Yds/TmAtt', 'WOPR', 'WOPR-X', 'WOPR-Y', 'Dakota', 'Dominator', 'W8 Dom', 'ST TD'],
+};
+
+export function groupStatsByCategory(stats) {
+  const grouped = {};
+  
+  // Initialize all categories
+  Object.keys(STAT_CATEGORIES).forEach(category => {
+    grouped[category] = {};
+  });
+  
+  // Group stats into categories
+  Object.entries(stats).forEach(([statName, value]) => {
+    let placed = false;
+    for (const [category, statList] of Object.entries(STAT_CATEGORIES)) {
+      if (statList.includes(statName)) {
+        grouped[category][statName] = value;
+        placed = true;
+        break;
+      }
+    }
+    // If stat doesn't fit any category, put in Advanced
+    if (!placed) {
+      grouped['Advanced'][statName] = value;
+    }
+  });
+  
+  // Remove empty categories
+  Object.keys(grouped).forEach(category => {
+    if (Object.keys(grouped[category]).length === 0) {
+      delete grouped[category];
+    }
+  });
+  
+  return grouped;
+}

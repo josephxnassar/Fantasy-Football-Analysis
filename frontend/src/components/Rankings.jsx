@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getRankings, getPlayer } from '../api';
+import { getRankings } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
+import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import './Rankings.css';
 
 export default function Rankings() {
@@ -9,9 +10,13 @@ export default function Rankings() {
   const [error, setError] = useState(null);
   const [format, setFormat] = useState('redraft');
   const [position, setPosition] = useState(null);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [playerDetails, setPlayerDetails] = useState(null);
-  const [loadingDetails, setLoadingDetails] = useState(false);
+  
+  const { 
+    playerDetails, 
+    loadingDetails, 
+    handlePlayerClick, 
+    closeDetails 
+  } = usePlayerDetails();
 
   const fetchRankings = useCallback(async () => {
     try {
@@ -30,24 +35,6 @@ export default function Rankings() {
   useEffect(() => {
     fetchRankings();
   }, [fetchRankings]);
-
-  const handlePlayerClick = async (playerName) => {
-    try {
-      setLoadingDetails(true);
-      setSelectedPlayer(playerName);
-      const response = await getPlayer(playerName);
-      setPlayerDetails(response.data);
-    } catch (err) {
-      setError(`Failed to load player details: ${err.message}`);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
-  const closeDetails = () => {
-    setPlayerDetails(null);
-    setSelectedPlayer(null);
-  };
 
   if (loading) return <div className="loading">Loading rankings...</div>;
   if (error) return <div className="error">Error: {error}</div>;
