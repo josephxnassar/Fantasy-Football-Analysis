@@ -13,7 +13,22 @@ export const getPlayerName = (player) => {
  * Format percentile value for display
  */
 export const formatPercentile = (percentile) => {
-  return typeof percentile === 'number' ? `${Math.round(percentile)}%` : 'N/A';
+  if (typeof percentile !== 'number') return 'N/A';
+  
+  // Convert percentile to letter grade
+  if (percentile >= 97) return 'A+';
+  if (percentile >= 93) return 'A';
+  if (percentile >= 90) return 'A-';
+  if (percentile >= 87) return 'B+';
+  if (percentile >= 83) return 'B';
+  if (percentile >= 80) return 'B-';
+  if (percentile >= 77) return 'C+';
+  if (percentile >= 73) return 'C';
+  if (percentile >= 70) return 'C-';
+  if (percentile >= 67) return 'D+';
+  if (percentile >= 63) return 'D';
+  if (percentile >= 60) return 'D-';
+  return 'F';
 };
 
 /**

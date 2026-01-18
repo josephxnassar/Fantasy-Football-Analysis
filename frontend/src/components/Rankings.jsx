@@ -69,7 +69,7 @@ export default function Rankings() {
             <tr>
               <th>Rank</th>
               <th>Player</th>
-              <th>Percentile</th>
+              <th>Grade</th>
             </tr>
           </thead>
           <tbody>
@@ -99,7 +99,7 @@ export default function Rankings() {
               <th>Rank</th>
               <th>Player</th>
               <th>Position</th>
-              <th>Percentile</th>
+              <th>Grade</th>
             </tr>
           </thead>
           <tbody>
