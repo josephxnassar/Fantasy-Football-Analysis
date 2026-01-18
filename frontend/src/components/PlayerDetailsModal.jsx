@@ -16,7 +16,7 @@ export default function PlayerDetailsModal({
   const rating = playerDetails?.stats?.Rating;
 
   const renderStatCategories = (details) => {
-    const groupedStats = groupStatsByCategory(details.stats);
+    const groupedStats = groupStatsByCategory(details.stats, details.position);
     
     return Object.entries(groupedStats).map(([category, stats]) => {
       const filteredStats = Object.entries(stats).filter(([key]) => key !== 'Rating');

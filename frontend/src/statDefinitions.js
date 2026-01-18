@@ -89,34 +89,41 @@ export function isKeyStat(statName, position) {
 // Stat categories for grouping
 export const STAT_CATEGORIES = {
   'Core': ['Fantasy Pts', 'PPR Pts', 'Rating'],
-  'Passing': ['Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Air Yds', 'YAC', 'Pass 1st', 'Pass EPA', 'Pass 2PT', 'PACR'],
+  'Passing': ['Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Sack Fum', 'Sack Fum Lost', 'Air Yds', 'YAC', 'Pass 1st', 'Pass EPA', 'Pass 2PT', 'PACR'],
   'Rushing': ['Carries', 'Rush Yds', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush EPA', 'Rush 2PT'],
   'Receiving': ['Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Rec Fum', 'Rec Fum Lost', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec EPA', 'Rec 2PT'],
   'Market Share': ['Tgt %', 'Air Yds %', 'YAC %', 'Rec Yds %', 'Rec TD %', 'Rec 1st %', 'TD+1st %', 'PPR %'],
   'Advanced': ['RACR', 'Yds/TmAtt', 'WOPR', 'WOPR-X', 'WOPR-Y', 'Dakota', 'Dominator', 'W8 Dom', 'ST TD'],
 };
 
-export function groupStatsByCategory(stats) {
+// Categories to show for each position
+export const CATEGORIES_BY_POSITION = {
+  'QB': ['Passing', 'Rushing'],
+  'RB': ['Rushing', 'Receiving'],
+  'WR': ['Receiving', 'Rushing'],
+  'TE': ['Receiving', 'Rushing'],
+};
+
+export function groupStatsByCategory(stats, position = null) {
   const grouped = {};
   
-  // Initialize all categories
-  Object.keys(STAT_CATEGORIES).forEach(category => {
+  // Determine which categories to show for this position
+  const categoriesToShow = position && CATEGORIES_BY_POSITION[position] 
+    ? CATEGORIES_BY_POSITION[position] 
+    : Object.keys(STAT_CATEGORIES);
+  
+  // Initialize only relevant categories
+  categoriesToShow.forEach(category => {
     grouped[category] = {};
   });
   
   // Group stats into categories
   Object.entries(stats).forEach(([statName, value]) => {
-    let placed = false;
     for (const [category, statList] of Object.entries(STAT_CATEGORIES)) {
-      if (statList.includes(statName)) {
+      if (statList.includes(statName) && categoriesToShow.includes(category)) {
         grouped[category][statName] = value;
-        placed = true;
         break;
       }
-    }
-    // If stat doesn't fit any category, put in Advanced
-    if (!placed) {
-      grouped['Advanced'][statName] = value;
     }
   });
   
