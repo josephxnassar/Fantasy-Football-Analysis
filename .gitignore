@@ -7,3 +7,8 @@ __pycache__/
 *.xlsm
 *.log
 *.db
+
+# NDPDepthChart module (not in active use)
+backend/depth_chart/ndp.py
+tests/ndp_test.py
+docs/ndp.md

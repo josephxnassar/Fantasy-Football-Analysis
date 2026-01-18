@@ -24,11 +24,8 @@ Processes NFL seasonal data by organizing into position and running ridge regres
 ### 2. [`Schedules`](./backend/schedules/schedules.py)
 Processes NFL schedule data by inserting bye weeks where games are missing from the schedule.
 
-### 3. [`NDPDepthChart`](./backend/depth_chart/ndp.py)
-Retrieves offensive player depth charts from `nfl_data_py`.  
-
-### 4. [`ESPNDepthChart`](./backend/depth_chart/espn.py)
-Scrapes player depth chart information directly from ESPN's website.
+### 3. [`ESPNDepthChart`](./backend/depth_chart/espn.py)
+Scrapes player depth chart information directly from ESPN's website for current depth positioning.
 
 ---
 
@@ -144,8 +141,7 @@ backend/              # Backend Python code (FastAPI)
 ├── app.py           # Core App class
 ├── models.py        # Pydantic response schemas
 ├── depth_chart/     # Player depth chart sources
-│   ├── ndp.py
-│   └── espn.py
+│   └── espn.py     # ESPN depth chart scraper
 ├── statistics/      # Player rating calculations
 │   └── ratings/
 ├── schedules/       # NFL schedule data processing
@@ -153,7 +149,6 @@ backend/              # Backend Python code (FastAPI)
 │   ├── DAO/
 │   └── service/
 ├── util/            # Constants and helpers
-├── data/            # Static data files
 └── base_source.py   # Base class for data sources
 
 frontend/            # React + Vite frontend
@@ -222,7 +217,6 @@ Each module's detailed documentation:
 
 - [`statistics.md`](./docs/statistics.md) - Statistics processor and rating algorithms
 - [`schedules.md`](./docs/schedules.md) - Schedule data processing
-- [`ndpdepthchart.md`](./docs/ndp.md) - NFL Data Py depth chart integration
 - [`espndepthchart.md`](./docs/espn.md) - ESPN depth chart scraping
 - [`import_seasonal_data.md`](./docs/import_seasonal_data.md) - Data import guide
 

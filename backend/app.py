@@ -9,7 +9,6 @@ class App:
     def run(self):
         instances = [
             ESPNDepthChart(), 
-            NDPDepthChart([2024]), 
             Schedules([2025]), 
             Statistics(constants.STATISTICS_SEASONS)
         ]
@@ -23,7 +22,7 @@ class App:
             self.db.save_to_db(cache, name)
 
     def load(self):
-        instances = [ESPNDepthChart.__new__(ESPNDepthChart), NDPDepthChart.__new__(NDPDepthChart), Schedules.__new__(Schedules), Statistics.__new__(Statistics)]
+        instances = [ESPNDepthChart.__new__(ESPNDepthChart), Schedules.__new__(Schedules), Statistics.__new__(Statistics)]
         
         for instance in instances:
             name = instance.__class__.__name__
