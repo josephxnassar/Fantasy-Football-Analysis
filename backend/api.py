@@ -75,10 +75,10 @@ def get_rankings(
         
         for pos in positions_to_fetch:
             if pos in stats_cache:
-                df = stats_cache[pos]
+                df = stats_cache[pos].copy()  # Make a copy to avoid modifying cached data
                 
                 # Calculate percentile for each player
-                rating_col = 'rating' if 'rating' in df.columns else df.columns[0]
+                rating_col = 'Rating' if 'Rating' in df.columns else df.columns[0]
                 df['percentile'] = df[rating_col].rank(pct=True) * 100
                 
                 # Convert DataFrame to list of dicts
@@ -179,7 +179,7 @@ def search_players(q: str, position: str = None):
                     results.append({
                         "name": player_name,
                         "position": pos,
-                        "rating": row["rating"] if "rating" in df.columns else 0
+                        "rating": row["Rating"] if "Rating" in df.columns else 0
                     })
         
         # Sort by rating descending
