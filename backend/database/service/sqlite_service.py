@@ -15,87 +15,85 @@ class SQLService:
             logger.warning(f"No cached data to save — call run() first.")
             return
         
-        # Special handling for Statistics with nested structure
         if cls_name == "Statistics" and 'averaged' in cache:
-            # Save averaged stats
-            for key, df in cache['averaged'].items():
-                table_name = f"{cls_name}_averaged_{key}"
-                self.db.save_table(table_name, df)
-            
-            # Save seasonal stats
-            for season, season_data in cache.get('by_year', {}).items():
-                for key, df in season_data.items():
-                    table_name = f"{cls_name}_{season}_{key}"
-                    self.db.save_table(table_name, df)
-            
-            # Save metadata (available seasons)
-            if 'available_seasons' in cache:
-                metadata_table = f"{cls_name}_metadata"
-                metadata_df = pd.DataFrame({'available_seasons': cache['available_seasons']})
-                self.db.save_table(metadata_table, metadata_df, index=False)
+            self._save_statistics_cache(cache, cls_name)
         else:
-            # Standard handling for other data sources
-            for key, df in cache.items():
-                table_name = f"{cls_name}_{key}"
-                self.db.save_table(table_name, df)
+            self._save_standard_cache(cache, cls_name)
+
+    def _save_standard_cache(self, cache: dict, cls_name: str) -> None:
+        """Save standard cache structure"""
+        for key, df in cache.items():
+            self.db.save_table(f"{cls_name}_{key}", df)
+
+    def _save_statistics_cache(self, cache: dict, cls_name: str) -> None:
+        """Save Statistics cache with nested structure"""
+        # Save averaged stats
+        for key, df in cache['averaged'].items():
+            self.db.save_table(f"{cls_name}_averaged_{key}", df)
+        
+        # Save seasonal stats
+        for season, season_data in cache.get('by_year', {}).items():
+            for key, df in season_data.items():
+                self.db.save_table(f"{cls_name}_{season}_{key}", df)
+        
+        # Save metadata
+        if 'available_seasons' in cache:
+            metadata_df = pd.DataFrame({'available_seasons': cache['available_seasons']})
+            self.db.save_table(f"{cls_name}_metadata", metadata_df, index=False)
 
     def load_from_db(self, keys: list, cls_name: str) -> dict:
-        # Special handling for Statistics
         if cls_name == "Statistics":
             return self._load_statistics_cache()
-        
-        # Standard handling for other data sources
+        return self._load_standard_cache(keys, cls_name)
+    
+    def _load_standard_cache(self, keys: list, cls_name: str) -> dict:
+        """Load standard cache structure"""
         data = {}
         for key in keys:
             table_name = f"{cls_name}_{key}"
-            if self.db.table_exists(table_name):
-                try:
-                    data[key] = self.db.load_table(table_name).set_index(key)
-                except Exception as e:
-                    logger.error(f"Error loading table '{table_name}': {e}")
-            else:
-                logger.warning(f"Table '{table_name}' does not exist in database.")
+            df = self._load_table_safe(table_name)
+            if df is not None:
+                data[key] = df.set_index(key)
         return data
+
+    def _load_table_safe(self, table_name: str) -> pd.DataFrame:
+        """Load table if it exists, return None otherwise"""
+        if not self.db.table_exists(table_name):
+            return None
+        try:
+            return self.db.load_table(table_name)
+        except Exception as e:
+            logger.error(f"Error loading table '{table_name}': {e}")
+            return None
     
     def _load_statistics_cache(self) -> dict:
         """Load Statistics cache with nested structure"""
         cache = {}
         
-        # Load metadata to get available seasons
-        metadata_table = "Statistics_metadata"
+        # Load metadata
+        metadata_df = self._load_table_safe("Statistics_metadata")
         available_seasons = []
-        if self.db.table_exists(metadata_table):
-            try:
-                metadata_df = self.db.load_table(metadata_table)
-                available_seasons = metadata_df['available_seasons'].tolist()
-                cache['available_seasons'] = available_seasons
-            except Exception as e:
-                logger.error(f"Error loading Statistics metadata: {e}")
+        if metadata_df is not None:
+            available_seasons = metadata_df['available_seasons'].tolist()
+            cache['available_seasons'] = available_seasons
         
         # Load averaged stats
-        averaged_stats = {}
-        for pos in constants.POSITIONS:
-            table_name = f"Statistics_averaged_{pos}"
-            if self.db.table_exists(table_name):
-                try:
-                    averaged_stats[pos] = self.db.load_table(table_name).set_index(pos)
-                except Exception as e:
-                    logger.error(f"Error loading table '{table_name}': {e}")
-        
+        averaged_stats = {
+            pos: df.set_index(pos)
+            for pos in constants.POSITIONS
+            if (df := self._load_table_safe(f"Statistics_averaged_{pos}")) is not None
+        }
         if averaged_stats:
             cache['averaged'] = averaged_stats
         
         # Load seasonal stats
         by_year = {}
         for season in available_seasons:
-            season_data = {}
-            for pos in constants.POSITIONS:
-                table_name = f"Statistics_{season}_{pos}"
-                if self.db.table_exists(table_name):
-                    try:
-                        season_data[pos] = self.db.load_table(table_name).set_index(pos)
-                    except Exception as e:
-                        logger.error(f"Error loading table '{table_name}': {e}")
+            season_data = {
+                pos: df.set_index(pos)
+                for pos in constants.POSITIONS
+                if (df := self._load_table_safe(f"Statistics_{season}_{pos}")) is not None
+            }
             if season_data:
                 by_year[season] = season_data
         
