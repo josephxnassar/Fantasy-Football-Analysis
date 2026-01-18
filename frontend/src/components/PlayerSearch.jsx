@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { searchPlayers } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { getStatDefinition, isKeyStat, groupStatsByCategory } from '../statDefinitions';
 import './PlayerDetailsModal.css';
 

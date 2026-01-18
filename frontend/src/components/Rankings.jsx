@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getRankings } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
