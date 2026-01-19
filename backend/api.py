@@ -18,6 +18,47 @@ INTEGER_STATS = {
     'Fantasy Pts', 'PPR Pts'
 }
 
+# Age multiplier configuration for dynasty format by position
+AGE_MULTIPLIERS = {
+    'QB': {'peak_age': 28, 'young_boost': 1.3, 'decline_per_year': 0.05},
+    'RB': {'peak_age': 24, 'young_boost': 1.5, 'decline_per_year': 0.15},     # Steepest decline
+    'WR': {'peak_age': 26, 'young_boost': 1.4, 'decline_per_year': 0.08},
+    'TE': {'peak_age': 27, 'young_boost': 1.3, 'decline_per_year': 0.07},
+}
+
+def calculate_age_multiplier(age: int, position: str) -> float:
+    """
+    Calculate age-based multiplier for dynasty format.
+    Young players get a boost for upside, older players penalized heavily.
+    """
+    if position not in AGE_MULTIPLIERS:
+        return 1.0
+    
+    config = AGE_MULTIPLIERS[position]
+    peak_age = config['peak_age']
+    young_boost = config['young_boost']
+    decline_rate = config['decline_per_year']
+    
+    # Young players (under peak): boost for upside potential
+    if age < peak_age:
+        if age < 21:
+            return young_boost * 0.9  # Very young, unproven
+        # Scale from 1.0 at peak down to lower at age 21
+        years_from_peak = peak_age - age
+        # Linear from peak (1.0) to young_boost at age 21
+        boost_factor = 1.0 + ((young_boost - 1.0) * years_from_peak / (peak_age - 21))
+        return min(young_boost, boost_factor)
+    
+    # At peak age
+    elif age == peak_age:
+        return 1.0
+    
+    # Past peak: steep decline
+    else:
+        years_past_peak = age - peak_age
+        multiplier = 1.0 - (years_past_peak * decline_rate)
+        return max(0.1, multiplier)  # Floor at 10% to avoid going negative
+
 # Initialize FastAPI app
 api = FastAPI(
     title="Fantasy Football API",
@@ -99,6 +140,7 @@ def get_rankings(
         # Get averaged stats (with ratings) from new cache structure
         averaged_stats = stats_cache.get('averaged', stats_cache)  # Fallback to old structure
         eligible_players = set(stats_cache.get('eligible_players', []))
+        player_ages = stats_cache.get('player_ages', {})  # Get ages for dynasty calculations
         
         # Build rankings response
         rankings_by_position = {}
@@ -110,9 +152,19 @@ def get_rankings(
             if pos in averaged_stats:
                 df = averaged_stats[pos].copy()  # Make a copy to avoid modifying cached data
 
-                # Redraft: include only eligible (present on latest roster and not RET)
-                if format == "redraft" and eligible_players:
+                # Filter to eligible (active) players for both formats
+                if eligible_players:
                     df = df[df.index.isin(eligible_players)]
+                
+                # Dynasty: apply age multipliers to ratings
+                if format == "dynasty" and 'Rating' in df.columns:
+                    for player_name in df.index:
+                        age = player_ages.get(player_name, 26)  # Default age 26 if not found
+                        multiplier = calculate_age_multiplier(age, pos)
+                        df.loc[player_name, 'Rating'] = df.loc[player_name, 'Rating'] * multiplier
+                    
+                    # Re-sort by updated ratings
+                    df = df.sort_values(by='Rating', ascending=False)
                 
                 # Calculate percentile for each player
                 rating_col = 'Rating' if 'Rating' in df.columns else df.columns[0]

@@ -98,15 +98,32 @@ class Statistics(BaseSource):
     def _load_key(self) -> dict:
         try:
             # Load roster for all seasons to map player_id -> (name, position)
-            all_rosters = nfl.import_seasonal_rosters(self.seasons, columns=['player_id', 'player_name', 'depth_chart_position', 'status', 'season'])
+            all_rosters = nfl.import_seasonal_rosters(self.seasons)
             
             # Build player mapping from all seasons
             player_dict = {}
+            self.player_ages = {}  # Store ages by player_name for dynasty calculations
+            current_season = max(self.seasons)
+            
             for row in all_rosters.itertuples(index=False):
                 player_dict[row.player_id] = (row.player_name, row.depth_chart_position)
+                
+                # Store age by player_name if available (only once per player, using first occurrence)
+                if row.player_name not in self.player_ages:
+                    age = None
+                    # Try to get age from the 'age' column if it exists
+                    if hasattr(row, 'age') and pd.notna(row.age):
+                        try:
+                            age = int(row.age)
+                        except (ValueError, TypeError):
+                            pass
+                    
+                    if age and age > 0:
+                        self.player_ages[row.player_name] = age
+            
+            logger.info(f"Loaded ages for {len(self.player_ages)} players")
             
             # Build eligibility from the latest season only (filter in-memory)
-            current_season = max(self.seasons)
             latest_roster = all_rosters[all_rosters['season'] == current_season]
             
             self.eligible_players = set()
@@ -219,5 +236,6 @@ class Statistics(BaseSource):
             'averaged': stats,
             'by_year': stats_by_year,
             'available_seasons': self.seasons,
-            'eligible_players': getattr(self, 'eligible_players', set())
+            'eligible_players': getattr(self, 'eligible_players', set()),
+            'player_ages': self.player_ages
         })
