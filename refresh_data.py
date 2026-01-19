@@ -15,9 +15,8 @@ if __name__ == "__main__":
     
     print("📊 Fetching fresh data from all sources...")
     print("   - ESPN Depth Charts (web scraping)")
-    print("   - NFL Data Py Depth Charts")
-    print("   - NFL Schedules (2025)")
-    print("   - Player Statistics (2024)")
+    print("   - NFL Schedules ")
+    print("   - Player Statistics ")
     print()
     print("⏳ This may take 1-2 minutes...")
     print()

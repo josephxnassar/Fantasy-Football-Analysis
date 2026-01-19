@@ -40,6 +40,11 @@ class SQLService:
         if 'available_seasons' in cache:
             metadata_df = pd.DataFrame({'available_seasons': cache['available_seasons']})
             self.db.save_table(f"{cls_name}_metadata", metadata_df, index=False)
+        
+        # Save eligible players
+        if 'eligible_players' in cache and cache['eligible_players']:
+            eligible_df = pd.DataFrame({'player_name': list(cache['eligible_players'])})
+            self.db.save_table(f"{cls_name}_eligible_players", eligible_df, index=False)
 
     def load_from_db(self, keys: list, cls_name: str) -> dict:
         if cls_name == "Statistics":
@@ -99,6 +104,13 @@ class SQLService:
         
         if by_year:
             cache['by_year'] = by_year
+        
+        # Load eligible players
+        eligible_df = self._load_table_safe("Statistics_eligible_players")
+        if eligible_df is not None and 'player_name' in eligible_df.columns:
+            cache['eligible_players'] = set(eligible_df['player_name'].tolist())
+        else:
+            cache['eligible_players'] = set()
         
         return cache
     

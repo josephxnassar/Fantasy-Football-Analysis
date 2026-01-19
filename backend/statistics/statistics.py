@@ -97,8 +97,24 @@ class Statistics(BaseSource):
 
     def _load_key(self) -> dict:
         try:
-            sr = nfl.import_seasonal_rosters(self.seasons, columns=['player_id', 'player_name', 'depth_chart_position'])
-            return {row.player_id: (row.player_name, row.depth_chart_position) for row in sr.itertuples(index=False)}
+            # Load roster for all seasons to map player_id -> (name, position)
+            all_rosters = nfl.import_seasonal_rosters(self.seasons, columns=['player_id', 'player_name', 'depth_chart_position', 'status', 'season'])
+            
+            # Build player mapping from all seasons
+            player_dict = {}
+            for row in all_rosters.itertuples(index=False):
+                player_dict[row.player_id] = (row.player_name, row.depth_chart_position)
+            
+            # Build eligibility from the latest season only (filter in-memory)
+            current_season = max(self.seasons)
+            latest_roster = all_rosters[all_rosters['season'] == current_season]
+            
+            self.eligible_players = set()
+            for row in latest_roster.itertuples(index=False):
+                if pd.notna(row.player_name) and row.status != 'RET':
+                    self.eligible_players.add(row.player_name)
+
+            return player_dict
         except Exception as e:
             logger.error(f"Error loading key: {e}")
             raise
@@ -202,5 +218,6 @@ class Statistics(BaseSource):
         self.set_cache({
             'averaged': stats,
             'by_year': stats_by_year,
-            'available_seasons': self.seasons
+            'available_seasons': self.seasons,
+            'eligible_players': getattr(self, 'eligible_players', set())
         })

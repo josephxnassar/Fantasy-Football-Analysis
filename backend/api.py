@@ -98,6 +98,7 @@ def get_rankings(
         
         # Get averaged stats (with ratings) from new cache structure
         averaged_stats = stats_cache.get('averaged', stats_cache)  # Fallback to old structure
+        eligible_players = set(stats_cache.get('eligible_players', []))
         
         # Build rankings response
         rankings_by_position = {}
@@ -108,6 +109,10 @@ def get_rankings(
         for pos in positions_to_fetch:
             if pos in averaged_stats:
                 df = averaged_stats[pos].copy()  # Make a copy to avoid modifying cached data
+
+                # Redraft: include only eligible (present on latest roster and not RET)
+                if format == "redraft" and eligible_players:
+                    df = df[df.index.isin(eligible_players)]
                 
                 # Calculate percentile for each player
                 rating_col = 'Rating' if 'Rating' in df.columns else df.columns[0]
