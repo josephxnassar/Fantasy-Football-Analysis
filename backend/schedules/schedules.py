@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, List
 
 import pandas as pd
 import nfl_data_py as nfl
@@ -8,9 +9,10 @@ from backend.base_source import BaseSource
 logger = logging.getLogger(__name__)
 
 class Schedules(BaseSource):
-    def __init__(self, seasons: list[int]):
+    def __init__(self, seasons: List[int]):
         super().__init__(seasons)
-        self.master_schedule = self._load()
+        self.master_schedule: pd.DataFrame = self._load()
+        self.weeks: int = 0
 
     def _load(self) -> pd.DataFrame:
         try:
@@ -39,7 +41,7 @@ class Schedules(BaseSource):
             raise
 
     def run(self) -> None:
-        schedules = {}
+        schedules: Dict[str, pd.DataFrame] = {}
         for team, group in self._create_combined_schedule().groupby('Team'):
             try:
                 schedules[team] = self._fill_bye_weeks(group.drop(columns='Team').set_index('week').sort_index().rename_axis(team), team)

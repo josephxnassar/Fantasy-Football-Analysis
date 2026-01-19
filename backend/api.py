@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Any, Dict, Optional
+import logging
+
 from backend.app import App
 from backend.models import (
     RankingsResponse, PlayerResponse, SearchResponse
@@ -12,7 +15,6 @@ from backend.util.api_helpers import (
     find_player_team,
     filter_stats
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ app.load()  # Load cached data
 
 
 @api.get("/")
-def read_root():
+def read_root() -> Dict[str, str]:
     """Root endpoint - API status"""
     return {
         "status": "online",
@@ -50,8 +52,8 @@ def read_root():
 @api.get("/api/rankings", response_model=RankingsResponse)
 def get_rankings(
     format: str = "redraft",  # redraft or dynasty
-    position: str = None       # QB, RB, WR, TE or None for all
-):
+    position: Optional[str] = None       # QB, RB, WR, TE or None for all
+) -> RankingsResponse:
     """
     Get player rankings filtered by format and position
     
@@ -130,7 +132,7 @@ def get_rankings(
 
 
 @api.get("/api/player/{player_name}", response_model=PlayerResponse)
-def get_player(player_name: str, season: int = None):
+def get_player(player_name: str, season: Optional[int] = None) -> PlayerResponse:
     """
     Get detailed player information including stats and team
     
@@ -184,7 +186,7 @@ def get_player(player_name: str, season: int = None):
 
 
 @api.get("/api/search")
-def search_players(q: str, position: str = None):
+def search_players(q: str, position: Optional[str] = None) -> SearchResponse:
     """
     Search for players by name
     
