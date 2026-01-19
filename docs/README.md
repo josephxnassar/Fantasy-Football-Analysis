@@ -38,7 +38,18 @@ Data Sources (NFL API, ESPN)
 
 ## Documentation Files
 
-### 1. [statistics.md](./statistics.md)
+### 0. [frontend-overview.md](./frontend-overview.md)
+**Purpose**: React frontend structure, flows, and data contracts
+
+**Includes**:
+- Project layout and key components/hooks
+- Rankings, search, and player details flows
+- API contracts used by the UI
+- Commands and environment configuration
+
+---
+
+### 1. [backend-statistics.md](./backend-statistics.md)
 **Purpose**: Player ratings and seasonal statistics processing
 
 **Key Components**:
@@ -54,7 +65,7 @@ Data Sources (NFL API, ESPN)
 
 ---
 
-### 2. [schedules.md](./schedules.md)
+### 2. [backend-schedules.md](./backend-schedules.md)
 **Purpose**: NFL schedule data collection and organization
 
 **Key Components**:
@@ -69,7 +80,7 @@ Data Sources (NFL API, ESPN)
 
 ---
 
-### 3. [espn.md](./espn.md)
+### 3. [backend-depth-charts.md](./backend-depth-charts.md)
 **Purpose**: Real-time team depth chart scraping
 
 **Key Components**:
@@ -84,7 +95,7 @@ Data Sources (NFL API, ESPN)
 
 ---
 
-### 4. [api.md](./api.md)
+### 4. [backend-api.md](./backend-api.md)
 **Purpose**: REST API endpoint documentation
 
 **Key Endpoints**:
@@ -98,7 +109,7 @@ Data Sources (NFL API, ESPN)
 
 ---
 
-### 5. [import_seasonal_data.md](./import_seasonal_data.md)
+### 5. [backend-import-seasonal-data.md](./backend-import-seasonal-data.md)
 **Purpose**: Reference documentation for `nfl_data_py` data columns
 
 **Includes**:
