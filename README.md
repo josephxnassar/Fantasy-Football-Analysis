@@ -213,12 +213,14 @@ Configured in `frontend/vite.config.js` with API proxy for development.
 
 ## 📚 Documentation
 
-Each module's detailed documentation:
+Complete documentation in the `docs/` folder:
 
+- [`README.md`](./docs/README.md) - Backend architecture and data flow overview
+- [`api.md`](./docs/api.md) - REST API endpoint reference
 - [`statistics.md`](./docs/statistics.md) - Statistics processor and rating algorithms
-- [`schedules.md`](./docs/schedules.md) - Schedule data processing
-- [`espndepthchart.md`](./docs/espn.md) - ESPN depth chart scraping
-- [`import_seasonal_data.md`](./docs/import_seasonal_data.md) - Data import guide
+- [`schedules.md`](./docs/schedules.md) - Schedule data processing and bye weeks
+- [`espn.md`](./docs/espn.md) - ESPN depth chart scraping
+- [`import_seasonal_data.md`](./docs/import_seasonal_data.md) - Data column definitions and mappings
 
 ---
 
