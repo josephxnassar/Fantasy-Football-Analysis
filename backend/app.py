@@ -8,8 +8,8 @@ from backend.util import constants
 
 class App:
     def __init__(self) -> None:
-    self.db: SQLService = SQLService()
-    self.caches: Dict[str, Any] = {}
+        self.db: SQLService = SQLService()
+        self.caches: Dict[str, Any] = {}
     
     def run(self) -> None:
         instances = [
