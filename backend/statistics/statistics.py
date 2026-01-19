@@ -30,24 +30,25 @@ class Statistics(BaseSource):
             
             # Build player mapping from all seasons
             player_dict = {}
-            self.player_ages = {}  # Store ages by player_name for dynasty calculations
+            age_tracker: Dict[str, Tuple[int, int]] = {}  # player_name -> (season, age)
             current_season = max(self.seasons)
             
             for row in all_rosters.itertuples(index=False):
                 player_dict[row.player_id] = (row.player_name, row.depth_chart_position)
                 
-                # Store age by player_name if available (only once per player, using first occurrence)
-                if row.player_name not in self.player_ages:
-                    age = None
-                    # Try to get age from the 'age' column if it exists
-                    if hasattr(row, 'age') and pd.notna(row.age):
-                        try:
-                            age = int(row.age)
-                        except (ValueError, TypeError):
-                            pass
-                    
-                    if age and age > 0:
-                        self.player_ages[row.player_name] = age
+                # Track the most recent age we have per player (use latest season available)
+                if hasattr(row, 'age') and pd.notna(row.age):
+                    try:
+                        age_val = int(row.age)
+                    except (ValueError, TypeError):
+                        age_val = None
+                    if age_val and age_val > 0:
+                        prev = age_tracker.get(row.player_name)
+                        if not prev or row.season > prev[0]:
+                            age_tracker[row.player_name] = (row.season, age_val)
+
+            # Collapse tracker to name -> age mapping for dynasty calculations
+            self.player_ages = {name: age for name, (_, age) in age_tracker.items()}
             
             logger.info(f"Loaded ages for {len(self.player_ages)} players")
             

@@ -8,7 +8,7 @@ from backend.models import (
     RankingsResponse, PlayerResponse, SearchResponse
 )
 from backend.util import constants
-from backend.util.dynasty_ratings import calculate_age_multiplier
+from backend.util.dynasty_ratings import calculate_age_multiplier, get_default_age
 from backend.util.api_helpers import (
     find_player_in_cache,
     get_player_available_seasons,
@@ -102,9 +102,12 @@ def get_rankings(
                 # Dynasty: apply age multipliers to ratings
                 if format == "dynasty" and 'Rating' in df.columns:
                     for player_name in df.index:
-                        age = player_ages.get(player_name, 26)  # Default age 26 if not found
+                        age = player_ages.get(player_name)
+                        if age is None:
+                            age = get_default_age(pos)
                         multiplier = calculate_age_multiplier(age, pos)
                         df.loc[player_name, 'Rating'] = df.loc[player_name, 'Rating'] * multiplier
+                        df.loc[player_name, 'Age'] = age
                     
                     # Re-sort by updated ratings
                     df = df.sort_values(by='Rating', ascending=False)

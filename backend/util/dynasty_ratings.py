@@ -12,6 +12,12 @@ AGE_MULTIPLIERS = {
 }
 
 
+def get_default_age(position: str) -> int:
+    """Fallback age when none is available; defaults to position peak age."""
+    config = AGE_MULTIPLIERS.get(position)
+    return config['peak_age'] if config else 26
+
+
 def calculate_age_multiplier(age: int, position: str) -> float:
     """
     Calculate age-based multiplier for dynasty format.
