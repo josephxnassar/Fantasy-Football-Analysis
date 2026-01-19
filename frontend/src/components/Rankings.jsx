@@ -17,6 +17,7 @@ export default function Rankings() {
     loadingDetails,
     availableSeasons,
     currentSeason,
+    playerGrade,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails 
@@ -46,16 +47,17 @@ export default function Rankings() {
 
   const renderPlayerRow = (player, idx, showPosition = false) => {
     const playerName = showPosition ? player.playerName : getPlayerName(player);
+    const grade = formatPercentile(player.percentile);
     return (
       <tr key={playerName}>
         <td>{idx + 1}</td>
         <td>
-          <span className="player-name-link" onClick={() => handlePlayerClick(playerName)}>
+          <span className="player-name-link" onClick={() => handlePlayerClick(playerName, grade)}>
             {playerName}
           </span>
         </td>
         {showPosition && <td>{player.position}</td>}
-        <td>{formatPercentile(player.percentile)}</td>
+        <td>{grade}</td>
       </tr>
     );
   };
@@ -99,11 +101,25 @@ export default function Rankings() {
               <th>Rank</th>
               <th>Player</th>
               <th>Position</th>
-              <th>Grade</th>
+              <th>Rating</th>
             </tr>
           </thead>
           <tbody>
-            {allPlayers.map((player, idx) => renderPlayerRow(player, idx, true))}
+            {allPlayers.map((player, idx) => {
+              const rating = typeof player.Rating === 'number' ? player.Rating.toFixed(2) : 'N/A';
+              return (
+                <tr key={player.playerName}>
+                  <td>{idx + 1}</td>
+                  <td>
+                    <span className="player-name-link" onClick={() => handlePlayerClick(player.playerName, formatPercentile(player.percentile))}>
+                      {player.playerName}
+                    </span>
+                  </td>
+                  <td>{player.position}</td>
+                  <td>{rating}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -168,6 +184,7 @@ export default function Rankings() {
           availableSeasons={availableSeasons}
           currentSeason={currentSeason}
           onSeasonChange={handleSeasonChange}
+          grade={playerGrade}
         />
       )}
     </div>

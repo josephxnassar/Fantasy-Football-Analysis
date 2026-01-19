@@ -9,7 +9,8 @@ export default function PlayerDetailsModal({
   onClose, 
   availableSeasons = [],
   onSeasonChange,
-  currentSeason
+  currentSeason,
+  grade = null
 }) {
   if (!playerDetails && !loading) return null;
 
@@ -52,7 +53,10 @@ export default function PlayerDetailsModal({
           <div className="loading">Loading player details...</div>
         ) : (
           <>
-            <h2>{playerDetails.name}</h2>
+            <div className="player-header">
+              <h2>{playerDetails.name}</h2>
+              {grade && <div className="grade-badge">{grade}</div>}
+            </div>
             <div className="player-details">
               <div className="details-grid">
                 <div className="detail-item">
