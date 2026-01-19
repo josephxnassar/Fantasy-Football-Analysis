@@ -4,60 +4,17 @@ from backend.app import App
 from backend.models import (
     RankingsResponse, PlayerResponse, SearchResponse
 )
+from backend.util import constants
+from backend.util.dynasty_ratings import calculate_age_multiplier
+from backend.util.api_helpers import (
+    find_player_in_cache,
+    get_player_available_seasons,
+    find_player_team,
+    filter_stats
+)
 import logging
 
 logger = logging.getLogger(__name__)
-
-# Stats that should be displayed as whole numbers (counts, yards, TDs)
-INTEGER_STATS = {
-    'Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 
-    'Sack Fum', 'Sack Fum Lost', 'Air Yds', 'YAC', 'Pass 1st', 'Pass 2PT',
-    'Carries', 'Rush Yds', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush 2PT',
-    'Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Rec Fum', 'Rec Fum Lost', 
-    'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'ST TD',
-    'Fantasy Pts', 'PPR Pts'
-}
-
-# Age multiplier configuration for dynasty format by position
-AGE_MULTIPLIERS = {
-    'QB': {'peak_age': 28, 'young_boost': 1.3, 'decline_per_year': 0.05},
-    'RB': {'peak_age': 24, 'young_boost': 1.5, 'decline_per_year': 0.15},     # Steepest decline
-    'WR': {'peak_age': 26, 'young_boost': 1.4, 'decline_per_year': 0.08},
-    'TE': {'peak_age': 27, 'young_boost': 1.3, 'decline_per_year': 0.07},
-}
-
-def calculate_age_multiplier(age: int, position: str) -> float:
-    """
-    Calculate age-based multiplier for dynasty format.
-    Young players get a boost for upside, older players penalized heavily.
-    """
-    if position not in AGE_MULTIPLIERS:
-        return 1.0
-    
-    config = AGE_MULTIPLIERS[position]
-    peak_age = config['peak_age']
-    young_boost = config['young_boost']
-    decline_rate = config['decline_per_year']
-    
-    # Young players (under peak): boost for upside potential
-    if age < peak_age:
-        if age < 21:
-            return young_boost * 0.9  # Very young, unproven
-        # Scale from 1.0 at peak down to lower at age 21
-        years_from_peak = peak_age - age
-        # Linear from peak (1.0) to young_boost at age 21
-        boost_factor = 1.0 + ((young_boost - 1.0) * years_from_peak / (peak_age - 21))
-        return min(young_boost, boost_factor)
-    
-    # At peak age
-    elif age == peak_age:
-        return 1.0
-    
-    # Past peak: steep decline
-    else:
-        years_past_peak = age - peak_age
-        multiplier = 1.0 - (years_past_peak * decline_rate)
-        return max(0.1, multiplier)  # Floor at 10% to avoid going negative
 
 # Initialize FastAPI app
 api = FastAPI(
@@ -78,25 +35,6 @@ api.add_middleware(
 # Initialize the data app
 app = App()
 app.load()  # Load cached data
-
-
-def _find_player_in_cache(player_name: str, cache_data: dict) -> tuple:
-    """Helper to find player and return (data, position). Returns (None, None) if not found."""
-    for position, df in cache_data.items():
-        if player_name in df.index:
-            return df.loc[player_name].to_dict(), position
-    return None, None
-
-
-def _get_player_available_seasons(player_name: str, by_year_stats: dict) -> list:
-    """Get list of seasons where player has data."""
-    seasons = []
-    for season, season_data in by_year_stats.items():
-        for position, df in season_data.items():
-            if player_name in df.index:
-                seasons.append(season)
-                break
-    return seasons
 
 
 @api.get("/")
@@ -123,13 +61,16 @@ def get_rankings(
     - **position**: QB, RB, WR, TE (optional)
     """
     # Validate inputs
-    valid_formats = ["redraft", "dynasty"]
-    valid_positions = ["QB", "RB", "WR", "TE"]
-    
-    if format not in valid_formats:
-        raise HTTPException(status_code=400, detail=f"Invalid format. Must be one of: {', '.join(valid_formats)}")
-    if position and position not in valid_positions:
-        raise HTTPException(status_code=400, detail=f"Invalid position. Must be one of: {', '.join(valid_positions)}")
+    if format not in constants.VALID_FORMATS:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid format. Must be one of: {', '.join(constants.VALID_FORMATS)}"
+        )
+    if position and position not in constants.POSITIONS:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid position. Must be one of: {', '.join(constants.POSITIONS)}"
+        )
     
     try:
         # Get statistics from cache
@@ -146,7 +87,7 @@ def get_rankings(
         rankings_by_position = {}
         
         # Determine which positions to include
-        positions_to_fetch = [position] if position else valid_positions
+        positions_to_fetch = [position] if position else constants.POSITIONS
         
         for pos in positions_to_fetch:
             if pos in averaged_stats:
@@ -207,10 +148,10 @@ def get_player(player_name: str, season: int = None):
             if not season_stats:
                 raise HTTPException(status_code=404, detail=f"No data available for season {season}")
             
-            player_data, player_position = _find_player_in_cache(player_name, season_stats)
+            player_data, player_position = find_player_in_cache(player_name, season_stats)
         else:
             averaged_stats = stats_cache.get('averaged', stats_cache)
-            player_data, player_position = _find_player_in_cache(player_name, averaged_stats)
+            player_data, player_position = find_player_in_cache(player_name, averaged_stats)
         
         if not player_data:
             raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
@@ -219,34 +160,14 @@ def get_player(player_name: str, season: int = None):
         player_seasons = []
         if season is None:
             by_year_stats = stats_cache.get('by_year', {})
-            player_seasons = _get_player_available_seasons(player_name, by_year_stats)
+            player_seasons = get_player_available_seasons(player_name, by_year_stats)
         
-        # Filter out stats with 0 or near-0 values (keep only meaningful stats)
-        filtered_stats = {
-            stat: value for stat, value in player_data.items() 
-            if not (isinstance(value, (int, float)) and abs(value) < 0.01)
-        }
-        
-        # Convert appropriate stats to whole numbers
-        for stat in filtered_stats:
-            if stat in INTEGER_STATS and isinstance(filtered_stats[stat], (int, float)):
-                filtered_stats[stat] = int(round(filtered_stats[stat]))
+        # Filter and format stats
+        filtered_stats = filter_stats(player_data, constants.INTEGER_STATS)
         
         # Get player's team from depth charts
         depth_charts = app.caches.get("ESPNDepthChart", {})
-        player_team = None
-        
-        for team, dc_data in depth_charts.items():
-            try:
-                for col in dc_data.columns:
-                    if player_name in dc_data[col].values:
-                        player_team = team
-                        break
-                if player_team:
-                    break
-            except Exception as e:
-                logger.warning(f"Error searching depth chart for team {team}: {e}")
-                continue
+        player_team = find_player_team(player_name, depth_charts)
         
         return PlayerResponse(
             name=player_name,
