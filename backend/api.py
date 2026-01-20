@@ -261,8 +261,3 @@ def search_players(q: str, position: Optional[str] = None) -> SearchResponse:
     except Exception as e:
         logger.error(f"Error searching for players: {e}")
         raise HTTPException(status_code=500, detail="Failed to search players")
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(api, host="0.0.0.0", port=8000)

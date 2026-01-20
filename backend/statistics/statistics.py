@@ -1,5 +1,4 @@
 import logging
-from collections import defaultdict
 from typing import Dict, List, Tuple
 
 import pandas as pd
@@ -98,11 +97,13 @@ class Statistics(BaseSource):
         """Partition data by position (works for both averaged and seasonal data)"""
         try:
             cols = ['player_name'] + data.columns.tolist()[1:]
-            position_data = defaultdict(list)
+            position_data = {}
             for _, row in data.iterrows():
                 try:
                     player_name, position = self.id_to_player[row.player_id]
                     if position in constants.POSITIONS:
+                        if position not in position_data:
+                            position_data[position] = []
                         position_data[position].append([player_name] + row.tolist()[1:])
                 except Exception as e:
                     logger.error(f"Failed to process player_id '{row.player_id}': {e}")
@@ -165,6 +166,6 @@ class Statistics(BaseSource):
             'averaged': stats,
             'by_year': stats_by_year,
             'available_seasons': self.seasons,
-            'eligible_players': getattr(self, 'eligible_players', set()),
+            'eligible_players': self.eligible_players,
             'player_ages': self.player_ages
         })

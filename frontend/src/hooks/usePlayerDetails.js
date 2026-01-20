@@ -10,7 +10,7 @@ export function usePlayerDetails() {
   const [baseRating, setBaseRating] = useState(null);
   const [playerRankingData, setPlayerRankingData] = useState(null);
 
-  const handlePlayerClick = async (playerName, _grade = null, rankingData = null) => {
+  const handlePlayerClick = async (playerName, rankingData = null) => {
     try {
       setLoadingDetails(true);
       setCurrentPlayerName(playerName);

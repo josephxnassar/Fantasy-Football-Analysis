@@ -54,7 +54,7 @@ export default function Rankings() {
       <tr key={playerName}>
         <td>{idx + 1}</td>
         <td>
-          <span className="player-name-link" onClick={() => handlePlayerClick(playerName, null, player)}>
+          <span className="player-name-link" onClick={() => handlePlayerClick(playerName, player)}>
             {playerName}
           </span>
         </td>
@@ -116,7 +116,7 @@ export default function Rankings() {
                 <tr key={player.playerName}>
                   <td>{idx + 1}</td>
                   <td>
-                    <span className="player-name-link" onClick={() => handlePlayerClick(player.playerName, null, player)}>
+                    <span className="player-name-link" onClick={() => handlePlayerClick(player.playerName, player)}>
                       {player.playerName}
                     </span>
                   </td>
