@@ -184,6 +184,12 @@ def get_player(player_name: str, season: Optional[int] = None) -> PlayerResponse
         if not player_data:
             raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
         
+        # Apply redraft multiplier to rating if showing averaged data
+        if season is None and 'Rating' in player_data:
+            redraft_mult = calculate_redraft_multiplier(player_position)
+            player_data = dict(player_data)  # Convert to dict if needed
+            player_data['Rating'] = player_data['Rating'] * redraft_mult
+        
         # Get available seasons for this player (only if showing averaged data)
         player_seasons = []
         if season is None:
@@ -232,12 +238,14 @@ def search_players(q: str, position: Optional[str] = None) -> SearchResponse:
             if position and pos != position:
                 continue
             
+            redraft_mult = calculate_redraft_multiplier(pos)
             for player_name, row in df.iterrows():
                 if query_lower in player_name.lower():
+                    rating = row["Rating"] if "Rating" in df.columns else 0
                     results.append({
                         "name": player_name,
                         "position": pos,
-                        "rating": row["Rating"] if "Rating" in df.columns else 0
+                        "rating": rating * redraft_mult
                     })
         
         # Sort by rating descending
