@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRankings } from '../api';
-import PlayerDetailsModal from './PlayerDetailsModal';
+import PlayerDetailsModalWrapper from './PlayerDetailsModalWrapper';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import { getPlayerName } from '../utils/helpers';
 import './Rankings.css';
@@ -181,17 +181,15 @@ export default function Rankings() {
         {position ? renderPositionTables() : renderOverallTable()}
       </div>
 
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal 
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-          rankingData={playerRankingData}
-        />
-      )}
+      <PlayerDetailsModalWrapper
+        playerDetails={playerDetails}
+        loadingDetails={loadingDetails}
+        availableSeasons={availableSeasons}
+        currentSeason={currentSeason}
+        playerRankingData={playerRankingData}
+        onSeasonChange={handleSeasonChange}
+        closeDetails={closeDetails}
+      />
     </div>
   );
 }

@@ -208,12 +208,24 @@ Search for players by name.
     {
       "name": "Ja'Marr Chase",
       "position": "WR",
-      "rating": 401.52
+      "rating": 401.52,
+      "Rating": 401.52,
+      "DynastyRating": 425.18,
+      "pos_percentile_redraft": 98.5,
+      "pos_percentile_dynasty": 99.0,
+      "overall_percentile_redraft": 95.2,
+      "overall_percentile_dynasty": 96.1
     },
     {
       "name": "JK Dobbins",
       "position": "RB",
-      "rating": 250.0
+      "rating": 250.0,
+      "Rating": 250.0,
+      "DynastyRating": 287.5,
+      "pos_percentile_redraft": 85.3,
+      "pos_percentile_dynasty": 88.2,
+      "overall_percentile_redraft": 78.4,
+      "overall_percentile_dynasty": 81.6
     }
   ],
   "count": 2
@@ -234,9 +246,14 @@ GET /api/search?q=hill&position=WR
 
 #### Notes:
 - **Partial Matching**: Matches anywhere in the player name (case-insensitive)
-- **Sorting**: Results sorted by rating (highest first)
+- **Sorting**: Results sorted by redraft rating (highest first)
 - **Limit**: Returns maximum 20 results
 - **Active Players Only**: Searches across all active players in the system
+- **Complete Rating Data**: Returns same comprehensive data as rankings endpoint:
+  - Both redraft and dynasty ratings with age adjustments
+  - Four percentile calculations (position and overall for both formats)
+  - Uses shared `calculate_enriched_rankings()` helper function
+- **Consistency**: Search results can be directly passed to PlayerDetailsModal to show full rating breakdown
 
 #### Status Codes:
 - `200`: Success
@@ -284,9 +301,15 @@ GET /api/search?q=hill&position=WR
 
 ```python
 {
-    "name": str,     # Player name
-    "position": str, # Position (QB, RB, WR, TE)
-    "rating": float  # Player rating
+    "name": str,                            # Player name
+    "position": str,                        # Position (QB, RB, WR, TE)
+    "rating": float,                        # Redraft rating (legacy field)
+    "Rating": float,                        # Redraft rating (position-adjusted)
+    "DynastyRating": float,                 # Dynasty rating (age-adjusted)
+    "pos_percentile_redraft": float,        # Position percentile for redraft (0-100)
+    "pos_percentile_dynasty": float,        # Position percentile for dynasty (0-100)
+    "overall_percentile_redraft": float,    # Overall percentile for redraft (0-100)
+    "overall_percentile_dynasty": float     # Overall percentile for dynasty (0-100)
 }
 ```
 

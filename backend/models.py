@@ -54,13 +54,25 @@ class PlayerSearchResult(BaseModel):
     name: str = Field(..., description="Player name")
     position: str = Field(..., description="Player position")
     rating: float = Field(..., description="Player rating")
+    Rating: float = Field(..., description="Redraft rating")
+    DynastyRating: float = Field(..., description="Dynasty rating")
+    pos_percentile_redraft: float = Field(..., description="Position percentile for redraft")
+    pos_percentile_dynasty: float = Field(..., description="Position percentile for dynasty")
+    overall_percentile_redraft: float = Field(..., description="Overall percentile for redraft")
+    overall_percentile_dynasty: float = Field(..., description="Overall percentile for dynasty")
     
     class Config:
         json_schema_extra = {
             "example": {
                 "name": "Ja'Marr Chase",
                 "position": "WR",
-                "rating": 401.52
+                "rating": 401.52,
+                "Rating": 401.52,
+                "DynastyRating": 425.18,
+                "pos_percentile_redraft": 98.5,
+                "pos_percentile_dynasty": 99.0,
+                "overall_percentile_redraft": 95.2,
+                "overall_percentile_dynasty": 96.1
             }
         }
 

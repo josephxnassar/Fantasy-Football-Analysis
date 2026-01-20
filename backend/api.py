@@ -14,7 +14,8 @@ from backend.util.api_helpers import (
     find_player_in_cache,
     get_player_available_seasons,
     find_player_team,
-    filter_stats
+    filter_stats,
+    calculate_enriched_rankings
 )
 
 logger = logging.getLogger(__name__)
@@ -78,63 +79,16 @@ def get_rankings(
         if not stats_cache:
             raise HTTPException(status_code=503, detail="Statistics data not loaded")
         
-        # Get averaged stats (with ratings) from new cache structure
-        averaged_stats = stats_cache.get('averaged', stats_cache)  # Fallback to old structure
-        eligible_players = set(stats_cache.get('eligible_players', []))
-        player_ages = stats_cache.get('player_ages', {})  # Get ages for dynasty calculations
+        # Use shared function to calculate enriched rankings
+        all_players = calculate_enriched_rankings(stats_cache, position)
         
-        # Build both redraft and dynasty ratings with percentiles
+        # Group by position for response
         computed_by_position = {}
-        overall_rows = []
-        
-        for pos in constants.POSITIONS:
-            if pos not in averaged_stats:
-                continue
-                
-            df = averaged_stats[pos].copy()
-            
-            # Filter to eligible (active) players
-            if eligible_players:
-                df = df[df.index.isin(eligible_players)]
-            
-            if 'Rating' not in df.columns or df.empty:
-                continue
-            
-            # Vectorized dynasty rating calculation
-            player_ages_list = [player_ages.get(name, get_default_age(pos)) for name in df.index]
-            multipliers = [calculate_age_multiplier(age, pos) for age in player_ages_list]
-            redraft_multiplier = calculate_redraft_multiplier(pos)
-            
-            df['DynastyRating'] = df['Rating'] * multipliers
-            df['Rating'] = df['Rating'] * redraft_multiplier  # Apply redraft scarcity adjustment
-            df['Age'] = player_ages_list
-            
-            # Position percentiles
-            df['pos_percentile_redraft'] = df['Rating'].rank(pct=True) * 100
-            df['pos_percentile_dynasty'] = df['DynastyRating'].rank(pct=True) * 100
-            
-            # Convert to records for this position
-            index_name = df.index.name if df.index.name else 'index'
-            records = df.reset_index().rename(columns={index_name: 'name'}).to_dict('records')
-            computed_by_position[pos] = records
-            overall_rows.extend([{**rec, 'position': pos} for rec in records])
-        
-        # Overall percentiles across all positions
-        if overall_rows:
-            overall_df = pd.DataFrame(overall_rows)
-            overall_df['overall_percentile_redraft'] = overall_df['Rating'].rank(pct=True) * 100
-            overall_df['overall_percentile_dynasty'] = overall_df['DynastyRating'].rank(pct=True) * 100
-            
-            # Map back to position records using (name, position) as key
-            for idx, row in overall_df.iterrows():
-                pos = row['position']
-                name = row['name']
-                # Find matching record in computed_by_position
-                for rec in computed_by_position[pos]:
-                    if rec['name'] == name:
-                        rec['overall_percentile_redraft'] = row['overall_percentile_redraft']
-                        rec['overall_percentile_dynasty'] = row['overall_percentile_dynasty']
-                        break
+        for player in all_players:
+            pos = player['position']
+            if pos not in computed_by_position:
+                computed_by_position[pos] = []
+            computed_by_position[pos].append(player)
         
         # Determine which positions to return
         positions_to_fetch = [position] if position else constants.POSITIONS
@@ -230,23 +184,29 @@ def search_players(q: str, position: Optional[str] = None) -> SearchResponse:
     
     try:
         stats_cache = app.caches.get("Statistics", {})
-        averaged_stats = stats_cache.get('averaged', stats_cache)
-        query_lower = q.lower()
-        results = []
+        if not stats_cache:
+            raise HTTPException(status_code=503, detail="Statistics data not loaded")
         
-        for pos, df in averaged_stats.items():
-            if position and pos != position:
-                continue
-            
-            redraft_mult = calculate_redraft_multiplier(pos)
-            for player_name, row in df.iterrows():
-                if query_lower in player_name.lower():
-                    rating = row["Rating"] if "Rating" in df.columns else 0
-                    results.append({
-                        "name": player_name,
-                        "position": pos,
-                        "rating": rating * redraft_mult
-                    })
+        # Use shared function to calculate enriched rankings
+        all_players = calculate_enriched_rankings(stats_cache, position)
+        
+        # Filter to search query
+        query_lower = q.lower()
+        results = [
+            {
+                "name": player['name'],
+                "position": player['position'],
+                "rating": player['Rating'],
+                "Rating": player['Rating'],
+                "DynastyRating": player['DynastyRating'],
+                "pos_percentile_redraft": player['pos_percentile_redraft'],
+                "pos_percentile_dynasty": player['pos_percentile_dynasty'],
+                "overall_percentile_redraft": player['overall_percentile_redraft'],
+                "overall_percentile_dynasty": player['overall_percentile_dynasty']
+            }
+            for player in all_players
+            if query_lower in player['name'].lower()
+        ]
         
         # Sort by rating descending
         results.sort(key=lambda x: x["rating"], reverse=True)

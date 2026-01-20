@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { searchPlayers } from '../api';
-import PlayerDetailsModal from './PlayerDetailsModal';
+import PlayerDetailsModalWrapper from './PlayerDetailsModalWrapper';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import './PlayerSearch.css';
 
@@ -15,6 +15,7 @@ export default function PlayerSearch() {
     loadingDetails,
     availableSeasons,
     currentSeason,
+    playerRankingData,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails 
@@ -68,7 +69,7 @@ export default function PlayerSearch() {
                   <div
                     key={player.name}
                     className="player-card"
-                    onClick={() => handlePlayerClick(player.name)}
+                    onClick={() => handlePlayerClick(player.name, player)}
                   >
                     <div className="player-name">{player.name}</div>
                     <div className="player-info">
@@ -85,16 +86,15 @@ export default function PlayerSearch() {
         )}
       </div>
 
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal 
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-        />
-      )}
+      <PlayerDetailsModalWrapper
+        playerDetails={playerDetails}
+        loadingDetails={loadingDetails}
+        availableSeasons={availableSeasons}
+        currentSeason={currentSeason}
+        playerRankingData={playerRankingData}
+        onSeasonChange={handleSeasonChange}
+        closeDetails={closeDetails}
+      />
     </div>
   );
 }

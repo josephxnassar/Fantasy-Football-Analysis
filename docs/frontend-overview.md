@@ -40,10 +40,11 @@ frontend/
 │   ├── hooks/
 │   │   └── usePlayerDetails.js  # Handles fetching and season switching for modal
 │   ├── components/
-│   │   ├── Rankings.jsx / Rankings.css        # Rankings page
-│   │   ├── PlayerSearch.jsx / PlayerSearch.css# Search page
-│   │   ├── PlayerDetailsModal.jsx / .css      # Modal with grouped stats
-│   │   └── PlayerDetailsModal.css             # Modal styling
+│   │   ├── Rankings.jsx / Rankings.css                # Rankings page
+│   │   ├── PlayerSearch.jsx / PlayerSearch.css        # Search page
+│   │   ├── PlayerDetailsModal.jsx / .css              # Modal with grouped stats
+│   │   ├── PlayerDetailsModalWrapper.jsx              # Reusable modal wrapper
+│   │   └── PlayerDetailsModal.css                     # Modal styling
 │   └── utils/
 │       └── helpers.js      # Formatting helpers
 ├── vite.config.js          # Dev server proxy to backend :8000
@@ -67,8 +68,13 @@ frontend/
 ### Player Search
 - Component: `components/PlayerSearch.jsx`
 - Submits `searchPlayers(query)` → `/api/search`
-- Displays result cards; clicking a card opens details modal
+- Displays result cards with player name, position, and redraft rating
+- Clicking a card:
+  - Calls `handlePlayerClick(player.name, player)` passing full player data
+  - Opens details modal with complete rating breakdown (same as Rankings)
+  - Shows both redraft and dynasty ratings with all percentiles
 - Validates min 2 chars; shows error states
+- Uses shared `PlayerDetailsModalWrapper` for consistent modal rendering
 
 ### Player Details Modal
 - Component: `components/PlayerDetailsModal.jsx`
@@ -98,6 +104,14 @@ frontend/
     - `pos_percentile_dynasty`: Position percentile (0-100) for dynasty
     - `overall_percentile_redraft`: Overall percentile (0-100) for redraft
     - `overall_percentile_dynasty`: Overall percentile (0-100) for dynasty
+
+- `searchPlayers(query, position?)` → `/api/search`
+  - Returns `{ query, results: [...], count }`
+  - Each result includes **identical fields** as rankings endpoint:
+    - `name`, `position`, `rating` (legacy)
+    - `Rating`, `DynastyRating`
+    - All four percentile fields
+  - Results can be passed directly to modal as `rankingData`
     - All player statistics
 - `getPlayer(name, season?)` → `/api/player/{name}`
   - Returns `{ name, position, team, stats, available_seasons }`
@@ -131,6 +145,26 @@ frontend/
 - `api.js`: Axios client with `getRankings`, `getPlayer`, `searchPlayers`
 - `statDefinitions.js`: tooltip text, key stats per position, category grouping
 - `helpers.js`: name extraction, percentile-to-letter grade, ordinal percentile formatting (e.g., "98th percentile" capped at 99th), stat formatting
+
+---
+
+## Notable Components & Hooks
+
+### usePlayerDetails Hook
+- Centralized logic for player modal interactions
+- Manages state: `playerDetails`, `loadingDetails`, `currentSeason`, `playerRankingData`
+- Methods:
+  - `handlePlayerClick(name, rankingData)`: Opens modal and fetches player data
+  - `handleSeasonChange(season)`: Switches between career average and specific season
+  - `closeDetails()`: Closes modal and resets state
+- Used by both Rankings and PlayerSearch components
+
+### PlayerDetailsModalWrapper Component
+- Reusable wrapper that renders `PlayerDetailsModal` with hook state
+- Eliminates code duplication between Rankings and PlayerSearch
+- Props: All props from `usePlayerDetails` hook
+- Handles conditional rendering (only shows when data is available)
+- Single source of truth for modal rendering logic
 
 ---
 
