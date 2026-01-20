@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { getStatDefinition, isKeyStat, groupStatsByCategory } from '../statDefinitions';
-import { formatStatValue } from '../utils/helpers';
+import { formatStatValue, formatOrdinalPercentile } from '../utils/helpers';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ 
@@ -10,11 +9,16 @@ export default function PlayerDetailsModal({
   availableSeasons = [],
   onSeasonChange,
   currentSeason,
-  grade = null
+  rankingData = null
 }) {
   if (!playerDetails && !loading) return null;
 
   const rating = playerDetails?.stats?.Rating;
+  const dynastyRating = rankingData?.DynastyRating;
+  const posPercentileRedraft = rankingData?.pos_percentile_redraft;
+  const posPercentileDynasty = rankingData?.pos_percentile_dynasty;
+  const overallPercentileRedraft = rankingData?.overall_percentile_redraft;
+  const overallPercentileDynasty = rankingData?.overall_percentile_dynasty;
 
   const renderStatCategories = (details) => {
     const groupedStats = groupStatsByCategory(details.stats, details.position);
@@ -55,7 +59,6 @@ export default function PlayerDetailsModal({
           <>
             <div className="player-header">
               <h2>{playerDetails.name}</h2>
-              {grade && <div className="grade-badge">{grade}</div>}
             </div>
             <div className="player-details">
               <div className="details-grid">
@@ -67,13 +70,40 @@ export default function PlayerDetailsModal({
                   <span className="label">Team:</span>
                   <span className="value">{playerDetails.team || 'N/A'}</span>
                 </div>
-                {rating && (
-                  <div className="detail-item rating-item">
-                    <span className="label">Rating:</span>
-                    <span className="value rating-value">{rating.toFixed(2)}</span>
-                  </div>
-                )}
               </div>
+
+              {/* Ratings Section */}
+              {(rating || dynastyRating) && (
+                <div className="ratings-section">
+                  <h3>Player Ratings</h3>
+                  <div className="ratings-grid">
+                    {rating && (
+                      <div className="rating-card">
+                        <div className="rating-label">Redraft Rating</div>
+                        <div className="rating-value">{rating.toFixed(2)}</div>
+                        {posPercentileRedraft && (
+                          <div className="percentile-info">
+                            <div>Position: {formatOrdinalPercentile(posPercentileRedraft)}</div>
+                            <div>Overall: {formatOrdinalPercentile(overallPercentileRedraft)}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {dynastyRating && (
+                      <div className="rating-card">
+                        <div className="rating-label">Dynasty Rating</div>
+                        <div className="rating-value">{dynastyRating.toFixed(2)}</div>
+                        {posPercentileDynasty && (
+                          <div className="percentile-info">
+                            <div>Position: {formatOrdinalPercentile(posPercentileDynasty)}</div>
+                            <div>Overall: {formatOrdinalPercentile(overallPercentileDynasty)}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Year Selector */}
               {availableSeasons.length > 0 && (

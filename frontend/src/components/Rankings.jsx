@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getRankings } from '../api';
 import PlayerDetailsModal from './PlayerDetailsModal';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
-import { getPlayerName, formatPercentile } from '../utils/helpers';
+import { getPlayerName } from '../utils/helpers';
 import './Rankings.css';
 
 export default function Rankings() {
@@ -17,7 +17,7 @@ export default function Rankings() {
     loadingDetails,
     availableSeasons,
     currentSeason,
-    playerGrade,
+    playerRankingData,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails 
@@ -47,17 +47,19 @@ export default function Rankings() {
 
   const renderPlayerRow = (player, idx, showPosition = false) => {
     const playerName = showPosition ? player.playerName : getPlayerName(player);
-    const grade = formatPercentile(player.percentile);
+    const rating = format === 'dynasty' 
+      ? (typeof player.DynastyRating === 'number' ? player.DynastyRating.toFixed(2) : 'N/A')
+      : (typeof player.Rating === 'number' ? player.Rating.toFixed(2) : 'N/A');
     return (
       <tr key={playerName}>
         <td>{idx + 1}</td>
         <td>
-          <span className="player-name-link" onClick={() => handlePlayerClick(playerName, grade)}>
+          <span className="player-name-link" onClick={() => handlePlayerClick(playerName, null, player)}>
             {playerName}
           </span>
         </td>
         {showPosition && <td>{player.position}</td>}
-        <td>{grade}</td>
+        <td>{rating}</td>
       </tr>
     );
   };
@@ -71,7 +73,7 @@ export default function Rankings() {
             <tr>
               <th>Rank</th>
               <th>Player</th>
-              <th>Grade</th>
+              <th>Rating</th>
             </tr>
           </thead>
           <tbody>
@@ -106,12 +108,14 @@ export default function Rankings() {
           </thead>
           <tbody>
             {allPlayers.map((player, idx) => {
-              const rating = typeof player.Rating === 'number' ? player.Rating.toFixed(2) : 'N/A';
+              const rating = format === 'dynasty'
+                ? (typeof player.DynastyRating === 'number' ? player.DynastyRating.toFixed(2) : 'N/A')
+                : (typeof player.Rating === 'number' ? player.Rating.toFixed(2) : 'N/A');
               return (
                 <tr key={player.playerName}>
                   <td>{idx + 1}</td>
                   <td>
-                    <span className="player-name-link" onClick={() => handlePlayerClick(player.playerName, formatPercentile(player.percentile))}>
+                    <span className="player-name-link" onClick={() => handlePlayerClick(player.playerName, null, player)}>
                       {player.playerName}
                     </span>
                   </td>
@@ -184,7 +188,7 @@ export default function Rankings() {
           availableSeasons={availableSeasons}
           currentSeason={currentSeason}
           onSeasonChange={handleSeasonChange}
-          grade={playerGrade}
+          rankingData={playerRankingData}
         />
       )}
     </div>

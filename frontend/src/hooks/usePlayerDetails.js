@@ -8,14 +8,14 @@ export function usePlayerDetails() {
   const [currentSeason, setCurrentSeason] = useState(null);
   const [currentPlayerName, setCurrentPlayerName] = useState(null);
   const [baseRating, setBaseRating] = useState(null);
-  const [playerGrade, setPlayerGrade] = useState(null);
+  const [playerRankingData, setPlayerRankingData] = useState(null);
 
-  const handlePlayerClick = async (playerName, grade = null) => {
+  const handlePlayerClick = async (playerName, _grade = null, rankingData = null) => {
     try {
       setLoadingDetails(true);
       setCurrentPlayerName(playerName);
-      setCurrentSeason(null); // Reset to average view
-      setPlayerGrade(grade);
+      setCurrentSeason(null);
+      setPlayerRankingData(rankingData);
       
       // Fetch averaged data (with rating)
       const response = await getPlayer(playerName);
@@ -62,7 +62,7 @@ export function usePlayerDetails() {
     setCurrentSeason(null);
     setBaseRating(null);
     setPlayerAvailableSeasons([]);
-    setPlayerGrade(null);
+    setPlayerRankingData(null);
   };
 
   return {
@@ -70,7 +70,7 @@ export function usePlayerDetails() {
     loadingDetails,
     availableSeasons: playerAvailableSeasons,
     currentSeason,
-    playerGrade,
+    playerRankingData,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails

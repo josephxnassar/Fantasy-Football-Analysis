@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Any, Dict, Optional
 import logging
+import pandas as pd
 
 from backend.app import App
 from backend.models import (
@@ -51,15 +52,12 @@ def read_root() -> Dict[str, str]:
 
 @api.get("/api/rankings", response_model=RankingsResponse)
 def get_rankings(
-    format: str = "redraft",  # redraft or dynasty
-    position: Optional[str] = None       # QB, RB, WR, TE or None for all
+    format: str = "redraft",
+    position: Optional[str] = None
 ) -> RankingsResponse:
-    """
-    Get player rankings filtered by format and position
+    """Get player rankings with both redraft and dynasty ratings/percentiles
     
-    - **format**: redraft or dynasty
-      - Redraft: Current season performance prioritized
-      - Dynasty: Factors in longevity, age, upside (requires enhanced data)
+    - **format**: redraft or dynasty (for backward compatibility, unused in computation)
     - **position**: QB, RB, WR, TE (optional)
     """
     # Validate inputs
@@ -85,41 +83,64 @@ def get_rankings(
         eligible_players = set(stats_cache.get('eligible_players', []))
         player_ages = stats_cache.get('player_ages', {})  # Get ages for dynasty calculations
         
-        # Build rankings response
-        rankings_by_position = {}
+        # Build both redraft and dynasty ratings with percentiles
+        computed_by_position = {}
+        overall_rows = []
         
-        # Determine which positions to include
+        for pos in constants.POSITIONS:
+            if pos not in averaged_stats:
+                continue
+                
+            df = averaged_stats[pos].copy()
+            
+            # Filter to eligible (active) players
+            if eligible_players:
+                df = df[df.index.isin(eligible_players)]
+            
+            if 'Rating' not in df.columns or df.empty:
+                continue
+            
+            # Vectorized dynasty rating calculation
+            player_ages_list = [player_ages.get(name, get_default_age(pos)) for name in df.index]
+            multipliers = [calculate_age_multiplier(age, pos) for age in player_ages_list]
+            
+            df['DynastyRating'] = df['Rating'] * multipliers
+            df['Age'] = player_ages_list
+            
+            # Position percentiles
+            df['pos_percentile_redraft'] = df['Rating'].rank(pct=True) * 100
+            df['pos_percentile_dynasty'] = df['DynastyRating'].rank(pct=True) * 100
+            
+            # Convert to records for this position
+            index_name = df.index.name if df.index.name else 'index'
+            records = df.reset_index().rename(columns={index_name: 'name'}).to_dict('records')
+            computed_by_position[pos] = records
+            overall_rows.extend([{**rec, 'position': pos} for rec in records])
+        
+        # Overall percentiles across all positions
+        if overall_rows:
+            overall_df = pd.DataFrame(overall_rows)
+            overall_df['overall_percentile_redraft'] = overall_df['Rating'].rank(pct=True) * 100
+            overall_df['overall_percentile_dynasty'] = overall_df['DynastyRating'].rank(pct=True) * 100
+            
+            # Map back to position records using (name, position) as key
+            for idx, row in overall_df.iterrows():
+                pos = row['position']
+                name = row['name']
+                # Find matching record in computed_by_position
+                for rec in computed_by_position[pos]:
+                    if rec['name'] == name:
+                        rec['overall_percentile_redraft'] = row['overall_percentile_redraft']
+                        rec['overall_percentile_dynasty'] = row['overall_percentile_dynasty']
+                        break
+        
+        # Determine which positions to return
         positions_to_fetch = [position] if position else constants.POSITIONS
-        
-        for pos in positions_to_fetch:
-            if pos in averaged_stats:
-                df = averaged_stats[pos].copy()  # Make a copy to avoid modifying cached data
-
-                # Filter to eligible (active) players for both formats
-                if eligible_players:
-                    df = df[df.index.isin(eligible_players)]
-                
-                # Dynasty: apply age multipliers to ratings
-                if format == "dynasty" and 'Rating' in df.columns:
-                    for player_name in df.index:
-                        age = player_ages.get(player_name)
-                        if age is None:
-                            age = get_default_age(pos)
-                        multiplier = calculate_age_multiplier(age, pos)
-                        df.loc[player_name, 'Rating'] = df.loc[player_name, 'Rating'] * multiplier
-                        df.loc[player_name, 'Age'] = age
-                    
-                    # Re-sort by updated ratings
-                    df = df.sort_values(by='Rating', ascending=False)
-                
-                # Calculate percentile for each player
-                rating_col = 'Rating' if 'Rating' in df.columns else df.columns[0]
-                df['percentile'] = df[rating_col].rank(pct=True) * 100
-                
-                # Convert DataFrame to list of dicts
-                player_rankings = df.reset_index().to_dict("records")
-                
-                rankings_by_position[pos] = player_rankings
+        rankings_by_position = {
+            pos: computed_by_position.get(pos, [])
+            for pos in positions_to_fetch
+            if pos in computed_by_position
+        }
         
         return RankingsResponse(
             format=format,

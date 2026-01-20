@@ -48,12 +48,10 @@ Returns the API status and version information.
 
 ### GET /api/rankings
 
-Get player rankings filtered by format and position.
+Get player rankings with both redraft and dynasty ratings and comprehensive percentile calculations.
 
 #### Query Parameters:
-- `format` (string, optional): `"redraft"` or `"dynasty"` (default: `"redraft"`)
-  - **Redraft**: Current season performance prioritized
-  - **Dynasty**: Applies age-based multipliers for player longevity and upside
+- `format` (string, optional): `"redraft"` or `"dynasty"` (default: `"redraft"`) - retained for backward compatibility but all calculations are performed simultaneously
 - `position` (string, optional): `"QB"`, `"RB"`, `"WR"`, `"TE"`, or `null` for all positions
 
 #### Response (RankingsResponse):
@@ -65,19 +63,27 @@ Get player rankings filtered by format and position.
   "rankings": {
     "WR": [
       {
-        "player_id": "00-0031234",
-        "player_name": "Ja'Marr Chase",
+        "name": "Ja'Marr Chase",
         "Rating": 401.52,
-        "percentile": 95.5,
+        "DynastyRating": 425.18,
+        "Age": 24,
+        "pos_percentile_redraft": 98.5,
+        "pos_percentile_dynasty": 99.0,
+        "overall_percentile_redraft": 95.2,
+        "overall_percentile_dynasty": 96.1,
         "Rec": 127,
         "Rec Yds": 1456,
         ...
       },
       {
-        "player_id": "00-0035678",
-        "player_name": "Justin Jefferson",
+        "name": "Justin Jefferson",
         "Rating": 314.54,
-        "percentile": 92.3,
+        "DynastyRating": 330.27,
+        "Age": 25,
+        "pos_percentile_redraft": 92.3,
+        "pos_percentile_dynasty": 93.8,
+        "overall_percentile_redraft": 88.1,
+        "overall_percentile_dynasty": 89.5,
         ...
       }
     ]
@@ -98,11 +104,23 @@ GET /api/rankings?format=dynasty&position=QB
 ```
 
 #### Notes:
-- **Percentile**: 0-100 scale showing player rank relative to position (100 = best)
-- **Dynasty Multiplier**: Age-based multipliers applied to base rating
-  - Young RBs (before age 24): Boost for upside potential
-  - Veterans past prime: Steep decline based on position
-- **Eligible Players**: Only active players from the latest season are included
+- **Rating**: Base rating calculated from Ridge Regression on historical performance
+- **DynastyRating**: Base rating multiplied by age-based positional multiplier
+  - Young players (below peak age): Boost for upside potential (e.g., RBs < 24)
+  - Peak age players: Multiplier of 1.0 (no adjustment)
+  - Veterans past prime: Declining multiplier based on position-specific curves
+- **Age**: Player age from most recent season roster; defaults to position peak age if unavailable
+- **Percentiles**: Four percentile calculations for comprehensive player evaluation
+  - `pos_percentile_redraft`: Redraft ranking within position (0-100)
+  - `pos_percentile_dynasty`: Dynasty ranking within position (0-100)
+  - `overall_percentile_redraft`: Redraft ranking across all positions (0-100)
+  - `overall_percentile_dynasty`: Dynasty ranking across all positions (0-100)
+- **Eligible Players**: Only active players from the latest season are included (excludes retired/inactive)
+- **Age Multiplier Curves by Position**:
+  - QB: Peak 28, moderate decline (5%/year)
+  - RB: Peak 24, steep decline (15%/year) - shortest career window
+  - WR: Peak 26, moderate decline (8%/year)
+  - TE: Peak 27, moderate decline (7%/year)
 
 #### Status Codes:
 - `200`: Success

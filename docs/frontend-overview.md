@@ -59,8 +59,10 @@ frontend/
 - Component: `components/Rankings.jsx`
 - On mount: `getRankings(format, position)` → `/api/rankings`
 - State: `format` (redraft/dynasty), `position` filter, `rankings`, loading/error
-- Displays either per-position tables or an overall table (sorted by `Rating`)
-- Clicking a player opens details modal (via `usePlayerDetails`)
+- Displays either per-position tables or an overall table
+  - Shows `Rating` or `DynastyRating` based on selected format
+  - Table simplified to rank, player name, and rating value
+- Clicking a player opens details modal with comprehensive percentile breakdown (via `usePlayerDetails`)
 
 ### Player Search
 - Component: `components/PlayerSearch.jsx`
@@ -73,16 +75,30 @@ frontend/
 - Hook: `usePlayerDetails`
   - `getPlayer(name)` for averaged stats + rating
   - `getPlayer(name, season)` for season view; keeps averaged `Rating`
+  - Stores `rankingData` passed from Rankings/Search click for percentile display
+- **Ratings Section**: Displays dual rating cards with comprehensive percentiles
+  - **Redraft Rating Card**: Shows base rating with position and overall percentiles
+  - **Dynasty Rating Card**: Shows age-adjusted rating with position and overall percentiles
+  - Percentiles formatted as ordinals (e.g., "98th percentile") and capped at 99th
 - Grouping: `groupStatsByCategory()` from `statDefinitions.js`
 - Key stats highlighted via `isKeyStat`
-- Shows available seasons buttons; maintains grade (percentile → letter) from Rankings/Search
+- Shows available seasons buttons for toggling between career average and individual seasons
 
 ---
 
 ## Data Contracts
 - `getRankings(format, position?)` → `/api/rankings`
   - Returns `{ format, position, model, rankings: { QB: [...], RB: [...], ... } }`
-  - Each player entry includes `Rating` and `percentile`
+  - Each player entry includes:
+    - `name`: Player name
+    - `Rating`: Redraft rating
+    - `DynastyRating`: Age-adjusted dynasty rating
+    - `Age`: Player age
+    - `pos_percentile_redraft`: Position percentile (0-100) for redraft
+    - `pos_percentile_dynasty`: Position percentile (0-100) for dynasty
+    - `overall_percentile_redraft`: Overall percentile (0-100) for redraft
+    - `overall_percentile_dynasty`: Overall percentile (0-100) for dynasty
+    - All player statistics
 - `getPlayer(name, season?)` → `/api/player/{name}`
   - Returns `{ name, position, team, stats, available_seasons }`
   - When season provided, `stats.Rating` stays from averaged call (set in hook)
@@ -114,7 +130,7 @@ frontend/
 - `usePlayerDetails.js`: manages modal state, fetches averaged + seasonal stats, keeps base rating
 - `api.js`: Axios client with `getRankings`, `getPlayer`, `searchPlayers`
 - `statDefinitions.js`: tooltip text, key stats per position, category grouping
-- `helpers.js`: name extraction, percentile-to-letter grade, stat formatting
+- `helpers.js`: name extraction, percentile-to-letter grade, ordinal percentile formatting (e.g., "98th percentile" capped at 99th), stat formatting
 
 ---
 

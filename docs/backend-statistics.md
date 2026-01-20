@@ -52,8 +52,8 @@ After initialization, the following attributes are available:
 - `raw_seasonal_data` (`pd.DataFrame`): Complete raw seasonal data (all seasons combined).
 - `seasonal_data` (`pd.DataFrame`): Career-averaged statistics (aggregated across all seasons).
 - `seasonal_data_by_year` (`Dict[int, pd.DataFrame]`): Raw data split by individual season.
-- `player_ages` (`Dict[str, int]`): Player names mapped to their ages (used for dynasty format).
-- `eligible_players` (`Set[str]`): Active players from the latest season (excludes retired/inactive).
+- `player_ages` (`Dict[str, int]`): Player names mapped to their ages from the most recent season roster (used for dynasty multiplier calculations). Ages are tracked using the latest season data to ensure accuracy.
+- `eligible_players` (`Set[str]`): Active players from the latest season (excludes retired/inactive players based on roster status).
 
 ---
 
@@ -67,8 +67,8 @@ Loads seasonal rosters using `nfl.import_seasonal_rosters()` and builds a dictio
 - `dict`: Mapping from `player_id` to `(player_name, depth_chart_position)`.
 
 #### Side Effects:
-- Sets `self.player_ages`: Dictionary mapping player names to their ages.
-- Sets `self.eligible_players`: Set of active players from the latest season.
+- Sets `self.player_ages`: Dictionary mapping player names to their ages. Ages are tracked from the most recent season available for each player to ensure accuracy for dynasty multiplier calculations. If a player appears in multiple seasons, only the latest season's age is retained.
+- Sets `self.eligible_players`: Set of active players from the latest season (filters out players with status 'RET' or inactive).
 
 #### Logs:
 - Success: Number of players with loaded ages.
@@ -197,7 +197,28 @@ Creates player ratings using Ridge Regression.
 
 ### `run() -> None`
 
-Main execution method that generates ratings for each position and stores results in cache.
+Main execution method that generates both redraft and dynasty ratings for each position and stores comprehensive results in cache.
+
+#### Process:
+1. **Averaged Data Processing**: 
+   - Partitions averaged data by position
+   - Filters sparse columns
+   - Creates base ratings using Ridge Regression
+   - Applies position-specific age multipliers for dynasty ratings
+   - Calculates position percentiles for both redraft and dynasty
+   - Renames columns to display-friendly names
+
+2. **Seasonal Data Processing**:
+   - Partitions each season's data by position
+   - Renames columns (no rating calculation for individual seasons)
+
+3. **Overall Percentiles**:
+   - Combines all position data
+   - Calculates overall percentiles across all players for both redraft and dynasty
+   - Maps percentiles back to individual position records
+
+#### Side Effects:
+- Calls `self.set_cache()` with comprehensive structure including both averaged and seasonal data, all percentiles, ages, and eligible players
 
 #### Process:
 1. **Process Averaged Data:**
@@ -227,6 +248,36 @@ Main execution method that generates ratings for each position and stores result
 ---
 
 ## Cache Structure
+
+The `run()` method stores a comprehensive cache structure:
+
+```python
+{
+    'averaged': {
+        'QB': DataFrame,  # With Rating, DynastyRating, Age, pos/overall percentiles
+        'RB': DataFrame,
+        'WR': DataFrame,
+        'TE': DataFrame
+    },
+    'by_year': {
+        2023: {'QB': DataFrame, 'RB': DataFrame, ...},
+        2024: {'QB': DataFrame, 'RB': DataFrame, ...}
+    },
+    'available_seasons': [2023, 2024],
+    'eligible_players': {'Player A', 'Player B', ...},
+    'player_ages': {'Player A': 25, 'Player B': 28, ...}
+}
+```
+
+### Averaged DataFrames Include:
+- `Rating`: Base rating from Ridge Regression
+- `DynastyRating`: Age-adjusted rating (Rating × age_multiplier)
+- `Age`: Player age from latest season
+- `pos_percentile_redraft`: Position rank (0-100) for redraft
+- `pos_percentile_dynasty`: Position rank (0-100) for dynasty
+- `overall_percentile_redraft`: Overall rank (0-100) for redraft
+- `overall_percentile_dynasty`: Overall rank (0-100) for dynasty
+- All renamed statistics columns
 
 After calling `run()`, the cache contains:
 

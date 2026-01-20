@@ -19,7 +19,7 @@ This project uses a Python virtual environment (venv) because `nfl_data_py` requ
 ## 📂 Modules
 
 ### 1. [`Statistics`](./backend/statistics/statistics.py)
-Processes NFL seasonal data by organizing into position and running ridge regression for rating calculations.
+Processes NFL seasonal data by organizing into position and running ridge regression for rating calculations. Generates both redraft and dynasty ratings simultaneously, with dynasty ratings applying age-based multipliers to account for player longevity and career trajectory.
 
 ### 2. [`Schedules`](./backend/schedules/schedules.py)
 Processes NFL schedule data by inserting bye weeks where games are missing from the schedule.
