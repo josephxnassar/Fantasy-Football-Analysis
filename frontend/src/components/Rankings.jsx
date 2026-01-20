@@ -92,7 +92,8 @@ export default function Rankings() {
       }))
     );
     
-    allPlayers.sort((a, b) => (b.Rating || 0) - (a.Rating || 0));
+    const ratingField = format === 'dynasty' ? 'DynastyRating' : 'Rating';
+    allPlayers.sort((a, b) => (b[ratingField] || 0) - (a[ratingField] || 0));
     
     return (
       <div className="position-section">
