@@ -6,9 +6,19 @@ Applies age-based multipliers to account for career longevity and upside potenti
 # Age multiplier configuration for dynasty format by position
 AGE_MULTIPLIERS = {
     'QB': {'peak_age': 28, 'young_boost': 1.3, 'decline_per_year': 0.05},
-    'RB': {'peak_age': 24, 'young_boost': 1.5, 'decline_per_year': 0.15},     # Steepest decline
+    'RB': {'peak_age': 24, 'young_boost': 1.15, 'decline_per_year': 0.15},    # Lower boost, steeper decline
     'WR': {'peak_age': 26, 'young_boost': 1.4, 'decline_per_year': 0.08},
     'TE': {'peak_age': 27, 'young_boost': 1.3, 'decline_per_year': 0.07},
+}
+
+# Redraft format multipliers to reflect scarcity differences
+# QBs have deep talent pools (available in rounds 6-10), so lower multiplier
+# RB/WR/TE have less depth and are premium positions, so maintain or boost
+REDRAFT_MULTIPLIERS = {
+    'QB': 0.85,   # Lots of good QBs available
+    'RB': 1.05,   # Scarce elite talent
+    'WR': 1.05,   # Scarce elite talent
+    'TE': 1.0,    # Moderate scarcity
 }
 
 
@@ -57,3 +67,17 @@ def calculate_age_multiplier(age: int, position: str) -> float:
         years_past_peak = age - peak_age
         multiplier = 1.0 - (years_past_peak * decline_rate)
         return max(0.1, multiplier)  # Floor at 10% to avoid going negative
+
+
+def calculate_redraft_multiplier(position: str) -> float:
+    """
+    Calculate position-based multiplier for redraft format.
+    Reflects scarcity of elite players at each position.
+    
+    Args:
+        position: Player's position (QB, RB, WR, TE)
+    
+    Returns:
+        Multiplier to apply to player's rating
+    """
+    return REDRAFT_MULTIPLIERS.get(position, 1.0)

@@ -9,7 +9,7 @@ from backend.models import (
     RankingsResponse, PlayerResponse, SearchResponse
 )
 from backend.util import constants
-from backend.util.dynasty_ratings import calculate_age_multiplier, get_default_age
+from backend.util.position_multipliers import calculate_age_multiplier, calculate_redraft_multiplier, get_default_age
 from backend.util.api_helpers import (
     find_player_in_cache,
     get_player_available_seasons,
@@ -103,8 +103,10 @@ def get_rankings(
             # Vectorized dynasty rating calculation
             player_ages_list = [player_ages.get(name, get_default_age(pos)) for name in df.index]
             multipliers = [calculate_age_multiplier(age, pos) for age in player_ages_list]
+            redraft_multiplier = calculate_redraft_multiplier(pos)
             
             df['DynastyRating'] = df['Rating'] * multipliers
+            df['Rating'] = df['Rating'] * redraft_multiplier  # Apply redraft scarcity adjustment
             df['Age'] = player_ages_list
             
             # Position percentiles

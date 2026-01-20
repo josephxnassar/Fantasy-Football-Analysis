@@ -104,8 +104,8 @@ GET /api/rankings?format=dynasty&position=QB
 ```
 
 #### Notes:
-- **Rating**: Base rating calculated from Ridge Regression on historical performance
-- **DynastyRating**: Base rating multiplied by age-based positional multiplier
+- **Rating**: Base rating calculated from Ridge Regression on historical performance, adjusted by position-specific redraft scarcity multipliers
+- **DynastyRating**: Base rating multiplied by age-based positional multiplier for dynasty value
   - Young players (below peak age): Boost for upside potential (e.g., RBs < 24)
   - Peak age players: Multiplier of 1.0 (no adjustment)
   - Veterans past prime: Declining multiplier based on position-specific curves
@@ -116,7 +116,12 @@ GET /api/rankings?format=dynasty&position=QB
   - `overall_percentile_redraft`: Redraft ranking across all positions (0-100)
   - `overall_percentile_dynasty`: Dynasty ranking across all positions (0-100)
 - **Eligible Players**: Only active players from the latest season are included (excludes retired/inactive)
-- **Age Multiplier Curves by Position**:
+- **Redraft Position Multipliers** (reflect position scarcity in redraft):
+  - QB: 0.85x - Deep talent pool, available in rounds 6-10
+  - RB: 1.05x - Limited elite talent
+  - WR: 1.05x - Limited elite talent
+  - TE: 1.0x - Moderate scarcity
+- **Dynasty Age Multiplier Curves by Position**:
   - QB: Peak 28, moderate decline (5%/year)
   - RB: Peak 24, steep decline (15%/year) - shortest career window
   - WR: Peak 26, moderate decline (8%/year)

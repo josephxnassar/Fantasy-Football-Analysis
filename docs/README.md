@@ -164,8 +164,11 @@ All data collection modules inherit from `BaseSource`:
 - Consistent error handling
 
 ### Dynasty vs Redraft
-- **Redraft**: Uses raw player ratings
-- **Dynasty**: Applies age-based multipliers using `dynasty_ratings.py`
+- **Redraft**: Uses player ratings adjusted by position-specific scarcity multipliers (`position_multipliers.py`)
+  - QB: 0.85x (deep talent pool)
+  - RB/WR: 1.05x (limited elite talent)
+  - TE: 1.0x (moderate scarcity)
+- **Dynasty**: Applies age-based multipliers using `position_multipliers.py`
   - Young RBs get boost (before peak age 24)
   - Veterans past prime get steep decline
   - Position-specific age curves
