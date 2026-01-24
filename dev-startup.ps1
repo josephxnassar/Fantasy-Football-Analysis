@@ -40,12 +40,25 @@ if (-Not (Test-Path $venvPath)) {
     Write-Host "  ✓ Virtual environment already exists" -ForegroundColor Green
 }
 
+# Activate virtual environment
+$activateScript = Join-Path $venvPath "Scripts\Activate.ps1"
+& $activateScript
+
+# Upgrade pip, setuptools, and wheel
+Write-Host ""
+Write-Host "Upgrading pip, setuptools, and wheel..." -ForegroundColor Yellow
+python -m pip install --upgrade pip setuptools wheel --quiet
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "  ✓ pip, setuptools, and wheel upgraded" -ForegroundColor Green
+} else {
+    Write-Host "  ✗ Failed to upgrade pip tools" -ForegroundColor Red
+    exit 1
+}
+
 # Install/Update Python dependencies
 Write-Host ""
 Write-Host "Installing Python dependencies from requirements.txt..." -ForegroundColor Yellow
-$activateScript = Join-Path $venvPath "Scripts\Activate.ps1"
-& $activateScript
-pip install -r $requirementsPath --quiet
+python -m pip install -r $requirementsPath --quiet
 if ($LASTEXITCODE -eq 0) {
     Write-Host "  ✓ Python dependencies installed" -ForegroundColor Green
 } else {
