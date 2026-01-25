@@ -12,11 +12,9 @@ class App:
         self.caches: Dict[str, Any] = {}
     
     def run(self) -> None:
-        instances = [
-            ESPNDepthChart(), 
-            Schedules([constants.CURRENT_SEASON]), 
-            Statistics(constants.STATISTICS_SEASONS)
-        ]
+        instances = [ESPNDepthChart(), 
+                     Schedules([constants.CURRENT_SEASON]), 
+                     Statistics(constants.STATISTICS_SEASONS)]
 
         for instance in instances:
             instance.run()

@@ -1,10 +1,7 @@
-"""
-Pydantic models for API request/response validation and documentation.
-"""
+"""Pydantic models for API request/response validation and documentation."""
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
-
 
 class RankingsResponse(BaseModel):
     """Response for player rankings endpoint"""

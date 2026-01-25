@@ -5,18 +5,16 @@ import logging
 import pandas as pd
 
 from backend.app import App
-from backend.models import (
-    RankingsResponse, PlayerResponse, SearchResponse
-)
+from backend.models import (RankingsResponse, 
+                            PlayerResponse, 
+                            SearchResponse)
 from backend.util import constants
 from backend.util.position_multipliers import calculate_age_multiplier, calculate_redraft_multiplier, get_default_age
-from backend.util.api_helpers import (
-    find_player_in_cache,
-    get_player_available_seasons,
-    find_player_team,
-    filter_stats,
-    calculate_enriched_rankings
-)
+from backend.util.api_helpers import (find_player_in_cache,
+                                      get_player_available_seasons,
+                                      find_player_team,
+                                      filter_stats,
+                                      calculate_enriched_rankings)
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +41,6 @@ app.load()  # Load cached data
 
 @api.get("/")
 def read_root() -> Dict[str, str]:
-    """Root endpoint - API status"""
     return {
         "status": "online",
         "message": "Fantasy Football Analysis API",
@@ -52,15 +49,7 @@ def read_root() -> Dict[str, str]:
 
 
 @api.get("/api/rankings", response_model=RankingsResponse)
-def get_rankings(
-    format: str = "redraft",
-    position: Optional[str] = None
-) -> RankingsResponse:
-    """Get player rankings with both redraft and dynasty ratings/percentiles
-    
-    - **format**: redraft or dynasty (for backward compatibility, unused in computation)
-    - **position**: QB, RB, WR, TE (optional)
-    """
+def get_rankings(format: str = "redraft", position: Optional[str] = None) -> RankingsResponse:
     # Validate inputs
     if format not in constants.VALID_FORMATS:
         raise HTTPException(
@@ -113,12 +102,6 @@ def get_rankings(
 
 @api.get("/api/player/{player_name}", response_model=PlayerResponse)
 def get_player(player_name: str, season: Optional[int] = None) -> PlayerResponse:
-    """
-    Get detailed player information including stats and team
-    
-    - **player_name**: The player's name (e.g., "Ja'Marr Chase")
-    - **season**: Optional season year (e.g., 2024). If not provided, returns averaged stats with rating.
-    """
     try:
         stats_cache = app.caches.get("Statistics", {})
         
@@ -173,12 +156,6 @@ def get_player(player_name: str, season: Optional[int] = None) -> PlayerResponse
 
 @api.get("/api/search")
 def search_players(q: str, position: Optional[str] = None) -> SearchResponse:
-    """
-    Search for players by name
-    
-    - **q**: Search query (player name or partial name)
-    - **position**: Filter by position (QB, RB, WR, TE) (optional)
-    """
     if not q or len(q) < 2:
         raise HTTPException(status_code=400, detail="Search query must be at least 2 characters")
     

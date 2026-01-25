@@ -50,10 +50,7 @@ class SQLService:
         
         # Save player ages for dynasty calculations
         if 'player_ages' in cache and cache['player_ages']:
-            ages_df = pd.DataFrame([
-                {'player_name': name, 'age': age} 
-                for name, age in cache['player_ages'].items()
-            ])
+            ages_df = pd.DataFrame([{'player_name': name, 'age': age} for name, age in cache['player_ages'].items()])
             self.db.save_table(f"{cls_name}_player_ages", ages_df, index=False)
 
     def load_from_db(self, keys: List[str], cls_name: str) -> Dict[str, Any]:
@@ -72,7 +69,6 @@ class SQLService:
         return data
 
     def _load_table_safe(self, table_name: str) -> Optional[pd.DataFrame]:
-        """Load table if it exists, return None otherwise"""
         if not self.db.table_exists(table_name):
             return None
         try:
@@ -93,22 +89,14 @@ class SQLService:
             cache['available_seasons'] = available_seasons
         
         # Load averaged stats
-        averaged_stats = {
-            pos: df.set_index(pos)
-            for pos in constants.POSITIONS
-            if (df := self._load_table_safe(f"Statistics_averaged_{pos}")) is not None
-        }
+        averaged_stats = {pos: df.set_index(pos) for pos in constants.POSITIONS if (df := self._load_table_safe(f"Statistics_averaged_{pos}")) is not None}
         if averaged_stats:
             cache['averaged'] = averaged_stats
         
         # Load seasonal stats
         by_year = {}
         for season in available_seasons:
-            season_data = {
-                pos: df.set_index(pos)
-                for pos in constants.POSITIONS
-                if (df := self._load_table_safe(f"Statistics_{season}_{pos}")) is not None
-            }
+            season_data = {pos: df.set_index(pos) for pos in constants.POSITIONS if (df := self._load_table_safe(f"Statistics_{season}_{pos}")) is not None}
             if season_data:
                 by_year[season] = season_data
         

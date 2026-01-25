@@ -1,3 +1,4 @@
+
 POSITIONS = ['QB', 'RB', 'WR', 'TE']
 
 TEAMS = ["ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE", 
@@ -7,10 +8,8 @@ TEAMS = ["ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
 
 STATISTICS_SEASONS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
 
-# Current NFL season for schedules and active rosters
 CURRENT_SEASON = 2025
 
-# Valid fantasy league formats
 VALID_FORMATS = ["redraft", "dynasty"]
 
 # Stats that should be displayed as whole numbers (counts, yards, TDs)
@@ -23,7 +22,6 @@ INTEGER_STATS = {
     'Fantasy Pts', 'PPR Pts'
 }
 
-# Column name mapping: ugly internal names -> presentable display names
 COLUMN_NAME_MAP = {
     # Fantasy Points
     'fantasy_points': 'Fantasy Pts',
