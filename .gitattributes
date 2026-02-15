@@ -1,0 +1,39 @@
+* text=auto eol=lf
+
+# Windows-native scripts
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Keep source/docs consistent in-repo
+*.py text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.env text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Never normalize binary files
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.webp -text
+*.ico -text
+*.pdf -text
+*.zip -text
+*.gz -text
+*.woff -text
+*.woff2 -text
+*.ttf -text
+*.eot -text

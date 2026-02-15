@@ -1,0 +1,11 @@
+.detail {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.detail-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+}

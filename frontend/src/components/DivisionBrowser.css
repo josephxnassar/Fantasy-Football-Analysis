@@ -1,0 +1,120 @@
+.division-browser {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Conference Selection */
+.conference-selector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.conference-button {
+  flex: 1;
+  max-width: 200px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 18px;
+  font-weight: 700;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: var(--color-bg-white);
+  color: var(--color-text-muted);
+}
+
+.conference-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.conference-button.active.afc {
+  background: linear-gradient(135deg, #c41e3a 0%, #e63946 100%);
+  border-color: #c41e3a;
+  color: white;
+  box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+}
+
+.conference-button.active.nfc {
+  background: linear-gradient(135deg, #003087 0%, #0050a1 100%);
+  border-color: #003087;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+}
+
+/* Division Selection */
+.division-selector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.division-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-muted);
+}
+
+.division-button:hover {
+  background: var(--color-bg-lighter);
+  color: var(--color-text-primary);
+}
+
+.division-button.active {
+  background: var(--color-primary-gradient);
+  border-color: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-primary);
+}
+
+/* Team Grid */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.team-card {
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.team-abbr {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.team-name {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.team-action {
+  font-size: 13px;
+  color: var(--color-info);
+  font-weight: 500;
+}

@@ -1,0 +1,69 @@
+.App {
+  min-height: 100vh;
+}
+
+.app-header {
+  background: var(--color-primary-gradient);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+.app-header p {
+  margin: 10px 0 0 0;
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.app-nav {
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  padding: 0;
+}
+
+.nav-button {
+  flex: 1;
+  padding: 16px 20px;
+  background: var(--color-bg-white);
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  color: var(--color-text-muted);
+}
+
+.nav-button:hover {
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+}
+
+.nav-button.active {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-bg-light);
+}
+
+main {
+  background: var(--color-bg-lighter);
+  min-height: calc(100vh - 200px);
+  padding: 20px 0;
+}

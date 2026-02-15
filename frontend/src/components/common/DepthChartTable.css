@@ -1,0 +1,155 @@
+/* Shared depth chart table styles — used by both full modal and mini (player modal) variants */
+
+/* ── Full-size table ── */
+.depth-chart-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.depth-chart-table thead th {
+  background: linear-gradient(180deg, var(--color-bg-light) 0%, #e9ecf1 100%);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+  border-right: 1px solid var(--color-border-light);
+}
+
+.depth-chart-table thead th:last-child {
+  border-right: none;
+}
+
+.depth-chart-table tbody tr {
+  border-bottom: 1px solid var(--color-border-light);
+  transition: background var(--transition-fast);
+}
+
+.depth-chart-table tbody tr:nth-child(even) {
+  background: var(--color-bg-white);
+}
+
+.depth-chart-table tbody tr:nth-child(odd) {
+  background: rgba(248, 249, 252, 0.6);
+}
+
+.depth-chart-table tbody tr:hover {
+  background: rgba(102, 126, 234, 0.06);
+}
+
+.depth-chart-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Shared cell styles ── */
+.position-cell {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 13px;
+  white-space: nowrap;
+  border-right: 2px solid var(--color-border);
+  background: rgba(102, 126, 234, 0.04);
+}
+
+.player-cell {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  border-right: 1px solid var(--color-border-light);
+}
+
+.player-cell:last-child {
+  border-right: none;
+}
+
+.player-cell.starter {
+  font-weight: 600;
+}
+
+.player-cell.empty {
+  color: var(--color-text-light);
+}
+
+.player-cell.highlight {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ── Mini table variant (player modal) ── */
+.depth-chart-mini-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.depth-chart-mini-table thead th {
+  background: linear-gradient(180deg, var(--color-bg-light) 0%, #e9ecf1 100%);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+  border-right: 1px solid var(--color-border-light);
+}
+
+.depth-chart-mini-table thead th:last-child {
+  border-right: none;
+}
+
+.depth-chart-mini-table tbody tr {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.depth-chart-mini-table tbody tr:nth-child(even) {
+  background: var(--color-bg-white);
+}
+
+.depth-chart-mini-table tbody tr:nth-child(odd) {
+  background: rgba(248, 249, 252, 0.6);
+}
+
+.depth-chart-mini-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.depth-chart-mini-table .position-cell {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+}
+
+.depth-chart-mini-table .player-cell {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 13px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .depth-chart-table,
+  .depth-chart-mini-table {
+    font-size: 12px;
+  }
+
+  .position-cell,
+  .player-cell {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

@@ -1,0 +1,151 @@
+.schedule-modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--color-bg-light);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.schedule-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.team-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.team-full-name {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.schedule-season-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.schedule-season-selector label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.schedule-season-selector select {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-white);
+  color: var(--color-text-primary);
+}
+
+.bye-week-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 12px;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.schedule-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--color-bg-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-fast);
+}
+
+.schedule-game:hover {
+  background: var(--color-bg-white);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.schedule-game.bye {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning);
+}
+
+.game-week {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+.game-opponent {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.game-opponent.home {
+  color: var(--color-success-text);
+}
+
+.game-opponent.away {
+  color: var(--color-primary);
+}
+
+.game-opponent.bye-text {
+  color: var(--color-warning-text);
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .schedule-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .schedule-modal-content {
+    padding: 1.5rem;
+  }
+}

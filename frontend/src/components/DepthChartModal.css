@@ -1,0 +1,31 @@
+/* Depth chart modal — layout only (table styles live in common/DepthChartTable.css) */
+
+.depth-chart-modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  max-width: 900px;
+  width: min(96vw, 900px);
+  max-height: 92vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.depth-chart-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.depth-chart-table-wrapper {
+  overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+  .depth-chart-modal-content {
+    padding: 1.5rem;
+  }
+}
+

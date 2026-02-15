@@ -1,0 +1,30 @@
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+
+# Environment & Logs
+.env
+*.log
+logs/
+.DS_Store
+
+# CI/CD
+.github/
+
+# Backend / Python
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/tmp_pytest/
+.pytest_tmp/
+.venv/
+backend/database/data/*.db
+*.xlsm
+
+# Frontend / Node
+node_modules/
+dist/
+.vite/
+
+# Note: uv.lock and package-lock.json are intentionally committed for reproducibility

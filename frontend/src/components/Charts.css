@@ -1,0 +1,154 @@
+/* ── Charts container ── */
+.charts-container {
+  width: 100%;
+  padding: var(--spacing-lg);
+}
+
+.charts-container h1 {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text-primary);
+}
+
+/* ── Controls row ── */
+.charts-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.charts-controls .control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.charts-controls label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.charts-controls select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  min-width: 140px;
+  transition: border-color var(--transition-fast);
+}
+
+.charts-controls select:hover {
+  border-color: var(--color-primary);
+}
+
+.charts-controls select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+/* ── Chart area ── */
+.chart-wrapper {
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+/* Prevent browser focus ring on SVG bar clicks */
+.chart-wrapper svg {
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chart-wrapper svg *:focus,
+.chart-wrapper svg *:focus-visible {
+  outline: none !important;
+}
+
+/* ── Recharts tooltip ── */
+.chart-tooltip {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  min-width: 160px;
+}
+
+.chart-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.chart-tooltip-headshot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-border-light);
+}
+
+.chart-tooltip-header strong {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.chart-tooltip-team {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.chart-tooltip-stats {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.chart-tooltip-stats strong {
+  color: var(--color-text-primary);
+}
+
+/* ── No data message ── */
+.no-data {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-xl);
+  font-size: 15px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .charts-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .charts-controls select {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .chart-wrapper {
+    padding: var(--spacing-sm);
+  }
+}
