@@ -3,7 +3,23 @@ import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from backend.config.settings import LOG_LEVEL
+from backend.config.settings import LOG_LEVEL, TIMING_ENABLED
+
+def _setup_timing_logger(log_dir: Path) -> None:
+    timing_logger = logging.getLogger("backend.timing")
+    timing_logger.setLevel(logging.INFO)
+    timing_logger.propagate = False
+
+    if timing_logger.hasHandlers():
+        timing_logger.handlers.clear()
+
+    if not TIMING_ENABLED:
+        return
+
+    timing_handler = RotatingFileHandler(log_dir / "timing.log", maxBytes=1_000_000, backupCount=3)
+    timing_handler.setLevel(logging.INFO)
+    timing_handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+    timing_logger.addHandler(timing_handler)
 
 def setup_logging() -> None:
     logger = logging.getLogger()
@@ -27,4 +43,5 @@ def setup_logging() -> None:
 
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
+    _setup_timing_logger(log_dir)
     

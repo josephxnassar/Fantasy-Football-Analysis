@@ -10,6 +10,7 @@ from backend import base_source
 from backend.statistics.util import stats_helpers
 from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
+from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class Statistics(base_source.BaseSource):
     def get_keys(self) -> List[str]:
         return constants.POSITIONS
 
+    @timed("Statistics._load_rosters")
     def _load_rosters(self) -> pd.DataFrame:
         """Load roster data from nflreadpy"""
         try:
@@ -32,6 +34,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to load rosters: {e}")
             raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e
 
+    @timed("Statistics._load")
     def _load(self) -> pd.DataFrame:
         """Load player stats from nflreadpy"""
         try:
@@ -40,6 +43,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to load player stats: {e}")
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
 
+    @timed("Statistics._load_snap_counts")
     def _load_snap_counts(self) -> pd.DataFrame:
         """Load weekly snap count percentages from nflreadpy."""
         try:
@@ -48,6 +52,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to load snap counts: {e}")
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
+    @timed("Statistics._extract_all_roster_data")
     def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict, set, Dict, Dict, Dict]:
         """Extract all roster-based data in a single pass through the dataframe."""
         try:
@@ -80,6 +85,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to extract roster data: {e}")
             raise DataProcessingError(f"Failed to extract roster data: {e}", source="Statistics") from e
         
+    @timed("Statistics._partition_data")
     def _partition_data(self, raw_stats: pd.DataFrame, snap_counts: pd.DataFrame) -> Tuple[Dict, Dict, Dict, pd.DataFrame]:
         """Aggregate raw weekly data by player/season, partition by position/year, and collect weekly stats."""
         try:
@@ -109,6 +115,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to partition seasonal data: {e}")
             raise DataProcessingError(f"Failed to partition seasonal data: {e}", source="Statistics") from e
 
+    @timed("Statistics._calculate_ratings_from_averages")
     def _calculate_ratings_from_averages(self, seasonal_df: pd.DataFrame, player_ages: Dict) -> Tuple[Dict, Dict]:
         """Calculate career averages by position and generate ratings."""
         try:
@@ -128,6 +135,7 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to calculate ratings: {e}")
             raise DataProcessingError(f"Failed to calculate ratings: {e}", source="Statistics") from e
 
+    @timed("Statistics.run")
     def run(self) -> None:
         """Load data, process statistics, calculate ratings, and store in cache"""
         rosters = self._load_rosters()

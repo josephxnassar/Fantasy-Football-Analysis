@@ -21,3 +21,4 @@ DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")
 
 # Logging
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "DEBUG").upper()
+TIMING_ENABLED: bool = os.getenv("TIMING_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
