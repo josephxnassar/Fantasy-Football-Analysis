@@ -9,9 +9,6 @@
 logs/
 .DS_Store
 
-# CI/CD
-.github/
-
 # Backend / Python
 __pycache__/
 *.pyc

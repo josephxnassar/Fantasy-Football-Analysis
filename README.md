@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-02-15
+Last verified: 2026-02-16
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
@@ -20,8 +20,10 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 2. [Quick Start](#quick-start)
 3. [Core Commands](#core-commands)
 4. [Configuration](#configuration)
-5. [Documentation Map](#documentation-map)
-6. [Repository Layout](#repository-layout)
+5. [CI (GitHub Actions)](#ci-github-actions)
+6. [Commit Template](#commit-template)
+7. [Documentation Map](#documentation-map)
+8. [Repository Layout](#repository-layout)
 
 ## Architecture At A Glance
 
@@ -123,6 +125,35 @@ Backend variables (loaded by [`backend/config/settings.py`](backend/config/setti
 
 Frontend variable:
 - `VITE_API_URL` (default: `http://localhost:8000/api`)
+
+## CI (GitHub Actions)
+
+Workflow file: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
+Triggers:
+- Push to `main` or `dev`
+- Pull request into `main` or `dev`
+- Manual run (`workflow_dispatch`)
+
+Checks:
+- Backend tests on Python `3.10` and `3.11` (`uv run pytest -q`)
+- Frontend production build (`npm ci && npm run build`)
+
+## Commit Template
+
+Template file: [`.gitmessage.txt`](.gitmessage.txt)
+
+Enable locally:
+
+```bash
+git config commit.template .gitmessage.txt
+```
+
+Optional (all repos on your machine):
+
+```bash
+git config --global commit.template "C:/path/to/.gitmessage.txt"
+```
 
 ## Documentation Map
 
