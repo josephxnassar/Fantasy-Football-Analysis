@@ -1,0 +1,17 @@
+<type>(<scope>): <short summary>
+
+Why:
+- <why this change is needed>
+
+What:
+- <key change 1>
+- <key change 2>
+
+Validation:
+- <command/test run>
+
+Refs:
+- <issue/pr/task id or n/a>
+
+# Types:
+# feat, fix, refactor, docs, test, chore, ci
