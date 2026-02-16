@@ -9,6 +9,7 @@ import pandas as pd
 
 from backend.database.DAO.sqlite_dao import SQLiteCacheManager
 from backend.util import constants
+from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class SQLService:
     def __init__(self) -> None:
         self.db: SQLiteCacheManager = SQLiteCacheManager()
 
+    @timed("SQLService.has_cached_data")
     def has_cached_data(self) -> bool:
         """Return True when all required cache families exist."""
         tables = set(self.db.list_tables())
@@ -25,6 +27,7 @@ class SQLService:
             return False
         return (f"{constants.CACHE['STATISTICS']}_metadata" in tables and f"{constants.CACHE['SCHEDULES']}_metadata" in tables and any(t.startswith(f"{constants.CACHE['DEPTH_CHART']}_") for t in tables))
 
+    @timed("SQLService.save_to_db")
     def save_to_db(self, cache: Dict[str, Any], cls_name: str) -> None:
         """Save one cache object based on its class name."""
         if cache is None:
@@ -43,6 +46,7 @@ class SQLService:
 
         logger.warning("Unsupported cache class '%s'; skipping save.", cls_name)
 
+    @timed("SQLService.load_from_db")
     def load_from_db(self, keys: List[str], cls_name: str) -> Dict[str, Any]:
         """Load one cache object based on its class name."""
         if cls_name == constants.CACHE["STATISTICS"]:
@@ -55,6 +59,7 @@ class SQLService:
         logger.warning("Unsupported cache class '%s'; returning empty cache.", cls_name)
         return {}
 
+    @timed("SQLService._save_statistics")
     def _save_statistics(self, cache: Dict[str, Any]) -> None:
         prefix = constants.CACHE["STATISTICS"]
 
@@ -78,6 +83,7 @@ class SQLService:
         seasons = cache.get("available_seasons", list(by_year.keys()))
         self._save_season_metadata(prefix, seasons)
 
+    @timed("SQLService._load_statistics")
     def _load_statistics(self) -> Dict[str, Any]:
         prefix = constants.CACHE["STATISTICS"]
 
@@ -110,6 +116,7 @@ class SQLService:
                 constants.STATS["BY_YEAR"]: by_year,
                 constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_stats}
 
+    @timed("SQLService._save_schedules")
     def _save_schedules(self, cache: Dict[str, Any]) -> None:
         prefix = constants.CACHE["SCHEDULES"]
         seasons: List[int] = []
@@ -127,6 +134,7 @@ class SQLService:
 
         self._save_season_metadata(prefix, seasons)
 
+    @timed("SQLService._load_schedules")
     def _load_schedules(self) -> Dict[int, Dict[str, pd.DataFrame]]:
         prefix = constants.CACHE["SCHEDULES"]
         seasons = self._load_season_metadata(prefix, fallback=constants.SEASONS)
@@ -145,11 +153,13 @@ class SQLService:
 
         return nested
 
+    @timed("SQLService._save_depth_charts")
     def _save_depth_charts(self, cache: Dict[str, Any]) -> None:
         prefix = constants.CACHE["DEPTH_CHART"]
         for team, df in cache.items():
             self.db.save_table(f"{prefix}_{team}", df)
 
+    @timed("SQLService._load_depth_charts")
     def _load_depth_charts(self, keys: List[str]) -> Dict[str, pd.DataFrame]:
         prefix = constants.CACHE["DEPTH_CHART"]
         charts: Dict[str, pd.DataFrame] = {}
