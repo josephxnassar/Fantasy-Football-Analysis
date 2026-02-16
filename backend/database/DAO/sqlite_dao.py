@@ -13,6 +13,8 @@ class SQLiteCacheManager:
     
     def __init__(self, db_path: str = DB_PATH) -> None:
         self.db_path: Path = Path(db_path)
+        if str(self.db_path) != ":memory:":
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn: sqlite3.Connection = sqlite3.connect(self.db_path)
         self.cursor: sqlite3.Cursor = self.conn.cursor()
 
