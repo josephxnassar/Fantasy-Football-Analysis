@@ -71,23 +71,6 @@ CURRENT_SEASON = max(SEASONS)
 # Valid fantasy formats
 VALID_FORMATS = ["redraft", "dynasty"]
 
-# Dynasty age multipliers
-AGE_MULTIPLIERS = {
-    'QB': {'peak_age': 28, 'young_boost': 1.3, 'decline_per_year': 0.05},
-    'RB': {'peak_age': 24, 'young_boost': 1.15, 'decline_per_year': 0.15},
-    'WR': {'peak_age': 26, 'young_boost': 1.4, 'decline_per_year': 0.08},
-    'TE': {'peak_age': 27, 'young_boost': 1.3, 'decline_per_year': 0.07},
-}
-
-# Redraft position multipliers
-REDRAFT_MULTIPLIERS = {
-    'QB': 0.85,   # Lots of good QBs available
-    'RB': 1.05,   # Scarce elite talent
-    'WR': 1.05,   # Scarce elite talent
-    'TE': 1.0,    # Moderate scarcity
-}
-
-
 # Important stats to keep in final output
 USEFUL_STATS = [
     'Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds',

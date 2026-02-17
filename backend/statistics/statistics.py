@@ -7,6 +7,7 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend import base_source
+from backend.statistics.ratings.regression.regression import Regression
 from backend.statistics.util import stats_helpers
 from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
@@ -17,10 +18,9 @@ logger = logging.getLogger(__name__)
 class Statistics(base_source.BaseSource):
     """Processes player statistics and generates ML-based ratings"""
     
-    def __init__(self, seasons: List[int], method: str = "ridge") -> None:
-        """Initialize with seasons and regression method"""
+    def __init__(self, seasons: List[int]) -> None:
+        """Initialize with seasons"""
         super().__init__(seasons)
-        self.ratings_method: str = method
 
     def get_keys(self) -> List[str]:
         return constants.POSITIONS
@@ -115,22 +115,40 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to partition seasonal data: {e}")
             raise DataProcessingError(f"Failed to partition seasonal data: {e}", source="Statistics") from e
 
-    @timed("Statistics._calculate_ratings_from_averages")
-    def _calculate_ratings_from_averages(self, seasonal_df: pd.DataFrame, player_ages: Dict) -> Tuple[Dict, Dict]:
-        """Calculate career averages by position and generate ratings."""
+    @timed("Statistics._calculate_ratings")
+    def _calculate_ratings(self, seasonal_df: pd.DataFrame, player_positions: Dict, eligible_players: set, rookies: Dict) -> Tuple[Dict, Dict]:
+        """Train simple forward-point models and predict current redraft/dynasty scores."""
         try:
-            stat_cols = seasonal_df.select_dtypes(include="number").columns.difference(["season", "player_id"])
-            averages_df = seasonal_df.groupby(["position", "player_display_name"])[stat_cols].mean()
-            present_positions = set(averages_df.index.get_level_values("position"))
-            dynasty_ratings, redraft_ratings = {}, {}
-            for position in (pos for pos in constants.POSITIONS if pos in present_positions):
-                default_age = constants.AGE_MULTIPLIERS.get(position, {}).get("peak_age", 26)
-                redraft_mult = constants.REDRAFT_MULTIPLIERS.get(position, 1.0)
-                base_ratings = stats_helpers.create_ratings(averages_df.loc[position], self.ratings_method)
-                dynasty_ratings.update({player_name: base_rating * stats_helpers.calculate_age_multiplier(player_ages.get(player_name, default_age), position) for player_name, base_rating in base_ratings.items()})
-                redraft_ratings.update({player_name: base_rating * redraft_mult for player_name, base_rating in base_ratings.items()})
+            df = seasonal_df.copy()
+            df["is_eligible"] = df["player_display_name"].isin(eligible_players)
+            df = df.sort_values(["player_display_name", "season"]).reset_index(drop=True)
 
-            return dynasty_ratings, redraft_ratings
+            grouped = df.groupby("player_display_name")["PPR Pts"]
+            df["PPR Pts_lag1"] = grouped.shift(1).fillna(0)
+            df["PPR Pts_trend"] = df["PPR Pts"] - df["PPR Pts_lag1"]
+            df["redraft_target"] = grouped.shift(-1)
+            df["dynasty_target"] = grouped.shift(-1) + grouped.shift(-2) + grouped.shift(-3)
+
+            numeric_cols = df.select_dtypes(include="number").columns.tolist()
+            feature_cols = [col for col in numeric_cols if col not in {"season", "player_id", "redraft_target", "dynasty_target"}]
+            inference_df = df[(df["season"] == max(self.seasons)) & (~df["player_display_name"].isin(set(rookies.keys())))]
+
+            def _predict_target(target_col: str) -> Dict[str, float]:
+                out = {name: 0.0 for name in player_positions}
+                train_df = df[df[target_col].notna()]
+                for pos in constants.POSITIONS:
+                    pos_train = train_df[train_df["position"] == pos]
+                    pos_infer = inference_df[inference_df["position"] == pos]
+                    if pos_train.empty or pos_infer.empty:
+                        continue
+                    model = Regression(pos_train[feature_cols].fillna(0), pos_train[target_col].astype(float), "ridge").fit()
+                    preds = model.predict(pos_infer[feature_cols].fillna(0))
+                    out.update({name: float(pred) for name, pred in zip(pos_infer["player_display_name"], preds)})
+                return out
+
+            redraft = _predict_target("redraft_target")
+            dynasty = _predict_target("dynasty_target")
+            return dynasty, redraft
         except Exception as e:
             logger.error(f"Failed to calculate ratings: {e}")
             raise DataProcessingError(f"Failed to calculate ratings: {e}", source="Statistics") from e
@@ -145,7 +163,7 @@ class Statistics(base_source.BaseSource):
         snap_counts = self._load_snap_counts()
         positions, seasonal_data, weekly_stats, seasonal_df = self._partition_data(raw_stats, snap_counts)
 
-        dynasty, redraft = self._calculate_ratings_from_averages(seasonal_df, player_ages)
+        dynasty, redraft = self._calculate_ratings(seasonal_df, positions, eligible, rookies)
 
         overall_rank_dyn = stats_helpers.calculate_overall_ranks(dynasty, eligible)
         overall_rank_red = stats_helpers.calculate_overall_ranks(redraft, eligible)

@@ -26,16 +26,6 @@ def test_add_derived_stats_handles_zero_division() -> None:
     assert result.loc[1, "Yds/Rush"] == 0.0
 
 
-def test_calculate_age_multiplier_behaviors() -> None:
-    young_wr = stats_helpers.calculate_age_multiplier(age=22, position="WR")
-    peak_wr = stats_helpers.calculate_age_multiplier(age=26, position="WR")
-    old_rb = stats_helpers.calculate_age_multiplier(age=30, position="RB")
-
-    assert young_wr > 1.0
-    assert peak_wr == 1.0
-    assert 0.1 <= old_rb < 1.0
-
-
 def test_rank_calculations_exclude_ineligible_players() -> None:
     ratings = {"A": 100.0, "B": 90.0, "C": 80.0}
     positions = {"A": "QB", "B": "QB", "C": "RB"}

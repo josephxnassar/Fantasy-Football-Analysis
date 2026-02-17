@@ -2,6 +2,7 @@
 
 import logging
 
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
@@ -41,12 +42,23 @@ class Regression(BaseRatings):
             logger.error(f"Failed to train {self.model_type.title()}Regression: {e}")
             raise DataProcessingError(f"Failed to train {self.model_type.title()}Regression: {e}", source="Regression") from e
 
+    def predict(self, X: pd.DataFrame) -> np.ndarray:
+        """Predict ratings for new rows using trained feature columns."""
+        try:
+            X_aligned = X.reindex(columns=self.X_clean.columns, fill_value=0).fillna(0)
+            X_scaled = self.scaler.transform(X_aligned)
+            return self.model.predict(X_scaled)
+        except Exception as e:
+            logger.error(f"Failed to predict ratings: {e}")
+            raise DataProcessingError(f"Failed to predict ratings: {e}", source="Regression") from e
+
     def get_ratings(self) -> pd.DataFrame:
         """Generate ratings from trained model"""
         try:
             X_scaled = self.scaler.transform(self.X_clean)
-            self.X_clean['rating'] = pd.Series(self.model.predict(X_scaled), index=self.X_clean.index, name="rating")
-            return self.X_clean.sort_values(by='rating', ascending=False)
+            rated = self.X_clean.copy()
+            rated["rating"] = pd.Series(self.model.predict(X_scaled), index=rated.index, name="rating")
+            return rated.sort_values(by="rating", ascending=False)
         except Exception as e:
             logger.error(f"Failed to calculate ratings: {e}")
             raise DataProcessingError(f"Failed to calculate ratings: {e}", source="Regression") from e
