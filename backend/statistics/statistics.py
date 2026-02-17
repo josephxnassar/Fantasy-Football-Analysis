@@ -60,17 +60,21 @@ class Statistics(base_source.BaseSource):
         """Extract all roster-based data in a single pass through the dataframe."""
         try:
             current_season = constants.CURRENT_SEASON
-            player_ages_by_season, eligible_players, player_headshots, player_teams, rookies = {}, set(), {}, {}, {}
+            today = pd.Timestamp.now().normalize()
+            player_ages_by_season, player_birth_dates, eligible_players, player_headshots, player_teams, rookies = {}, {}, set(), {}, {}, {}
             for row in rosters.itertuples(index=False):
                 name = getattr(row, "full_name", None)
                 season = getattr(row, "season", None)
+                position = getattr(row, "position", None)
                 if pd.isna(name):
                     continue
-                if pd.notna(birth_date := getattr(row, "birth_date", None)):
-                    age = (pd.Timestamp(year=season, month=9, day=1) - pd.to_datetime(birth_date)).days // 365
+                if position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
+                    birth_ts = pd.to_datetime(birth_date)
+                    age = (pd.Timestamp(year=season, month=9, day=1) - birth_ts).days // 365
                     if age > 0:
                         player_ages_by_season.setdefault(name, {})[int(season)] = int(age)
-                if season == current_season:
+                        player_birth_dates[name] = birth_ts
+                if season == current_season and position in constants.POSITIONS:
                     if getattr(row, "status", None) != "RET":
                         eligible_players.add(name)
                     if pd.notna(headshot := getattr(row, "headshot_url", None)):
@@ -79,7 +83,7 @@ class Statistics(base_source.BaseSource):
                         player_teams[name] = team
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True
-            player_ages = {name: season_ages[max(season_ages)] for name, season_ages in player_ages_by_season.items()}
+            player_ages = {name: int((today - birth_ts).days // 365) for name, birth_ts in player_birth_dates.items()}
             logger.info(f"Ages: {len(player_ages)} | Eligible: {len(eligible_players)} | Headshots: {len(player_headshots)} | Player-Teams: {len(player_teams)} | Rookies: {sum(1 for v in rookies.values() if v)}")
             
             return player_ages, player_ages_by_season, eligible_players, player_headshots, player_teams, rookies

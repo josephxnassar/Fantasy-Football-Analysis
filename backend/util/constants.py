@@ -63,7 +63,7 @@ TEAM_NAMES = {
 }
 
 # Available seasons
-SEASONS = list(range(2016, 2025))
+SEASONS = list(range(2016, 2026))
 
 # Last season in list
 CURRENT_SEASON = max(SEASONS)
