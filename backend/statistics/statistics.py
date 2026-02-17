@@ -47,17 +47,20 @@ class Statistics(base_source.BaseSource):
     def _load_snap_counts(self) -> pd.DataFrame:
         """Load weekly snap count percentages from nflreadpy."""
         try:
-            return nfl.load_snap_counts(seasons=self.seasons).to_pandas()
+            snap_seasons = self.seasons
+            if min(self.seasons) < 2012:
+                snap_seasons = [season for season in self.seasons if season >= 2012]
+            return nfl.load_snap_counts(seasons=snap_seasons).to_pandas()
         except Exception as e:
             logger.error(f"Failed to load snap counts: {e}")
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
     @timed("Statistics._extract_all_roster_data")
-    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict, set, Dict, Dict, Dict]:
+    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict, Dict, set, Dict, Dict, Dict]:
         """Extract all roster-based data in a single pass through the dataframe."""
         try:
             current_season = constants.CURRENT_SEASON
-            age_tracker, eligible_players, player_headshots, player_teams, rookies = {}, set(), {}, {}, {}
+            player_ages_by_season, eligible_players, player_headshots, player_teams, rookies = {}, set(), {}, {}, {}
             for row in rosters.itertuples(index=False):
                 name = getattr(row, "full_name", None)
                 season = getattr(row, "season", None)
@@ -65,9 +68,8 @@ class Statistics(base_source.BaseSource):
                     continue
                 if pd.notna(birth_date := getattr(row, "birth_date", None)):
                     age = (pd.Timestamp(year=season, month=9, day=1) - pd.to_datetime(birth_date)).days // 365
-                    prev = age_tracker.get(name)
-                    if age > 0 and (not prev or season > prev[0]):
-                        age_tracker[name] = (season, age)
+                    if age > 0:
+                        player_ages_by_season.setdefault(name, {})[int(season)] = int(age)
                 if season == current_season:
                     if getattr(row, "status", None) != "RET":
                         eligible_players.add(name)
@@ -77,10 +79,10 @@ class Statistics(base_source.BaseSource):
                         player_teams[name] = team
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True
-            player_ages = {name: age for name, (_, age) in age_tracker.items()}
+            player_ages = {name: season_ages[max(season_ages)] for name, season_ages in player_ages_by_season.items()}
             logger.info(f"Ages: {len(player_ages)} | Eligible: {len(eligible_players)} | Headshots: {len(player_headshots)} | Player-Teams: {len(player_teams)} | Rookies: {sum(1 for v in rookies.values() if v)}")
             
-            return player_ages, eligible_players, player_headshots, player_teams, rookies
+            return player_ages, player_ages_by_season, eligible_players, player_headshots, player_teams, rookies
         except Exception as e:
             logger.error(f"Failed to extract roster data: {e}")
             raise DataProcessingError(f"Failed to extract roster data: {e}", source="Statistics") from e
@@ -116,11 +118,10 @@ class Statistics(base_source.BaseSource):
             raise DataProcessingError(f"Failed to partition seasonal data: {e}", source="Statistics") from e
 
     @timed("Statistics._calculate_ratings")
-    def _calculate_ratings(self, seasonal_df: pd.DataFrame, player_positions: Dict, eligible_players: set, rookies: Dict) -> Tuple[Dict, Dict]:
+    def _calculate_ratings(self, seasonal_df: pd.DataFrame, player_ages_by_season: Dict, player_positions: Dict, rookies: Dict) -> Tuple[Dict, Dict]:
         """Train simple forward-point models and predict current redraft/dynasty scores."""
         try:
             df = seasonal_df.copy()
-            df["is_eligible"] = df["player_display_name"].isin(eligible_players)
             df = df.sort_values(["player_display_name", "season"]).reset_index(drop=True)
 
             grouped = df.groupby("player_display_name")["PPR Pts"]
@@ -157,13 +158,13 @@ class Statistics(base_source.BaseSource):
     def run(self) -> None:
         """Load data, process statistics, calculate ratings, and store in cache"""
         rosters = self._load_rosters()
-        player_ages, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
+        player_ages, player_ages_by_season, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
 
         raw_stats = self._load()
         snap_counts = self._load_snap_counts()
         positions, seasonal_data, weekly_stats, seasonal_df = self._partition_data(raw_stats, snap_counts)
 
-        dynasty, redraft = self._calculate_ratings(seasonal_df, positions, eligible, rookies)
+        dynasty, redraft = self._calculate_ratings(seasonal_df, player_ages_by_season, positions, rookies)
 
         overall_rank_dyn = stats_helpers.calculate_overall_ranks(dynasty, eligible)
         overall_rank_red = stats_helpers.calculate_overall_ranks(redraft, eligible)
