@@ -11,8 +11,9 @@ function formatDisplayStat(key, value) {
 }
 
 function getWeekMatchupLabel(week) {
-  if (!week?.team_opponent) return null;
-  return `vs ${week.team_opponent}`;
+  const opponent = week?.opponent_team ?? week?.team_opponent;
+  if (!opponent) return null;
+  return `vs ${opponent}`;
 }
 
 function renderStatCategories(details) {
