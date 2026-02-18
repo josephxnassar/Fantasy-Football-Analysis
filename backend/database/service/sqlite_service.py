@@ -86,7 +86,7 @@ class SQLService:
         seasons = constants.SEASONS
 
         all_players_df = self._load_table_safe(f"{prefix}_{constants.STATS['ALL_PLAYERS']}")
-        all_players = all_players_df.to_dict("records") if all_players_df is not None and not all_players_df.empty else []
+        all_players = [{key: (None if pd.isna(value) else value) for key, value in rec.items()} for rec in all_players_df.to_dict("records")] if all_players_df is not None and not all_players_df.empty else []
 
         by_year: Dict[int, Dict[str, pd.DataFrame]] = {}
         for season in seasons:
@@ -102,7 +102,7 @@ class SQLService:
         weekly_df = self._load_table_safe(f"{prefix}_{constants.STATS['PLAYER_WEEKLY_STATS']}")
         weekly_stats: Dict[str, List[Dict[str, Any]]] = {}
         if weekly_df is not None and not weekly_df.empty:
-            for rec in weekly_df.to_dict("records"):
+            for rec in [{key: (None if pd.isna(value) else value) for key, value in row.items()} for row in weekly_df.to_dict("records")]:
                 player_name = rec.pop("player_name", None)
                 if player_name:
                     weekly_stats.setdefault(player_name, []).append(rec)
