@@ -177,7 +177,6 @@ class Statistics(base_source.BaseSource):
 
         all_players = stats_helpers.build_all_players(redraft, dynasty, positions, eligible, player_ages, headshots, teams, rookies, overall_rank_red, overall_rank_dyn, pos_rank_red, pos_rank_dyn)
 
-        self.set_cache({'available_seasons':                    self.seasons,
-                        constants.STATS["ALL_PLAYERS"]:         all_players,
+        self.set_cache({constants.STATS["ALL_PLAYERS"]:         all_players,
                         constants.STATS["BY_YEAR"]:             seasonal_data,
                         constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_stats})

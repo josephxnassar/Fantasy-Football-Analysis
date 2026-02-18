@@ -5,16 +5,11 @@ from backend.statistics.util import stats_helpers
 
 pytestmark = pytest.mark.unit
 
-
 def test_add_derived_stats_handles_zero_division() -> None:
-    df = pd.DataFrame(
-        {
-            "Rec Yds": [100.0, 0.0],
-            "Rec": [5.0, 0.0],
-            "Rush Yds": [80.0, 20.0],
-            "Carries": [20.0, 0.0],
-        }
-    )
+    df = pd.DataFrame({"Rec Yds": [100.0, 0.0],
+                       "Rec": [5.0, 0.0],
+                       "Rush Yds": [80.0, 20.0],
+                       "Carries": [20.0, 0.0]})
 
     result = stats_helpers.add_derived_stats(df)
 
@@ -24,7 +19,6 @@ def test_add_derived_stats_handles_zero_division() -> None:
     assert result.loc[1, "Yds/Rec"] == 0.0
     assert result.loc[0, "Yds/Rush"] == 4.0
     assert result.loc[1, "Yds/Rush"] == 0.0
-
 
 def test_rank_calculations_exclude_ineligible_players() -> None:
     ratings = {"A": 100.0, "B": 90.0, "C": 80.0}
@@ -36,7 +30,6 @@ def test_rank_calculations_exclude_ineligible_players() -> None:
 
     assert overall == {"A": 1, "C": 2}
     assert by_position == {"A": 1, "C": 1}
-
 
 def test_build_all_players_includes_expected_fields() -> None:
     redraft = {"A": 100.0, "B": 85.0}
@@ -52,20 +45,7 @@ def test_build_all_players_includes_expected_fields() -> None:
     pos_red = {"A": 1}
     pos_dyn = {"A": 1}
 
-    players = stats_helpers.build_all_players(
-        redraft,
-        dynasty,
-        positions,
-        eligible,
-        ages,
-        headshots,
-        teams,
-        rookies,
-        overall_red,
-        overall_dyn,
-        pos_red,
-        pos_dyn,
-    )
+    players = stats_helpers.build_all_players(redraft, dynasty, positions, eligible, ages, headshots, teams, rookies, overall_red, overall_dyn, pos_red, pos_dyn)
 
     by_name = {player["name"]: player for player in players}
     assert set(by_name) == {"A", "B"}

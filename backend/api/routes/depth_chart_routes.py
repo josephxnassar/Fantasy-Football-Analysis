@@ -1,5 +1,4 @@
 """Depth chart API routes — team depth charts"""
-from typing import List
 
 import pandas as pd
 from fastapi import APIRouter, Request

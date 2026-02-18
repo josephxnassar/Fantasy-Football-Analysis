@@ -66,7 +66,6 @@ Configured seasons:
 ## Output Cache Shape
 
 Public keys used by API routes:
-- `available_seasons`
 - `all_players`
 - `by_year`
 - `player_weekly_stats`
