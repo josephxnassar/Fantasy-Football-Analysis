@@ -1,7 +1,10 @@
-from backend import config  # Imports and runs setup_logging() from __init__.py
-from backend.api.api import api
-from backend.config.settings import API_HOST, API_PORT
 import uvicorn
+
+from backend.api.api import api
+from backend.config import setup_logging
+from backend.config.settings import API_HOST, API_PORT
+
+setup_logging()
 
 if __name__ == "__main__":
     # Run the FastAPI server

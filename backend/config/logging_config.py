@@ -5,6 +5,7 @@ from pathlib import Path
 
 from backend.config.settings import LOG_LEVEL, TIMING_ENABLED
 
+
 def _setup_timing_logger(log_dir: Path) -> None:
     timing_logger = logging.getLogger("backend.timing")
     timing_logger.setLevel(logging.INFO)

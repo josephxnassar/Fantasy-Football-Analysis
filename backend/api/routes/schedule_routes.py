@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Request
 
-from backend.api.models import TeamScheduleResponse, TeamScheduleGame
+from backend.api.models import TeamScheduleGame, TeamScheduleResponse
 from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.api.util.team_helpers import get_team_schedule_entry, validate_team
 from backend.util import constants

@@ -14,18 +14,18 @@ class BaseSource(ABC):
     """Abstract base for all data sources (Statistics, Schedules, DepthChart)"""
     
     def __init__(self, seasons: List[int]) -> None:
-        self.cache: Dict[str, Any] = {}
+        self.cache: Dict[Any, Any] = {}
         self.seasons: List[int] = seasons
 
     def get_keys(self) -> List[str]:
         """Return cache keys for this source"""
         return constants.TEAMS
 
-    def get_cache(self) -> Dict[str, Any]:
+    def get_cache(self) -> Dict[Any, Any]:
         """Return cached data"""
         return self.cache
 
-    def set_cache(self, cache: Dict[str, Any]) -> None:
+    def set_cache(self, cache: Dict[Any, Any]) -> None:
         """Set cached data"""
         self.cache = cache
 

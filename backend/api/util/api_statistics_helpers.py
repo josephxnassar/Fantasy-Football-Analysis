@@ -1,11 +1,12 @@
 """Statistics cache transformation and lookup helpers."""
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
 from fastapi import HTTPException
 
 from backend.util import constants
+
 
 def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return ranking-eligible cached players, optionally filtered by position."""
@@ -13,7 +14,7 @@ def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[st
 
 def get_all_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return all cached players, optionally filtered by position."""
-    players = stats_cache.get(constants.STATS["ALL_PLAYERS"], [])
+    players = cast(List[Dict[str, Any]], stats_cache.get(constants.STATS["ALL_PLAYERS"], []))
     if position_filter:
         return [player for player in players if player.get("position") == position_filter]
     return players

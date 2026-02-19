@@ -1,6 +1,7 @@
 """Ridge regression model for player ratings"""
 
 import logging
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -47,7 +48,7 @@ class Regression(BaseRatings):
         try:
             X_aligned = X.reindex(columns=self.X_clean.columns, fill_value=0).fillna(0)
             X_scaled = self.scaler.transform(X_aligned)
-            return self.model.predict(X_scaled)
+            return cast(np.ndarray, self.model.predict(X_scaled))
         except Exception as e:
             logger.error(f"Failed to predict ratings: {e}")
             raise DataProcessingError(f"Failed to predict ratings: {e}", source="Regression") from e

@@ -1,10 +1,12 @@
 import pytest
 from fastapi import HTTPException
 
-from backend.api.util.api_statistics_helpers import (build_overall_chart_players,
-                                                     find_player_team,
-                                                     get_player_profile,
-                                                     resolve_chart_season)
+from backend.api.util.api_statistics_helpers import (
+    build_overall_chart_players,
+    find_player_team,
+    get_player_profile,
+    resolve_chart_season,
+)
 
 pytestmark = pytest.mark.unit
 

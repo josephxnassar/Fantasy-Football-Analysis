@@ -1,7 +1,7 @@
 """ESPN depth chart scraping and processing"""
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Optional, Tuple
 
 import pandas as pd
@@ -64,7 +64,7 @@ class ESPNDepthChart(BaseSource):
     def _create_depth_chart(self, positions: List[str], players: List[str]) -> pd.DataFrame:
         """Create structured depth chart DataFrame"""
         try:
-            roster = {}
+            roster: dict[str, List[List[str]]] = {}
             for idx, pos in enumerate(positions):
                 if pos in constants.POSITIONS:
                     start_idx = idx * 4

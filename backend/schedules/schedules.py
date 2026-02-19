@@ -7,7 +7,6 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend.base_source import BaseSource
-from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)

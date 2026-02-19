@@ -5,18 +5,26 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request
 
-from backend.api.models import ChartDataResponse, PlayerResponse, RankingsResponse, SearchResponse
+from backend.api.models import (
+    ChartDataResponse,
+    ChartPlayerEntry,
+    PlayerResponse,
+    PlayerSearchResult,
+    RankingsResponse,
+    SearchResponse,
+)
+from backend.api.util.api_statistics_helpers import (
+    build_overall_chart_players,
+    build_position_chart_players,
+    find_player_team,
+    get_all_players,
+    get_player_profile,
+    get_ranked_players,
+    group_rankings_by_position,
+    resolve_chart_season,
+)
 from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.api.util.search_helpers import filter_search_results
-from backend.api.util.api_statistics_helpers import (get_ranked_players,
-                                                     group_rankings_by_position,
-                                                     get_player_profile,
-                                                     get_all_players,
-                                                     find_player_team,
-                                                     resolve_chart_season,
-                                                     build_overall_chart_players,
-                                                     build_position_chart_players)
-
 from backend.util import constants
 from backend.util.exceptions import PlayerNotFoundError
 
@@ -75,9 +83,10 @@ def search_players(request: Request, q: str, position: Optional[str] = None) -> 
 
     results = filter_search_results(all_players, q)
     top_results = heapq.nlargest(20, results, key=lambda x: x.get("redraft_rating", 0))
+    typed_results = [PlayerSearchResult(**result) for result in top_results]
 
     return SearchResponse(query=q,
-                          results=top_results,
+                          results=typed_results,
                           count=len(results))
 
 @router.get("/chart-data", response_model=ChartDataResponse)
@@ -95,11 +104,12 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
 
     if position == "Overall":
         players, stat_columns = build_overall_chart_players(season_data, player_meta_by_name)
+        typed_players = [ChartPlayerEntry(**player) for player in players]
         return ChartDataResponse(season=target_season,
                                  position=position,
                                  available_seasons=available,
                                  stat_columns=stat_columns,
-                                 players=players)
+                                 players=typed_players)
 
     df = season_data.get(position)
     if df is None or df.empty:
@@ -111,9 +121,10 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
 
     players = build_position_chart_players(df, player_meta_by_name)
     stat_columns = sorted(df.select_dtypes(include="number").columns.tolist())
+    typed_players = [ChartPlayerEntry(**player) for player in players]
 
     return ChartDataResponse(season=target_season,
                              position=position,
                              available_seasons=available,
                              stat_columns=stat_columns,
-                             players=players)
+                             players=typed_players)

@@ -1,7 +1,7 @@
 """Player statistics processing and ML-based ratings generation"""
 
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 import nflreadpy as nfl
 import pandas as pd
@@ -61,25 +61,39 @@ class Statistics(base_source.BaseSource):
         try:
             current_season = constants.CURRENT_SEASON
             today = pd.Timestamp.now().normalize()
-            player_ages_by_season, player_birth_dates, eligible_players, player_headshots, player_teams, rookies = {}, {}, set(), {}, {}, {}
+            player_ages_by_season: Dict[str, Dict[int, int]] = {}
+            player_birth_dates: Dict[str, pd.Timestamp] = {}
+            eligible_players: set[str] = set()
+            player_headshots: Dict[str, str] = {}
+            player_teams: Dict[str, str] = {}
+            rookies: Dict[str, bool] = {}
             for row in rosters.itertuples(index=False):
-                name = getattr(row, "full_name", None)
-                season = getattr(row, "season", None)
-                position = getattr(row, "position", None)
-                if pd.isna(name):
+                name_raw = getattr(row, "full_name", None)
+                if not isinstance(name_raw, str) or not name_raw:
                     continue
-                if position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
+                name = name_raw
+
+                season_raw = getattr(row, "season", None)
+                season_int: int | None = None
+                if pd.notna(season_raw):
+                    try:
+                        season_int = int(cast(int | float | str, season_raw))
+                    except (TypeError, ValueError):
+                        season_int = None
+
+                position = getattr(row, "position", None)
+                if season_int is not None and position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
                     birth_ts = pd.to_datetime(birth_date)
-                    age = (pd.Timestamp(year=season, month=9, day=1) - birth_ts).days // 365
+                    age = (pd.Timestamp(year=season_int, month=9, day=1) - birth_ts).days // 365
                     if age > 0:
-                        player_ages_by_season.setdefault(name, {})[int(season)] = int(age)
+                        player_ages_by_season.setdefault(name, {})[season_int] = int(age)
                         player_birth_dates[name] = birth_ts
-                if season == current_season and position in constants.POSITIONS:
+                if season_int == current_season and position in constants.POSITIONS:
                     if getattr(row, "status", None) != "RET":
                         eligible_players.add(name)
-                    if pd.notna(headshot := getattr(row, "headshot_url", None)):
+                    if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
                         player_headshots[name] = headshot
-                    if pd.notna(team := getattr(row, "team", None)):
+                    if isinstance(team := getattr(row, "team", None), str) and team:
                         player_teams[name] = team
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True

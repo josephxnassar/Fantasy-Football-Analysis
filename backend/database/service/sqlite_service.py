@@ -28,7 +28,7 @@ class SQLService:
         return (f"{constants.CACHE['STATISTICS']}_{constants.STATS['ALL_PLAYERS']}" in tables and any(t.startswith(f"{constants.CACHE['SCHEDULES']}_") for t in tables) and any(t.startswith(f"{constants.CACHE['DEPTH_CHART']}_") for t in tables))
 
     @timed("SQLService.save_to_db")
-    def save_to_db(self, cache: Dict[str, Any], cls_name: str) -> None:
+    def save_to_db(self, cache: Dict[Any, Any], cls_name: str) -> None:
         """Save one cache object based on its class name."""
         if cache is None:
             logger.warning("No cached data to save - call run() first.")
@@ -47,7 +47,7 @@ class SQLService:
         logger.warning("Unsupported cache class '%s'; skipping save.", cls_name)
 
     @timed("SQLService.load_from_db")
-    def load_from_db(self, keys: List[str], cls_name: str) -> Dict[str, Any]:
+    def load_from_db(self, keys: List[str], cls_name: str) -> Dict[Any, Any]:
         """Load one cache object based on its class name."""
         if cls_name == constants.CACHE["STATISTICS"]:
             return self._load_statistics()

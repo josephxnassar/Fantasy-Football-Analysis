@@ -1,20 +1,20 @@
 """FastAPI application setup, middleware, exception handlers, and router registration"""
 
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 from typing import Dict
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.api.routes.statistics_routes import router as statistics_router
-from backend.api.routes.schedule_routes import router as schedule_router
 from backend.api.routes.depth_chart_routes import router as depth_chart_router
+from backend.api.routes.schedule_routes import router as schedule_router
+from backend.api.routes.statistics_routes import router as statistics_router
 from backend.api.routes.teams_routes import router as teams_router
 from backend.app import App
 from backend.config.settings import CORS_ORIGINS
-from backend.util.exceptions import CacheNotLoadedError, PlayerNotFoundError, FantasyFootballError
+from backend.util.exceptions import CacheNotLoadedError, FantasyFootballError, PlayerNotFoundError
 
 logger = logging.getLogger(__name__)
 
