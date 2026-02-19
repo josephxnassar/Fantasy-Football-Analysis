@@ -54,8 +54,8 @@ Configured seasons:
 5. Train per-position Ridge models to produce base ratings.
 
 6. Derive rating variants:
-- `RedraftRating` via position multipliers
-- `DynastyRating` via age multipliers
+- `redraft_rating` via position multipliers
+- `dynasty_rating` via age multipliers
 
 7. Compute rank metadata:
 - `overall_rank_redraft`
@@ -71,8 +71,8 @@ Public keys used by API routes:
 - `player_weekly_stats`
 
 Canonical rating fields:
-- `RedraftRating`
-- `DynastyRating`
+- `redraft_rating`
+- `dynasty_rating`
 
 ## Related Files
 

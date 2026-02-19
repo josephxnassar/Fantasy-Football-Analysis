@@ -148,8 +148,5 @@ COLUMN_NAME_MAP = {
     'wopr_x': 'WOPR-X',
     'wopr_y': 'WOPR-Y',
     'dom': 'Dominator',
-    'w8dom': 'W8 Dom',
-
-    # Keep rating as explicit redraft rating
-    'rating': 'RedraftRating'
+    'w8dom': 'W8 Dom'
 }

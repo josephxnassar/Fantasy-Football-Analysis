@@ -76,13 +76,13 @@ class ESPNDepthChart(BaseSource):
             rows = []
             for pos, position_group in roster.items():
                 for g in position_group:
-                    rows.append({'Position': pos,
-                                 'Starter':  g[0] if len(g) > 0 else None,
+                    rows.append({'position': pos,
+                                 'starter':  g[0] if len(g) > 0 else None,
                                  '2nd':      g[1] if len(g) > 1 else None,
                                  '3rd':      g[2] if len(g) > 2 else None,
                                  '4th':      g[3] if len(g) > 3 else None})
 
-            return pd.DataFrame(rows).set_index("Position").replace(r'(Q|D|O|IR|PUP|NFI|SUS)$', '', regex=True)
+            return pd.DataFrame(rows).set_index("position").replace(r'(Q|D|O|IR|PUP|NFI|SUS)$', '', regex=True)
         except Exception as e:
             logger.error(f"Failed to create depth chart: {e}")
             raise ScrapingError(f"Failed to create depth chart: {e}", source="ESPNDepthChart") from e

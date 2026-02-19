@@ -34,8 +34,8 @@ def test_sqlite_service_round_trip_for_all_cache_families(tmp_path, stats_cache,
         assert retired["team"] is None
         assert 2025 in loaded_stats[constants.STATS["BY_YEAR"]]
         assert loaded_stats[constants.STATS["BY_YEAR"]][2025]["QB"].loc["Patrick Mahomes", "Pass TD"] == 32
-        assert loaded_schedules[2025]["KC"].loc[2, "Opponent"] == "BYE"
-        assert loaded_depth["KC"].loc["QB", "Starter"] == "Patrick Mahomes"
+        assert loaded_schedules[2025]["KC"].loc[2, "opponent"] == "BYE"
+        assert loaded_depth["KC"].loc["QB", "starter"] == "Patrick Mahomes"
     finally:
         service.close()
 

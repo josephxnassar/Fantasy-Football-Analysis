@@ -39,9 +39,9 @@ def _build_statistics_cache() -> Dict[str, Any]:
 
     return {constants.STATS["ALL_PLAYERS"]: [{"name": "Patrick Mahomes",
                                               "position": "QB",
-                                              "Age": 30,
-                                              "RedraftRating": 401.5,
-                                              "DynastyRating": 372.9,
+                                              "age": 30,
+                                              "redraft_rating": 401.5,
+                                              "dynasty_rating": 372.9,
                                               "headshot_url": "https://example.com/mahomes.png",
                                               "team": "KC",
                                               "is_rookie": False,
@@ -52,9 +52,9 @@ def _build_statistics_cache() -> Dict[str, Any]:
                                               "pos_rank_dynasty": 1},
                                              {"name": "JaMarr Chase",
                                               "position": "WR",
-                                              "Age": 26,
-                                              "RedraftRating": 356.2,
-                                              "DynastyRating": 421.0,
+                                              "age": 26,
+                                              "redraft_rating": 356.2,
+                                              "dynasty_rating": 421.0,
                                               "headshot_url": "https://example.com/chase.png",
                                               "team": "CIN",
                                               "is_rookie": False,
@@ -65,9 +65,9 @@ def _build_statistics_cache() -> Dict[str, Any]:
                                               "pos_rank_dynasty": 1},
                                              {"name": "Retired Veteran",
                                               "position": "QB",
-                                              "Age": 41,
-                                              "RedraftRating": 999.0,
-                                              "DynastyRating": 999.0,
+                                              "age": 41,
+                                              "redraft_rating": 999.0,
+                                              "dynasty_rating": 999.0,
                                               "headshot_url": None,
                                               "team": None,
                                               "is_rookie": False,
@@ -94,22 +94,22 @@ def _build_statistics_cache() -> Dict[str, Any]:
                                                                       "Snap Share": 0.91}]}}
 
 def _build_schedules_cache() -> Dict[int, Dict[str, pd.DataFrame]]:
-    kc_schedule = pd.DataFrame({"Opponent": ["BAL", "BYE", "CIN"],
-                                "HomeAway": ["HOME", None, "AWAY"]}, index=pd.Index([1, 2, 3], name="week"))
-    cin_schedule = pd.DataFrame({"Opponent": ["CLE", "PIT", "KC"],
-                                 "HomeAway": ["HOME", "AWAY", "HOME"]}, index=pd.Index([1, 2, 3], name="week"))
+    kc_schedule = pd.DataFrame({"opponent": ["BAL", "BYE", "CIN"],
+                                "home_away": ["HOME", None, "AWAY"]}, index=pd.Index([1, 2, 3], name="week"))
+    cin_schedule = pd.DataFrame({"opponent": ["CLE", "PIT", "KC"],
+                                 "home_away": ["HOME", "AWAY", "HOME"]}, index=pd.Index([1, 2, 3], name="week"))
     return {2025: {"KC": kc_schedule, "CIN": cin_schedule},
             2024: {"KC": kc_schedule.copy()}}
 
 def _build_depth_chart_cache() -> Dict[str, pd.DataFrame]:
-    kc = (pd.DataFrame([{"Position": "QB", "Starter": "Patrick Mahomes", "2nd": "Carson Wentz", "3rd": None, "4th": None},
-                        {"Position": "RB", "Starter": "Isiah Pacheco", "2nd": "Kareem Hunt", "3rd": None, "4th": None},
-                        {"Position": "WR", "Starter": "Rashee Rice", "2nd": "Xavier Worthy", "3rd": None, "4th": None},
-                        {"Position": "TE", "Starter": "Travis Kelce", "2nd": "Noah Gray", "3rd": None, "4th": None}]).set_index("Position").rename_axis("KC"))
-    cin = (pd.DataFrame([{"Position": "QB", "Starter": "Joe Burrow", "2nd": "Jake Browning", "3rd": None, "4th": None},
-                         {"Position": "RB", "Starter": "Chase Brown", "2nd": "Zack Moss", "3rd": None, "4th": None},
-                         {"Position": "WR", "Starter": "JaMarr Chase", "2nd": "Tee Higgins", "3rd": None, "4th": None},
-                         {"Position": "TE", "Starter": "Mike Gesicki", "2nd": "Tanner Hudson", "3rd": None, "4th": None}]).set_index("Position").rename_axis("CIN"))
+    kc = (pd.DataFrame([{"position": "QB", "starter": "Patrick Mahomes", "2nd": "Carson Wentz", "3rd": None, "4th": None},
+                        {"position": "RB", "starter": "Isiah Pacheco", "2nd": "Kareem Hunt", "3rd": None, "4th": None},
+                        {"position": "WR", "starter": "Rashee Rice", "2nd": "Xavier Worthy", "3rd": None, "4th": None},
+                        {"position": "TE", "starter": "Travis Kelce", "2nd": "Noah Gray", "3rd": None, "4th": None}]).set_index("position").rename_axis("KC"))
+    cin = (pd.DataFrame([{"position": "QB", "starter": "Joe Burrow", "2nd": "Jake Browning", "3rd": None, "4th": None},
+                         {"position": "RB", "starter": "Chase Brown", "2nd": "Zack Moss", "3rd": None, "4th": None},
+                         {"position": "WR", "starter": "JaMarr Chase", "2nd": "Tee Higgins", "3rd": None, "4th": None},
+                         {"position": "TE", "starter": "Mike Gesicki", "2nd": "Tanner Hudson", "3rd": None, "4th": None}]).set_index("position").rename_axis("CIN"))
 
     return {"KC": kc, "CIN": cin}
 

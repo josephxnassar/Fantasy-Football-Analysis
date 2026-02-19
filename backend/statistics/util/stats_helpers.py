@@ -42,9 +42,9 @@ def build_all_players(redraft_ratings: Dict[str, float], dynasty_ratings: Dict[s
     """Build pre-assembled player list with all metadata for API consumption"""
     return [{"name": player_name,
              "position": player_positions.get(player_name),
-             "Age": player_ages.get(player_name),
-             "RedraftRating": redraft_ratings[player_name],
-             "DynastyRating": dynasty_ratings.get(player_name),
+             "age": player_ages.get(player_name),
+             "redraft_rating": redraft_ratings[player_name],
+             "dynasty_rating": dynasty_ratings.get(player_name),
              "headshot_url": player_headshots.get(player_name),
              "team": player_teams.get(player_name),
              "is_rookie": player_rookies.get(player_name, False),

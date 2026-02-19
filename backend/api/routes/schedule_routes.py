@@ -22,8 +22,8 @@ def get_team_schedule(request: Request, team: str, season: Optional[int] = None)
     bye_week = None
 
     for week, row in team_schedule_df.iterrows():
-        opponent = row.get('Opponent', 'BYE')
-        home_away = row.get('HomeAway')
+        opponent = row.get('opponent', 'BYE')
+        home_away = row.get('home_away')
         if opponent == 'BYE':
             bye_week = int(week)
             home_away = None

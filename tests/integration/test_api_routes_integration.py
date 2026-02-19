@@ -32,7 +32,7 @@ def test_player_endpoint_returns_profile_weekly_stats_and_ranking_data(client_fa
     assert payload["name"] == "Patrick Mahomes"
     assert payload["position"] == "QB"
     assert payload["team"] == "KC"
-    assert payload["stats"]["RedraftRating"] == 401.5
+    assert payload["stats"]["redraft_rating"] == 401.5
     assert payload["weekly_stats"][0]["week"] == 1
     assert payload["ranking_data"]["overall_rank_redraft"] == 1
 

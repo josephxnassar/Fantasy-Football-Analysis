@@ -18,12 +18,12 @@ export default function PlayerCard({ player, onPlayerClick }) {
         <div className="player-details-row">
           {player.team && <DetailBadge>{player.team}</DetailBadge>}
           <DetailBadge>{player.position}</DetailBadge>
-          {player.Age && <DetailBadge>Age {player.Age}</DetailBadge>}
+          {player.age && <DetailBadge>Age {player.age}</DetailBadge>}
         </div>
       </div>
       <div className="player-ratings-row">
-        <RatingBadge rating={player.RedraftRating} label="Redraft" />
-        <RatingBadge rating={player.DynastyRating} label="Dynasty" />
+        <RatingBadge rating={player.redraft_rating} label="Redraft" />
+        <RatingBadge rating={player.dynasty_rating} label="Dynasty" />
       </div>
     </div>
   );

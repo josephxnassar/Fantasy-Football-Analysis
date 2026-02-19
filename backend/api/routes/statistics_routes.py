@@ -74,7 +74,7 @@ def search_players(request: Request, q: str, position: Optional[str] = None) -> 
     all_players = get_all_players(stats_cache, position)
 
     results = filter_search_results(all_players, q)
-    top_results = heapq.nlargest(20, results, key=lambda x: x.get("RedraftRating", 0))
+    top_results = heapq.nlargest(20, results, key=lambda x: x.get("redraft_rating", 0))
 
     return SearchResponse(query=q,
                           results=top_results,

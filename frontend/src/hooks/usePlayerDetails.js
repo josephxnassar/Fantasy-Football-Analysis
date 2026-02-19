@@ -23,8 +23,8 @@ export function usePlayerDetails() {
       setPlayerDetails(response.data);
       
       setBaseRating(
-        resolvedRankingData?.RedraftRating ||
-        response.data.stats?.RedraftRating ||
+        resolvedRankingData?.redraft_rating ||
+        response.data.stats?.redraft_rating ||
         null
       );
       
@@ -56,7 +56,7 @@ export function usePlayerDetails() {
             ...response.data,
             stats: {
               ...response.data.stats,
-              RedraftRating: baseRating,
+              redraft_rating: baseRating,
             },
           }
         : response.data;

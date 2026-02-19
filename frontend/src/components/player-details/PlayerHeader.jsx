@@ -11,7 +11,7 @@ export default function PlayerHeader({ playerDetails, rankingData }) {
         <div className="player-meta">
           {playerDetails.team && <span className="meta-item">{playerDetails.team}</span>}
           <span className="meta-item">{playerDetails.position}</span>
-          {rankingData?.Age && <span className="meta-item">Age {rankingData.Age}</span>}
+          {rankingData?.age && <span className="meta-item">Age {rankingData.age}</span>}
         </div>
       </div>
       <img

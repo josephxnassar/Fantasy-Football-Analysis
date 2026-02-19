@@ -3,7 +3,6 @@
 export const STAT_DEFINITIONS = {
   'Non-PPR Pts': 'Total fantasy points (standard scoring, non-PPR)',
   'PPR Pts': 'Total fantasy points in PPR (Point Per Reception) format',
-  'RedraftRating': 'Overall redraft rating calculated by machine learning model',
   'Snap Share': 'Percent of offensive snaps played',
   
   'Comp': 'Pass completions',

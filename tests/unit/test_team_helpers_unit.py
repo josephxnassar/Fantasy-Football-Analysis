@@ -25,7 +25,7 @@ def test_get_team_schedule_entry_returns_requested_season(schedules_cache) -> No
 
     assert season == 2025
     assert available == [2025, 2024]
-    assert schedule_df.loc[2, "Opponent"] == "BYE"
+    assert schedule_df.loc[2, "opponent"] == "BYE"
 
 def test_get_team_cache_raises_when_team_data_missing(depth_chart_cache) -> None:
     caches = {constants.CACHE["DEPTH_CHART"]: depth_chart_cache}
