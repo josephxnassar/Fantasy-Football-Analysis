@@ -19,22 +19,15 @@ class App:
         self.db: SQLService = SQLService()
         self.caches: Dict[str, Any] = {}
     
-    def initialize(self, refresh_if_missing: bool = True) -> None:
-        """Load cache data, or optionally refresh if cache is missing."""
+    def initialize(self) -> None:
+        """Load cached data when available, otherwise fetch and persist fresh data."""
         if self.db.has_cached_data():
             self.load()
             return
 
-        if refresh_if_missing:
-            self.run()
-            self.save()
-            return
-
-        self.caches = {}
-        logger.warning(
-            "Cache tables are missing. API started without preloaded data; "
-            "run backend/refresh_data.py to populate cache."
-        )
+        logger.info("Cache tables missing; fetching fresh data and rebuilding cache.")
+        self.run()
+        self.save()
     
     def run(self) -> None:
         """Fetch fresh data from all sources"""

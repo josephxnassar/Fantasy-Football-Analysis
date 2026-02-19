@@ -28,14 +28,13 @@ Last verified: 2026-02-19
 Primary orchestrator: [`app.py`](app.py)
 
 Startup sequence:
-1. `App.initialize(refresh_if_missing=...)` checks for required cache tables.
+1. `App.initialize()` checks for required cache tables.
 2. If cache exists: `App.load()` hydrates in-memory data.
-3. If cache missing and `refresh_if_missing=True`: `App.run()` fetches data, then `App.save()` persists it.
-4. If cache missing and `refresh_if_missing=False`: startup continues with empty caches.
+3. If cache missing: `App.run()` fetches data, then `App.save()` persists it.
 
 FastAPI lifecycle integration:
 - [`api/api.py`](api/api.py) attaches `fantasy_app` to `app.state` during lifespan.
-- API startup uses `initialize(refresh_if_missing=False)` to avoid long cold starts.
+- API startup uses `initialize()` to ensure cache is available.
 
 ## Module Map
 

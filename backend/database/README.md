@@ -52,7 +52,7 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 - at least one `Schedules_*` table exists
 - at least one `ESPNDepthChart_*` table exists
 
-If false, API startup does not auto-refresh caches. Use `backend/refresh_data.py` to populate data.
+If false, required cache families are missing and startup should trigger a cache rebuild via `App.initialize()`.
 
 ## Database Path
 
@@ -69,7 +69,7 @@ Rebuild and persist:
 uv run python backend/refresh_data.py
 ```
 
-Run API (loads cache if present):
+Run API (loads cache if present, otherwise rebuilds cache):
 
 ```bash
 uv run python backend/run_api.py

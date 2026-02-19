@@ -150,7 +150,7 @@ def client_factory(monkeypatch):
                 self.caches = caches
                 self.db = DummyDB()
 
-            def initialize(self, refresh_if_missing: bool = True) -> None:
+            def initialize(self) -> None:
                 return None
 
         monkeypatch.setattr(api_module, "App", FakeApp)

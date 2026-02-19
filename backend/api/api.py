@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app_instance: FastAPI):
     """Initialize cache-backed app state at startup and close resources on shutdown."""
     fantasy_app = App()
-    fantasy_app.initialize(refresh_if_missing=False)
+    fantasy_app.initialize()
     app_instance.state.fantasy_app = fantasy_app
     try:
         yield

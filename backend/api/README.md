@@ -31,12 +31,12 @@ FastAPI routers that expose cache-backed fantasy data from `App.caches`.
 
 During lifespan in [`api.py`](api.py):
 1. Build `App()`
-2. Call `initialize(refresh_if_missing=False)`
+2. Call `initialize()`
 3. Attach to `request.app.state.fantasy_app`
 
 Behavior:
 - Existing DB cache -> load into memory
-- Missing DB cache -> start without loaded caches (routes return `503` for cache-backed requests until refresh)
+- Missing DB cache -> fetch fresh source data, persist cache, and load into memory
 
 Routes rely on these caches and surface `503` when required caches are unavailable.
 
