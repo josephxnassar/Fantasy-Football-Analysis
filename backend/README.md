@@ -107,6 +107,12 @@ Variables:
 - `LOG_ROTATION_INTERVAL`
 - `LOG_BACKUP_COUNT`
 - `TIMING_ENABLED`
+- `TIMING_RUN_LOGS_KEEP`
+
+Timing logs:
+- Standard file logs are separated into subfolders under `LOG_DIR`: `errors/errors.log`, `timing/`.
+- With `TIMING_ENABLED=true`, each process run writes to `logs/timing/timing-<timestamp>-pid<pid>.log`.
+- `TIMING_RUN_LOGS_KEEP` controls how many of those run files are retained.
 
 ## Detailed Docs
 

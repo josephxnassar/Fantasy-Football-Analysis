@@ -32,4 +32,5 @@ LOG_DIR: str = os.getenv("LOG_DIR", "logs")
 LOG_ROTATION_WHEN: str = os.getenv("LOG_ROTATION_WHEN", "midnight")
 LOG_ROTATION_INTERVAL: int = int(os.getenv("LOG_ROTATION_INTERVAL", "1"))
 LOG_BACKUP_COUNT: int = int(os.getenv("LOG_BACKUP_COUNT", "14"))
+TIMING_RUN_LOGS_KEEP: int = int(os.getenv("TIMING_RUN_LOGS_KEEP", "30"))
 TIMING_ENABLED: bool = os.getenv("TIMING_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
