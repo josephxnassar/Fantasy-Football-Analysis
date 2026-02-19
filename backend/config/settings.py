@@ -14,7 +14,15 @@ API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
 API_PORT: int = int(os.getenv("API_PORT", "8000"))
 
 # CORS - comma-separated origins, or "*" for dev
-CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "*").split(",")
+_raw_cors_origins = os.getenv("CORS_ORIGINS", "*").strip()
+if _raw_cors_origins == "*":
+    CORS_ORIGINS: list[str] = ["*"]
+else:
+    CORS_ORIGINS = [origin.strip() for origin in _raw_cors_origins.split(",") if origin.strip()]
+
+CORS_ALLOW_CREDENTIALS: bool = (
+    os.getenv("CORS_ALLOW_CREDENTIALS", "false").strip().lower() in {"1", "true", "yes", "on"}
+)
 
 # Database
 DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")
