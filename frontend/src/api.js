@@ -82,5 +82,3 @@ export const getChartData = (position, season = null) => {
     params: { position, ...(season && { season }) },
   });
 };
-
-export default api;

@@ -1,6 +1,6 @@
 /* Hook for managing player details modal state */
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { getPlayer } from '../api';
 
 export function usePlayerDetails() {
@@ -12,7 +12,7 @@ export function usePlayerDetails() {
   const [baseRating, setBaseRating] = useState(null);
   const [playerRankingData, setPlayerRankingData] = useState(null);
 
-  const handlePlayerClick = async (playerName, rankingData = null) => {
+  const handlePlayerClick = useCallback(async (playerName, rankingData = null) => {
     try {
       setLoadingDetails(true);
       setCurrentPlayerName(playerName);
@@ -39,9 +39,9 @@ export function usePlayerDetails() {
     } finally {
       setLoadingDetails(false);
     }
-  };
+  }, []);
 
-  const handleSeasonChange = async (season) => {
+  const handleSeasonChange = useCallback(async (season) => {
     if (!currentPlayerName) return;
     
     try {
@@ -67,16 +67,16 @@ export function usePlayerDetails() {
     } finally {
       setLoadingDetails(false);
     }
-  };
+  }, [baseRating, currentPlayerName]);
 
-  const closeDetails = () => {
+  const closeDetails = useCallback(() => {
     setPlayerDetails(null);
     setCurrentPlayerName(null);
     setCurrentSeason(null);
     setBaseRating(null);
     setPlayerAvailableSeasons([]);
     setPlayerRankingData(null);
-  };
+  }, []);
 
   return {
     playerDetails,

@@ -1,6 +1,6 @@
 /* Stat definitions and categorization for player statistics */
 
-export const STAT_DEFINITIONS = {
+const STAT_DEFINITIONS = {
   'Non-PPR Pts': 'Total fantasy points (standard scoring, non-PPR)',
   'PPR Pts': 'Total fantasy points in PPR (Point Per Reception) format',
   'Snap Share': 'Percent of offensive snaps played',
@@ -101,16 +101,6 @@ export const POSITION_STAT_GROUPS = {
     'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec YAC', 'Rec Fum Lost', 'Rec EPA'],
     'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum Lost', 'Rush EPA'],
   },
-};
-
-export const STAT_CATEGORIES = {
-  'Core': ['Non-PPR Pts', 'PPR Pts'],
-  'Usage': ['Snap Share'],
-  'Passing': ['Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Sack Fum', 'Sack Fum Lost', 'Air Yds', 'YAC', 'Pass 1st', 'Pass EPA', 'Pass 2PT', 'PACR'],
-  'Rushing': ['Carries', 'Rush Yds', 'Rush TD', 'Yds/Rush', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush EPA', 'Rush 2PT'],
-  'Receiving': ['Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Yds/Rec', 'Rec Fum', 'Rec Fum Lost', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec EPA', 'Rec 2PT'],
-  'Market Share': ['Tgt %', 'Air Yds %', 'YAC %', 'Rec Yds %', 'Rec TD %', 'Rec 1st %', 'TD+1st %', 'PPR %'],
-  'Advanced': ['RACR', 'Yds/TmAtt', 'WOPR', 'WOPR-X', 'WOPR-Y', 'Dakota', 'Dominator', 'W8 Dom', 'ST TD'],
 };
 
 const MISSING_STAT_DEFAULTS = {

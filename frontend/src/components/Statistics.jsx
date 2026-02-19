@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import Rankings from './Rankings';
-import PlayerSearch from './PlayerSearch';
-import Charts from './Charts';
-import { SubTabNav } from './common';
+import { Suspense, lazy, useState } from 'react';
+import { LoadingMessage, SubTabNav } from './common';
 import './Statistics.css';
+
+const Rankings = lazy(() => import('./Rankings'));
+const PlayerSearch = lazy(() => import('./PlayerSearch'));
+const Charts = lazy(() => import('./Charts'));
 
 const TABS = [
   { id: 'rankings', label: 'Rankings' },
@@ -28,7 +29,9 @@ function Statistics() {
       <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
 
       <div className="statistics-content">
-        {renderContent()}
+        <Suspense fallback={<LoadingMessage message="Loading statistics..." />}>
+          {renderContent()}
+        </Suspense>
       </div>
     </div>
   );

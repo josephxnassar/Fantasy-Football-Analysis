@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import './App.css';
-import Statistics from './components/Statistics';
-import Schedules from './components/Schedules';
-import DepthCharts from './components/DepthCharts';
-import { ErrorBoundary } from './components/common';
+import { ErrorBoundary, LoadingMessage } from './components/common';
+
+const Statistics = lazy(() => import('./components/Statistics'));
+const Schedules = lazy(() => import('./components/Schedules'));
+const DepthCharts = lazy(() => import('./components/DepthCharts'));
 
 function App() {
   const [activeTab, setActiveTab] = useState('statistics');
@@ -75,7 +76,9 @@ function App() {
             </div>
           )}
         >
-          {renderTab()}
+          <Suspense fallback={<LoadingMessage message="Loading section..." />}>
+            {renderTab()}
+          </Suspense>
         </ErrorBoundary>
       </main>
     </div>
