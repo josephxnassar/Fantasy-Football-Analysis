@@ -67,3 +67,51 @@ main {
   min-height: calc(100vh - 200px);
   padding: 20px 0;
 }
+
+.tab-error-fallback {
+  max-width: 760px;
+  margin: 40px auto;
+  padding: 28px;
+  text-align: center;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.tab-error-fallback h2 {
+  margin: 0 0 12px 0;
+  color: var(--color-danger-text);
+}
+
+.tab-error-fallback p {
+  margin: 0 0 20px 0;
+  color: var(--color-text-secondary);
+}
+
+.tab-error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tab-error-btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-error-btn.primary {
+  background: var(--color-danger);
+  color: white;
+}
+
+.tab-error-btn.secondary {
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
