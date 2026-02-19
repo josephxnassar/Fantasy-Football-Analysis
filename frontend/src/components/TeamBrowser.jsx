@@ -1,6 +1,6 @@
 /* Shared team browser component used by Schedules and Depth Charts tabs. Provides Division Browser / Team Search sub-tabs and renders a modal via renderModal prop. */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import DivisionBrowser from './DivisionBrowser';
 import TeamSearch from './TeamSearch';
 import { SubTabNav } from './common';
@@ -17,8 +17,13 @@ function TeamBrowser({ actionLabel, renderModal }) {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const { divisions, teamNames, allTeams, loading, error } = useDivisions();
 
-  const handleTeamSelect = (team) => setSelectedTeam(team);
-  const handleCloseModal = () => setSelectedTeam(null);
+  const handleTeamSelect = useCallback((team) => {
+    setSelectedTeam(team);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedTeam(null);
+  }, []);
 
   return (
     <div className="team-browser-container">
