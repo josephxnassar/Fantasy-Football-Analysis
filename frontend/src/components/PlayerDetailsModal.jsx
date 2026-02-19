@@ -34,7 +34,7 @@ export default function PlayerDetailsModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="player-details-close-button" onClick={onClose}>×</button>
         
         {loading ? (
           <div className="loading">Loading player details...</div>

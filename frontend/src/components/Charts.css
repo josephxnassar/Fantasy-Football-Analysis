@@ -129,7 +129,7 @@
 }
 
 /* ── No data message ── */
-.no-data {
+.charts-no-data {
   text-align: center;
   color: var(--color-text-muted);
   padding: var(--spacing-xl);

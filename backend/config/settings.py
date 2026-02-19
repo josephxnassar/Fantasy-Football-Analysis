@@ -20,9 +20,7 @@ if _raw_cors_origins == "*":
 else:
     CORS_ORIGINS = [origin.strip() for origin in _raw_cors_origins.split(",") if origin.strip()]
 
-CORS_ALLOW_CREDENTIALS: bool = (
-    os.getenv("CORS_ALLOW_CREDENTIALS", "false").strip().lower() in {"1", "true", "yes", "on"}
-)
+CORS_ALLOW_CREDENTIALS: bool = (os.getenv("CORS_ALLOW_CREDENTIALS", "false").strip().lower() in {"1", "true", "yes", "on"})
 
 # Database
 DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")

@@ -213,7 +213,7 @@ export default function Charts() {
       </div>
 
       {barData.length === 0 ? (
-        <p className="no-data">No data available for the selected stat.</p>
+        <p className="charts-no-data">No data available for the selected stat.</p>
       ) : (
         <div className="chart-wrapper">
           <ResponsiveContainer width="100%" height={chartHeight}>

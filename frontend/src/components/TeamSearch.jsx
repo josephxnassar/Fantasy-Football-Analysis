@@ -26,7 +26,7 @@ function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
       <div className="search-container">
         <input
           type="text"
-          className="search-input"
+          className="team-search-input"
           placeholder="Search teams by name or abbreviation..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}

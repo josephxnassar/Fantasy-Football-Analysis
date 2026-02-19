@@ -72,7 +72,6 @@ class Statistics(base_source.BaseSource):
                 if not isinstance(name_raw, str) or not name_raw:
                     continue
                 name = name_raw
-
                 season_raw = getattr(row, "season", None)
                 season_int: int | None = None
                 if pd.notna(season_raw):
@@ -80,7 +79,6 @@ class Statistics(base_source.BaseSource):
                         season_int = int(cast(int | float | str, season_raw))
                     except (TypeError, ValueError):
                         season_int = None
-
                 position = getattr(row, "position", None)
                 if season_int is not None and position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
                     birth_ts = pd.to_datetime(birth_date)

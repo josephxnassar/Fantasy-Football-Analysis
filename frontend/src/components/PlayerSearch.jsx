@@ -54,7 +54,7 @@ export default function PlayerSearch() {
             placeholder="Search by player name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
+            className="player-search-input"
           />
           <button type="submit" className="search-button" disabled={loading}>
             {loading ? 'Searching...' : 'Search'}
