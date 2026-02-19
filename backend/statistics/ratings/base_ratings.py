@@ -7,7 +7,6 @@ from typing import Any
 
 import pandas as pd
 
-
 class BaseRatings(ABC):
     """Base class for all rating models"""
     

@@ -7,7 +7,6 @@ from fastapi import HTTPException
 
 from backend.util import constants
 
-
 def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return ranking-eligible cached players, optionally filtered by position."""
     return [player for player in get_all_players(stats_cache, position_filter) if player.get("is_eligible", True)]
