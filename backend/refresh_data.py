@@ -1,7 +1,7 @@
 """Refresh script to regenerate all data and save to database cache."""
 
 from backend.app import App
-from backend.config import setup_logging
+from backend.config.logging_config import setup_logging
 
 setup_logging()
 

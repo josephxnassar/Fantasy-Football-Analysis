@@ -1,7 +1,7 @@
 import uvicorn
 
 from backend.api.api import api
-from backend.config import setup_logging
+from backend.config.logging_config import setup_logging
 from backend.config.settings import API_HOST, API_PORT
 
 setup_logging()

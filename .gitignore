@@ -14,6 +14,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 backend/tests/tmp_pytest/
+backend/tests/tmp_pytest_runtime/
+backend/tests/tmp_mypy_cache/
+backend/tests/.pytest_work/
 .pytest_tmp/
 .ruff_cache/
 .mypy_cache/
