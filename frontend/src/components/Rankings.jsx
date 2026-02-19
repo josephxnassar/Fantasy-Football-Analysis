@@ -80,10 +80,6 @@ export default function Rankings() {
       }));
   }, [rankingEntries, format, topN]);
 
-  if (loading) return <LoadingMessage message="Loading rankings..." />;
-  if (error) return <ErrorMessage message={error} />;
-  if (!rankings) return <EmptyStateMessage message="No data available" />;
-
   const renderPlayerRow = useCallback((player, idx, showPosition = false) => {
     return (
       <PlayerTableRow
@@ -138,6 +134,10 @@ export default function Rankings() {
         </table>
       </div>
     ), [sortedOverallPlayers, renderPlayerRow]);
+
+  if (loading) return <LoadingMessage message="Loading rankings..." />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!rankings) return <EmptyStateMessage message="No data available" />;
 
   return (
     <div className="rankings-container">
