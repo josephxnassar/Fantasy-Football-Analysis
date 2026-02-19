@@ -29,7 +29,7 @@ export const getRankings = (format = 'redraft', position = null) => {
  * @param {number|null} season - Season year or null for career average
  */
 export const getPlayer = (playerName, season = null) => {
-  return api.get(`/player/${playerName}`, {
+  return api.get(`/player/${encodeURIComponent(playerName)}`, {
     params: season ? { season } : {},
   });
 };
@@ -59,7 +59,7 @@ export const getDivisions = () => {
  * @param {number|null} season - Season year or null for most recent available
  */
 export const getTeamSchedule = (team, season = null) => {
-  return api.get(`/schedules/${team}`, {
+  return api.get(`/schedules/${encodeURIComponent(team)}`, {
     params: season ? { season } : {},
   });
 };
@@ -69,7 +69,7 @@ export const getTeamSchedule = (team, season = null) => {
  * @param {string} team - Team abbreviation (e.g., "KC")
  */
 export const getTeamDepthChart = (team) => {
-  return api.get(`/depth-charts/${team}`);
+  return api.get(`/depth-charts/${encodeURIComponent(team)}`);
 };
 
 /**
