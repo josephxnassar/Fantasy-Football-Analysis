@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-02-16
+Last verified: 2026-02-19
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
@@ -19,11 +19,12 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 1. [Architecture At A Glance](#architecture-at-a-glance)
 2. [Quick Start](#quick-start)
 3. [Core Commands](#core-commands)
-4. [Configuration](#configuration)
-5. [CI (GitHub Actions)](#ci-github-actions)
-6. [Commit Template](#commit-template)
-7. [Documentation Map](#documentation-map)
-8. [Repository Layout](#repository-layout)
+4. [Quality Checks](#quality-checks)
+5. [Configuration](#configuration)
+6. [CI (GitHub Actions)](#ci-github-actions)
+7. [Commit Template](#commit-template)
+8. [Documentation Map](#documentation-map)
+9. [Repository Layout](#repository-layout)
 
 ## Architecture At A Glance
 
@@ -109,6 +110,29 @@ cd frontend
 npm run dev
 ```
 
+## Quality Checks
+
+Static analysis configuration files:
+- Python (`ruff`, `mypy`): [`pyproject.toml`](pyproject.toml)
+- Frontend (`eslint`): [`frontend/eslint.config.js`](frontend/eslint.config.js)
+
+Backend quality checks:
+
+```bash
+uv run ruff check backend
+uv run mypy
+uv run pytest -q
+```
+
+Frontend quality checks:
+
+```bash
+cd frontend
+npm run lint
+npm run test:run
+npm run build
+```
+
 ## Configuration
 
 Environment template: [`.env.example`](.env.example)
@@ -136,8 +160,14 @@ Triggers:
 - Manual run (`workflow_dispatch`)
 
 Checks:
-- Backend tests on Python `3.10` and `3.11` (`uv run pytest -q`)
-- Frontend production build (`npm ci && npm run build`)
+- Backend lint/type/tests on Python `3.10` and `3.11`:
+  - `uv run ruff check backend`
+  - `uv run mypy`
+  - `uv run pytest -q`
+- Frontend lint/tests/build:
+  - `npm run lint`
+  - `npm run test:run`
+  - `npm run build`
 
 ## Commit Template
 

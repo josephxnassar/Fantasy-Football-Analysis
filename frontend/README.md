@@ -1,6 +1,6 @@
 # Frontend
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](vite.config.js)
@@ -12,10 +12,11 @@ React + Vite client for browsing rankings, schedules, depth charts, charts, and 
 ## Table of Contents
 
 1. [Run Locally](#run-locally)
-2. [Environment And Proxy](#environment-and-proxy)
-3. [UI Navigation Model](#ui-navigation-model)
-4. [Key Source Paths](#key-source-paths)
-5. [Build](#build)
+2. [Quality Checks](#quality-checks)
+3. [Environment And Proxy](#environment-and-proxy)
+4. [UI Navigation Model](#ui-navigation-model)
+5. [Key Source Paths](#key-source-paths)
+6. [Build](#build)
 
 ## Run Locally
 
@@ -25,6 +26,14 @@ npm run dev
 ```
 
 Default URL: `http://localhost:3000`
+
+## Quality Checks
+
+```bash
+npm run lint
+npm run test:run
+npm run build
+```
 
 ## Environment And Proxy
 
