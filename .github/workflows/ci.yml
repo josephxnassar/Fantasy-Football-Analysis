@@ -40,6 +40,12 @@ jobs:
       - name: Sync backend dependencies
         run: uv sync --frozen
 
+      - name: Run backend lint (ruff)
+        run: uv run ruff check backend
+
+      - name: Run backend type checks (mypy)
+        run: uv run mypy
+
       - name: Run backend tests
         run: uv run pytest -q
 
@@ -60,6 +66,14 @@ jobs:
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
+
+      - name: Run frontend lint (eslint)
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm run test:run
 
       - name: Build frontend
         working-directory: frontend

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import './App.css';
-import Statistics from './components/Statistics';
-import Schedules from './components/Schedules';
-import DepthCharts from './components/DepthCharts';
+import { ErrorBoundary, LoadingMessage } from './components/common';
+
+const Statistics = lazy(() => import('./components/Statistics'));
+const Schedules = lazy(() => import('./components/Schedules'));
+const DepthCharts = lazy(() => import('./components/DepthCharts'));
 
 function App() {
   const [activeTab, setActiveTab] = useState('statistics');
@@ -47,7 +49,37 @@ function App() {
       </nav>
 
       <main>
-        {renderTab()}
+        <ErrorBoundary
+          resetKey={activeTab}
+          onReset={() => setActiveTab('statistics')}
+          fallbackRender={({ resetErrorBoundary }) => (
+            <div className="tab-error-fallback">
+              <h2>This section crashed.</h2>
+              <p>Try opening another tab or reset this section.</p>
+              <div className="tab-error-actions">
+                <button
+                  className="tab-error-btn secondary"
+                  onClick={() => {
+                    setActiveTab('statistics');
+                    resetErrorBoundary();
+                  }}
+                >
+                  Go To Statistics
+                </button>
+                <button
+                  className="tab-error-btn primary"
+                  onClick={resetErrorBoundary}
+                >
+                  Retry Tab
+                </button>
+              </div>
+            </div>
+          )}
+        >
+          <Suspense fallback={<LoadingMessage message="Loading section..." />}>
+            {renderTab()}
+          </Suspense>
+        </ErrorBoundary>
       </main>
     </div>
   );

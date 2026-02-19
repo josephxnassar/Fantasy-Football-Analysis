@@ -16,7 +16,7 @@
   margin-bottom: 30px;
 }
 
-.search-input {
+.player-search-input {
   flex: 1;
   padding: 12px 16px;
   font-size: 16px;
@@ -25,7 +25,7 @@
   transition: border-color var(--transition-normal);
 }
 
-.search-input:focus {
+.player-search-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);

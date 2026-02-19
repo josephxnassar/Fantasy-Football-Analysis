@@ -8,28 +8,44 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchTeamData = async () => {
       if (!team) {
-        setData(null);
-        setError(null);
-        setLoading(false);
+        if (!cancelled) {
+          setData(null);
+          setError(null);
+          setLoading(false);
+        }
         return;
       }
 
       try {
-        setLoading(true);
+        if (!cancelled) {
+          setLoading(true);
+        }
         const response = await fetchFn(team);
-        setData(response.data);
-        setError(null);
+        if (!cancelled) {
+          setData(response.data);
+          setError(null);
+        }
       } catch (err) {
-        setError(defaultErrorMessage);
+        if (!cancelled) {
+          setError(defaultErrorMessage);
+        }
         console.error(err);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchTeamData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [team, fetchFn, defaultErrorMessage]);
 
   return { data, loading, error };

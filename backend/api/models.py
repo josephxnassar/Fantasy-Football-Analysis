@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class RankingsResponse(BaseModel):
     """Response for player rankings endpoint"""
     format: str = Field(..., description="Format: redraft or dynasty")
@@ -44,7 +45,7 @@ class PlayerResponse(BaseModel):
                 "name": "Ja'Marr Chase",
                 "position": "WR",
                 "team": "CIN",
-                "stats": {"RedraftRating": 401.52, "receptions": 127.0},
+                "stats": {"redraft_rating": 401.52, "receptions": 127.0},
                 "available_seasons": [2021, 2022, 2023, 2024],
                 "headshot_url": "https://example.com/images/jamarre-chase.png",
                 "weekly_stats": [
@@ -54,8 +55,8 @@ class PlayerResponse(BaseModel):
                 "ranking_data": {
                     "name": "Ja'Marr Chase",
                     "position": "WR",
-                    "RedraftRating": 401.52,
-                    "DynastyRating": 425.18,
+                    "redraft_rating": 401.52,
+                    "dynasty_rating": 425.18,
                 },
             }
         }
@@ -65,9 +66,9 @@ class PlayerSearchResult(BaseModel):
     """Player search result"""
     name: str = Field(..., description="Player name")
     position: str = Field(..., description="Player position")
-    RedraftRating: float = Field(..., description="Redraft rating")
-    DynastyRating: float = Field(..., description="Dynasty rating")
-    Age: Optional[int] = Field(None, description="Player age")
+    redraft_rating: float = Field(..., description="Redraft rating")
+    dynasty_rating: float = Field(..., description="Dynasty rating")
+    age: Optional[int] = Field(None, description="Player age")
     team: Optional[str] = Field(None, description="Team abbreviation")
     is_rookie: bool = Field(default=False, description="Whether player is a rookie")
     is_eligible: bool = Field(default=True, description="Whether player is active/eligible for rankings")
@@ -81,9 +82,9 @@ class PlayerSearchResult(BaseModel):
             "example": {
                 "name": "Ja'Marr Chase",
                 "position": "WR",
-                "RedraftRating": 401.52,
-                "DynastyRating": 425.18,
-                "Age": 24,
+                "redraft_rating": 401.52,
+                "dynasty_rating": 425.18,
+                "age": 24,
                 "team": "CIN",
                 "is_rookie": False,
                 "is_eligible": True,
@@ -106,8 +107,8 @@ class SearchResponse(BaseModel):
             "example": {
                 "query": "chase",
                 "results": [
-                    {"name": "Ja'Marr Chase", "position": "WR", "RedraftRating": 401.52},
-                    {"name": "JK Dobbins", "position": "RB", "RedraftRating": 250.0},
+                    {"name": "Ja'Marr Chase", "position": "WR", "redraft_rating": 401.52},
+                    {"name": "JK Dobbins", "position": "RB", "redraft_rating": 250.0},
                 ],
                 "count": 2,
             }

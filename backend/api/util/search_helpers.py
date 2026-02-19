@@ -2,6 +2,7 @@
 
 from typing import Dict, List
 
+
 def filter_search_results(all_players: List[Dict], query: str) -> List[Dict]:
     """Filter players by search query (case-insensitive substring match)."""
     query_lower = query.lower()

@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from backend.api.util.cache_helpers import get_cache
 from backend.util import constants
 
+
 def get_team_cache(caches: Dict[str, Any], cache_name: str, team: str, label: str = "Data") -> Any:
     """Validate team, look up its entry in a cache, and return it."""
     team = validate_team(team)
@@ -24,7 +25,7 @@ def validate_team(team: str) -> str:
                             detail=f"Invalid team. Must be one of: {', '.join(sorted(constants.TEAMS))}")
     return team
 
-def get_team_schedule_entry(schedule_cache: Dict[int, Dict[str, Any]], team: str, season: Optional[int]) -> Tuple[int, List[int], Any]:
+def get_team_schedule_entry(schedule_cache: Dict[Any, Dict[str, Any]], team: str, season: Optional[int]) -> Tuple[int, List[int], Any]:
     """Resolve a team schedule entry with season support for nested schedule cache."""
     available_seasons = get_available_schedule_seasons(schedule_cache, team)
     if not available_seasons:
@@ -38,6 +39,6 @@ def get_team_schedule_entry(schedule_cache: Dict[int, Dict[str, Any]], team: str
         raise HTTPException(status_code=404, detail=f"Schedule not found for team '{team}' in season {target_season}")
     return target_season, available_seasons, team_schedule_df
 
-def get_available_schedule_seasons(schedule_cache: Dict[int, Dict[str, Any]], team: str) -> List[int]:
+def get_available_schedule_seasons(schedule_cache: Dict[Any, Dict[str, Any]], team: str) -> List[int]:
     """Return available schedule seasons for a team from nested schedule cache."""
     return sorted([int(season) for season, teams in schedule_cache.items() if isinstance(teams, dict) and team in teams], reverse=True)

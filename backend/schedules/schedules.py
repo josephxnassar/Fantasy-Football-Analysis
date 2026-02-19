@@ -7,7 +7,6 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend.base_source import BaseSource
-from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
@@ -43,10 +42,10 @@ class Schedules(BaseSource):
     def _create_combined_schedule(self) -> pd.DataFrame:
         """Combine home and away games into single schedule"""
         try:
-            home_games = self.master_schedule.rename(columns={'away_team': 'Opponent', 'home_team': 'Team'})
-            home_games["HomeAway"] = "HOME"
-            away_games = self.master_schedule.rename(columns={'home_team': 'Opponent', 'away_team': 'Team'})
-            away_games["HomeAway"] = "AWAY"
+            home_games = self.master_schedule.rename(columns={'away_team': 'opponent', 'home_team': 'team'})
+            home_games["home_away"] = "HOME"
+            away_games = self.master_schedule.rename(columns={'home_team': 'opponent', 'away_team': 'team'})
+            away_games["home_away"] = "AWAY"
             return pd.concat([home_games, away_games], ignore_index=True)
         except Exception as e:
             logger.error(f"Failed to create combined schedule: {e}")
@@ -55,10 +54,10 @@ class Schedules(BaseSource):
     def run(self) -> None:
         """Process schedules for all teams"""
         schedules_by_year: Dict[int, Dict[str, pd.DataFrame]] = {}
-        for (season, team), group in self._create_combined_schedule().groupby(['season', 'Team']):
+        for (season, team), group in self._create_combined_schedule().groupby(['season', 'team']):
             try:
                 total_weeks = int(self.weeks_by_season.get(season, 18))
-                team_schedule = self._fill_bye_weeks(group.drop(columns=['Team', 'season']).set_index('week').sort_index(), total_weeks)
+                team_schedule = self._fill_bye_weeks(group.drop(columns=['team', 'season']).set_index('week').sort_index(), total_weeks)
                 schedules_by_year.setdefault(int(season), {})[team] = team_schedule
             except Exception as e:
                 logger.warning(f"Skipping team '{team}' season '{season}': {e}")

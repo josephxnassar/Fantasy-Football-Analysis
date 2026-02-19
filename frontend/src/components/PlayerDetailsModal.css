@@ -100,7 +100,7 @@
 }
 
 
-.close-button {
+.player-details-close-button {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -111,7 +111,7 @@
   color: #666;
 }
 
-.close-button:hover {
+.player-details-close-button:hover {
   color: #000;
 }
 
@@ -201,7 +201,7 @@
 }
 
 .rating-value {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
@@ -237,11 +237,6 @@
 .rating-item .label {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.875rem;
-}
-
-.rating-value {
-  font-size: 2rem !important;
-  font-weight: 700;
 }
 
 /* Year Selector Styles */
@@ -493,7 +488,7 @@
   padding: 1rem;
 }
 
-.no-data {
+.player-details-no-data {
   color: #999;
   font-style: italic;
   text-align: center;

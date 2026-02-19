@@ -11,8 +11,9 @@ function formatDisplayStat(key, value) {
 }
 
 function getWeekMatchupLabel(week) {
-  if (!week?.team_opponent) return null;
-  return `vs ${week.team_opponent}`;
+  const opponent = week?.opponent_team ?? week?.team_opponent;
+  if (!opponent) return null;
+  return `vs ${opponent}`;
 }
 
 function renderStatCategories(details) {
@@ -44,12 +45,12 @@ function renderStatCategories(details) {
 function renderWeeklyStats(playerDetails, currentSeason) {
   const weeklyStats = playerDetails?.weekly_stats;
   if (!weeklyStats || weeklyStats.length === 0) {
-    return <p className="no-data">No weekly data available</p>;
+    return <p className="player-details-no-data">No weekly data available</p>;
   }
 
   const seasonWeeks = weeklyStats.filter((week) => week.season === currentSeason);
   if (seasonWeeks.length === 0) {
-    return <p className="no-data">No weekly data available for {currentSeason}</p>;
+    return <p className="player-details-no-data">No weekly data available for {currentSeason}</p>;
   }
 
   seasonWeeks.sort((a, b) => (a.week || 0) - (b.week || 0));

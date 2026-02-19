@@ -26,7 +26,7 @@ export default function PlayerTableRow({
         </div>
       </td>
       {showPosition && <td>{player.position}</td>}
-      <td>{player.Age || 'N/A'}</td>
+      <td>{player.age || 'N/A'}</td>
       <td>{ratingValue}</td>
     </tr>
   );

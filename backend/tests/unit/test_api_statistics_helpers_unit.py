@@ -1,10 +1,12 @@
 import pytest
 from fastapi import HTTPException
 
-from backend.api.util.api_statistics_helpers import (build_overall_chart_players,
-                                                     find_player_team,
-                                                     get_player_profile,
-                                                     resolve_chart_season)
+from backend.api.util.api_statistics_helpers import (
+    build_overall_chart_players,
+    find_player_team,
+    get_player_profile,
+    resolve_chart_season,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -14,8 +16,8 @@ def test_get_player_profile_uses_most_recent_and_attaches_ratings(stats_cache) -
     assert position == "QB"
     assert seasons == [2025, 2024]
     assert player_meta["name"] == "Patrick Mahomes"
-    assert stats["RedraftRating"] == player_meta["RedraftRating"]
-    assert stats["DynastyRating"] == player_meta["DynastyRating"]
+    assert stats["redraft_rating"] == player_meta["redraft_rating"]
+    assert stats["dynasty_rating"] == player_meta["dynasty_rating"]
     assert stats["Pass TD"] == 32
 
 def test_resolve_chart_season_rejects_invalid_year(stats_cache) -> None:

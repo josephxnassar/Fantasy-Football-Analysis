@@ -41,9 +41,9 @@ export default function TeamScheduleModal({ team, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
+    <div className="schedule-modal-overlay" onClick={handleOverlayClick}>
       <div className="schedule-modal-content">
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="schedule-close-button" onClick={onClose}>×</button>
         
         {loading && <div className="loading">Loading schedule...</div>}
         

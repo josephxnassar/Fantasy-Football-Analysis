@@ -1,20 +1,20 @@
 """FastAPI application setup, middleware, exception handlers, and router registration"""
 
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 from typing import Dict
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.api.routes.statistics_routes import router as statistics_router
-from backend.api.routes.schedule_routes import router as schedule_router
 from backend.api.routes.depth_chart_routes import router as depth_chart_router
+from backend.api.routes.schedule_routes import router as schedule_router
+from backend.api.routes.statistics_routes import router as statistics_router
 from backend.api.routes.teams_routes import router as teams_router
 from backend.app import App
-from backend.config.settings import CORS_ORIGINS
-from backend.util.exceptions import CacheNotLoadedError, PlayerNotFoundError, FantasyFootballError
+from backend.config.settings import CORS_ALLOW_CREDENTIALS, CORS_ORIGINS
+from backend.util.exceptions import CacheNotLoadedError, FantasyFootballError, PlayerNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +34,16 @@ api = FastAPI(title="Fantasy Football API",
               version="0.1.0",
               lifespan=lifespan)
 
+allow_credentials = CORS_ALLOW_CREDENTIALS and CORS_ORIGINS != ["*"]
+if CORS_ALLOW_CREDENTIALS and CORS_ORIGINS == ["*"]:
+    logger.warning(
+        "CORS_ALLOW_CREDENTIALS=true ignored because CORS_ORIGINS is '*'. "
+        "Set explicit origins to allow credentialed browser requests."
+    )
+
 api.add_middleware(CORSMiddleware,
                    allow_origins=CORS_ORIGINS,
-                   allow_credentials=True,
+                   allow_credentials=allow_credentials,
                    allow_methods=["*"],
                    allow_headers=["*"])
 

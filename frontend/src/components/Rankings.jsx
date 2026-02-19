@@ -47,46 +47,53 @@ export default function Rankings() {
     fetchRankings();
   }, [fetchRankings]);
 
+  const rankingEntries = useMemo(() => Object.entries(rankings?.rankings || {}), [rankings]);
+
   const sortedByPosition = useMemo(
     () =>
-      Object.entries(rankings?.rankings || {}).map(([pos, players]) => ({
+      rankingEntries.map(([pos, players]) => ({
         pos,
-        players: sortPlayersByRating(players, format).slice(0, topN),
+        players: sortPlayersByRating(players, format)
+          .slice(0, topN)
+          .map((player) => ({
+            ...player,
+            playerName: getPlayerName(player),
+            ratingValue: getRatingValue(player, format),
+          })),
       })),
-    [rankings, format, topN]
+    [rankingEntries, format, topN]
   );
 
   const sortedOverallPlayers = useMemo(() => {
-    const allPlayers = Object.entries(rankings?.rankings || {}).flatMap(([pos, players]) =>
+    const allPlayers = rankingEntries.flatMap(([pos, players]) =>
       players.map((player) => ({
         ...player,
         position: pos,
         playerName: getPlayerName(player),
       }))
     );
-    return sortPlayersByRating(allPlayers, format).slice(0, topN);
-  }, [rankings, format, topN]);
+    return sortPlayersByRating(allPlayers, format)
+      .slice(0, topN)
+      .map((player) => ({
+        ...player,
+        ratingValue: getRatingValue(player, format),
+      }));
+  }, [rankingEntries, format, topN]);
 
-  if (loading) return <LoadingMessage message="Loading rankings..." />;
-  if (error) return <ErrorMessage message={error} />;
-  if (!rankings) return <EmptyStateMessage message="No data available" />;
-
-  const renderPlayerRow = (player, idx, showPosition = false) => {
-    const playerName = showPosition ? player.playerName : getPlayerName(player);
-    const ratingValue = getRatingValue(player, format);
+  const renderPlayerRow = useCallback((player, idx, showPosition = false) => {
     return (
       <PlayerTableRow
-        key={playerName}
-        player={{ ...player, playerName }}
+        key={player.playerName}
+        player={player}
         index={idx}
-        ratingValue={ratingValue}
+        ratingValue={player.ratingValue}
         showPosition={showPosition}
         onPlayerClick={handlePlayerClick}
       />
     );
-  };
+  }, [handlePlayerClick]);
 
-  const renderPositionTables = () =>
+  const renderPositionTables = useMemo(() =>
     sortedByPosition.map(({ pos, players }) => {
       return (
         <div key={pos} className="position-section">
@@ -106,10 +113,9 @@ export default function Rankings() {
           </table>
         </div>
       );
-    });
+    }), [sortedByPosition, renderPlayerRow]);
 
-  const renderOverallTable = () => {
-    return (
+  const renderOverallTable = useMemo(() => (
       <div className="position-section">
         <h2>Overall Rankings</h2>
         <table>
@@ -127,8 +133,11 @@ export default function Rankings() {
           </tbody>
         </table>
       </div>
-    );
-  };
+    ), [sortedOverallPlayers, renderPlayerRow]);
+
+  if (loading) return <LoadingMessage message="Loading rankings..." />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!rankings) return <EmptyStateMessage message="No data available" />;
 
   return (
     <div className="rankings-container">
@@ -176,7 +185,7 @@ export default function Rankings() {
       </div>
 
       <div className="rankings-table">
-        {position ? renderPositionTables() : renderOverallTable()}
+        {position ? renderPositionTables : renderOverallTable}
       </div>
 
       {(playerDetails || loadingDetails) && (

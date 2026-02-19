@@ -1,7 +1,9 @@
 """Refresh script to regenerate all data and save to database cache."""
 
-from backend import config  # Imports and runs setup_logging() from __init__.py
 from backend.app import App
+from backend.config.logging_config import setup_logging
+
+setup_logging()
 
 if __name__ == "__main__":
     print("=" * 60)

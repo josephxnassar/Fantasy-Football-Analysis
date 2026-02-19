@@ -5,10 +5,6 @@ from typing import Dict, List
 
 import pandas as pd
 
-from backend.statistics.ratings.regression.regression import Regression
-from backend.util import constants
-from backend.util.exceptions import DataProcessingError
-
 logger = logging.getLogger(__name__)
 
 def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
@@ -20,34 +16,6 @@ def add_derived_stats(df: pd.DataFrame) -> pd.DataFrame:
     source_map = {"Yds/Rec": ("Rec Yds", "Rec"), "Yds/Rush": ("Rush Yds", "Carries")}
     derived = {out_col: _safe_rate(df, num_col, den_col) for out_col, (num_col, den_col) in source_map.items() if {num_col, den_col}.issubset(df.columns)}
     return pd.concat([df, pd.DataFrame(derived, index=df.index)], axis=1) if derived else df
-
-def create_ratings(df: pd.DataFrame, method: str) -> Dict[str, float]:
-    """Generate ratings using regression model and return as player->rating mapping"""
-    try:
-        if "PPR Pts" not in df.columns:
-            raise DataProcessingError("Missing required column 'PPR Pts'", source="stats_helpers")
-        y = df["PPR Pts"]
-        X = df.drop(columns=["Non-PPR Pts", "PPR Pts"], errors="ignore")
-        return Regression(X, y, method).fit().get_ratings()["rating"].to_dict()
-    except Exception as e:
-        logger.error(f"Failed to create ratings using '{method}': {e}")
-        raise DataProcessingError(f"Failed to create ratings using '{method}': {e}", source="stats_helpers") from e
-
-def calculate_age_multiplier(age: int, position: str) -> float:
-    """Calculate dynasty rating multiplier based on age"""
-    config = constants.AGE_MULTIPLIERS.get(position)
-    if not config:
-        return 1.0
-
-    peak_age = config['peak_age']
-    young_boost = config['young_boost']
-    decline_rate = config['decline_per_year']
-    
-    if age < peak_age:
-        return young_boost * 0.9 if age < 21 else min(young_boost, 1.0 + ((young_boost - 1.0) * (peak_age - age) / (peak_age - 21)))
-    if age > peak_age:
-        return max(0.1, 1.0 - ((age - peak_age) * decline_rate))
-    return 1.0
 
 def _ranks_from_dict(ratings: Dict[str, float]) -> Dict[str, int]:
     """Convert {player: rating} to {player: rank} (1 = best)."""
@@ -74,9 +42,9 @@ def build_all_players(redraft_ratings: Dict[str, float], dynasty_ratings: Dict[s
     """Build pre-assembled player list with all metadata for API consumption"""
     return [{"name": player_name,
              "position": player_positions.get(player_name),
-             "Age": player_ages.get(player_name),
-             "RedraftRating": redraft_ratings[player_name],
-             "DynastyRating": dynasty_ratings.get(player_name),
+             "age": player_ages.get(player_name),
+             "redraft_rating": redraft_ratings[player_name],
+             "dynasty_rating": dynasty_ratings.get(player_name),
              "headshot_url": player_headshots.get(player_name),
              "team": player_teams.get(player_name),
              "is_rookie": player_rookies.get(player_name, False),

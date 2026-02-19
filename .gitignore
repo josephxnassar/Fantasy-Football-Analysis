@@ -13,8 +13,13 @@ logs/
 __pycache__/
 *.pyc
 .pytest_cache/
-tests/tmp_pytest/
+backend/tests/tmp_pytest/
+backend/tests/tmp_pytest_runtime/
+backend/tests/tmp_mypy_cache/
+backend/tests/.pytest_work/
 .pytest_tmp/
+.ruff_cache/
+.mypy_cache/
 .venv/
 backend/database/data/*
 !backend/database/data/.gitkeep
@@ -24,5 +29,6 @@ backend/database/data/*
 node_modules/
 dist/
 .vite/
+.eslintcache/
 
 # Note: uv.lock and package-lock.json are intentionally committed for reproducibility

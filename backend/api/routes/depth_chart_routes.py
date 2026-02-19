@@ -1,5 +1,4 @@
 """Depth chart API routes — team depth charts"""
-from typing import List
 
 import pandas as pd
 from fastapi import APIRouter, Request
@@ -26,7 +25,7 @@ def get_team_depth_chart(request: Request, team: str) -> TeamDepthChartResponse:
     return TeamDepthChartResponse(team=team,
                                   team_name=constants.TEAM_NAMES.get(team, team),
                                   depth_chart= [DepthChartEntry(position=position,
-                                                                starter=_normalize_depth_value(row.get('Starter')),
+                                                                starter=_normalize_depth_value(row.get('starter')),
                                                                 second=_normalize_depth_value(row.get('2nd')),
                                                                 third=_normalize_depth_value(row.get('3rd')),
                                                                 fourth=_normalize_depth_value(row.get('4th'))) for position, row in df.iterrows()])

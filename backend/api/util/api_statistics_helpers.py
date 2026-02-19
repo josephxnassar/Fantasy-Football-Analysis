@@ -1,11 +1,12 @@
 """Statistics cache transformation and lookup helpers."""
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
 from fastapi import HTTPException
 
 from backend.util import constants
+
 
 def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return ranking-eligible cached players, optionally filtered by position."""
@@ -13,7 +14,7 @@ def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[st
 
 def get_all_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return all cached players, optionally filtered by position."""
-    players = stats_cache.get(constants.STATS["ALL_PLAYERS"], [])
+    players = cast(List[Dict[str, Any]], stats_cache.get(constants.STATS["ALL_PLAYERS"], []))
     if position_filter:
         return [player for player in players if player.get("position") == position_filter]
     return players
@@ -39,18 +40,18 @@ def get_player_profile(stats_cache: Dict[str, Any], player_name: str, season: Op
             break
 
     if stats_dict and player_meta:
-        redraft = player_meta.get("RedraftRating")
-        dynasty = player_meta.get("DynastyRating")
+        redraft = player_meta.get("redraft_rating")
+        dynasty = player_meta.get("dynasty_rating")
         if redraft is not None:
-            stats_dict["RedraftRating"] = redraft
+            stats_dict["redraft_rating"] = redraft
         if dynasty is not None:
-            stats_dict["DynastyRating"] = dynasty
+            stats_dict["dynasty_rating"] = dynasty
 
     return stats_dict, position, available_seasons, player_meta
 
 def group_rankings_by_position(players: List[Dict[str, Any]], format_name: str = "redraft") -> Dict[str, List[Dict[str, Any]]]:
     """Group players by position and sort each position by selected rating."""
-    sort_key = "DynastyRating" if format_name == "dynasty" else "RedraftRating"
+    sort_key = "dynasty_rating" if format_name == "dynasty" else "redraft_rating"
     grouped: Dict[str, List[Dict[str, Any]]] = {}
 
     for player in players:

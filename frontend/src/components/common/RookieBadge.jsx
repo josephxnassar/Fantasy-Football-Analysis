@@ -1,4 +1,3 @@
-import React from 'react';
 import './RookieBadge.css';
 
 export default function RookieBadge({ isRookie, size = 'medium' }) {

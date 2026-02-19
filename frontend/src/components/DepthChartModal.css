@@ -1,5 +1,18 @@
 /* Depth chart modal — layout only (table styles live in common/DepthChartTable.css) */
 
+.depth-chart-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .depth-chart-modal-content {
   background: white;
   padding: 2rem;
@@ -12,11 +25,47 @@
   box-shadow: var(--shadow-lg);
 }
 
+.depth-chart-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--color-bg-light);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.depth-chart-close-button:hover {
+  background: var(--color-border);
+  color: var(--color-text-primary);
+}
+
 .depth-chart-header {
   text-align: center;
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid var(--color-border-light);
+}
+
+.depth-chart-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.depth-chart-full-name {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
 }
 
 .depth-chart-table-wrapper {
@@ -28,4 +77,3 @@
     padding: 1.5rem;
   }
 }
-

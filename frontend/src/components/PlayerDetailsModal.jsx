@@ -24,8 +24,8 @@ export default function PlayerDetailsModal({
 
   if (!playerDetails && !loading) return null;
 
-  const rating = playerDetails?.stats?.RedraftRating;
-  const dynastyRating = rankingData?.DynastyRating;
+  const rating = playerDetails?.stats?.redraft_rating;
+  const dynastyRating = rankingData?.dynasty_rating;
   const posRankRedraft = rankingData?.pos_rank_redraft;
   const posRankDynasty = rankingData?.pos_rank_dynasty;
   const overallRankRedraft = rankingData?.overall_rank_redraft;
@@ -34,7 +34,7 @@ export default function PlayerDetailsModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="player-details-close-button" onClick={onClose}>×</button>
         
         {loading ? (
           <div className="loading">Loading player details...</div>

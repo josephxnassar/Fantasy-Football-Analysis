@@ -8,26 +8,42 @@ export function useTeamDepthChart(team) {
   const [depthChartLoading, setDepthChartLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!team) {
-      setTeamDepthChart(null);
-      setDepthChartLoading(false);
+      if (!cancelled) {
+        setTeamDepthChart(null);
+        setDepthChartLoading(false);
+      }
       return;
     }
 
     const fetchDepthChart = async () => {
       try {
-        setDepthChartLoading(true);
+        if (!cancelled) {
+          setDepthChartLoading(true);
+        }
         const response = await getTeamDepthChart(team);
-        setTeamDepthChart(response.data);
+        if (!cancelled) {
+          setTeamDepthChart(response.data);
+        }
       } catch (err) {
         console.error(`Failed to load depth chart: ${err.message}`);
-        setTeamDepthChart(null);
+        if (!cancelled) {
+          setTeamDepthChart(null);
+        }
       } finally {
-        setDepthChartLoading(false);
+        if (!cancelled) {
+          setDepthChartLoading(false);
+        }
       }
     };
 
     fetchDepthChart();
+
+    return () => {
+      cancelled = true;
+    };
   }, [team]);
 
   return { teamDepthChart, depthChartLoading };

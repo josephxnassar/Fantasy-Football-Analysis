@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -25,10 +25,10 @@ class SQLService:
         tables = set(self.db.list_tables())
         if not tables:
             return False
-        return (f"{constants.CACHE['STATISTICS']}_metadata" in tables and f"{constants.CACHE['SCHEDULES']}_metadata" in tables and any(t.startswith(f"{constants.CACHE['DEPTH_CHART']}_") for t in tables))
+        return (f"{constants.CACHE['STATISTICS']}_{constants.STATS['ALL_PLAYERS']}" in tables and any(t.startswith(f"{constants.CACHE['SCHEDULES']}_") for t in tables) and any(t.startswith(f"{constants.CACHE['DEPTH_CHART']}_") for t in tables))
 
     @timed("SQLService.save_to_db")
-    def save_to_db(self, cache: Dict[str, Any], cls_name: str) -> None:
+    def save_to_db(self, cache: Dict[Any, Any], cls_name: str) -> None:
         """Save one cache object based on its class name."""
         if cache is None:
             logger.warning("No cached data to save - call run() first.")
@@ -47,7 +47,7 @@ class SQLService:
         logger.warning("Unsupported cache class '%s'; skipping save.", cls_name)
 
     @timed("SQLService.load_from_db")
-    def load_from_db(self, keys: List[str], cls_name: str) -> Dict[str, Any]:
+    def load_from_db(self, keys: List[str], cls_name: str) -> Dict[Any, Any]:
         """Load one cache object based on its class name."""
         if cls_name == constants.CACHE["STATISTICS"]:
             return self._load_statistics()
@@ -80,17 +80,13 @@ class SQLService:
             if weekly_rows:
                 self.db.save_table(f"{prefix}_{constants.STATS['PLAYER_WEEKLY_STATS']}", pd.DataFrame(weekly_rows), index=False)
 
-        seasons = cache.get("available_seasons", list(by_year.keys()))
-        self._save_season_metadata(prefix, seasons)
-
     @timed("SQLService._load_statistics")
     def _load_statistics(self) -> Dict[str, Any]:
         prefix = constants.CACHE["STATISTICS"]
-
-        seasons = self._load_season_metadata(prefix)
+        seasons = constants.SEASONS
 
         all_players_df = self._load_table_safe(f"{prefix}_{constants.STATS['ALL_PLAYERS']}")
-        all_players = all_players_df.to_dict("records") if all_players_df is not None and not all_players_df.empty else []
+        all_players = [{key: (None if pd.isna(value) else value) for key, value in rec.items()} for rec in all_players_df.to_dict("records")] if all_players_df is not None and not all_players_df.empty else []
 
         by_year: Dict[int, Dict[str, pd.DataFrame]] = {}
         for season in seasons:
@@ -106,38 +102,29 @@ class SQLService:
         weekly_df = self._load_table_safe(f"{prefix}_{constants.STATS['PLAYER_WEEKLY_STATS']}")
         weekly_stats: Dict[str, List[Dict[str, Any]]] = {}
         if weekly_df is not None and not weekly_df.empty:
-            for rec in weekly_df.to_dict("records"):
+            for rec in [{key: (None if pd.isna(value) else value) for key, value in row.items()} for row in weekly_df.to_dict("records")]:
                 player_name = rec.pop("player_name", None)
                 if player_name:
                     weekly_stats.setdefault(player_name, []).append(rec)
 
-        return {"available_seasons": seasons,
-                constants.STATS["ALL_PLAYERS"]: all_players,
+        return {constants.STATS["ALL_PLAYERS"]: all_players,
                 constants.STATS["BY_YEAR"]: by_year,
                 constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_stats}
 
     @timed("SQLService._save_schedules")
     def _save_schedules(self, cache: Dict[str, Any]) -> None:
         prefix = constants.CACHE["SCHEDULES"]
-        seasons: List[int] = []
 
         for season, season_map in cache.items():
             if not isinstance(season_map, dict):
                 continue
-            try:
-                seasons.append(int(season))
-            except (TypeError, ValueError):
-                pass
-
             for team, df in season_map.items():
                 self.db.save_table(f"{prefix}_{season}_{team}", df)
-
-        self._save_season_metadata(prefix, seasons)
 
     @timed("SQLService._load_schedules")
     def _load_schedules(self) -> Dict[int, Dict[str, pd.DataFrame]]:
         prefix = constants.CACHE["SCHEDULES"]
-        seasons = self._load_season_metadata(prefix, fallback=constants.SEASONS)
+        seasons = constants.SEASONS
         nested: Dict[int, Dict[str, pd.DataFrame]] = {}
 
         for season in seasons:
@@ -172,28 +159,6 @@ class SQLService:
             charts[team] = df.set_index(index_col)
 
         return charts
-
-    def _save_season_metadata(self, prefix: str, seasons: Iterable[Any]) -> None:
-        clean: List[int] = []
-        for value in seasons:
-            try:
-                clean.append(int(value))
-            except (TypeError, ValueError):
-                continue
-        clean = sorted(set(clean))
-        if clean:
-            self.db.save_table(f"{prefix}_metadata", pd.DataFrame({"available_seasons": clean}), index=False)
-
-    def _load_season_metadata(self, prefix: str, fallback: Optional[Iterable[Any]] = None) -> List[int]:
-        df = self._load_table_safe(f"{prefix}_metadata")
-        raw = (df["available_seasons"].tolist() if df is not None and "available_seasons" in df.columns else list(fallback or []))
-        seasons: List[int] = []
-        for value in raw:
-            try:
-                seasons.append(int(value))
-            except (TypeError, ValueError):
-                continue
-        return seasons
 
     def _load_table_safe(self, table_name: str) -> Optional[pd.DataFrame]:
         try:

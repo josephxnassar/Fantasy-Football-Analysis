@@ -63,30 +63,13 @@ TEAM_NAMES = {
 }
 
 # Available seasons
-SEASONS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+SEASONS = list(range(2016, 2026))
 
 # Last season in list
 CURRENT_SEASON = max(SEASONS)
 
 # Valid fantasy formats
 VALID_FORMATS = ["redraft", "dynasty"]
-
-# Dynasty age multipliers
-AGE_MULTIPLIERS = {
-    'QB': {'peak_age': 28, 'young_boost': 1.3, 'decline_per_year': 0.05},
-    'RB': {'peak_age': 24, 'young_boost': 1.15, 'decline_per_year': 0.15},
-    'WR': {'peak_age': 26, 'young_boost': 1.4, 'decline_per_year': 0.08},
-    'TE': {'peak_age': 27, 'young_boost': 1.3, 'decline_per_year': 0.07},
-}
-
-# Redraft position multipliers
-REDRAFT_MULTIPLIERS = {
-    'QB': 0.85,   # Lots of good QBs available
-    'RB': 1.05,   # Scarce elite talent
-    'WR': 1.05,   # Scarce elite talent
-    'TE': 1.0,    # Moderate scarcity
-}
-
 
 # Important stats to keep in final output
 USEFUL_STATS = [
@@ -165,8 +148,5 @@ COLUMN_NAME_MAP = {
     'wopr_x': 'WOPR-X',
     'wopr_y': 'WOPR-Y',
     'dom': 'Dominator',
-    'w8dom': 'W8 Dom',
-
-    # Keep rating as explicit redraft rating
-    'rating': 'RedraftRating'
+    'w8dom': 'W8 Dom'
 }

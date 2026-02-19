@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
@@ -36,7 +36,7 @@ During lifespan in [`api.py`](api.py):
 
 Behavior:
 - Existing DB cache -> load into memory
-- Missing DB cache -> run source fetch, then persist
+- Missing DB cache -> fetch fresh source data, persist cache, and load into memory
 
 Routes rely on these caches and surface `503` when required caches are unavailable.
 

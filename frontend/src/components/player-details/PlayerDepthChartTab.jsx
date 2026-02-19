@@ -17,7 +17,7 @@ export default function PlayerDepthChartTab({ depthChartLoading, teamDepthChart,
         </>
       )}
       {!depthChartLoading && (!teamDepthChart || teamDepthChart.depth_chart.length === 0) && (
-        <p className="no-data">No depth chart available</p>
+        <p className="player-details-no-data">No depth chart available</p>
       )}
     </div>
   );

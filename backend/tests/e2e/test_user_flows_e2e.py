@@ -4,7 +4,6 @@ import pytest
 
 pytestmark = pytest.mark.e2e
 
-
 def test_user_can_discover_player_then_open_team_views(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
         rankings_response = client.get("/api/rankings", params={"format": "redraft", "position": "QB"})

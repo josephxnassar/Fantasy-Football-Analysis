@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Request
 
-from backend.api.models import TeamScheduleResponse, TeamScheduleGame
+from backend.api.models import TeamScheduleGame, TeamScheduleResponse
 from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.api.util.team_helpers import get_team_schedule_entry, validate_team
 from backend.util import constants
@@ -22,8 +22,8 @@ def get_team_schedule(request: Request, team: str, season: Optional[int] = None)
     bye_week = None
 
     for week, row in team_schedule_df.iterrows():
-        opponent = row.get('Opponent', 'BYE')
-        home_away = row.get('HomeAway')
+        opponent = row.get('opponent', 'BYE')
+        home_away = row.get('home_away')
         if opponent == 'BYE':
             bye_week = int(week)
             home_away = None

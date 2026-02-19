@@ -1,6 +1,6 @@
 # Backend
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-runtime-009688?logo=fastapi&logoColor=white)](api/api.py)
 [![SQLite](https://img.shields.io/badge/SQLite-cache-003B57?logo=sqlite&logoColor=white)](database/service/sqlite_service.py)
@@ -13,8 +13,9 @@ Last verified: 2026-02-15
 3. [Module Map](#module-map)
 4. [Cache Families](#cache-families)
 5. [Run Commands](#run-commands)
-6. [Configuration](#configuration)
-7. [Detailed Docs](#detailed-docs)
+6. [Quality Checks](#quality-checks)
+7. [Configuration](#configuration)
+8. [Detailed Docs](#detailed-docs)
 
 ## Responsibilities
 
@@ -33,6 +34,7 @@ Startup sequence:
 
 FastAPI lifecycle integration:
 - [`api/api.py`](api/api.py) attaches `fantasy_app` to `app.state` during lifespan.
+- API startup uses `initialize()` to ensure cache is available.
 
 ## Module Map
 
@@ -77,6 +79,16 @@ uv run python backend/run_api.py
 
 Default URL: `http://localhost:8000`
 
+## Quality Checks
+
+Run from repository root:
+
+```bash
+uv run ruff check backend
+uv run mypy
+uv run pytest -q
+```
+
 ## Configuration
 
 Settings file: [`config/settings.py`](config/settings.py)  
@@ -86,6 +98,7 @@ Variables:
 - `API_HOST`
 - `API_PORT`
 - `CORS_ORIGINS`
+- `CORS_ALLOW_CREDENTIALS`
 - `DB_PATH`
 - `LOG_LEVEL`
 

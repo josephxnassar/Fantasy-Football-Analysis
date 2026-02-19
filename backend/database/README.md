@@ -1,6 +1,6 @@
 # Database Layer
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![SQLite](https://img.shields.io/badge/SQLite-persistence-003B57?logo=sqlite&logoColor=white)](service/sqlite_service.py)
 
@@ -28,8 +28,8 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 
 | Cache Family | Stored Shape |
 |---|---|
-| `Statistics` | `all_players`, per-season/per-position tables, weekly stats, metadata |
-| `Schedules` | One table per `season + team`, plus season metadata |
+| `Statistics` | `all_players`, per-season/per-position tables, weekly stats |
+| `Schedules` | One table per `season + team` |
 | `ESPNDepthChart` | One table per team |
 
 ## Load Rules
@@ -37,7 +37,6 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 `SQLService.load_from_db(keys, cls_name)` reconstructs runtime cache structures expected by API routes:
 
 - Statistics:
-  - `available_seasons`
   - `all_players`
   - `by_year`
   - `player_weekly_stats`
@@ -49,11 +48,11 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 ## Cache Presence Gate
 
 `SQLService.has_cached_data()` returns true only if:
-- `Statistics_metadata` exists
-- `Schedules_metadata` exists
+- `Statistics_all_players` exists
+- at least one `Schedules_*` table exists
 - at least one `ESPNDepthChart_*` table exists
 
-If false, backend startup fetches fresh data and persists it.
+If false, required cache families are missing and startup should trigger a cache rebuild via `App.initialize()`.
 
 ## Database Path
 
@@ -70,7 +69,7 @@ Rebuild and persist:
 uv run python backend/refresh_data.py
 ```
 
-Run API (loads cache if present):
+Run API (loads cache if present, otherwise rebuilds cache):
 
 ```bash
 uv run python backend/run_api.py
