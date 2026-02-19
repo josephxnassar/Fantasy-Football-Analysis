@@ -30,7 +30,7 @@ class Timer:
             return
         elapsed = perf_counter() - self._start
         status = "failed" if exc_type is not None else "completed"
-        self.logger.info("[timing] %s %s in %.3fs", self.name, status, elapsed)
+        self.logger.info("timer=%s | status=%s | elapsed=%.3fs", self.name, status, elapsed)
 
 def timed(name: str | None = None) -> Callable[[F], F]:
     """Decorator for timing a function with `Timer`."""

@@ -5,24 +5,15 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request
 
-from backend.api.models import (
-    ChartDataResponse,
-    ChartPlayerEntry,
-    PlayerResponse,
-    PlayerSearchResult,
-    RankingsResponse,
-    SearchResponse,
-)
-from backend.api.util.api_statistics_helpers import (
-    build_overall_chart_players,
-    build_position_chart_players,
-    find_player_team,
-    get_all_players,
-    get_player_profile,
-    get_ranked_players,
-    group_rankings_by_position,
-    resolve_chart_season,
-)
+from backend.api.models import (ChartDataResponse, ChartPlayerEntry, PlayerResponse, PlayerSearchResult, RankingsResponse, SearchResponse)
+from backend.api.util.api_statistics_helpers import (get_ranked_players,
+                                                     get_all_players,
+                                                     get_player_profile,
+                                                     group_rankings_by_position,
+                                                     find_player_team,
+                                                     resolve_chart_season,
+                                                     build_position_chart_players,
+                                                     build_overall_chart_players)
 from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.api.util.search_helpers import filter_search_results
 from backend.util import constants
