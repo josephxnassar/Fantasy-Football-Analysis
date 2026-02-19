@@ -1,5 +1,6 @@
 """Main application orchestrator for data sources and caching"""
 
+import logging
 from typing import Any, Dict
 
 from backend.database.service.sqlite_service import SQLService
@@ -7,6 +8,8 @@ from backend.depth_chart.espn import ESPNDepthChart
 from backend.schedules.schedules import Schedules
 from backend.statistics.statistics import Statistics
 from backend.util import constants
+
+logger = logging.getLogger(__name__)
 
 
 class App:
@@ -16,13 +19,22 @@ class App:
         self.db: SQLService = SQLService()
         self.caches: Dict[str, Any] = {}
     
-    def initialize(self) -> None:
-        """Load from cache or fetch fresh data if cache doesn't exist"""
+    def initialize(self, refresh_if_missing: bool = True) -> None:
+        """Load cache data, or optionally refresh if cache is missing."""
         if self.db.has_cached_data():
             self.load()
-        else:
+            return
+
+        if refresh_if_missing:
             self.run()
             self.save()
+            return
+
+        self.caches = {}
+        logger.warning(
+            "Cache tables are missing. API started without preloaded data; "
+            "run backend/refresh_data.py to populate cache."
+        )
     
     def run(self) -> None:
         """Fetch fresh data from all sources"""
