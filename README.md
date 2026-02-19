@@ -144,6 +144,7 @@ Backend variables (loaded by [`backend/config/settings.py`](backend/config/setti
 | `API_HOST` | `0.0.0.0` | API bind host |
 | `API_PORT` | `8000` | API bind port |
 | `CORS_ORIGINS` | `*` | Allowed origins |
+| `CORS_ALLOW_CREDENTIALS` | `false` | Enable credentialed CORS only when origins are explicit |
 | `DB_PATH` | `backend/database/data/nfl_cache.db` | SQLite location |
 | `LOG_LEVEL` | `DEBUG` | Root logging level |
 

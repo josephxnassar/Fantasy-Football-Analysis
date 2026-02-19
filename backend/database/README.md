@@ -1,6 +1,6 @@
 # Database Layer
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![SQLite](https://img.shields.io/badge/SQLite-persistence-003B57?logo=sqlite&logoColor=white)](service/sqlite_service.py)
 
@@ -52,7 +52,7 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 - at least one `Schedules_*` table exists
 - at least one `ESPNDepthChart_*` table exists
 
-If false, backend startup fetches fresh data and persists it.
+If false, API startup does not auto-refresh caches. Use `backend/refresh_data.py` to populate data.
 
 ## Database Path
 

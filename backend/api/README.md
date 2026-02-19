@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-15
+Last verified: 2026-02-19
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
@@ -31,12 +31,12 @@ FastAPI routers that expose cache-backed fantasy data from `App.caches`.
 
 During lifespan in [`api.py`](api.py):
 1. Build `App()`
-2. Call `initialize()`
+2. Call `initialize(refresh_if_missing=False)`
 3. Attach to `request.app.state.fantasy_app`
 
 Behavior:
 - Existing DB cache -> load into memory
-- Missing DB cache -> run source fetch, then persist
+- Missing DB cache -> start without loaded caches (routes return `503` for cache-backed requests until refresh)
 
 Routes rely on these caches and surface `503` when required caches are unavailable.
 
