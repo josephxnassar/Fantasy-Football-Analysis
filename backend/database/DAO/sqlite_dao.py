@@ -47,10 +47,6 @@ class SQLiteCacheManager:
     def list_tables(self) -> List[str]:
         self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         return [row[0] for row in self.cursor.fetchall()]
-    
-    def has_tables(self) -> bool:
-        """Check if database has any tables"""
-        return len(self.list_tables()) > 0
 
     def drop_table(self, table_name: str) -> None:
         safe_name = self._validate_table_name(table_name)
