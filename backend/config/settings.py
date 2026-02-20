@@ -24,6 +24,7 @@ CORS_ALLOW_CREDENTIALS: bool = (os.getenv("CORS_ALLOW_CREDENTIALS", "false").str
 
 # Database
 DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")
+DEPTH_CHART_SOURCE: str = os.getenv("DEPTH_CHART_SOURCE", "espn").strip().lower()
 
 # Logging
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "DEBUG").upper()

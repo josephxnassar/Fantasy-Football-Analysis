@@ -43,7 +43,7 @@ FastAPI lifecycle integration:
 | API | FastAPI app, routers, response models | [`api/api.py`](api/api.py) |
 | Statistics | Ratings/ranks and stat cache generation | [`statistics/statistics.py`](statistics/statistics.py) |
 | Schedules | Team schedule normalization + BYE insertion | [`schedules/schedules.py`](schedules/schedules.py) |
-| Depth charts | ESPN scraper for team depth order | [`depth_chart/espn.py`](depth_chart/espn.py) |
+| Depth charts | ESPN scraper or seasonal nflreadpy depth charts | [`depth_chart/espn.py`](depth_chart/espn.py) |
 | Database | SQLite persistence for all cache families | [`database/service/sqlite_service.py`](database/service/sqlite_service.py) |
 | Config | Env settings + logging setup | [`config/settings.py`](config/settings.py) |
 
@@ -100,6 +100,7 @@ Variables:
 - `CORS_ORIGINS`
 - `CORS_ALLOW_CREDENTIALS`
 - `DB_PATH`
+- `DEPTH_CHART_SOURCE`
 - `LOG_LEVEL`
 - `LOG_CONSOLE_LEVEL`
 - `LOG_DIR`
@@ -108,6 +109,10 @@ Variables:
 - `LOG_BACKUP_COUNT`
 - `TIMING_ENABLED`
 - `TIMING_RUN_LOGS_KEEP`
+
+Depth chart source:
+- `DEPTH_CHART_SOURCE=espn` uses live ESPN scraping.
+- `DEPTH_CHART_SOURCE=nrp` uses seasonal `nflreadpy` depth charts.
 
 Timing logs:
 - Standard file logs are separated into subfolders under `LOG_DIR`: `errors/errors.log`, `timing/`.
