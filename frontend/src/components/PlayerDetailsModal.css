@@ -480,6 +480,27 @@
   transition: all 0.2s;
 }
 
+.week-stat-item.stat-good {
+  background: var(--color-success-bg);
+  border-left-color: var(--color-success);
+  color: var(--color-success-text);
+  font-weight: 600;
+}
+
+.week-stat-item.stat-medium {
+  background: var(--color-warning-bg);
+  border-left-color: var(--color-warning);
+  color: var(--color-warning-text);
+  font-weight: 600;
+}
+
+.week-stat-item.stat-poor {
+  background: var(--color-danger-bg);
+  border-left-color: var(--color-danger);
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
 .week-no-stats {
   color: #999;
   font-size: 0.9rem;
