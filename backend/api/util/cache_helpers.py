@@ -6,6 +6,7 @@ from fastapi import Request
 
 from backend.util.exceptions import CacheNotLoadedError
 
+
 def get_app_caches(request: Request) -> Dict[str, Any]:
     """Return in-memory caches attached to FastAPI app state."""
     fantasy_app = getattr(request.app.state, "fantasy_app", None)

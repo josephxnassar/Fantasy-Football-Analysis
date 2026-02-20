@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class RankingsResponse(BaseModel):
     """Response for player rankings endpoint"""
     format: str = Field(..., description="Format: redraft or dynasty")

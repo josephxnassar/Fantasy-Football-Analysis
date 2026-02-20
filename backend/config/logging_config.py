@@ -6,7 +6,17 @@ from logging import FileHandler
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
-from backend.config.settings import (LOG_BACKUP_COUNT, LOG_CONSOLE_LEVEL, LOG_DIR, LOG_LEVEL, LOG_ROTATION_INTERVAL, LOG_ROTATION_WHEN, TIMING_ENABLED, TIMING_RUN_LOGS_KEEP)
+from backend.config.settings import (
+    LOG_BACKUP_COUNT,
+    LOG_CONSOLE_LEVEL,
+    LOG_DIR,
+    LOG_LEVEL,
+    LOG_ROTATION_INTERVAL,
+    LOG_ROTATION_WHEN,
+    TIMING_ENABLED,
+    TIMING_RUN_LOGS_KEEP,
+)
+
 
 def _build_rotating_handler(log_path: Path, level: int, formatter: logging.Formatter) -> TimedRotatingFileHandler:
     handler = TimedRotatingFileHandler(log_path, when=LOG_ROTATION_WHEN, interval=LOG_ROTATION_INTERVAL, backupCount=LOG_BACKUP_COUNT, encoding="utf-8")
@@ -37,21 +47,33 @@ def _setup_timing_logger(timing_log_dir: Path) -> None:
         return
 
     timing_formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    run_id = f"{datetime.now():%Y%m%d-%H%M%S-%f}-pid{os.getpid()}"
-    timing_path = timing_log_dir / f"timing-{run_id}.log"
-    timing_handler: FileHandler = FileHandler(timing_path, encoding="utf-8")
-    timing_handler.setLevel(logging.INFO)
-    timing_handler.setFormatter(timing_formatter)
-    timing_logger.addHandler(timing_handler)
-    timing_logger.info("run_started | run_id=%s | pid=%s", run_id, os.getpid())
-    _prune_old_timing_logs(timing_log_dir)
+
+    class _LazyTimingFileHandler(logging.Handler):
+        def __init__(self) -> None:
+            super().__init__(level=logging.INFO)
+            self._file_handler: FileHandler | None = None
+
+        def emit(self, record: logging.LogRecord) -> None:
+            handler = self._file_handler
+            if handler is None:
+                run_id = f"{datetime.now():%Y%m%d-%H%M%S-%f}-pid{os.getpid()}"
+                timing_path = timing_log_dir / f"timing-{run_id}.log"
+                file_handler: FileHandler = FileHandler(timing_path, encoding="utf-8")
+                file_handler.setLevel(logging.INFO)
+                file_handler.setFormatter(timing_formatter)
+                self._file_handler = file_handler
+                handler = file_handler
+                _prune_old_timing_logs(timing_log_dir)
+            handler.emit(record)
+
+    timing_logger.addHandler(_LazyTimingFileHandler())
 
 def setup_logging() -> None:
     logger = logging.getLogger()
     logger.setLevel(getattr(logging, LOG_LEVEL, logging.DEBUG))
 
     line_formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s:%(lineno)d | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    console_formatter = logging.Formatter("%(levelname)-8s: %(message)s")
+    console_formatter = logging.Formatter("%(levelname)s: %(message)s")
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(getattr(logging, LOG_CONSOLE_LEVEL, logging.INFO))

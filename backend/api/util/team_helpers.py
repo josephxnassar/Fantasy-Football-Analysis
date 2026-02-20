@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from backend.api.util.cache_helpers import get_cache
 from backend.util import constants
 
+
 def get_team_cache(caches: Dict[str, Any], cache_name: str, team: str, label: str = "Data") -> Any:
     """Validate team, look up its entry in a cache, and return it."""
     team = validate_team(team)
