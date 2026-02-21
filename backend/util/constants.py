@@ -72,9 +72,11 @@ CURRENT_SEASON = max(SEASONS)
 USEFUL_STATS = [
     'Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds',
     'Sack Fum', 'Sack Fum Lost', 'Air Yds', 'YAC', 'Pass 1st', 'Pass 2PT',
-    'Carries', 'Rush Yds', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush 2PT',
-    'Rec', 'Tgt', 'Rec Yds', 'Rec TD', 'Rec Fum', 'Rec Fum Lost',
-    'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'ST TD',
+    'Pass EPA', 'PACR',
+    'Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum', 'Rush Fum Lost', 'Rush 1st', 'Rush 2PT', 'Rush EPA',
+    'Rec', 'Tgt', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Fum', 'Rec Fum Lost',
+    'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR',
+    'Tgt Share', 'Air Yds Share', 'WOPR', 'ST TD',
     'Non-PPR Pts', 'PPR Pts'
 ]
 

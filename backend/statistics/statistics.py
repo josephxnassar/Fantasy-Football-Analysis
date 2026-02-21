@@ -105,23 +105,23 @@ class Statistics(base_source.BaseSource):
         try:
             df = raw_stats.loc[(raw_stats["season_type"] == "REG") & raw_stats["position"].isin(constants.POSITIONS)]
             weekly_source_df = df.copy()
+            
             numeric_cols = df.select_dtypes(include="number").columns.difference(["week", "season"])
             non_numeric_cols = ["season", "position", "player_display_name", "player_id"]
             df = df[non_numeric_cols + numeric_cols.tolist()]
+
             player_positions = df.drop_duplicates("player_display_name").set_index("player_display_name")["position"].to_dict()
+            
             seasonal_df = stats_helpers.add_derived_stats(df.groupby(["season", "position", "player_display_name", "player_id"], as_index=False)[numeric_cols].sum().rename(columns=constants.COLUMN_NAME_MAP))
+            seasonal_data_df = {season: {position: stats_helpers.build_position_df(position_group) for position, position_group in season_group.groupby("position")} for season, season_group in seasonal_df.groupby("season")}
 
-            def _build_position_df(group: pd.DataFrame) -> pd.DataFrame:
-                df_out = group.drop(columns=["season", "position", "player_id"]).set_index("player_display_name").dropna(axis=1, how="all")
-                df_out[constants.USEFUL_STATS] = df_out[constants.USEFUL_STATS].astype(int)
-                return df_out
-
-            seasonal_data_df = {season: {position: _build_position_df(position_group) for position, position_group in season_group.groupby("position")} for season, season_group in seasonal_df.groupby("season")}
             weekly_cols = non_numeric_cols + numeric_cols.tolist() + ["week", "opponent_team"]
             weekly_df = stats_helpers.add_derived_stats(weekly_source_df[weekly_cols].rename(columns=constants.COLUMN_NAME_MAP))
+
             snap_df = snap_counts.loc[(snap_counts["game_type"] == "REG") & snap_counts["position"].isin(constants.POSITIONS), ["season", "week", "player", "position", "offense_pct"]].rename(columns={"player": "player_display_name", "offense_pct": "Snap Share"})
             weekly_df = weekly_df.merge(snap_df, on=["season", "week", "player_display_name", "position"], how="left")
-            new_weekly_cols = weekly_df.select_dtypes(include="number").columns.tolist() + ["opponent_team"]
+            
+            new_weekly_cols = stats_helpers.select_useful_cols(weekly_df, ["season", "week", "Snap Share", "opponent_team"])
             weekly_player_stats = {player: group[new_weekly_cols].to_dict("records") for player, group in weekly_df.groupby("player_display_name")}
 
             return player_positions, seasonal_data_df, weekly_player_stats, seasonal_df

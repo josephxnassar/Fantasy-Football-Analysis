@@ -5,8 +5,17 @@ from typing import Dict, List
 
 import pandas as pd
 
+from backend.util import constants
+
 logger = logging.getLogger(__name__)
 
+def build_position_df(group: pd.DataFrame) -> pd.DataFrame:
+    df_out = group.drop(columns=["season", "position", "player_id"]).set_index("player_display_name")
+    return df_out[select_useful_cols(df_out, [])].dropna(axis=1, how="all")
+
+def select_useful_cols(source_df: pd.DataFrame, base_cols: List[str]) -> List[str]:
+                return [col for col in base_cols + constants.USEFUL_STATS if col in source_df.columns]
+            
 def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
     return df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1)
