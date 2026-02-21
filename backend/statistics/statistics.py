@@ -34,7 +34,7 @@ class Statistics(base_source.BaseSource):
             raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e
 
     @timed("Statistics._load")
-    def _load(self) -> pd.DataFrame:
+    def _load_player_stats(self) -> pd.DataFrame:
         """Load player stats from nflreadpy"""
         try:
             return nfl.load_player_stats(seasons=self.seasons).to_pandas()
@@ -136,7 +136,7 @@ class Statistics(base_source.BaseSource):
         rosters = self._load_rosters()
         player_ages, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
 
-        raw_stats = self._load()
+        raw_stats = self._load_player_stats()
         snap_counts = self._load_snap_counts()
         positions, seasonal_data, weekly_stats, seasonal_df = self._partition_data(raw_stats, snap_counts)
 

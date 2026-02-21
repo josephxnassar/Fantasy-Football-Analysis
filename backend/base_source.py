@@ -30,11 +30,6 @@ class BaseSource(ABC):
         self.cache = cache
 
     @abstractmethod
-    def _load(self) -> pd.DataFrame:
-        """Load raw data from source"""
-        pass
-
-    @abstractmethod
     def run(self) -> None:
         """Process data and populate cache"""
         pass

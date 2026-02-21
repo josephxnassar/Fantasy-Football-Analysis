@@ -19,7 +19,7 @@ class NRPDepthChart(BaseSource):
     def __init__(self) -> None:
         super().__init__([constants.CURRENT_SEASON])
 
-    def _load(self) -> pd.DataFrame:
+    def _load_depth_charts(self) -> pd.DataFrame:
         """Load seasonal depth chart snapshots from nflreadpy."""
         try:
             return nfl.load_depth_charts(seasons=self.seasons).to_pandas()
@@ -80,7 +80,7 @@ class NRPDepthChart(BaseSource):
     def run(self) -> None:
         """Build depth-chart cache keyed by team abbreviation."""
         team_depth_charts: Dict[str, pd.DataFrame] = {}
-        latest_rows = self._latest_team_rows(self._load())
+        latest_rows = self._latest_team_rows(self._load_depth_charts())
 
         for team in constants.TEAMS:
             team_rows = latest_rows[latest_rows["team"] == team]
