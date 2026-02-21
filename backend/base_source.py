@@ -4,8 +4,6 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-import pandas as pd
-
 from backend.util import constants
 
 logger = logging.getLogger(__name__)
