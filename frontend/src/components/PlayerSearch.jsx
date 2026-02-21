@@ -18,7 +18,6 @@ export default function PlayerSearch() {
     loadingDetails,
     availableSeasons,
     currentSeason,
-    playerRankingData,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails 
@@ -91,7 +90,6 @@ export default function PlayerSearch() {
           availableSeasons={availableSeasons}
           currentSeason={currentSeason}
           onSeasonChange={handleSeasonChange}
-          rankingData={playerRankingData}
         />
       )}
     </div>

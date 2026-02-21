@@ -68,9 +68,6 @@ SEASONS = list(range(2016, 2026))
 # Last season in list
 CURRENT_SEASON = max(SEASONS)
 
-# Valid fantasy formats
-VALID_FORMATS = ["redraft", "dynasty"]
-
 # Important stats to keep in final output
 USEFUL_STATS = [
     'Comp', 'Att', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds',

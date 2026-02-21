@@ -2,7 +2,6 @@
 
 import RookieBadge from './RookieBadge';
 import DetailBadge from './DetailBadge';
-import RatingBadge from './RatingBadge';
 
 export default function PlayerCard({ player, onPlayerClick }) {
   return (
@@ -20,10 +19,6 @@ export default function PlayerCard({ player, onPlayerClick }) {
           <DetailBadge>{player.position}</DetailBadge>
           {player.age && <DetailBadge>Age {player.age}</DetailBadge>}
         </div>
-      </div>
-      <div className="player-ratings-row">
-        <RatingBadge rating={player.redraft_rating} label="Redraft" />
-        <RatingBadge rating={player.dynasty_rating} label="Dynasty" />
       </div>
     </div>
   );

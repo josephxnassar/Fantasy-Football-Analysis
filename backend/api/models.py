@@ -5,39 +5,18 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class RankingsResponse(BaseModel):
-    """Response for player rankings endpoint"""
-    format: str = Field(..., description="Format: redraft or dynasty")
-    position: Optional[str] = Field(None, description="Position filter: QB, RB, WR, or TE")
-    model: str = Field(..., description="Model used: linear, ridge, or lasso")
-    rankings: Dict[str, List[Dict[str, Any]]] = Field(..., description="Rankings grouped by position")
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "format": "redraft",
-                "position": "WR",
-                "model": "ridge",
-                "rankings": {
-                    "WR": [
-                        {"name": "Ja'Marr Chase", "rating": 401.52},
-                        {"name": "Justin Jefferson", "rating": 314.54},
-                    ]
-                },
-            }
-        }
-    )
-
 class PlayerResponse(BaseModel):
-    """Response for individual player details"""
+    """Response for individual player details."""
     name: str = Field(..., description="Player name")
     position: str = Field(..., description="Player position: QB, RB, WR, TE")
     team: Optional[str] = Field(None, description="Team abbreviation")
     stats: Dict[str, Any] = Field(..., description="Player statistics (season total or average)")
     available_seasons: List[int] = Field(default_factory=list, description="Seasons where player has data")
+    age: Optional[int] = Field(None, description="Player age")
+    is_rookie: bool = Field(default=False, description="Whether player is a rookie")
+    is_eligible: bool = Field(default=True, description="Whether player is active/eligible")
     headshot_url: Optional[str] = Field(None, description="URL to player headshot image")
     weekly_stats: Optional[List[Dict[str, Any]]] = Field(None, description="Weekly breakdown of player statistics by season and week")
-    ranking_data: Optional[Dict[str, Any]] = Field(None, description="Cached ranking metadata for this player")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -45,53 +24,40 @@ class PlayerResponse(BaseModel):
                 "name": "Ja'Marr Chase",
                 "position": "WR",
                 "team": "CIN",
-                "stats": {"redraft_rating": 401.52, "receptions": 127.0},
+                "stats": {"receptions": 127.0, "receiving_yards": 1716.0},
                 "available_seasons": [2021, 2022, 2023, 2024],
+                "age": 25,
+                "is_rookie": False,
+                "is_eligible": True,
                 "headshot_url": "https://example.com/images/jamarre-chase.png",
                 "weekly_stats": [
                     {"season": 2024, "week": 1, "receptions": 6, "rec_yds": 89},
                     {"season": 2024, "week": 2, "receptions": 8, "rec_yds": 102},
                 ],
-                "ranking_data": {
-                    "name": "Ja'Marr Chase",
-                    "position": "WR",
-                    "redraft_rating": 401.52,
-                    "dynasty_rating": 425.18,
-                },
             }
         }
     )
 
 class PlayerSearchResult(BaseModel):
-    """Player search result"""
+    """Player search result."""
     name: str = Field(..., description="Player name")
     position: str = Field(..., description="Player position")
-    redraft_rating: float = Field(..., description="Redraft rating")
-    dynasty_rating: float = Field(..., description="Dynasty rating")
     age: Optional[int] = Field(None, description="Player age")
     team: Optional[str] = Field(None, description="Team abbreviation")
     is_rookie: bool = Field(default=False, description="Whether player is a rookie")
-    is_eligible: bool = Field(default=True, description="Whether player is active/eligible for rankings")
-    pos_rank_redraft: Optional[int] = Field(None, description="Position rank for redraft (1 = best)")
-    pos_rank_dynasty: Optional[int] = Field(None, description="Position rank for dynasty (1 = best)")
-    overall_rank_redraft: Optional[int] = Field(None, description="Overall rank for redraft (1 = best)")
-    overall_rank_dynasty: Optional[int] = Field(None, description="Overall rank for dynasty (1 = best)")
+    is_eligible: bool = Field(default=True, description="Whether player is active/eligible")
+    headshot_url: Optional[str] = Field(None, description="URL to player headshot image")
 
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "name": "Ja'Marr Chase",
                 "position": "WR",
-                "redraft_rating": 401.52,
-                "dynasty_rating": 425.18,
                 "age": 24,
                 "team": "CIN",
                 "is_rookie": False,
                 "is_eligible": True,
-                "pos_rank_redraft": 1,
-                "pos_rank_dynasty": 1,
-                "overall_rank_redraft": 3,
-                "overall_rank_dynasty": 2,
+                "headshot_url": "https://example.com/images/jamarre-chase.png",
             }
         }
     )
@@ -107,8 +73,8 @@ class SearchResponse(BaseModel):
             "example": {
                 "query": "chase",
                 "results": [
-                    {"name": "Ja'Marr Chase", "position": "WR", "redraft_rating": 401.52},
-                    {"name": "JK Dobbins", "position": "RB", "redraft_rating": 250.0},
+                    {"name": "Ja'Marr Chase", "position": "WR", "team": "CIN"},
+                    {"name": "JK Dobbins", "position": "RB", "team": "LAC"},
                 ],
                 "count": 2,
             }

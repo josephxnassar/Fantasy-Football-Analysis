@@ -1,4 +1,4 @@
-"""Player statistics processing and ML-based ratings generation"""
+"""Player statistics processing and cache generation."""
 
 import logging
 from typing import Dict, List, Tuple, cast
@@ -7,7 +7,6 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend import base_source
-from backend.statistics.ratings.regression.regression import Regression
 from backend.statistics.util import stats_helpers
 from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
@@ -16,7 +15,7 @@ from backend.util.timing import timed
 logger = logging.getLogger(__name__)
 
 class Statistics(base_source.BaseSource):
-    """Processes player statistics and generates ML-based ratings"""
+    """Processes player statistics and builds stat caches."""
     
     def __init__(self, seasons: List[int]) -> None:
         """Initialize with seasons"""
@@ -56,13 +55,12 @@ class Statistics(base_source.BaseSource):
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
     @timed("Statistics._extract_all_roster_data")
-    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict, Dict, set, Dict, Dict, Dict]:
+    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict[str, int], set[str], Dict[str, str], Dict[str, str], Dict[str, bool]]:
         """Extract all roster-based data in a single pass through the dataframe."""
         try:
             current_season = constants.CURRENT_SEASON
             today = pd.Timestamp.now().normalize()
-            player_ages_by_season: Dict[str, Dict[int, int]] = {}
-            player_birth_dates: Dict[str, pd.Timestamp] = {}
+            player_ages: Dict[str, int] = {}
             eligible_players: set[str] = set()
             player_headshots: Dict[str, str] = {}
             player_teams: Dict[str, str] = {}
@@ -80,12 +78,11 @@ class Statistics(base_source.BaseSource):
                     except (TypeError, ValueError):
                         season_int = None
                 position = getattr(row, "position", None)
-                if season_int is not None and position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
+                if position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
                     birth_ts = pd.to_datetime(birth_date)
-                    age = (pd.Timestamp(year=season_int, month=9, day=1) - birth_ts).days // 365
+                    age = (today - birth_ts).days // 365
                     if age > 0:
-                        player_ages_by_season.setdefault(name, {})[season_int] = int(age)
-                        player_birth_dates[name] = birth_ts
+                        player_ages[name] = int(age)
                 if season_int == current_season and position in constants.POSITIONS:
                     if getattr(row, "status", None) != "RET":
                         eligible_players.add(name)
@@ -95,10 +92,9 @@ class Statistics(base_source.BaseSource):
                         player_teams[name] = team
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True
-            player_ages = {name: int((today - birth_ts).days // 365) for name, birth_ts in player_birth_dates.items()}
             logger.info(f"Ages: {len(player_ages)} | Eligible: {len(eligible_players)} | Headshots: {len(player_headshots)} | Player-Teams: {len(player_teams)} | Rookies: {sum(1 for v in rookies.values() if v)}")
             
-            return player_ages, player_ages_by_season, eligible_players, player_headshots, player_teams, rookies
+            return player_ages, eligible_players, player_headshots, player_teams, rookies
         except Exception as e:
             logger.error(f"Failed to extract roster data: {e}")
             raise DataProcessingError(f"Failed to extract roster data: {e}", source="Statistics") from e
@@ -133,61 +129,27 @@ class Statistics(base_source.BaseSource):
             logger.error(f"Failed to partition seasonal data: {e}")
             raise DataProcessingError(f"Failed to partition seasonal data: {e}", source="Statistics") from e
 
-    @timed("Statistics._calculate_ratings")
-    def _calculate_ratings(self, seasonal_df: pd.DataFrame, player_ages_by_season: Dict, player_positions: Dict, rookies: Dict) -> Tuple[Dict, Dict]:
-        """Train simple forward-point models and predict current redraft/dynasty scores."""
-        try:
-            df = seasonal_df.copy()
-            df = df.sort_values(["player_display_name", "season"]).reset_index(drop=True)
-
-            grouped = df.groupby("player_display_name")["PPR Pts"]
-            df["PPR Pts_lag1"] = grouped.shift(1).fillna(0)
-            df["PPR Pts_trend"] = df["PPR Pts"] - df["PPR Pts_lag1"]
-            df["redraft_target"] = grouped.shift(-1)
-            df["dynasty_target"] = grouped.shift(-1) + grouped.shift(-2) + grouped.shift(-3)
-
-            numeric_cols = df.select_dtypes(include="number").columns.tolist()
-            feature_cols = [col for col in numeric_cols if col not in {"season", "player_id", "redraft_target", "dynasty_target"}]
-            inference_df = df[(df["season"] == max(self.seasons)) & (~df["player_display_name"].isin(set(rookies.keys())))]
-
-            def _predict_target(target_col: str) -> Dict[str, float]:
-                out = {name: 0.0 for name in player_positions}
-                train_df = df[df[target_col].notna()]
-                for pos in constants.POSITIONS:
-                    pos_train = train_df[train_df["position"] == pos]
-                    pos_infer = inference_df[inference_df["position"] == pos]
-                    if pos_train.empty or pos_infer.empty:
-                        continue
-                    model = Regression(pos_train[feature_cols].fillna(0), pos_train[target_col].astype(float), "ridge").fit()
-                    preds = model.predict(pos_infer[feature_cols].fillna(0))
-                    out.update({name: float(pred) for name, pred in zip(pos_infer["player_display_name"], preds)})
-                return out
-
-            redraft = _predict_target("redraft_target")
-            dynasty = _predict_target("dynasty_target")
-            return dynasty, redraft
-        except Exception as e:
-            logger.error(f"Failed to calculate ratings: {e}")
-            raise DataProcessingError(f"Failed to calculate ratings: {e}", source="Statistics") from e
-
     @timed("Statistics.run")
     def run(self) -> None:
-        """Load data, process statistics, calculate ratings, and store in cache"""
+        """Load data, process statistics, and store cache data."""
         rosters = self._load_rosters()
-        player_ages, player_ages_by_season, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
+        player_ages, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
 
         raw_stats = self._load()
         snap_counts = self._load_snap_counts()
         positions, seasonal_data, weekly_stats, seasonal_df = self._partition_data(raw_stats, snap_counts)
 
-        dynasty, redraft = self._calculate_ratings(seasonal_df, player_ages_by_season, positions, rookies)
+        if seasonal_df.empty:
+            raise DataProcessingError("No seasonal statistics were produced.", source="Statistics")
 
-        overall_rank_dyn = stats_helpers.calculate_overall_ranks(dynasty, eligible)
-        overall_rank_red = stats_helpers.calculate_overall_ranks(redraft, eligible)
-        pos_rank_dyn = stats_helpers.calculate_position_ranks(dynasty, positions, eligible)
-        pos_rank_red = stats_helpers.calculate_position_ranks(redraft, positions, eligible)
-
-        all_players = stats_helpers.build_all_players(redraft, dynasty, positions, eligible, player_ages, headshots, teams, rookies, overall_rank_red, overall_rank_dyn, pos_rank_red, pos_rank_dyn)
+        all_players = stats_helpers.build_all_players(
+            positions,
+            eligible,
+            player_ages,
+            headshots,
+            teams,
+            rookies,
+        )
 
         self.set_cache({constants.STATS["ALL_PLAYERS"]:         all_players,
                         constants.STATS["BY_YEAR"]:             seasonal_data,

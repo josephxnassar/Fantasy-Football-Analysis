@@ -2,25 +2,22 @@ import { Suspense, lazy, useState } from 'react';
 import { LoadingMessage, SubTabNav } from './common';
 import './Statistics.css';
 
-const Rankings = lazy(() => import('./Rankings'));
 const PlayerSearch = lazy(() => import('./PlayerSearch'));
 const Charts = lazy(() => import('./Charts'));
 
 const TABS = [
-  { id: 'rankings', label: 'Rankings' },
   { id: 'charts', label: 'Charts' },
   { id: 'search', label: 'Player Search' },
 ];
 
 function Statistics() {
-  const [activeSubTab, setActiveSubTab] = useState('rankings');
+  const [activeSubTab, setActiveSubTab] = useState('charts');
 
   const renderContent = () => {
     switch (activeSubTab) {
-      case 'rankings': return <Rankings />;
       case 'search': return <PlayerSearch />;
       case 'charts': return <Charts />;
-      default: return <Rankings />;
+      default: return <Charts />;
     }
   };
 

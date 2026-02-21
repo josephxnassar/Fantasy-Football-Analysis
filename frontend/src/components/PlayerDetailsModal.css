@@ -85,21 +85,6 @@
   box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
-.grade-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  color: #f9fafb;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-  min-width: 64px;
-}
-
-
 .player-details-close-button {
   position: absolute;
   top: 1rem;
@@ -127,116 +112,6 @@
   margin: 0 0 1rem 0;
   font-size: 16px;
   color: var(--color-text-primary);
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.detail-item .label {
-  font-weight: bold;
-  color: #666;
-  font-size: 0.875rem;
-}
-
-.detail-item .value {
-  font-size: 1.125rem;
-}
-
-.rating-item {
-  grid-column: 1 / -1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem;
-  border-radius: 8px;
-  color: white;
-}
-
-.ratings-section {
-  margin: 1.5rem 0;
-}
-
-.ratings-section h3 {
-  margin-bottom: 1rem;
-  color: #333;
-  font-size: 1.25rem;
-}
-
-.ratings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.rating-card {
-  background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.rating-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
-}
-
-.rating-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
-}
-
-.rating-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.percentile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.percentile-info div {
-  display: flex;
-  align-items: center;
-  font-size: 0.875rem;
-  color: #4b5563;
-  font-weight: 500;
-}
-
-.percentile-info div:before {
-  content: '•';
-  margin-right: 0.5rem;
-  color: #667eea;
-  font-weight: bold;
-}
-
-.rating-item .label {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.875rem;
 }
 
 /* Year Selector Styles */

@@ -12,17 +12,6 @@ const api = axios.create({
 });
 
 /**
- * Fetch player rankings
- * @param {string} format - 'redraft' or 'dynasty'
- * @param {string|null} position - Position filter or null for all
- */
-export const getRankings = (format = 'redraft', position = null) => {
-  return api.get('/rankings', {
-    params: { format, position },
-  });
-};
-
-/**
  * Fetch player details
  * @param {string} playerName - Player name
  * @param {number|null} season - Season year or null for career average

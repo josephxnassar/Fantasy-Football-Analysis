@@ -7,7 +7,7 @@ Last verified: 2026-02-19
 [![Axios](https://img.shields.io/badge/Axios-HTTP-5A29E4)](src/api.js)
 [![Recharts](https://img.shields.io/badge/Recharts-Charts-22C55E)](src/components/Charts.jsx)
 
-React + Vite client for browsing rankings, schedules, depth charts, charts, and player details from the backend API.
+React + Vite client for browsing player statistics, schedules, depth charts, charts, and player details from the backend API.
 
 ## Table of Contents
 
@@ -49,7 +49,6 @@ Top-level tabs in [`src/App.jsx`](src/App.jsx):
 - `Depth Charts`
 
 Statistics sub-tabs in [`src/components/Statistics.jsx`](src/components/Statistics.jsx):
-- Rankings
 - Charts
 - Player Search
 

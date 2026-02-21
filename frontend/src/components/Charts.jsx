@@ -102,7 +102,6 @@ export default function Charts() {
     loadingDetails,
     availableSeasons: playerSeasons,
     currentSeason: playerSeason,
-    playerRankingData,
     handlePlayerClick,
     handleSeasonChange: handlePlayerSeasonChange,
     closeDetails,
@@ -258,7 +257,6 @@ export default function Charts() {
           availableSeasons={playerSeasons}
           currentSeason={playerSeason}
           onSeasonChange={handlePlayerSeasonChange}
-          rankingData={playerRankingData}
         />
       )}
     </div>

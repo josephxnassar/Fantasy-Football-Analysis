@@ -8,10 +8,6 @@ from fastapi import HTTPException
 from backend.util import constants
 
 
-def get_ranked_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Return ranking-eligible cached players, optionally filtered by position."""
-    return [player for player in get_all_players(stats_cache, position_filter) if player.get("is_eligible", True)]
-
 def get_all_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """Return all cached players, optionally filtered by position."""
     players = cast(List[Dict[str, Any]], stats_cache.get(constants.STATS["ALL_PLAYERS"], []))
@@ -39,30 +35,7 @@ def get_player_profile(stats_cache: Dict[str, Any], player_name: str, season: Op
                 position = pos
             break
 
-    if stats_dict and player_meta:
-        redraft = player_meta.get("redraft_rating")
-        dynasty = player_meta.get("dynasty_rating")
-        if redraft is not None:
-            stats_dict["redraft_rating"] = redraft
-        if dynasty is not None:
-            stats_dict["dynasty_rating"] = dynasty
-
     return stats_dict, position, available_seasons, player_meta
-
-def group_rankings_by_position(players: List[Dict[str, Any]], format_name: str = "redraft") -> Dict[str, List[Dict[str, Any]]]:
-    """Group players by position and sort each position by selected rating."""
-    sort_key = "dynasty_rating" if format_name == "dynasty" else "redraft_rating"
-    grouped: Dict[str, List[Dict[str, Any]]] = {}
-
-    for player in players:
-        position = player.get("position")
-        if not position:
-            continue
-        grouped.setdefault(position, []).append({k: v for k, v in player.items() if k != "position"})
-
-    for pos_players in grouped.values():
-        pos_players.sort(key=lambda row: row.get(sort_key, 0), reverse=True)
-    return grouped
 
 def find_player_team(player_name: str, depth_charts: Dict[str, Any]) -> Optional[str]:
     """Find a player's current team from depth chart values."""

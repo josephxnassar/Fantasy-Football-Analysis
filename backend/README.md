@@ -41,7 +41,7 @@ FastAPI lifecycle integration:
 | Module | Purpose | Entry File |
 |---|---|---|
 | API | FastAPI app, routers, response models | [`api/api.py`](api/api.py) |
-| Statistics | Ratings/ranks and stat cache generation | [`statistics/statistics.py`](statistics/statistics.py) |
+| Statistics | Player/stat cache generation | [`statistics/statistics.py`](statistics/statistics.py) |
 | Schedules | Team schedule normalization + BYE insertion | [`schedules/schedules.py`](schedules/schedules.py) |
 | Depth charts | ESPN scraper or seasonal nflreadpy depth charts | [`depth_chart/espn.py`](depth_chart/espn.py), [`depth_chart/nrp.py`](depth_chart/nrp.py) |
 | Database | SQLite persistence for all cache families | [`database/service/sqlite_service.py`](database/service/sqlite_service.py) |

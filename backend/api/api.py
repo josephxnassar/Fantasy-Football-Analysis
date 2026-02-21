@@ -30,7 +30,7 @@ async def lifespan(app_instance: FastAPI):
         fantasy_app.db.close()
 
 api = FastAPI(title="Fantasy Football API",
-              description="API for dynasty and redraft player rankings",
+              description="API for player statistics, schedules, depth charts, and charts",
               version="0.1.0",
               lifespan=lifespan)
 

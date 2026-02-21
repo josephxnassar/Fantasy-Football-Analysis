@@ -3,9 +3,8 @@
 Last verified: 2026-02-15
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
-[![Ridge Regression](https://img.shields.io/badge/Model-Ridge-0EA5E9)](ratings/regression/regression.py)
 
-Generates rating/rank metadata and season/week stat caches consumed by API routes.
+Generates season/week stat caches and player metadata consumed by API routes.
 
 ## Table of Contents
 
@@ -51,17 +50,14 @@ Configured seasons:
 - `by_year` (season -> position -> DataFrame)
 - `player_weekly_stats` (player -> week records with snap share)
 
-5. Train per-position Ridge models to produce base ratings.
-
-6. Derive rating variants:
-- `redraft_rating` via position multipliers
-- `dynasty_rating` via age multipliers
-
-7. Compute rank metadata:
-- `overall_rank_redraft`
-- `overall_rank_dynasty`
-- `pos_rank_redraft`
-- `pos_rank_dynasty`
+5. Build searchable player metadata from roster fields:
+- `name`
+- `position`
+- `team`
+- `age`
+- `headshot_url`
+- `is_rookie`
+- `is_eligible`
 
 ## Output Cache Shape
 
@@ -70,15 +66,9 @@ Public keys used by API routes:
 - `by_year`
 - `player_weekly_stats`
 
-Canonical rating fields:
-- `redraft_rating`
-- `dynasty_rating`
-
 ## Related Files
 
 - Helpers: [`util/stats_helpers.py`](util/stats_helpers.py)
-- Model interface: [`ratings/base_ratings.py`](ratings/base_ratings.py)
-- Ridge model: [`ratings/regression/regression.py`](ratings/regression/regression.py)
 - Constants/config: [`../util/constants.py`](../util/constants.py)
 
 ## Rebuild Command
