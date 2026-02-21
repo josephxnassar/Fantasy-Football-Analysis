@@ -43,6 +43,8 @@ const STAT_DEFINITIONS = {
   'Rec 1st': 'First downs via receiving',
   'Rec EPA': 'Expected Points Added via receiving',
   'Rec 2PT': 'Two-point conversion receptions',
+  'Tgt Share': 'Target share - proportion of team pass attempts targeted at player',
+  'Air Yds Share': 'Air yards share - proportion of team air yards earned by player',
   
   'Tgt %': 'Target share - percentage of team pass attempts targeted at player',
   'Air Yds %': 'Air yards share - percentage of team total air yards',
@@ -73,34 +75,41 @@ export const POSITION_STAT_GROUPS = {
   'Overall': {
     'Core': ['Non-PPR Pts', 'PPR Pts'],
     'Usage': ['Snap Share'],
-    'Passing': ['Pass Yds', 'Pass TD', 'INT'],
-    'Rushing': ['Rush Yds', 'Rush TD', 'Carries', 'Yds/Rush'],
-    'Receiving': ['Rec', 'Rec Yds', 'Rec TD', 'Tgt', 'Yds/Rec'],
+    'Passing': ['Att', 'Comp', 'Pass Yds', 'Pass TD', 'INT', 'Pass EPA', 'PACR'],
+    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
+    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
+    'Special Teams': ['ST TD']
   },
   'QB': {
     'Core': ['Non-PPR Pts', 'PPR Pts'],
     'Usage': ['Snap Share'],
-    'Passing': ['Att', 'Comp', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Fum', 'Pass EPA'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum Lost', 'Rush EPA'],
+    'Passing': ['Att', 'Comp', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Air Yds', 'YAC', 'Pass 1st', 'Pass 2PT', 'Pass EPA', 'PACR'],
+    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush 1st', 'Rush 2PT', 'Rush EPA'],
+    'Ball Security': ['Sack Fum', 'Sack Fum Lost', 'Rush Fum', 'Rush Fum Lost']
   },
   'RB': {
     'Core': ['Non-PPR Pts', 'PPR Pts'],
     'Usage': ['Snap Share'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum Lost', 'Rush EPA'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec YAC', 'Rec Fum Lost', 'Rec EPA'],
+    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush 1st', 'Rush 2PT', 'Rush EPA'],
+    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
+    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost'],
+    'Special Teams': ['ST TD']
   },
   'WR': {
     'Core': ['Non-PPR Pts', 'PPR Pts'],
     'Usage': ['Snap Share'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec YAC', 'Rec Fum Lost', 'Rec EPA'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum Lost', 'Rush EPA'],
+    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
+    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
+    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost'],
+    'Special Teams': ['ST TD']
   },
   'TE': {
     'Core': ['Non-PPR Pts', 'PPR Pts'],
     'Usage': ['Snap Share'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec YAC', 'Rec Fum Lost', 'Rec EPA'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush Fum Lost', 'Rush EPA'],
-  },
+    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
+    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
+    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost']
+  }
 };
 
 const MISSING_STAT_DEFAULTS = {

@@ -113,7 +113,8 @@ class Statistics(base_source.BaseSource):
             player_positions = df.drop_duplicates("player_display_name").set_index("player_display_name")["position"].to_dict()
             
             seasonal_df = stats_helpers.add_derived_stats(df.groupby(["season", "position", "player_display_name", "player_id"], as_index=False)[numeric_cols].sum().rename(columns=constants.COLUMN_NAME_MAP))
-            seasonal_data_df = {season: {position: stats_helpers.build_position_df(position_group) for position, position_group in season_group.groupby("position")} for season, season_group in seasonal_df.groupby("season")}
+            seasonal_useful_cols = stats_helpers.select_useful_cols(seasonal_df, [])
+            seasonal_data_df = {season: {position: stats_helpers.build_position_df(position_group, seasonal_useful_cols) for position, position_group in season_group.groupby("position")} for season, season_group in seasonal_df.groupby("season")}
 
             weekly_cols = non_numeric_cols + numeric_cols.tolist() + ["week", "opponent_team"]
             weekly_df = stats_helpers.add_derived_stats(weekly_source_df[weekly_cols].rename(columns=constants.COLUMN_NAME_MAP))
