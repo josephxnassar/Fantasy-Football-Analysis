@@ -31,7 +31,7 @@ class NRPDepthChart(BaseSource):
         """Keep latest snapshot rows per team for fantasy positions."""
         try:
             depth = raw.copy()
-            depth["team"] = depth["team"].replace({"LA": "LAR", "WAS": "WSH"})
+            depth["team"] = depth["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
             depth = depth.loc[depth["team"].isin(constants.TEAMS) & depth["pos_abb"].isin(constants.POSITIONS)]
             depth = depth.dropna(subset=["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"])
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)

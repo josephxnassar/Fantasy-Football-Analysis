@@ -29,6 +29,16 @@ TEAMS = ["ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
          "LV" , "LAC", "LAR", "MIA", "MIN", "NE" , "NO" , "NYG", 
          "NYJ", "PHI", "PIT", "SF" , "SEA", "TB" , "TEN", "WSH"]
 
+# Normalize historical/alternate abbreviations to canonical team codes.
+TEAM_ABBR_NORMALIZATION = {
+    "LA": "LAR",
+    "STL": "LAR",
+    "WAS": "WSH",
+    "OAK": "LV",
+    "SD": "LAC",
+    "JAC": "JAX",
+}
+
 # NFL Division Structure
 NFL_DIVISIONS = {
     "AFC": {

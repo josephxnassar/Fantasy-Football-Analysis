@@ -38,10 +38,15 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
         raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
 
     depth_charts = caches.get(constants.CACHE["DEPTH_CHART"], {})
+    player_team = (player_meta or {}).get("team")
+    if isinstance(player_team, str):
+        player_team = constants.TEAM_ABBR_NORMALIZATION.get(player_team, player_team)
+    if player_team not in constants.TEAMS:
+        player_team = find_player_team(resolved_name, depth_charts)
 
     return PlayerResponse(name=resolved_name,
                           position=position,
-                          team=(player_meta or {}).get("team") or find_player_team(resolved_name, depth_charts),
+                          team=player_team,
                           stats=stats_dict,
                           available_seasons=available_seasons,
                           age=(player_meta or {}).get("age"),

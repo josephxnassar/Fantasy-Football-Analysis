@@ -236,7 +236,7 @@ class Statistics(base_source.BaseSource):
                     if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
                         player_headshots[name] = headshot
                     if isinstance(team := getattr(row, "team", None), str) and team:
-                        player_teams[name] = team
+                        player_teams[name] = constants.TEAM_ABBR_NORMALIZATION.get(team, team)
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True
             logger.info("Positions: %s | Ages: %s | Eligible: %s | Headshots: %s | Player-Teams: %s | Rookies: %s", len(player_positions), len(player_ages), len(eligible_players), len(player_headshots), len(player_teams), sum(1 for v in rookies.values() if v))

@@ -7,6 +7,7 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend.base_source import BaseSource
+from backend.util import constants
 from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class Schedules(BaseSource):
         """Load schedules from nflreadpy"""
         try:
             df = nfl.load_schedules(seasons=self.seasons).to_pandas()
-            reg_games = df[df['game_type'] == 'REG'][['season', 'week', 'away_team', 'home_team']].replace({"LA":"LAR", "WAS":"WSH"})
+            reg_games = (df[df['game_type'] == 'REG'][['season', 'week', 'away_team', 'home_team']].replace(constants.TEAM_ABBR_NORMALIZATION))
             self.weeks_by_season = reg_games.groupby('season')['week'].nunique().to_dict()
             return reg_games
         except Exception as e:
