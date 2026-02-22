@@ -5,6 +5,7 @@ import './DepthChartTable.css';
 function DepthChartTable({ entries, variant = 'full', highlightName = null }) {
   const tableClass = variant === 'mini' ? 'depth-chart-mini-table' : 'depth-chart-table';
 
+  // Build consistent cell class list for state styling (starter/empty/highlight).
   const cellClass = (name, extra = '') => {
     const classes = ['player-cell'];
     if (extra) classes.push(extra);

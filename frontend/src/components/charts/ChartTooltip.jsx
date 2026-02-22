@@ -1,4 +1,5 @@
 export default function ChartTooltip({ active, payload }) {
+  // Tooltip renders only for active hover events with payload data.
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
 
@@ -11,6 +12,7 @@ export default function ChartTooltip({ active, payload }) {
             alt=""
             className="chart-tooltip-headshot"
             onError={(e) => {
+              // Image fallback keeps tooltip stable when headshot URLs fail.
               e.target.src = '/vacant-player.svg';
             }}
           />

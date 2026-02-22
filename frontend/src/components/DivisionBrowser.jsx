@@ -5,6 +5,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
   const [expandedConference, setExpandedConference] = useState('AFC');
   const [expandedDivision, setExpandedDivision] = useState('North');
 
+  // Derived lists for current conference/division selection.
   const conferences = useMemo(() => Object.keys(divisions || {}), [divisions]);
   const currentDivisions = useMemo(
     () => divisions?.[expandedConference] || {},
@@ -14,6 +15,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
   const teams = useMemo(() => currentDivisions[expandedDivision] || [], [currentDivisions, expandedDivision]);
 
   useEffect(() => {
+    // If payload changes, keep conference selection valid.
     if (conferences.length === 0) {
       return;
     }
@@ -23,6 +25,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
   }, [conferences, expandedConference]);
 
   useEffect(() => {
+    // If conference changes, keep division selection valid.
     if (divisionNames.length === 0) {
       return;
     }
@@ -33,6 +36,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
 
   const handleConferenceSelect = useCallback(
     (conf) => {
+      // Switching conference resets to first valid division in that conference.
       setExpandedConference(conf);
       const nextDivisions = divisions?.[conf] || {};
       const nextDivisionNames = Object.keys(nextDivisions);

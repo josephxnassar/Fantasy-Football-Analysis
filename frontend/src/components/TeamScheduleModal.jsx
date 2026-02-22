@@ -9,6 +9,7 @@ export default function TeamScheduleModal({ team, onClose }) {
   const [selectedSeason, setSelectedSeason] = useState(null);
 
   useEffect(() => {
+    // Fetch schedule whenever team or selected season changes.
     const fetchSchedule = async () => {
       if (!team) return;
 
@@ -34,6 +35,7 @@ export default function TeamScheduleModal({ team, onClose }) {
 
   if (!team) return null;
 
+  // Close only on true overlay click (not modal content click).
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();

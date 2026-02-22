@@ -9,6 +9,7 @@ const DepthCharts = lazy(() => import('./components/DepthCharts'));
 function App() {
   const [activeTab, setActiveTab] = useState('statistics');
 
+  // Resolve the currently selected top-level tab to its view component.
   const renderTab = () => {
     switch (activeTab) {
       case 'statistics': return <Statistics />;

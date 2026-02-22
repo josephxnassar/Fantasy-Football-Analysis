@@ -2,6 +2,7 @@ import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../uti
 import { getStatColorClass } from '../../utils/statColorHelpers';
 
 export default function AggregateStatsGrid({ groupedStats }) {
+  // Render each category as a horizontal stat-card row.
   return Object.entries(groupedStats).map(([category, stats]) => {
     const entries = Object.entries(stats);
     if (!entries.length) return null;

@@ -2,6 +2,7 @@ import { groupStatsByCategoryMap } from '../../utils/statDefinitions';
 import { EFFICIENCY_CATEGORY_MAP } from './statTabConfigs';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
+// Applies the efficiency category map to either seasonal or weekly records.
 function groupEfficiencyStats(record) {
   return groupStatsByCategoryMap(record, EFFICIENCY_CATEGORY_MAP, { hideZero: true });
 }

@@ -4,6 +4,7 @@ import './TeamSearch.css';
 function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
   const [query, setQuery] = useState('');
 
+  // Client-side team filtering by abbreviation or full team name.
   const filteredTeams = allTeams.filter((team) => {
     const searchLower = query.toLowerCase();
     const teamNameLower = (teamNames[team] || '').toLowerCase();

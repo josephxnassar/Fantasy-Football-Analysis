@@ -8,6 +8,7 @@ export default function DepthChartModal({ team, onClose }) {
 
   if (!team) return null;
 
+  // Close only on true overlay click (not modal content click).
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();

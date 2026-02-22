@@ -2,6 +2,7 @@ import { groupStatsByCategoryMap } from '../../utils/statDefinitions';
 import { OPPORTUNITY_CATEGORY_MAP } from './statTabConfigs';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
+// Opportunity tab focuses on usage/share + model opportunity outputs.
 function groupOpportunityStats(record) {
   return groupStatsByCategoryMap(record, OPPORTUNITY_CATEGORY_MAP, { hideZero: true });
 }

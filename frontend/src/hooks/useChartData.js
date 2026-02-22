@@ -9,6 +9,7 @@ export function useChartData(position, season) {
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
+    // Pull chart payload for current position + season filter.
     try {
       setLoading(true);
       const response = await getChartData(position, season);

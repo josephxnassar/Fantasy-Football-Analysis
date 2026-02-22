@@ -3,6 +3,7 @@ export default function StatsSeasonSelector({
   currentSeason,
   onSeasonChange,
 }) {
+  // Hide season controls when only one season exists.
   if (availableSeasons.length <= 1) return null;
 
   return (

@@ -1,9 +1,12 @@
 /* Category configs for advanced player stat tabs. */
 
+// Shared baseline fantasy outputs used across tabs.
 const SUMMARY_STATS = ['fp_ppr', 'fp_std', 'exp_fp'];
+// Usage/snap-share indicators that describe role.
 const USAGE_SHARE_STATS = ['target_share', 'air_yards_share', 'wopr', 'sc_offense_snaps', 'sc_offense_pct'];
 const OPP_MODEL_ATTEMPT_STATS = ['ffo_pass_att', 'ffo_rush_att', 'ffo_rec_att'];
 
+// Core efficiency metrics + external model detail blocks.
 const CORE_EFFICIENCY_STATS = ['Yds/Rush', 'Yds/Rec', 'passing_epa', 'rushing_epa', 'receiving_epa', 'passing_cpoe', 'pacr', 'racr'];
 const NEXTGEN_PASSING_STATS = [
   'ng_pass_passer_rating',
@@ -51,12 +54,14 @@ const OPP_MODEL_EXPECTED_STATS = ['ffo_total_fp_exp', 'ffo_total_yds_gained_exp'
 const OPP_MODEL_REALIZED_STATS = ['ffo_total_fp', 'ffo_total_yds_gained', 'ffo_total_td'];
 const OPP_MODEL_DELTA_STATS = ['ffo_total_fp_diff', 'ffo_total_yds_gained_diff', 'ffo_total_td_diff'];
 
+// Role and opportunity tab sections.
 export const OPPORTUNITY_CATEGORY_MAP = {
   'Share Signals': USAGE_SHARE_STATS,
   'Model Opportunity': [...OPP_MODEL_ATTEMPT_STATS, ...OPP_MODEL_EXPECTED_STATS],
   'Realized Outcome': OPP_MODEL_REALIZED_STATS,
 };
 
+// Efficiency tab sections.
 export const EFFICIENCY_CATEGORY_MAP = {
   'Core Efficiency': CORE_EFFICIENCY_STATS,
   'Next Gen Passing': NEXTGEN_PASSING_STATS,
@@ -65,6 +70,7 @@ export const EFFICIENCY_CATEGORY_MAP = {
   'PFR Detail': PFR_DETAIL_STATS,
 };
 
+// Interpretation tab sections.
 export const INTERPRETATION_CATEGORY_MAP = {
   Composite: ['volume_score', ...SUMMARY_STATS],
   Percentiles: PERCENTILE_STATS,

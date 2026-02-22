@@ -78,24 +78,29 @@ const LOWER_IS_BETTER_TOKENS = [
 ];
 
 function toKey(statName) {
+  // Normalize stat key for consistent lookup logic.
   return String(statName || '').trim().toLowerCase();
 }
 
 function compactKey(statName) {
+  // Removes punctuation for fallback threshold matches.
   return toKey(statName).replace(/[^a-z0-9]/g, '');
 }
 
 function isLowerBetter(statName) {
+  // Detect turnover/error-style stats where lower values are better.
   const key = toKey(statName);
   return LOWER_IS_BETTER_TOKENS.some((token) => key.includes(token));
 }
 
 function isPercentMetric(statName) {
+  // Percent/rate stats use percent-specific color thresholds.
   const key = toKey(statName);
   return key.endsWith('_pct') || key.includes('percentile');
 }
 
 function normalizePercentageValue(statName, value) {
+  // Convert ratio-form percentages (0-1) into 0-100 for threshold comparisons.
   if (!Number.isFinite(value)) return value;
   const key = toKey(statName);
   const isRatioPercent = key.endsWith('_pct') || key.includes('percent') || key.includes('share');
@@ -106,6 +111,7 @@ function normalizePercentageValue(statName, value) {
 }
 
 function getThreshold(statName) {
+  // Tries exact key first, then compact key fallback.
   const key = toKey(statName);
   const compact = compactKey(statName);
   return STAT_THRESHOLDS[key] ?? STAT_THRESHOLDS[compact];

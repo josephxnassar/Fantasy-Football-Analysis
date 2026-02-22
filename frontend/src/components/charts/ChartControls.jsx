@@ -14,6 +14,7 @@ export default function ChartControls({
   topN,
   setTopN,
 }) {
+  // Fully controlled filter row; parent owns all chart state.
   return (
     <div className="charts-controls">
       <div className="control-group">

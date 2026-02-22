@@ -19,6 +19,7 @@ export function useTeamDepthChart(team) {
     }
 
     const fetchDepthChart = async () => {
+      // Fetch depth chart data for the selected team and keep hook state in sync.
       try {
         if (!cancelled) {
           setDepthChartLoading(true);

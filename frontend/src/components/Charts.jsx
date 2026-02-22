@@ -15,12 +15,16 @@ import PlayerDetailsModal from './PlayerDetailsModal';
 import './Charts.css';
 
 export default function Charts() {
+  // UI controls for the chart query.
   const [position, setPosition] = useState('Overall');
   const [season, setSeason] = useState(null);
   const [stat, setStat] = useState(DEFAULT_STAT.Overall);
   const [topN, setTopN] = useState(20);
+
+  // Server payload for selected position + season.
   const { chartData, loading, error } = useChartData(position, season);
 
+  // Shared player-modal state/handlers reused from search/chart clicks.
   const {
     playerDetails,
     loadingDetails,
@@ -31,14 +35,17 @@ export default function Charts() {
     closeDetails,
   } = usePlayerDetails();
 
+  // Flatten API rows into sorted chart bars for the selected stat.
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
 
+  // Build grouped stat picker options from available columns + position config.
   const statOptions = useMemo(
     () => getStatOptions(position, chartData?.stat_columns || [], POSITION_STAT_GROUPS),
     [position, chartData?.stat_columns]
   );
 
   useEffect(() => {
+    // Keep selected stat valid when position/season payload changes.
     const filteredStats = statOptions.flatMap(({ stats }) => stats);
     if (!filteredStats.length) return;
     if (!filteredStats.includes(stat)) {
@@ -72,6 +79,7 @@ export default function Charts() {
         <p className="charts-no-data">No data available for the selected stat.</p>
       ) : (
         <div className="chart-wrapper">
+          {/* Height scales with row count so labels remain readable. */}
           <ResponsiveContainer width="100%" height={chartHeight}>
             <BarChart
               data={barData}
@@ -91,6 +99,7 @@ export default function Charts() {
                 tick={{ fontSize: 12, cursor: 'pointer' }}
                 stroke="var(--color-text-muted)"
                 onClick={(e) => {
+                  // Clicking a player label opens the player modal.
                   if (e?.value) handlePlayerClick(e.value);
                 }}
               />

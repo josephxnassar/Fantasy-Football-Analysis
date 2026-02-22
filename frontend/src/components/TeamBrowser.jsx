@@ -13,8 +13,13 @@ const TABS = [
 ];
 
 function TeamBrowser({ actionLabel, renderModal }) {
+  // Sub-tab for browse vs search modes.
   const [activeSubTab, setActiveSubTab] = useState('browse');
+
+  // Selected team controls modal visibility.
   const [selectedTeam, setSelectedTeam] = useState(null);
+
+  // Shared teams/divisions payload used by both sub-tabs.
   const { divisions, teamNames, allTeams, loading, error } = useDivisions();
 
   const handleTeamSelect = useCallback((team) => {

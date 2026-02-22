@@ -23,6 +23,7 @@ export default function PlayerSearch() {
     closeDetails 
   } = usePlayerDetails();
 
+  // Execute player search and update result/error state for the modal list.
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim() || searchQuery.length < 2) {

@@ -3,16 +3,19 @@
 import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
 
 function hasDisplayValue(value) {
+  // Shared null/NaN guard used across grouping helpers.
   return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
 }
 
 function isVisibleStatValue(value, options = {}) {
+  // Optional hideZero flag removes placeholder zeros from UI cards.
   if (!hasDisplayValue(value)) return false;
   if (options.hideZero && typeof value === 'number' && value === 0) return false;
   return true;
 }
 
 export function normalizeStatsRecord(stats) {
+  // Keep only known, displayable stat keys from the backend payload.
   const normalized = {};
   if (!stats || typeof stats !== 'object') return normalized;
 
@@ -27,6 +30,7 @@ export function normalizeStatsRecord(stats) {
 }
 
 export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
+  // Generic grouping helper driven by explicit category -> stat key lists.
   const grouped = {};
   if (!stats || typeof stats !== 'object') return grouped;
   const normalized = normalizeStatsRecord(stats);
@@ -48,6 +52,7 @@ export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
 }
 
 export function groupStatsByPosition(stats, position) {
+  // Fantasy tab grouping path: use position-specific default categories.
   const grouped = {};
   const positionGroups = POSITION_STAT_GROUPS[position] || POSITION_STAT_GROUPS.Overall;
   const normalized = normalizeStatsRecord(stats);

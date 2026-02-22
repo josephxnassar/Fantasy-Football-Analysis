@@ -1,6 +1,7 @@
 import { groupStatsByPosition } from '../../utils/statDefinitions';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
+// Fantasy tab uses position-aware grouping (QB vs RB/WR/TE categories).
 function groupFantasyStats(record, position) {
   return groupStatsByPosition(record, position);
 }

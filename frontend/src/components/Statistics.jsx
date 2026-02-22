@@ -13,6 +13,7 @@ const TABS = [
 function Statistics() {
   const [activeSubTab, setActiveSubTab] = useState('charts');
 
+  // Render the active statistics sub-tab content.
   const renderContent = () => {
     switch (activeSubTab) {
       case 'search': return <PlayerSearch />;

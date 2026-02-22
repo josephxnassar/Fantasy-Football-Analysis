@@ -2,6 +2,7 @@ import { groupStatsByCategoryMap } from '../../utils/statDefinitions';
 import { INTERPRETATION_CATEGORY_MAP } from './statTabConfigs';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
+// Interpreted metrics are grouped into composite/percentile/expectation buckets.
 function groupInterpretationStats(record) {
   return groupStatsByCategoryMap(record, INTERPRETATION_CATEGORY_MAP, { hideZero: true });
 }

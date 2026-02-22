@@ -6,10 +6,12 @@ import { groupStatsByCategoryMap, groupStatsByPosition, normalizeStatsRecord } f
 export { groupStatsByCategoryMap, groupStatsByPosition, normalizeStatsRecord, POSITION_STAT_GROUPS };
 
 function hasDisplayValue(value) {
+  // Central display guard used by formatters and grouping utilities.
   return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
 }
 
 export function getStatLabel(statName) {
+  // Uses canonical metadata first; falls back to raw key if unknown.
   const key = typeof statName === 'string' ? statName.trim() : statName;
   return STAT_META[key]?.label || statName;
 }
@@ -23,6 +25,7 @@ export function formatStatForDisplay(statName, value) {
   if (!hasDisplayValue(value)) return value;
   if (typeof value !== 'number') return value;
 
+  // Format type is driven by metadata so tabs stay consistent.
   const key = typeof statName === 'string' ? statName.trim() : statName;
   const format = STAT_META[key]?.format;
   if (format === 'int') return Math.round(value);

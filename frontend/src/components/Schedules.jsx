@@ -5,6 +5,7 @@ function Schedules() {
   return (
     <TeamBrowser
       actionLabel="View Schedule →"
+      // TeamBrowser owns selection; this injects the team-specific modal.
       renderModal={(team, onClose) => (
         <TeamScheduleModal team={team} onClose={onClose} />
       )}

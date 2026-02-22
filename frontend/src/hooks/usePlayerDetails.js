@@ -4,11 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPlayer } from '../api';
 
 export function usePlayerDetails() {
+  // Full player payload used by PlayerDetailsModal.
   const [playerDetails, setPlayerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+
+  // Season selector state for the active player.
   const [playerAvailableSeasons, setPlayerAvailableSeasons] = useState([]);
   const [currentSeason, setCurrentSeason] = useState(null);
   const [currentPlayerName, setCurrentPlayerName] = useState(null);
+
+  // Request tokens prevent stale async responses from overwriting fresh state.
   const playerRequestIdRef = useRef(0);
   const seasonRequestIdRef = useRef(0);
   const mountedRef = useRef(true);
@@ -23,6 +28,7 @@ export function usePlayerDetails() {
   }, []);
 
   const handlePlayerClick = useCallback(async (playerName) => {
+    // New player request invalidates pending season-specific requests.
     const requestId = ++playerRequestIdRef.current;
     seasonRequestIdRef.current += 1;
 
@@ -38,7 +44,7 @@ export function usePlayerDetails() {
       const seasons = response.data.available_seasons || [];
       setPlayerAvailableSeasons(seasons);
       
-      // Default to most recent season (first in list, which is sorted descending)
+      // API season list is sorted descending; first entry is most recent.
       const mostRecentSeason = seasons.length > 0 ? seasons[0] : null;
       setCurrentSeason(mostRecentSeason);
     } catch (err) {
@@ -52,6 +58,8 @@ export function usePlayerDetails() {
 
   const handleSeasonChange = useCallback(async (season) => {
     if (!currentPlayerName) return;
+
+    // Track season request separately so rapid season clicks stay safe.
     const requestId = ++seasonRequestIdRef.current;
     
     try {
@@ -71,6 +79,7 @@ export function usePlayerDetails() {
   }, [currentPlayerName]);
 
   const closeDetails = useCallback(() => {
+    // Bump request tokens to ignore any late async responses.
     playerRequestIdRef.current += 1;
     seasonRequestIdRef.current += 1;
     setLoadingDetails(false);

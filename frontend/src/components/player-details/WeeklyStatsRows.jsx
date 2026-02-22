@@ -2,11 +2,13 @@ import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../uti
 import { getStatColorClass } from '../../utils/statColorHelpers';
 
 function getWeekMatchupLabel(week) {
+  // Supports both current and legacy opponent field names.
   const opponent = week?.opponent_team ?? week?.team_opponent;
   return opponent ? `vs ${opponent}` : null;
 }
 
 function renderWeeklyCategories(groupedStats) {
+  // Drop empty categories so each week only shows useful stat groups.
   const categories = Object.entries(groupedStats).filter(([, stats]) => Object.keys(stats).length > 0);
   if (!categories.length) {
     return <p className="week-no-stats">No stats recorded</p>;
@@ -59,6 +61,7 @@ export default function WeeklyStatsRows({
   return (
     <div className="weekly-stats-container">
       {seasonWeeks.map((week, idx) => {
+        // Tab-specific grouper controls which weekly stats render for this tab.
         const groupedStats = groupWeeklyRecord(week, playerDetails.position);
         const matchupLabel = getWeekMatchupLabel(week);
         const weekKey = week.game_id

@@ -6,6 +6,7 @@ export default function PlayerDepthChartTab({ depthChartLoading, teamDepthChart,
       {depthChartLoading && (
         <div className="loading">Loading depth chart...</div>
       )}
+      {/* Mini table highlights the selected player inside their team depth chart. */}
       {!depthChartLoading && teamDepthChart && teamDepthChart.depth_chart.length > 0 && (
         <>
           <h3>{teamDepthChart.team_name} Depth Chart</h3>

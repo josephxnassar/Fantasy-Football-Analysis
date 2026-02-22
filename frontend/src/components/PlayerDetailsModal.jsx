@@ -16,7 +16,10 @@ export default function PlayerDetailsModal({
   onSeasonChange,
   currentSeason
 }) {
-  const [modalTab, setModalTab] = useState('statistics'); // 'statistics' or 'depth-chart'
+  // Local modal tab state: stats view or team depth-chart view.
+  const [modalTab, setModalTab] = useState('statistics');
+
+  // Depth chart follows the player's current team from player payload.
   const { teamDepthChart, depthChartLoading } = useTeamDepthChart(playerDetails?.team);
 
   if (!playerDetails && !loading) return null;
@@ -32,6 +35,7 @@ export default function PlayerDetailsModal({
           <>
             <PlayerHeader playerDetails={playerDetails} />
             <div className="player-details">
+              {/* Top-level content tabs inside the player modal. */}
               <SubTabNav
                 tabs={[
                   { id: 'statistics', label: 'Statistics' },
