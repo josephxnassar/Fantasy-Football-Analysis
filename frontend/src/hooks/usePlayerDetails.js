@@ -9,8 +9,6 @@ export function usePlayerDetails() {
   const [playerAvailableSeasons, setPlayerAvailableSeasons] = useState([]);
   const [currentSeason, setCurrentSeason] = useState(null);
   const [currentPlayerName, setCurrentPlayerName] = useState(null);
-  const [baseRating, setBaseRating] = useState(null);
-  const [playerRankingData, setPlayerRankingData] = useState(null);
   const playerRequestIdRef = useRef(0);
   const seasonRequestIdRef = useRef(0);
   const mountedRef = useRef(true);
@@ -24,7 +22,7 @@ export function usePlayerDetails() {
     };
   }, []);
 
-  const handlePlayerClick = useCallback(async (playerName, rankingData = null) => {
+  const handlePlayerClick = useCallback(async (playerName) => {
     const requestId = ++playerRequestIdRef.current;
     seasonRequestIdRef.current += 1;
 
@@ -35,16 +33,8 @@ export function usePlayerDetails() {
       const response = await getPlayer(playerName);
       if (!mountedRef.current || requestId !== playerRequestIdRef.current) return;
 
-      const resolvedRankingData = rankingData || response.data?.ranking_data || null;
-      setPlayerRankingData(resolvedRankingData);
       setPlayerDetails(response.data);
-      
-      setBaseRating(
-        resolvedRankingData?.redraft_rating ||
-        response.data.stats?.redraft_rating ||
-        null
-      );
-      
+
       const seasons = response.data.available_seasons || [];
       setPlayerAvailableSeasons(seasons);
       
@@ -70,19 +60,7 @@ export function usePlayerDetails() {
       
       const response = await getPlayer(currentPlayerName, season);
       if (!mountedRef.current || requestId !== seasonRequestIdRef.current) return;
-      
-      // Keep the base rating from the initial load
-      const nextDetails = baseRating !== null
-        ? {
-            ...response.data,
-            stats: {
-              ...response.data.stats,
-              redraft_rating: baseRating,
-            },
-          }
-        : response.data;
-
-      setPlayerDetails(nextDetails);
+      setPlayerDetails(response.data);
     } catch (err) {
       console.error(`Failed to load season data: ${err.message}`);
     } finally {
@@ -90,7 +68,7 @@ export function usePlayerDetails() {
         setLoadingDetails(false);
       }
     }
-  }, [baseRating, currentPlayerName]);
+  }, [currentPlayerName]);
 
   const closeDetails = useCallback(() => {
     playerRequestIdRef.current += 1;
@@ -99,9 +77,7 @@ export function usePlayerDetails() {
     setPlayerDetails(null);
     setCurrentPlayerName(null);
     setCurrentSeason(null);
-    setBaseRating(null);
     setPlayerAvailableSeasons([]);
-    setPlayerRankingData(null);
   }, []);
 
   return {
@@ -109,7 +85,6 @@ export function usePlayerDetails() {
     loadingDetails,
     availableSeasons: playerAvailableSeasons,
     currentSeason,
-    playerRankingData,
     handlePlayerClick,
     handleSeasonChange,
     closeDetails

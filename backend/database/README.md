@@ -1,6 +1,6 @@
 # Database Layer
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![SQLite](https://img.shields.io/badge/SQLite-persistence-003B57?logo=sqlite&logoColor=white)](service/sqlite_service.py)
 
@@ -31,6 +31,8 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 | `Statistics` | `all_players`, per-season/per-position tables, weekly stats |
 | `Schedules` | One table per `season + team` |
 | `ESPNDepthChart` | One table per team |
+
+Statistics weekly rows are flattened with an internal key column (`__player_key`) so cache grouping is stable on reload.
 
 ## Load Rules
 

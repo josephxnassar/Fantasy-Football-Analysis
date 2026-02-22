@@ -44,7 +44,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 14px;
-  background: white;
+  background: var(--color-bg-white);
   cursor: pointer;
   min-width: 140px;
   transition: border-color var(--transition-fast);
@@ -57,7 +57,7 @@
 .charts-controls select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+  box-shadow: var(--shadow-focus-primary);
 }
 
 /* ── Chart area ── */
@@ -84,7 +84,7 @@
 
 /* ── Recharts tooltip ── */
 .chart-tooltip {
-  background: white;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--spacing-sm) var(--spacing-md);

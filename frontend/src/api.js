@@ -1,6 +1,5 @@
-/**
- * API client for Fantasy Football backend
- */
+/* API client for Fantasy Football backend */
+
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -11,17 +10,6 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-/**
- * Fetch player rankings
- * @param {string} format - 'redraft' or 'dynasty'
- * @param {string|null} position - Position filter or null for all
- */
-export const getRankings = (format = 'redraft', position = null) => {
-  return api.get('/rankings', {
-    params: { format, position },
-  });
-};
 
 /**
  * Fetch player details

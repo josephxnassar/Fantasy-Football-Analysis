@@ -22,10 +22,6 @@ class ESPNDepthChart(BaseSource):
     def __init__(self) -> None:
         super().__init__([constants.CURRENT_SEASON])
 
-    def _load(self) -> pd.DataFrame:
-        """Not used for depth charts"""
-        pass
-
     def _get_soup(self, team: str) -> BeautifulSoup:
         """Fetch and parse ESPN depth chart page"""
         try:

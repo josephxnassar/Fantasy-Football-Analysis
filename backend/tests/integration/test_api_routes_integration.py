@@ -6,24 +6,17 @@ from backend.util import constants
 
 pytestmark = pytest.mark.integration
 
-def test_rankings_endpoint_filters_ineligible_players(client_factory, app_caches) -> None:
+def test_search_endpoint_omits_legacy_rating_fields(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
-        response = client.get("/api/rankings", params={"format": "redraft"})
+        response = client.get("/api/search", params={"q": "maho"})
 
     assert response.status_code == 200
     payload = response.json()
-    returned_names = {player["name"] for position_players in payload["rankings"].values() for player in position_players}
-    assert "Retired Veteran" not in returned_names
-    assert payload["model"] == "ridge"
+    assert payload["count"] >= 1
+    assert payload["results"][0]["name"] == "Patrick Mahomes"
+    assert "redraft_rating" not in payload["results"][0]
 
-def test_rankings_endpoint_rejects_invalid_format(client_factory, app_caches) -> None:
-    with client_factory(app_caches) as client:
-        response = client.get("/api/rankings", params={"format": "auction"})
-
-    assert response.status_code == 400
-    assert "Invalid format" in response.json()["detail"]
-
-def test_player_endpoint_returns_profile_weekly_stats_and_ranking_data(client_factory, app_caches) -> None:
+def test_player_endpoint_returns_profile_weekly_stats_and_player_metadata(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
         response = client.get("/api/player/Patrick%20Mahomes")
 
@@ -32,9 +25,15 @@ def test_player_endpoint_returns_profile_weekly_stats_and_ranking_data(client_fa
     assert payload["name"] == "Patrick Mahomes"
     assert payload["position"] == "QB"
     assert payload["team"] == "KC"
-    assert payload["stats"]["redraft_rating"] == 401.5
+    assert payload["age"] == 30
+    assert payload["is_eligible"] is True
     assert payload["weekly_stats"][0]["week"] == 1
-    assert payload["ranking_data"]["overall_rank_redraft"] == 1
+
+def test_player_endpoint_requires_canonical_name(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/player/patrick%20mahomes%20ii")
+
+    assert response.status_code == 404
 
 def test_schedule_and_depth_chart_endpoints_return_team_data(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
@@ -68,7 +67,7 @@ def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> Non
     empty_stats_caches[constants.CACHE["STATISTICS"]] = {}
 
     with client_factory(empty_stats_caches) as client:
-        response = client.get("/api/rankings")
+        response = client.get("/api/search", params={"q": "maho"})
 
     assert response.status_code == 503
     assert "not loaded" in response.json()["detail"].lower()

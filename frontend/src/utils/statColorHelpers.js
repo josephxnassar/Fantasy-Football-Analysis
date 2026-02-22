@@ -1,75 +1,174 @@
-/* Stat color-coding helpers (similar to Sleeper) - Returns CSS class based on stat performance thresholds */
+/* Stat color-coding helpers - returns CSS class from stat thresholds. */
 
-// Define thresholds for "good" performance (green) - using display names
 const STAT_THRESHOLDS = {
-  // Passing (QB)
-  'Pass Yds': 300,
-  'Pass TD': 3,
-  'Comp': 25,
-  'Att': 35,
-  
-  // Rushing (RB/QB)
-  'Rush Yds': 100,
-  'Rush TD': 1,
-  'Carries': 20,
-  'Yds/Rush': 5,
-  
-  // Receiving (WR/TE/RB)
-  'Rec': 8,
-  'Rec Yds': 100,
-  'Rec TD': 1,
-  'Tgt': 10,
-  'Yds/Rec': 12,
-  'Rec YAC': 50,
-  
-  // Advanced stats
-  'Pass EPA': 5,
-  'Rush EPA': 2,
-  'Rec EPA': 2,
-  
-  // Fantasy Points
-  'PPR Pts': 20,
-  'Snap Share': 70,
+  fp_ppr: 20,
+  fp_std: 15,
+  exp_fp: 15,
+  volume_score: 65,
+
+  pass_att: 35,
+  attempts: 35,
+  completions: 24,
+  pass_yds: 300,
+  passing_yards: 275,
+  pass_td: 3,
+  passing_tds: 2,
+
+  rush_att: 20,
+  carries: 18,
+  rush_yds: 100,
+  rushing_yards: 85,
+  rush_td: 1,
+  rushing_tds: 1,
+
+  rec: 8,
+  receptions: 6,
+  targets: 10,
+  rec_yds: 100,
+  receiving_yards: 85,
+  rec_td: 1,
+  receiving_tds: 1,
+
+  passing_first_downs: 15,
+  rushing_first_downs: 5,
+  receiving_first_downs: 5,
+  sc_offense_snaps: 35,
+  sc_offense_pct: 60,
+  target_share: 20,
+  air_yards_share: 20,
+  wopr: 0.6,
+
+  ydsrec: 12,
+  ydsrush: 5,
+
+  ng_pass_passer_rating: 95,
+  ng_pass_cmp_pct: 65,
+  ng_rec_catch_pct: 70,
+  ng_rec_avg_separation: 3,
+  ng_rush_avg_rush_yds: 4.5,
+  ng_rush_rush_yds_over_exp_per_att: 0.5,
+
+  pfr_rush_ybc_att: 2.5,
+  pfr_rush_yac_att: 1.8,
+  pfr_rec_ybc_r: 5,
+  pfr_rec_yac_r: 4,
+
+  // Backward-compatible legacy labels
+  pprpts: 20,
+  nonpprpts: 15,
+  att: 35,
+  passyds: 300,
+  passtd: 3,
+  rushyds: 100,
+  rushtd: 1,
+  tgt: 10,
+  recyds: 100,
+  rectd: 1,
 };
 
-// Stats where lower is better (red for high values) - using display names
-const LOWER_IS_BETTER = new Set([
-  'INT',
-  'Sacks',
-  'Sack Fum',
-  'Rush Fum',
-  'Rush Fum Lost',
-  'Rec Fum',
-  'Rec Fum Lost'
-]);
+const LOWER_IS_BETTER_TOKENS = [
+  'interception',
+  '_int',
+  'fumble',
+  'drop',
+  'bad_throw',
+  'times_sacked',
+  'times_pressured',
+  'pressure_pct',
+];
+
+function toKey(statName) {
+  return String(statName || '').trim().toLowerCase();
+}
+
+function compactKey(statName) {
+  return toKey(statName).replace(/[^a-z0-9]/g, '');
+}
+
+function isLowerBetter(statName) {
+  const key = toKey(statName);
+  return LOWER_IS_BETTER_TOKENS.some((token) => key.includes(token));
+}
+
+function isPercentMetric(statName) {
+  const key = toKey(statName);
+  return key.endsWith('_pct') || key.includes('percentile');
+}
+
+function normalizePercentageValue(statName, value) {
+  if (!Number.isFinite(value)) return value;
+  const key = toKey(statName);
+  const isRatioPercent = key.endsWith('_pct') || key.includes('percent') || key.includes('share');
+  if (isRatioPercent && Math.abs(value) <= 1) {
+    return value * 100;
+  }
+  return value;
+}
+
+function getThreshold(statName) {
+  const key = toKey(statName);
+  const compact = compactKey(statName);
+  return STAT_THRESHOLDS[key] ?? STAT_THRESHOLDS[compact];
+}
 
 /**
- * Get color class for a stat value
- * @param {string} statName - The stat key
- * @param {number} value - The stat value
- * @returns {string} - CSS class: 'stat-good', 'stat-medium', 'stat-poor', or ''
+ * Get color class for a stat value.
+ * @param {string} statName - Stat key.
+ * @param {number} value - Stat value.
+ * @returns {string} CSS class.
  */
 export function getStatColorClass(statName, value) {
-  if (value === null || value === undefined) return '';
-  const normalizedValue = statName === 'Snap Share' && value <= 1 ? value * 100 : value;
-  
-  // Handle lower-is-better stats (turnovers, etc)
-  if (LOWER_IS_BETTER.has(statName)) {
-    if (value === 0) return 'stat-good';
-    if (value === 1) return 'stat-medium';
-    if (value >= 2) return 'stat-poor';
-    return '';
-  }
-  
-  // Handle normal stats (higher is better)
-  const threshold = STAT_THRESHOLDS[statName];
-  if (!threshold) return '';
-  
-  if (normalizedValue >= threshold) {
-    return 'stat-good';
-  } else if (normalizedValue >= threshold * 0.5) {
-    return 'stat-medium';
-  } else {
+  if (value === null || value === undefined || Number.isNaN(value)) return '';
+  const numeric = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numeric)) return '';
+
+  const normalizedValue = normalizePercentageValue(statName, numeric);
+
+  if (isLowerBetter(statName)) {
+    if (isPercentMetric(statName)) {
+      if (normalizedValue <= 10) return 'stat-good';
+      if (normalizedValue <= 20) return 'stat-medium';
+      return 'stat-poor';
+    }
+    if (normalizedValue === 0) return 'stat-good';
+    if (normalizedValue <= 1) return 'stat-medium';
     return 'stat-poor';
   }
+
+  const threshold = getThreshold(statName);
+  if (threshold !== undefined) {
+    if (normalizedValue >= threshold) return 'stat-good';
+    if (normalizedValue >= threshold * 0.5) return 'stat-medium';
+    return 'stat-poor';
+  }
+
+  if (isPercentMetric(statName)) {
+    if (normalizedValue >= 80) return 'stat-good';
+    if (normalizedValue >= 60) return 'stat-medium';
+    return 'stat-poor';
+  }
+
+  const key = toKey(statName);
+  if (key.includes('td')) {
+    if (numeric >= 2) return 'stat-good';
+    if (numeric >= 1) return 'stat-medium';
+    return 'stat-poor';
+  }
+  if (key.includes('yds') || key.includes('yards')) {
+    if (numeric >= 100) return 'stat-good';
+    if (numeric >= 50) return 'stat-medium';
+    return 'stat-poor';
+  }
+  if (key.includes('att') || key.includes('attempt')) {
+    if (numeric >= 20) return 'stat-good';
+    if (numeric >= 10) return 'stat-medium';
+    return 'stat-poor';
+  }
+
+  // Generic fallback so numeric stats are always color-scored.
+  if (normalizedValue < 0) return 'stat-poor';
+  if (normalizedValue === 0) return 'stat-poor';
+  if (Math.abs(normalizedValue) < 1) return 'stat-medium';
+  if (Math.abs(normalizedValue) < 5) return 'stat-medium';
+  return 'stat-good';
 }

@@ -1,17 +1,17 @@
 import { RookieBadge } from '../common';
 
-export default function PlayerHeader({ playerDetails, rankingData }) {
+export default function PlayerHeader({ playerDetails }) {
   return (
     <div className="player-header">
       <div className="player-info">
         <div className="player-name-row">
           <h2>{playerDetails.name}</h2>
-          <RookieBadge isRookie={rankingData?.is_rookie} size="medium" />
+          <RookieBadge isRookie={playerDetails?.is_rookie} size="medium" />
         </div>
         <div className="player-meta">
           {playerDetails.team && <span className="meta-item">{playerDetails.team}</span>}
           <span className="meta-item">{playerDetails.position}</span>
-          {rankingData?.age && <span className="meta-item">Age {rankingData.age}</span>}
+          {playerDetails?.age && <span className="meta-item">Age {playerDetails.age}</span>}
         </div>
       </div>
       <img

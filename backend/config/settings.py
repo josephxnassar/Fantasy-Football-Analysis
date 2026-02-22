@@ -24,7 +24,14 @@ CORS_ALLOW_CREDENTIALS: bool = (os.getenv("CORS_ALLOW_CREDENTIALS", "false").str
 
 # Database
 DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")
+DEPTH_CHART_SOURCE: str = os.getenv("DEPTH_CHART_SOURCE", "espn").strip().lower()
 
 # Logging
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "DEBUG").upper()
+LOG_CONSOLE_LEVEL: str = os.getenv("LOG_CONSOLE_LEVEL", "INFO").upper()
+LOG_DIR: str = os.getenv("LOG_DIR", "logs")
+LOG_ROTATION_WHEN: str = os.getenv("LOG_ROTATION_WHEN", "midnight")
+LOG_ROTATION_INTERVAL: int = int(os.getenv("LOG_ROTATION_INTERVAL", "1"))
+LOG_BACKUP_COUNT: int = int(os.getenv("LOG_BACKUP_COUNT", "14"))
+TIMING_RUN_LOGS_KEEP: int = int(os.getenv("TIMING_RUN_LOGS_KEEP", "30"))
 TIMING_ENABLED: bool = os.getenv("TIMING_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}

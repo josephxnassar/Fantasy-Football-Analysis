@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
@@ -9,10 +9,11 @@ Last verified: 2026-02-19
 [![SQLite](https://img.shields.io/badge/SQLite-Cache-003B57?logo=sqlite&logoColor=white)](backend/database/service/sqlite_service.py)
 
 Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend for:
-- Player rankings (`redraft` and `dynasty`)
 - Player profile + weekly stat breakdowns
+- Advanced stat exploration (EPA, air-yards share, WOPR, etc.)
 - Team schedules and depth charts
 - Chart-ready seasonal stat exploration
+- Stats-backed canonical player naming in search/player lists
 
 ## Table of Contents
 
@@ -192,7 +193,7 @@ git config --global commit.template "C:/path/to/.gitmessage.txt"
 |---|---|
 | Backend overview | [`backend/README.md`](backend/README.md) |
 | API routes/models/errors | [`backend/api/README.md`](backend/api/README.md) |
-| Statistics pipeline + ratings | [`backend/statistics/README.md`](backend/statistics/README.md) |
+| Statistics pipeline | [`backend/statistics/README.md`](backend/statistics/README.md) |
 | SQLite cache layer | [`backend/database/README.md`](backend/database/README.md) |
 | Frontend architecture | [`frontend/README.md`](frontend/README.md) |
 
@@ -201,7 +202,7 @@ git config --global commit.template "C:/path/to/.gitmessage.txt"
 ```text
 backend/
   api/            FastAPI app, routes, models, API helpers
-  statistics/     nflreadpy ingestion + rating/rank generation
+  statistics/     nflreadpy ingestion + stat cache generation
   schedules/      schedule normalization + bye-week filling
   depth_chart/    ESPN depth chart scraper
   database/       SQLite DAO/service cache persistence

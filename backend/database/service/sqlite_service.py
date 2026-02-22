@@ -76,7 +76,7 @@ class SQLService:
 
         weekly = cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {})
         if weekly:
-            weekly_rows = [{"player_name": player_name, **week_stats} for player_name, week_list in weekly.items() for week_stats in week_list]
+            weekly_rows = [{"__player_key": player_name, **week_stats} for player_name, week_list in weekly.items() for week_stats in week_list]
             if weekly_rows:
                 self.db.save_table(f"{prefix}_{constants.STATS['PLAYER_WEEKLY_STATS']}", pd.DataFrame(weekly_rows), index=False)
 
@@ -103,7 +103,8 @@ class SQLService:
         weekly_stats: Dict[str, List[Dict[str, Any]]] = {}
         if weekly_df is not None and not weekly_df.empty:
             for rec in [{key: (None if pd.isna(value) else value) for key, value in row.items()} for row in weekly_df.to_dict("records")]:
-                player_name = rec.pop("player_name", None)
+                # Prefer the dedicated cache key; fall back to legacy table shape.
+                player_name = rec.pop("__player_key", rec.pop("player_name", None))
                 if player_name:
                     weekly_stats.setdefault(player_name, []).append(rec)
 

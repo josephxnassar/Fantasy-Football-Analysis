@@ -4,8 +4,6 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-import pandas as pd
-
 from backend.util import constants
 
 logger = logging.getLogger(__name__)
@@ -28,11 +26,6 @@ class BaseSource(ABC):
     def set_cache(self, cache: Dict[Any, Any]) -> None:
         """Set cached data"""
         self.cache = cache
-
-    @abstractmethod
-    def _load(self) -> pd.DataFrame:
-        """Load raw data from source"""
-        pass
 
     @abstractmethod
     def run(self) -> None:

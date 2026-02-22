@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
@@ -40,6 +40,10 @@ Behavior:
 
 Routes rely on these caches and surface `503` when required caches are unavailable.
 
+Statistics route behavior:
+- `/api/player/{player_name}` matches the provided player name directly against stats cache player names.
+- JSON-safe numeric cleanup is handled in the statistics pipeline output (not in API route code).
+
 ## Endpoint Index
 
 Local base URL: `http://localhost:8000`
@@ -47,7 +51,6 @@ Local base URL: `http://localhost:8000`
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/` | API status |
-| `GET` | `/api/rankings` | Rankings by format and optional position |
 | `GET` | `/api/player/{player_name}` | Player profile + stats + weekly data |
 | `GET` | `/api/search` | Name search (optional position filter) |
 | `GET` | `/api/chart-data` | Chart payload by position/season |

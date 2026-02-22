@@ -10,14 +10,12 @@ from backend.api.util.api_statistics_helpers import (
 
 pytestmark = pytest.mark.unit
 
-def test_get_player_profile_uses_most_recent_and_attaches_ratings(stats_cache) -> None:
+def test_get_player_profile_uses_most_recent_season(stats_cache) -> None:
     stats, position, seasons, player_meta = get_player_profile(stats_cache, "Patrick Mahomes")
 
     assert position == "QB"
     assert seasons == [2025, 2024]
     assert player_meta["name"] == "Patrick Mahomes"
-    assert stats["redraft_rating"] == player_meta["redraft_rating"]
-    assert stats["dynasty_rating"] == player_meta["dynasty_rating"]
     assert stats["Pass TD"] == 32
 
 def test_resolve_chart_season_rejects_invalid_year(stats_cache) -> None:

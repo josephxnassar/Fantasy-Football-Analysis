@@ -3,14 +3,15 @@
 import logging
 from typing import Any, Dict
 
+from backend.config.settings import DEPTH_CHART_SOURCE
 from backend.database.service.sqlite_service import SQLService
 from backend.depth_chart.espn import ESPNDepthChart
+from backend.depth_chart.nrp import NRPDepthChart
 from backend.schedules.schedules import Schedules
 from backend.statistics.statistics import Statistics
 from backend.util import constants
 
 logger = logging.getLogger(__name__)
-
 
 class App:
     """Orchestrates data fetching, caching, and loading for all sources"""
@@ -28,16 +29,25 @@ class App:
         logger.info("Cache tables missing; fetching fresh data and rebuilding cache.")
         self.run()
         self.save()
+
+    def _get_depth_chart_source(self):
+        source = DEPTH_CHART_SOURCE
+        if source == "nrp":
+            return NRPDepthChart()
+        if source == "espn":
+            return ESPNDepthChart()
+        logger.warning("Unknown DEPTH_CHART_SOURCE '%s'; defaulting to 'espn'.", source)
+        return ESPNDepthChart()
     
     def run(self) -> None:
         """Fetch fresh data from all sources"""
-        instances = [ESPNDepthChart(), 
-                     Schedules(constants.SEASONS), 
-                     Statistics(constants.SEASONS)]
+        instances = [(constants.CACHE["DEPTH_CHART"], self._get_depth_chart_source()),
+                     (constants.CACHE["SCHEDULES"], Schedules(constants.SEASONS)),
+                     (constants.CACHE["STATISTICS"], Statistics(constants.SEASONS))]
 
-        for instance in instances:
+        for cache_name, instance in instances:
             instance.run()
-            self.caches[instance.__class__.__name__] = instance.get_cache()
+            self.caches[cache_name] = instance.get_cache()
     
     def save(self) -> None:
         """Save all caches to database"""
@@ -46,10 +56,6 @@ class App:
 
     def load(self) -> None:
         """Load all caches from database"""
-        instances = [ESPNDepthChart.__new__(ESPNDepthChart), 
-                     Schedules.__new__(Schedules), 
-                     Statistics.__new__(Statistics)]
-        
-        for instance in instances:
-            name = instance.__class__.__name__
-            self.caches[name] = self.db.load_from_db(instance.get_keys(), name)
+        self.caches[constants.CACHE["DEPTH_CHART"]] = self.db.load_from_db(constants.TEAMS, constants.CACHE["DEPTH_CHART"])
+        self.caches[constants.CACHE["SCHEDULES"]] = self.db.load_from_db(constants.TEAMS, constants.CACHE["SCHEDULES"])
+        self.caches[constants.CACHE["STATISTICS"]] = self.db.load_from_db(constants.POSITIONS, constants.CACHE["STATISTICS"])
