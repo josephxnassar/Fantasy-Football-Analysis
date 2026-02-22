@@ -1,5 +1,4 @@
 import { groupStatsByPosition } from '../../utils/statDefinitions';
-import { adaptPlayerDetailsForDisplay } from '../../utils/playerStatsAdapter';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
 function groupFantasyStats(record, position) {
@@ -7,12 +6,10 @@ function groupFantasyStats(record, position) {
 }
 
 export default function PlayerFantasyTab({ playerDetails, currentSeason, viewMode }) {
-  const displayDetails = adaptPlayerDetailsForDisplay(playerDetails);
-
   return (
     <PlayerStatsTabLayout
       title="Fantasy Production"
-      playerDetails={displayDetails}
+      playerDetails={playerDetails}
       currentSeason={currentSeason}
       viewMode={viewMode}
       groupSeasonRecord={groupFantasyStats}

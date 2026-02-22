@@ -55,16 +55,16 @@ describe('statDefinitions', () => {
     expect(formatStatForDisplay('fp_ppr_pct', 91.26)).toBe('91.3%');
   });
 
-  it('returns fallback definition for unknown stats', () => {
-    expect(getStatDefinition('does_not_exist')).toBe('No definition available');
+  it('returns empty definition for unknown stats', () => {
+    expect(getStatDefinition('does_not_exist')).toBe('');
   });
 
   it('returns friendly labels for canonical keys', () => {
     expect(getStatLabel('pass_yds')).toBe('Pass Yds');
-    expect(getStatLabel('targets_pct')).toBe('Tgt %ile');
+    expect(getStatLabel('targets_pct')).toBe('Target Percentile');
   });
 
   it('does not expose a removed redraft_rating display definition', () => {
-    expect(getStatDefinition('redraft_rating')).toBe('No definition available');
+    expect(getStatDefinition('redraft_rating')).toBe('');
   });
 });

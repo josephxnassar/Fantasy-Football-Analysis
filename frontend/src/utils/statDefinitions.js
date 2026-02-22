@@ -194,10 +194,6 @@ export const POSITION_STAT_GROUPS = {
   },
 };
 
-function normalizeStatKey(statName) {
-  return statName;
-}
-
 function hasDisplayValue(value) {
   return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
 }
@@ -208,54 +204,22 @@ function isVisibleStatValue(value, options = {}) {
   return true;
 }
 
-function fallbackLabel(statName) {
-  return statName
-    .replace(/_/g, ' ')
-    .split(' ')
-    .map((token) => {
-      const lower = token.toLowerCase();
-      if (lower === 'ffo' || lower === 'pfr' || lower === 'wopr') return lower.toUpperCase();
-      if (lower === 'ng') return 'NG';
-      if (lower === 'sc') return 'Snap';
-      if (lower === 'fp') return 'FP';
-      if (lower === 'td') return 'TD';
-      if (lower === 'yds') return 'Yds';
-      if (lower === 'yac') return 'YAC';
-      if (lower === 'ybc') return 'YBC';
-      if (lower === 'epa') return 'EPA';
-      if (lower === 'cpoe') return 'CPOE';
-      if (lower === 'pct') return '%';
-      if (lower === 'att') return 'Att';
-      return token.charAt(0).toUpperCase() + token.slice(1);
-    })
-    .join(' ')
-    .replace(/\s+%/g, '%');
-}
-
-function fallbackDefinition(statName) {
-  if (statName.startsWith('ffo_')) return 'Fantasy opportunity model metric.';
-  if (statName.startsWith('ng_')) return 'Next Gen Stats metric.';
-  if (statName.startsWith('pfr_')) return 'Pro Football Reference advanced metric.';
-  if (statName.startsWith('sc_')) return 'Snap count metric.';
-  return 'No definition available';
-}
-
 export function getStatLabel(statName) {
-  const canonical = normalizeStatKey(statName);
-  return STAT_META[canonical]?.label || fallbackLabel(statName);
+  const key = typeof statName === 'string' ? statName.trim() : statName;
+  return STAT_META[key]?.label || statName;
 }
 
 export function getStatDefinition(statName) {
-  const canonical = normalizeStatKey(statName);
-  return STAT_META[canonical]?.description || fallbackDefinition(statName);
+  const key = typeof statName === 'string' ? statName.trim() : statName;
+  return STAT_META[key]?.description || '';
 }
 
 export function formatStatForDisplay(statName, value) {
   if (!hasDisplayValue(value)) return value;
   if (typeof value !== 'number') return value;
 
-  const canonical = normalizeStatKey(statName);
-  const format = STAT_META[canonical]?.format;
+  const key = typeof statName === 'string' ? statName.trim() : statName;
+  const format = STAT_META[key]?.format;
   if (format === 'int') return Math.round(value);
   if (format === 'decimal1') return value.toFixed(1);
   if (format === 'decimal2') return value.toFixed(2);
@@ -269,11 +233,9 @@ export function normalizeStatsRecord(stats) {
 
   Object.entries(stats).forEach(([rawKey, value]) => {
     if (!hasDisplayValue(value)) return;
-    const canonical = normalizeStatKey(rawKey);
-    if (!Object.prototype.hasOwnProperty.call(STAT_META, canonical)) return;
-    if (!Object.prototype.hasOwnProperty.call(normalized, canonical) || rawKey === canonical) {
-      normalized[canonical] = value;
-    }
+    const key = rawKey.trim();
+    if (!Object.prototype.hasOwnProperty.call(STAT_META, key)) return;
+    normalized[key] = value;
   });
 
   return normalized;
@@ -289,11 +251,12 @@ export function normalizeStatsRecord(stats) {
 export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
   const grouped = {};
   if (!stats || typeof stats !== 'object') return grouped;
+  const normalized = normalizeStatsRecord(stats);
 
   Object.entries(categoryMap).forEach(([category, statKeys]) => {
     const orderedStats = {};
     statKeys.forEach((statKey) => {
-      const value = stats[statKey];
+      const value = normalized[statKey];
       if (isVisibleStatValue(value, options)) {
         orderedStats[statKey] = value;
       }
