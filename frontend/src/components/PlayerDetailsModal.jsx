@@ -43,16 +43,14 @@ export default function PlayerDetailsModal({
               />
 
               {modalTab === 'statistics' && (
-                <>
-                  <PlayerStatsView
-                    playerDetails={playerDetails}
-                    availableSeasons={availableSeasons}
-                    onSeasonChange={onSeasonChange}
-                    currentSeason={currentSeason}
-                    viewMode={viewMode}
-                    setViewMode={setViewMode}
-                  />
-                </>
+                <PlayerStatsView
+                  playerDetails={playerDetails}
+                  availableSeasons={availableSeasons}
+                  onSeasonChange={onSeasonChange}
+                  currentSeason={currentSeason}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                />
               )}
 
               {modalTab === 'depth-chart' && (

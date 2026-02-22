@@ -1,6 +1,5 @@
 .App {
   min-height: 100vh;
-  isolation: isolate;
 }
 
 .app-header {
@@ -29,10 +28,6 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  contain: paint;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
 }
 
 .nav-container {
@@ -71,8 +66,6 @@ main {
   background: var(--color-bg-lighter);
   min-height: calc(100vh - 200px);
   padding: 20px 0;
-  position: relative;
-  contain: paint;
 }
 
 .tab-error-fallback {

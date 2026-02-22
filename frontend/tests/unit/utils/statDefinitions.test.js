@@ -33,7 +33,6 @@ describe('statDefinitions', () => {
     const grouped = groupStatsByPosition(
       {
         fp_ppr: 312.4,
-        fp_ppr_pct: 88.3,
         pass_att: 520,
         pass_yds: 4102,
         pass_td: 31,
@@ -44,7 +43,7 @@ describe('statDefinitions', () => {
     );
 
     expect(grouped.Core.fp_ppr).toBe(312.4);
-    expect(grouped.Core.fp_ppr_pct).toBe(88.3);
+    expect(grouped.Core.fp_ppr_pct).toBeUndefined();
     expect(grouped.Passing.pass_att).toBe(520);
     expect(grouped.Passing.pass_yds).toBe(4102);
     expect(grouped.Rushing.rush_yds).toBe(121);
