@@ -6,13 +6,11 @@ function groupInterpretationStats(record) {
   return groupStatsByCategoryMap(record, INTERPRETATION_CATEGORY_MAP, { hideZero: true });
 }
 
-export default function PlayerInterpretationTab({ playerDetails, currentSeason, viewMode }) {
+export default function PlayerInterpretationTab({ statsContext }) {
   return (
     <PlayerStatsTabLayout
       title="Interpretation"
-      playerDetails={playerDetails}
-      currentSeason={currentSeason}
-      viewMode={viewMode}
+      statsContext={statsContext}
       groupSeasonRecord={groupInterpretationStats}
       groupWeeklyRecord={groupInterpretationStats}
       emptySeasonText="No interpreted data available"

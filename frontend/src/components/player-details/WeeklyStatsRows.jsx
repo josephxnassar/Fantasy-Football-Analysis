@@ -35,11 +35,11 @@ function renderWeeklyCategories(groupedStats) {
 }
 
 export default function WeeklyStatsRows({
-  playerDetails,
-  currentSeason,
+  statsContext,
   groupWeeklyRecord,
   emptyWeeklyText,
 }) {
+  const { playerDetails, currentSeason } = statsContext;
   if (!playerDetails?.position) {
     return <p className="player-details-no-data">{emptyWeeklyText}</p>;
   }

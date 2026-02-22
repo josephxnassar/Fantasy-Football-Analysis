@@ -7,14 +7,13 @@ function hasStats(groupedStats) {
 
 export default function PlayerStatsTabLayout({
   title,
-  playerDetails,
-  currentSeason,
-  viewMode,
+  statsContext,
   groupSeasonRecord,
   groupWeeklyRecord = groupSeasonRecord,
   emptySeasonText = 'No seasonal data available',
   emptyWeeklyText = 'No weekly data available',
 }) {
+  const { playerDetails, currentSeason, viewMode } = statsContext;
   const groupedSeasonStats = groupSeasonRecord(playerDetails?.stats || {}, playerDetails?.position);
 
   return (
@@ -26,8 +25,7 @@ export default function PlayerStatsTabLayout({
           : <p className="player-details-no-data">{emptySeasonText}</p>
       ) : (
         <WeeklyStatsRows
-          playerDetails={playerDetails}
-          currentSeason={currentSeason}
+          statsContext={statsContext}
           groupWeeklyRecord={groupWeeklyRecord}
           emptyWeeklyText={emptyWeeklyText}
         />

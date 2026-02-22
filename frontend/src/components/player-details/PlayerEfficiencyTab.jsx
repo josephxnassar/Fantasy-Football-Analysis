@@ -6,13 +6,11 @@ function groupEfficiencyStats(record) {
   return groupStatsByCategoryMap(record, EFFICIENCY_CATEGORY_MAP, { hideZero: true });
 }
 
-export default function PlayerEfficiencyTab({ playerDetails, currentSeason, viewMode }) {
+export default function PlayerEfficiencyTab({ statsContext }) {
   return (
     <PlayerStatsTabLayout
       title="Efficiency Profile"
-      playerDetails={playerDetails}
-      currentSeason={currentSeason}
-      viewMode={viewMode}
+      statsContext={statsContext}
       groupSeasonRecord={groupEfficiencyStats}
       groupWeeklyRecord={groupEfficiencyStats}
       emptySeasonText="No efficiency data available"

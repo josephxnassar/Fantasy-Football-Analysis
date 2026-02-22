@@ -30,26 +30,19 @@ class NRPDepthChart(BaseSource):
     def _latest_team_rows(self, raw: pd.DataFrame) -> pd.DataFrame:
         """Keep latest snapshot rows per team for fantasy positions."""
         try:
-            required_columns = {"dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"}
-            missing = required_columns.difference(raw.columns)
-            if missing:
-                raise ValueError(f"Missing required columns: {sorted(missing)}")
-
             depth = raw.copy()
             depth["team"] = depth["team"].replace({"LA": "LAR", "WAS": "WSH"})
-            depth = depth[(depth["team"].isin(constants.TEAMS)) & (depth["pos_abb"].isin(constants.POSITIONS))]
+            depth = depth.loc[depth["team"].isin(constants.TEAMS) & depth["pos_abb"].isin(constants.POSITIONS)]
             depth = depth.dropna(subset=["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"])
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
             depth["pos_rank"] = pd.to_numeric(depth["pos_rank"], errors="coerce")
             depth["pos_slot"] = pd.to_numeric(depth["pos_slot"], errors="coerce")
             depth = depth.dropna(subset=["dt", "pos_rank", "pos_slot"])
-
-            depth["team_max_dt"] = depth.groupby("team")["dt"].transform("max")
-            depth = depth[depth["dt"] == depth["team_max_dt"]].drop(columns=["team_max_dt"])
+            depth["player_name"] = depth["player_name"].astype(str).str.strip()
+            depth = depth.loc[depth["player_name"] != ""]
+            depth = depth.loc[depth["dt"].eq(depth.groupby("team")["dt"].transform("max"))]
             depth["pos_rank"] = depth["pos_rank"].astype(int)
             depth["pos_slot"] = depth["pos_slot"].astype(int)
-            depth["player_name"] = depth["player_name"].astype(str).str.strip()
-            depth = depth[depth["player_name"] != ""]
             return depth
         except Exception as e:
             logger.error(f"Failed to normalize nflreadpy depth chart rows: {e}")
@@ -63,12 +56,13 @@ class NRPDepthChart(BaseSource):
             grouped = deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)
 
             for (position, _slot), group in grouped:
-                depth_players = group["player_name"].drop_duplicates().tolist()
+                depth_players = group["player_name"].drop_duplicates().tolist()[:4]
+                depth_players += [None] * (4 - len(depth_players))
                 rows.append({"position": position,
-                             "starter": depth_players[0] if len(depth_players) > 0 else None,
-                             "2nd": depth_players[1] if len(depth_players) > 1 else None,
-                             "3rd": depth_players[2] if len(depth_players) > 2 else None,
-                             "4th": depth_players[3] if len(depth_players) > 3 else None})
+                             "starter": depth_players[0],
+                             "2nd": depth_players[1],
+                             "3rd": depth_players[2],
+                             "4th": depth_players[3]})
 
             if not rows:
                 return pd.DataFrame(columns=["starter", "2nd", "3rd", "4th"]).rename_axis("position")
@@ -81,10 +75,11 @@ class NRPDepthChart(BaseSource):
         """Build depth-chart cache keyed by team abbreviation."""
         team_depth_charts: Dict[str, pd.DataFrame] = {}
         latest_rows = self._latest_team_rows(self._load_depth_charts())
+        rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
 
         for team in constants.TEAMS:
-            team_rows = latest_rows[latest_rows["team"] == team]
-            if team_rows.empty:
+            team_rows = rows_by_team.get(team)
+            if team_rows is None or team_rows.empty:
                 logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
                 continue
             team_depth_charts[team] = self._create_depth_chart(team_rows).rename_axis(team)

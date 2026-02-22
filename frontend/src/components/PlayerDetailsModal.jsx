@@ -16,7 +16,6 @@ export default function PlayerDetailsModal({
   onSeasonChange,
   currentSeason
 }) {
-  const [viewMode, setViewMode] = useState('aggregate'); // 'aggregate' or 'weekly'
   const [modalTab, setModalTab] = useState('statistics'); // 'statistics' or 'depth-chart'
   const { teamDepthChart, depthChartLoading } = useTeamDepthChart(playerDetails?.team);
 
@@ -45,11 +44,11 @@ export default function PlayerDetailsModal({
               {modalTab === 'statistics' && (
                 <PlayerStatsView
                   playerDetails={playerDetails}
-                  availableSeasons={availableSeasons}
-                  onSeasonChange={onSeasonChange}
-                  currentSeason={currentSeason}
-                  viewMode={viewMode}
-                  setViewMode={setViewMode}
+                  seasonControls={{
+                    availableSeasons,
+                    onSeasonChange,
+                    currentSeason,
+                  }}
                 />
               )}
 

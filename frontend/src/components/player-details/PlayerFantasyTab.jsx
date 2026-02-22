@@ -5,13 +5,11 @@ function groupFantasyStats(record, position) {
   return groupStatsByPosition(record, position);
 }
 
-export default function PlayerFantasyTab({ playerDetails, currentSeason, viewMode }) {
+export default function PlayerFantasyTab({ statsContext }) {
   return (
     <PlayerStatsTabLayout
       title="Fantasy Production"
-      playerDetails={playerDetails}
-      currentSeason={currentSeason}
-      viewMode={viewMode}
+      statsContext={statsContext}
       groupSeasonRecord={groupFantasyStats}
       groupWeeklyRecord={groupFantasyStats}
       emptySeasonText="No fantasy seasonal data available"

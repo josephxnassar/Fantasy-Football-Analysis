@@ -14,11 +14,40 @@
   --color-bg-white: #fff;
   --color-bg-light: #f8f9fa;
   --color-bg-lighter: #f5f5f5;
+  --color-bg-soft: #f3f4f6;
+  --color-primary-soft: #f0f2ff;
+  --color-surface-accent: #f8fafc;
+  --color-surface-muted: #e2e8f0;
+  --color-surface-card: #ffffff;
+  --color-surface-success: #f0fdf4;
+  --color-surface-warning: #fffbea;
+  --color-surface-danger: #fef2f2;
+  --color-overlay-dark: rgba(0, 0, 0, 0.5);
   
   /* Border colors */
   --color-border: #dee2e6;
   --color-border-light: #e5e7eb;
   --color-border-input: #ddd;
+  --color-border-muted: #e0e0e0;
+  --color-border-accent-soft: #dbe3ff;
+  --color-border-accent: #cbd5e1;
+  --color-border-accent-hover: #c7d2fe;
+  --color-border-info-soft: #dbeafe;
+
+  --color-text-strong: #0f172a;
+  --color-text-slate: #334155;
+  --color-text-slate-muted: #475569;
+  --color-text-subtle: #64748b;
+
+  --color-success-soft-border: #86efac;
+  --color-success-strong: #22c55e;
+  --color-success-deep: #166534;
+  --color-warning-soft-border: #fde68a;
+  --color-warning-strong: #f59e0b;
+  --color-warning-deep: #92400e;
+  --color-danger-soft-border: #fca5a5;
+  --color-danger-strong: #ef4444;
+  --color-danger-deep: #991b1b;
   
   /* Status colors */
   --color-success: #28a745;
@@ -41,6 +70,16 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
   --shadow-primary: 0 4px 12px rgba(102, 126, 234, 0.3);
+  --shadow-primary-chip: 0 2px 4px rgba(102, 126, 234, 0.3);
+  --shadow-headshot: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-headshot-hover: 0 6px 16px rgba(0, 0, 0, 0.15);
+  --shadow-primary-sm: 0 2px 4px rgba(102, 126, 234, 0.2);
+  --shadow-primary-md: 0 2px 8px rgba(102, 126, 234, 0.4);
+  --shadow-surface-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-surface-card: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-surface-md: 0 3px 8px rgba(30, 58, 138, 0.1);
+  --shadow-surface-subtle: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-focus-primary: 0 0 0 2px rgba(102, 126, 234, 0.15);
   
   /* Border radius */
   --radius-sm: 4px;

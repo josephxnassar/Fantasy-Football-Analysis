@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { SubTabNav } from '../common';
 import PlayerEfficiencyTab from './PlayerEfficiencyTab';
 import PlayerFantasyTab from './PlayerFantasyTab';
@@ -7,34 +7,25 @@ import PlayerOpportunityTab from './PlayerOpportunityTab';
 import StatsSeasonSelector from './StatsSeasonSelector';
 import StatsViewModeToggle from './StatsViewModeToggle';
 
-const STATS_TABS = [
-  { id: 'fantasy', label: 'Fantasy' },
-  { id: 'opportunity', label: 'Role & Opportunity' },
-  { id: 'efficiency', label: 'Efficiency' },
-  { id: 'interpretation', label: 'Interpretation' },
+const STAT_TAB_CONFIG = [
+  { id: 'fantasy', label: 'Fantasy', component: PlayerFantasyTab },
+  { id: 'opportunity', label: 'Role & Opportunity', component: PlayerOpportunityTab },
+  { id: 'efficiency', label: 'Efficiency', component: PlayerEfficiencyTab },
+  { id: 'interpretation', label: 'Interpretation', component: PlayerInterpretationTab },
 ];
 
-const TAB_COMPONENTS = {
-  fantasy: PlayerFantasyTab,
-  opportunity: PlayerOpportunityTab,
-  efficiency: PlayerEfficiencyTab,
-  interpretation: PlayerInterpretationTab,
-};
+const STATS_TABS = STAT_TAB_CONFIG.map(({ id, label }) => ({ id, label }));
 
 export default function PlayerStatsView({
   playerDetails,
-  availableSeasons,
-  onSeasonChange,
-  currentSeason,
-  viewMode,
-  setViewMode,
+  seasonControls,
 }) {
+  const [viewMode, setViewMode] = useState('aggregate');
   const [statsTab, setStatsTab] = useState('fantasy');
-  const hasWeeklyData = useMemo(
-    () => Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0,
-    [playerDetails]
-  );
-  const ActiveTabComponent = TAB_COMPONENTS[statsTab] || PlayerFantasyTab;
+  const { availableSeasons, currentSeason, onSeasonChange } = seasonControls;
+  const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
+  const ActiveTabComponent = STAT_TAB_CONFIG.find((tab) => tab.id === statsTab)?.component || PlayerFantasyTab;
+  const statsContext = { playerDetails, currentSeason, viewMode };
 
   return (
     <>
@@ -59,9 +50,7 @@ export default function PlayerStatsView({
       </div>
 
       <ActiveTabComponent
-        playerDetails={playerDetails}
-        currentSeason={currentSeason}
-        viewMode={viewMode}
+        statsContext={statsContext}
       />
     </>
   );

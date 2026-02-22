@@ -1,21 +1,19 @@
 """Helper functions for statistics transformations and cache shaping."""
 
-import logging
 from typing import Dict, Iterable, List, Mapping
 
 import pandas as pd
 
 from backend.util import constants
 
-logger = logging.getLogger(__name__)
 
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
     filtered = source
-    if "season_type" in filtered.columns:
-        filtered = filtered.loc[filtered["season_type"] == "REG"]
-    elif "game_type" in filtered.columns:
-        filtered = filtered.loc[filtered["game_type"] == "REG"]
+    for season_col in ("season_type", "game_type"):
+        if season_col in filtered.columns:
+            filtered = filtered.loc[filtered[season_col] == "REG"]
+            break
     return filtered.loc[filtered["position"].isin(constants.POSITIONS)]
 
 def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.DataFrame:
@@ -36,7 +34,10 @@ def merge_prefixed(base: pd.DataFrame, source: pd.DataFrame, join_candidates: Li
 
 def add_derived_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Add derived stats (Yds/Rec, Yds/Rush) from available stat column variants."""
-    source_options = {"Yds/Rec": [("receiving_yards", "receptions"), ("Rec Yds", "Rec")], "Yds/Rush": [("rushing_yards", "carries"), ("Rush Yds", "Carries")]}
+    source_options = {
+        "Yds/Rec": [("receiving_yards", "receptions"), ("Rec Yds", "Rec")],
+        "Yds/Rush": [("rushing_yards", "carries"), ("Rush Yds", "Carries")],
+    }
     derived = {}
     for out_col, options in source_options.items():
         for num_col, den_col in options:
@@ -47,7 +48,7 @@ def add_derived_stats(df: pd.DataFrame) -> pd.DataFrame:
 
 def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
-    return df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1)
+    return (df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1))
 
 def add_interpreted_metrics(df: pd.DataFrame, include_week: bool = False) -> pd.DataFrame:
     """Add canonical metrics and position-context percentiles for interpretation."""
@@ -91,9 +92,7 @@ def build_seasonal_data(seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.Dat
             position_df = season_group.loc[season_group["position"] == position]
             if position_df.empty:
                 continue
-            position_df = (position_df.drop(columns=drop_cols, errors="ignore").drop_duplicates(subset=["player_display_name"]).set_index("player_display_name"))
-            position_df = _clean_numeric_stats(position_df)
-            season_map[position] = position_df
+            season_map[position] = _clean_numeric_stats(position_df.drop(columns=drop_cols, errors="ignore").drop_duplicates(subset=["player_display_name"]).set_index("player_display_name"))
         if season_map:
             seasonal_data[int(season)] = season_map
     return seasonal_data
@@ -102,16 +101,14 @@ def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Replace non-finite numeric values with 0 for JSON-safe chart payloads."""
     cleaned = df.copy()
     numeric_cols = cleaned.select_dtypes(include="number").columns
-    if len(numeric_cols):
-        cleaned.loc[:, numeric_cols] = cleaned.loc[:, numeric_cols].replace([float("inf"), -float("inf")], 0).fillna(0)
-    text_cols = [column for column in cleaned.columns if column not in numeric_cols]
-    if text_cols:
-        cleaned.loc[:, text_cols] = cleaned.loc[:, text_cols].where(pd.notna(cleaned.loc[:, text_cols]), None)
+    text_cols = [col for col in cleaned.columns if col not in numeric_cols]
+    cleaned.loc[:, numeric_cols] = cleaned.loc[:, numeric_cols].replace([float("inf"), -float("inf")], 0).fillna(0)
+    cleaned.loc[:, text_cols] = cleaned.loc[:, text_cols].where(pd.notna(cleaned.loc[:, text_cols]), None)
     return cleaned
 
 def build_weekly_player_stats(weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
     """Build player -> weekly record list view for player modal."""
-    sort_cols = [col for col in ["season", "week", "player_display_name"] if col in weekly_df.columns]
+    sort_cols = [col for col in ("season", "week", "player_display_name") if col in weekly_df.columns]
     ordered = weekly_df.sort_values(sort_cols) if sort_cols else weekly_df
     ordered = _clean_weekly_records(ordered)
     return {player_name: group.drop(columns=["player_display_name"], errors="ignore").to_dict("records") for player_name, group in ordered.groupby("player_display_name", sort=False)}

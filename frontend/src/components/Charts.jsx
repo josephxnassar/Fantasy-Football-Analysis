@@ -1,9 +1,9 @@
 /* Bar chart tab — single-stat horizontal bar chart with position/season controls. */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { getChartData } from '../api';
+import { useChartData } from '../hooks/useChartData';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import { POSITION_STAT_GROUPS } from '../utils/statDefinitions';
 import { ErrorMessage, LoadingMessage } from './common';
@@ -19,9 +19,7 @@ export default function Charts() {
   const [season, setSeason] = useState(null);
   const [stat, setStat] = useState(DEFAULT_STAT.Overall);
   const [topN, setTopN] = useState(20);
-  const [chartData, setChartData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { chartData, loading, error } = useChartData(position, season);
 
   const {
     playerDetails,
@@ -32,21 +30,6 @@ export default function Charts() {
     handleSeasonChange: handlePlayerSeasonChange,
     closeDetails,
   } = usePlayerDetails();
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await getChartData(position, season);
-      setChartData(res.data);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [position, season]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
 
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
 

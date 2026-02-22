@@ -6,13 +6,11 @@ function groupOpportunityStats(record) {
   return groupStatsByCategoryMap(record, OPPORTUNITY_CATEGORY_MAP, { hideZero: true });
 }
 
-export default function PlayerOpportunityTab({ playerDetails, currentSeason, viewMode }) {
+export default function PlayerOpportunityTab({ statsContext }) {
   return (
     <PlayerStatsTabLayout
       title="Role & Opportunity"
-      playerDetails={playerDetails}
-      currentSeason={currentSeason}
-      viewMode={viewMode}
+      statsContext={statsContext}
       groupSeasonRecord={groupOpportunityStats}
       groupWeeklyRecord={groupOpportunityStats}
       emptySeasonText="No opportunity data available"
