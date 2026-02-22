@@ -6,6 +6,7 @@ from backend.api.util.api_statistics_helpers import (
     find_player_team,
     get_player_profile,
     resolve_chart_season,
+    resolve_player_name,
 )
 
 pytestmark = pytest.mark.unit
@@ -42,3 +43,6 @@ def test_build_overall_chart_players_aggregates_across_positions(stats_cache) ->
 def test_find_player_team_from_depth_charts(depth_chart_cache) -> None:
     team = find_player_team("Patrick Mahomes", depth_chart_cache)
     assert team == "KC"
+
+def test_resolve_player_name_uses_stats_alias_map(stats_cache) -> None:
+    assert resolve_player_name(stats_cache, "patrick mahomes ii") == "Patrick Mahomes"

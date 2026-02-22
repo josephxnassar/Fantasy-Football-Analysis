@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
@@ -39,6 +39,10 @@ Behavior:
 - Missing DB cache -> fetch fresh source data, persist cache, and load into memory
 
 Routes rely on these caches and surface `503` when required caches are unavailable.
+
+Statistics route behavior:
+- `/api/player/{player_name}` resolves names via stats cache aliases (`player_name_aliases`) when available, then fetches profile/weekly data for the canonical name.
+- JSON-safe numeric cleanup is handled in the statistics pipeline output (not in API route code).
 
 ## Endpoint Index
 

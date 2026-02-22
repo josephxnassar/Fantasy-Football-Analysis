@@ -1,6 +1,6 @@
 # Frontend
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](vite.config.js)
@@ -66,6 +66,7 @@ Schedules and Depth Charts share the same team navigation pattern via [`src/comp
 | Reusable components | [`src/components/common/`](src/components/common) |
 | Player modal sub-components | [`src/components/player-details/`](src/components/player-details) |
 | Utilities | [`src/utils/`](src/utils) |
+| Stat definitions + adapter | [`src/utils/statDefinitions.js`](src/utils/statDefinitions.js), [`src/utils/playerStatsAdapter.js`](src/utils/playerStatsAdapter.js) |
 | Global styles/tokens | [`src/index.css`](src/index.css) |
 
 ## Build

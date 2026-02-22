@@ -1,13 +1,14 @@
-import { getStatDefinition, groupStatsByPosition } from '../../utils/statDefinitions';
-import { formatStatValue } from '../../utils/helpers';
+import {
+  formatStatForDisplay,
+  getStatDefinition,
+  getStatLabel,
+  groupStatsByPosition,
+} from '../../utils/statDefinitions';
 import { getStatColorClass } from '../../utils/statColorHelpers';
+import { adaptPlayerDetailsForDisplay } from '../../utils/playerStatsAdapter';
 
 function formatDisplayStat(key, value) {
-  if (key === 'Snap Share' && typeof value === 'number') {
-    const pct = value <= 1 ? value * 100 : value;
-    return `${pct.toFixed(1)}%`;
-  }
-  return formatStatValue(value);
+  return formatStatForDisplay(key, value);
 }
 
 function getWeekMatchupLabel(week) {
@@ -17,6 +18,9 @@ function getWeekMatchupLabel(week) {
 }
 
 function renderStatCategories(details) {
+  if (!details?.stats || !details?.position) {
+    return <p className="player-details-no-data">No seasonal data available</p>;
+  }
   const groupedStats = groupStatsByPosition(details.stats, details.position);
 
   return Object.entries(groupedStats).map(([category, stats]) => {
@@ -32,7 +36,7 @@ function renderStatCategories(details) {
               className="stat-item"
               title={getStatDefinition(key)}
             >
-              <span className="stat-label">{key}</span>
+              <span className="stat-label">{getStatLabel(key)}</span>
               <span className="stat-value">{formatDisplayStat(key, value)}</span>
             </div>
           ))}
@@ -43,6 +47,9 @@ function renderStatCategories(details) {
 }
 
 function renderWeeklyStats(playerDetails, currentSeason) {
+  if (!playerDetails?.position) {
+    return <p className="player-details-no-data">No weekly data available</p>;
+  }
   const weeklyStats = playerDetails?.weekly_stats;
   if (!weeklyStats || weeklyStats.length === 0) {
     return <p className="player-details-no-data">No weekly data available</p>;
@@ -77,7 +84,7 @@ function renderWeeklyStats(playerDetails, currentSeason) {
             {coreEntries.length > 0 && (
               <div className="week-ppr-row">
                 {coreEntries.map(([key, value]) => (
-                  <span key={key} className="week-ppr">{key}: {formatDisplayStat(key, value)}</span>
+                  <span key={key} className="week-ppr">{getStatLabel(key)}: {formatDisplayStat(key, value)}</span>
                 ))}
               </div>
             )}
@@ -90,7 +97,7 @@ function renderWeeklyStats(playerDetails, currentSeason) {
                       const colorClass = getStatColorClass(key, value);
                       return (
                         <span key={key} className={`week-stat-item ${colorClass}`}>
-                          {key}: {formatDisplayStat(key, value)}
+                          {getStatLabel(key)}: {formatDisplayStat(key, value)}
                         </span>
                       );
                     })}
@@ -111,7 +118,7 @@ function renderWeeklyStats(playerDetails, currentSeason) {
                           const colorClass = getStatColorClass(key, value);
                           return (
                             <span key={key} className={`week-stat-item ${colorClass}`}>
-                              {key}: {formatDisplayStat(key, value)}
+                              {getStatLabel(key)}: {formatDisplayStat(key, value)}
                             </span>
                           );
                         })}
@@ -138,6 +145,8 @@ export default function PlayerStatsView({
   viewMode,
   setViewMode,
 }) {
+  const displayDetails = adaptPlayerDetailsForDisplay(playerDetails);
+
   return (
     <>
       {availableSeasons.length > 1 && (
@@ -157,7 +166,7 @@ export default function PlayerStatsView({
         </div>
       )}
 
-      {playerDetails?.weekly_stats && playerDetails.weekly_stats.length > 0 && (
+      {displayDetails?.weekly_stats && displayDetails.weekly_stats.length > 0 && (
         <div className="view-mode-toggle">
           <button
             className={`toggle-btn ${viewMode === 'aggregate' ? 'active' : ''}`}
@@ -177,8 +186,8 @@ export default function PlayerStatsView({
       <div className="stats-section">
         <h3>Statistics {currentSeason ? `(${currentSeason} Season)` : '(Most Recent Season)'}</h3>
         {viewMode === 'aggregate'
-          ? renderStatCategories(playerDetails)
-          : renderWeeklyStats(playerDetails, currentSeason)}
+          ? renderStatCategories(displayDetails)
+          : renderWeeklyStats(displayDetails, currentSeason)}
       </div>
     </>
   );

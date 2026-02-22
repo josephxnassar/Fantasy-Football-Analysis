@@ -1,75 +1,81 @@
-/* Stat color-coding helpers (similar to Sleeper) - Returns CSS class based on stat performance thresholds */
+/* Stat color-coding helpers - returns CSS class from stat thresholds. */
 
-// Define thresholds for "good" performance (green) - using display names
 const STAT_THRESHOLDS = {
-  // Passing (QB)
+  fp_ppr: 20,
+  fp_std: 15,
+  volume_score: 65,
+
+  pass_att: 35,
+  pass_yds: 300,
+  pass_td: 3,
+
+  rush_att: 20,
+  rush_yds: 100,
+  rush_td: 1,
+
+  rec: 8,
+  targets: 10,
+  rec_yds: 100,
+  rec_td: 1,
+
+  exp_fp: 15,
+  'Yds/Rec': 12,
+  'Yds/Rush': 5,
+
+  // Backward-compatible legacy labels
+  'PPR Pts': 20,
+  'Non-PPR Pts': 15,
+  Att: 35,
   'Pass Yds': 300,
   'Pass TD': 3,
-  'Comp': 25,
-  'Att': 35,
-  
-  // Rushing (RB/QB)
+  Carries: 20,
   'Rush Yds': 100,
   'Rush TD': 1,
-  'Carries': 20,
-  'Yds/Rush': 5,
-  
-  // Receiving (WR/TE/RB)
-  'Rec': 8,
+  Rec: 8,
+  Tgt: 10,
   'Rec Yds': 100,
   'Rec TD': 1,
-  'Tgt': 10,
-  'Yds/Rec': 12,
-  'Rec YAC': 50,
-  
-  // Advanced stats
-  'Pass EPA': 5,
-  'Rush EPA': 2,
-  'Rec EPA': 2,
-  
-  // Fantasy Points
-  'PPR Pts': 20,
-  'Snap Share': 70,
 };
 
-// Stats where lower is better (red for high values) - using display names
 const LOWER_IS_BETTER = new Set([
+  'pass_int',
+  'passing_interceptions',
   'INT',
+  'interceptions',
   'Sacks',
   'Sack Fum',
   'Rush Fum',
   'Rush Fum Lost',
   'Rec Fum',
-  'Rec Fum Lost'
+  'Rec Fum Lost',
 ]);
 
 /**
- * Get color class for a stat value
- * @param {string} statName - The stat key
- * @param {number} value - The stat value
- * @returns {string} - CSS class: 'stat-good', 'stat-medium', 'stat-poor', or ''
+ * Get color class for a stat value.
+ * @param {string} statName - Stat key.
+ * @param {number} value - Stat value.
+ * @returns {string} CSS class.
  */
 export function getStatColorClass(statName, value) {
-  if (value === null || value === undefined) return '';
-  const normalizedValue = statName === 'Snap Share' && value <= 1 ? value * 100 : value;
-  
-  // Handle lower-is-better stats (turnovers, etc)
+  if (value === null || value === undefined || Number.isNaN(value)) return '';
+
   if (LOWER_IS_BETTER.has(statName)) {
     if (value === 0) return 'stat-good';
     if (value === 1) return 'stat-medium';
     if (value >= 2) return 'stat-poor';
     return '';
   }
-  
-  // Handle normal stats (higher is better)
-  const threshold = STAT_THRESHOLDS[statName];
-  if (!threshold) return '';
-  
-  if (normalizedValue >= threshold) {
-    return 'stat-good';
-  } else if (normalizedValue >= threshold * 0.5) {
-    return 'stat-medium';
-  } else {
+
+  if (statName.endsWith('_pct')) {
+    if (value >= 80) return 'stat-good';
+    if (value >= 60) return 'stat-medium';
     return 'stat-poor';
   }
+
+  const threshold = STAT_THRESHOLDS[statName];
+  if (!threshold) return '';
+
+  if (value >= threshold) return 'stat-good';
+  if (value >= threshold * 0.5) return 'stat-medium';
+  return 'stat-poor';
 }

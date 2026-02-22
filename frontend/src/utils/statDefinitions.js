@@ -1,150 +1,189 @@
-/* Stat definitions and categorization for player statistics */
+/* Canonical stat metadata, labels, and grouping for modal/chart rendering. */
 
-const STAT_DEFINITIONS = {
-  'Non-PPR Pts': 'Total fantasy points (standard scoring, non-PPR)',
-  'PPR Pts': 'Total fantasy points in PPR (Point Per Reception) format',
-  'Snap Share': 'Percent of offensive snaps played',
-  
-  'Comp': 'Pass completions',
-  'Att': 'Pass attempts',
-  'Pass Yds': 'Total passing yards',
-  'Pass TD': 'Passing touchdowns',
-  'INT': 'Interceptions thrown',
-  'Sacks': 'Times sacked',
-  'Sack Yds': 'Yards lost due to sacks',
-  'Sack Fum': 'Fumbles on sacks',
-  'Sack Fum Lost': 'Fumbles lost on sacks',
-  'Air Yds': 'Total air yards (distance ball travels in air)',
-  'YAC': 'Yards after catch (total for QB\'s completions)',
-  'Pass 1st': 'First downs via passing',
-  'Pass EPA': 'Expected Points Added via passing',
-  'Pass 2PT': 'Two-point conversion passes',
-  'PACR': 'Passing Air Conversion Ratio',
-  
-  'Carries': 'Rushing attempts',
-  'Rush Yds': 'Total rushing yards',
-  'Rush TD': 'Rushing touchdowns',
-  'Rush Fum': 'Rushing fumbles',
-  'Rush Fum Lost': 'Rushing fumbles lost',
-  'Rush 1st': 'First downs via rushing',
-  'Rush EPA': 'Expected Points Added via rushing',
-  'Rush 2PT': 'Two-point conversion rushes',
-  'Yds/Rush': 'Yards per rushing attempt',
+const STAT_META = {
+  fp_ppr: {
+    label: 'PPR Pts',
+    description: 'PPR fantasy points.',
+    format: 'decimal1',
+  },
+  fp_std: {
+    label: 'Non-PPR Pts',
+    description: 'Standard (non-PPR) fantasy points.',
+    format: 'decimal1',
+  },
+  exp_fp: {
+    label: 'Expected Pts',
+    description: 'Expected fantasy points from opportunity model.',
+    format: 'decimal1',
+  },
+  volume_score: {
+    label: 'Volume Score',
+    description: 'Blend of usage percentiles (pass/rush/target volume).',
+    format: 'decimal1',
+  },
 
-  'Rec': 'Receptions (catches)',
-  'Yds/Rec': 'Yards per reception',
-  'Tgt': 'Targets (passes thrown to player)',
-  'Rec Yds': 'Receiving yards',
-  'Rec TD': 'Receiving touchdowns',
-  'Rec Fum': 'Receiving fumbles',
-  'Rec Fum Lost': 'Receiving fumbles lost',
-  'Rec Air Yds': 'Air yards on receptions',
-  'Rec YAC': 'Yards after catch',
-  'Rec 1st': 'First downs via receiving',
-  'Rec EPA': 'Expected Points Added via receiving',
-  'Rec 2PT': 'Two-point conversion receptions',
-  'Tgt Share': 'Target share - proportion of team pass attempts targeted at player',
-  'Air Yds Share': 'Air yards share - proportion of team air yards earned by player',
-  
-  'Tgt %': 'Target share - percentage of team pass attempts targeted at player',
-  'Air Yds %': 'Air yards share - percentage of team total air yards',
-  'YAC %': 'Yards after catch share - percentage of team total YAC',
-  'Rec Yds %': 'Receiving yards share - share of team receiving yards',
-  'Rec TD %': 'Receiving touchdown share - percentage of team receiving TDs',
-  'Rec 1st %': 'Receiving first down share - share of team receiving first downs',
-  'TD+1st %': 'Combined share of receiving touchdowns and first downs',
-  'PPR %': 'PPR fantasy points share - player\'s share of team PPR points',
-  
-  'RACR': 'Receiver Air Conversion Ratio - ratio of receiving yards to air yards',
-  'Yds/TmAtt': 'Yards per team pass attempt - receiving yards divided by team pass attempts',
-  'WOPR': 'Weighted Opportunity Rating - combines target and air yards share',
-  'WOPR-X': 'Air yards share weight used in WOPR calculation',
-  'WOPR-Y': 'Target share weight used in WOPR calculation',
-  'Dakota': 'Composite metric of WOPR and YPTMPA - overall efficiency/usage indicator',
-  'Dominator': 'Sum of share of receiving yards and touchdowns',
-  'W8 Dom': 'Weighted dominator - emphasizes yards more heavily than touchdowns',
-  
-  'ST TD': 'Special teams touchdowns (returns, etc.)',
+  pass_att: { label: 'Pass Att', description: 'Passing attempts.', format: 'int' },
+  pass_yds: { label: 'Pass Yds', description: 'Passing yards.', format: 'int' },
+  pass_td: { label: 'Pass TD', description: 'Passing touchdowns.', format: 'int' },
+
+  rush_att: { label: 'Carries', description: 'Rushing attempts.', format: 'int' },
+  rush_yds: { label: 'Rush Yds', description: 'Rushing yards.', format: 'int' },
+  rush_td: { label: 'Rush TD', description: 'Rushing touchdowns.', format: 'int' },
+
+  rec: { label: 'Rec', description: 'Receptions.', format: 'int' },
+  targets: { label: 'Tgt', description: 'Targets.', format: 'int' },
+  rec_yds: { label: 'Rec Yds', description: 'Receiving yards.', format: 'int' },
+  rec_td: { label: 'Rec TD', description: 'Receiving touchdowns.', format: 'int' },
+
+  fp_ppr_pct: {
+    label: 'PPR %ile',
+    description: 'Percentile rank in PPR points vs same position context.',
+    format: 'percent1',
+  },
+  pass_att_pct: {
+    label: 'Pass Att %ile',
+    description: 'Percentile rank in passing volume.',
+    format: 'percent1',
+  },
+  pass_yds_pct: {
+    label: 'Pass Yds %ile',
+    description: 'Percentile rank in passing yards.',
+    format: 'percent1',
+  },
+  rush_att_pct: {
+    label: 'Rush Att %ile',
+    description: 'Percentile rank in rushing volume.',
+    format: 'percent1',
+  },
+  rush_yds_pct: {
+    label: 'Rush Yds %ile',
+    description: 'Percentile rank in rushing yards.',
+    format: 'percent1',
+  },
+  rec_yds_pct: {
+    label: 'Rec Yds %ile',
+    description: 'Percentile rank in receiving yards.',
+    format: 'percent1',
+  },
+  targets_pct: {
+    label: 'Tgt %ile',
+    description: 'Percentile rank in targets.',
+    format: 'percent1',
+  },
+  exp_fp_pct: {
+    label: 'Expected Pts %ile',
+    description: 'Percentile rank in expected points.',
+    format: 'percent1',
+  },
+
+  'Yds/Rec': {
+    label: 'Yds/Rec',
+    description: 'Yards per reception.',
+    format: 'decimal1',
+  },
+  'Yds/Rush': {
+    label: 'Yds/Rush',
+    description: 'Yards per rush attempt.',
+    format: 'decimal1',
+  },
 };
-
-export function getStatDefinition(statName) {
-  return STAT_DEFINITIONS[statName] || 'No definition available';
-}
 
 export const POSITION_STAT_GROUPS = {
-  'Overall': {
-    'Core': ['Non-PPR Pts', 'PPR Pts'],
-    'Usage': ['Snap Share'],
-    'Passing': ['Att', 'Comp', 'Pass Yds', 'Pass TD', 'INT', 'Pass EPA', 'PACR'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
-    'Special Teams': ['ST TD']
+  Overall: {
+    Core: ['fp_ppr', 'fp_ppr_pct', 'fp_std', 'volume_score'],
+    Usage: ['pass_att', 'rush_att', 'targets', 'pass_att_pct', 'rush_att_pct', 'targets_pct'],
+    Production: ['pass_yds', 'pass_td', 'rush_yds', 'rush_td', 'rec_yds', 'rec_td'],
+    Efficiency: ['Yds/Rec', 'Yds/Rush'],
+    Opportunity: ['exp_fp', 'exp_fp_pct'],
   },
-  'QB': {
-    'Core': ['Non-PPR Pts', 'PPR Pts'],
-    'Usage': ['Snap Share'],
-    'Passing': ['Att', 'Comp', 'Pass Yds', 'Pass TD', 'INT', 'Sacks', 'Sack Yds', 'Air Yds', 'YAC', 'Pass 1st', 'Pass 2PT', 'Pass EPA', 'PACR'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush 1st', 'Rush 2PT', 'Rush EPA'],
-    'Ball Security': ['Sack Fum', 'Sack Fum Lost', 'Rush Fum', 'Rush Fum Lost']
+  QB: {
+    Core: ['fp_ppr', 'fp_ppr_pct', 'fp_std', 'volume_score'],
+    Passing: ['pass_att', 'pass_yds', 'pass_td', 'pass_att_pct', 'pass_yds_pct'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'rush_att_pct', 'rush_yds_pct', 'Yds/Rush'],
+    Opportunity: ['exp_fp', 'exp_fp_pct'],
   },
-  'RB': {
-    'Core': ['Non-PPR Pts', 'PPR Pts'],
-    'Usage': ['Snap Share'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush 1st', 'Rush 2PT', 'Rush EPA'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
-    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost'],
-    'Special Teams': ['ST TD']
+  RB: {
+    Core: ['fp_ppr', 'fp_ppr_pct', 'fp_std', 'volume_score'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'rush_att_pct', 'rush_yds_pct', 'Yds/Rush'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'targets_pct', 'rec_yds_pct', 'Yds/Rec'],
+    Opportunity: ['exp_fp', 'exp_fp_pct'],
   },
-  'WR': {
-    'Core': ['Non-PPR Pts', 'PPR Pts'],
-    'Usage': ['Snap Share'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
-    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost'],
-    'Special Teams': ['ST TD']
+  WR: {
+    Core: ['fp_ppr', 'fp_ppr_pct', 'fp_std', 'volume_score'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'targets_pct', 'rec_yds_pct', 'Yds/Rec'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'Yds/Rush'],
+    Opportunity: ['exp_fp', 'exp_fp_pct'],
   },
-  'TE': {
-    'Core': ['Non-PPR Pts', 'PPR Pts'],
-    'Usage': ['Snap Share'],
-    'Receiving': ['Tgt', 'Rec', 'Rec Yds', 'Yds/Rec', 'Rec TD', 'Rec Air Yds', 'Rec YAC', 'Rec 1st', 'Rec 2PT', 'Rec EPA', 'RACR', 'Tgt Share', 'Air Yds Share', 'WOPR'],
-    'Rushing': ['Carries', 'Rush Yds', 'Yds/Rush', 'Rush TD', 'Rush EPA'],
-    'Ball Security': ['Rush Fum', 'Rush Fum Lost', 'Rec Fum', 'Rec Fum Lost']
-  }
+  TE: {
+    Core: ['fp_ppr', 'fp_ppr_pct', 'fp_std', 'volume_score'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'targets_pct', 'rec_yds_pct', 'Yds/Rec'],
+    Opportunity: ['exp_fp', 'exp_fp_pct'],
+  },
 };
 
-const MISSING_STAT_DEFAULTS = {
-  'Pass EPA': 0,
-  'Rush EPA': 0,
-  'Rec EPA': 0,
-};
+function normalizeStatKey(statName) {
+  return statName;
+}
+
+function hasDisplayValue(value) {
+  return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
+}
+
+export function getStatLabel(statName) {
+  const canonical = normalizeStatKey(statName);
+  return STAT_META[canonical]?.label || statName;
+}
+
+export function getStatDefinition(statName) {
+  const canonical = normalizeStatKey(statName);
+  return STAT_META[canonical]?.description || 'No definition available';
+}
+
+export function formatStatForDisplay(statName, value) {
+  if (!hasDisplayValue(value)) return value;
+  if (typeof value !== 'number') return value;
+
+  const canonical = normalizeStatKey(statName);
+  const format = STAT_META[canonical]?.format;
+  if (format === 'int') return Math.round(value);
+  if (format === 'decimal1') return value.toFixed(1);
+  if (format === 'percent1') return `${value.toFixed(1)}%`;
+  return Number.isInteger(value) ? value : value.toFixed(2);
+}
+
+export function normalizeStatsRecord(stats) {
+  const normalized = {};
+  if (!stats || typeof stats !== 'object') return normalized;
+
+  Object.entries(stats).forEach(([rawKey, value]) => {
+    if (!hasDisplayValue(value)) return;
+    const canonical = normalizeStatKey(rawKey);
+    if (!Object.prototype.hasOwnProperty.call(STAT_META, canonical)) return;
+    if (!Object.prototype.hasOwnProperty.call(normalized, canonical) || rawKey === canonical) {
+      normalized[canonical] = value;
+    }
+  });
+
+  return normalized;
+}
 
 /**
- * Group stats by position and category
- * Works with both aggregated and weekly stats (backend normalizes all stat names to display format)
- * @param {Object} stats - Stats object with display-named fields
- * @param {string} position - Player position (QB, RB, WR, TE)
- * @returns {Object} Stats grouped by category
+ * Group stats by position and category, with canonical stat keys.
+ * @param {Object} stats - Stats record from API.
+ * @param {string} position - Player position.
+ * @returns {Object<string, Object<string, number>>} Grouped category map.
  */
 export function groupStatsByPosition(stats, position) {
   const grouped = {};
-  
-  // Get stats structure for this position
-  const positionGroups = POSITION_STAT_GROUPS[position];
-  if (!positionGroups) return grouped;
-  
-  // Metadata fields to skip
-  const skipFields = new Set(['season', 'week']);
+  const positionGroups = POSITION_STAT_GROUPS[position] || POSITION_STAT_GROUPS.Overall;
+  const normalized = normalizeStatsRecord(stats);
 
-  // Build output using configured stat order for deterministic rendering.
-  Object.entries(positionGroups).forEach(([category, statList]) => {
+  Object.entries(positionGroups).forEach(([category, statKeys]) => {
     const orderedStats = {};
-    statList.forEach((statName) => {
-      if (skipFields.has(statName)) return;
-      const value = stats[statName];
-      if (value != null) {
-        orderedStats[statName] = value;
-      } else if (Object.prototype.hasOwnProperty.call(MISSING_STAT_DEFAULTS, statName)) {
-        orderedStats[statName] = MISSING_STAT_DEFAULTS[statName];
+    statKeys.forEach((statKey) => {
+      const value = normalized[statKey];
+      if (hasDisplayValue(value)) {
+        orderedStats[statKey] = value;
       }
     });
     if (Object.keys(orderedStats).length > 0) {

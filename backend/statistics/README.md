@@ -1,10 +1,10 @@
 # Statistics Module
 
-Last verified: 2026-02-15
+Last verified: 2026-02-22
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
 
-Generates season/week stat caches and player metadata consumed by API routes.
+Generates statistics caches consumed by the API (`all_players`, `by_year`, `player_weekly_stats`, `player_name_aliases`).
 
 ## Table of Contents
 
@@ -27,37 +27,34 @@ Loaded from `nflreadpy`:
 | Dataset | Loader |
 |---|---|
 | Rosters | `nfl.load_rosters` |
-| Player stats | `nfl.load_player_stats` |
+| Player stats (weekly) | `nfl.load_player_stats(summary_level="week")` |
+| Player stats (seasonal reg) | `nfl.load_player_stats(summary_level="reg")` |
+| Fantasy opportunity (weekly) | `nfl.load_ff_opportunity(stat_type="weekly")` |
+| Next Gen passing/receiving/rushing | `nfl.load_nextgen_stats(...)` |
+| PFR advanced weekly pass/rush/rec | `nfl.load_pfr_advstats(..., summary_level="week")` |
+| PFR advanced seasonal pass/rush/rec | `nfl.load_pfr_advstats(..., summary_level="season")` |
 | Snap counts | `nfl.load_snap_counts` |
+
+Season guards used in loaders:
+- PFR advanced: `>= 2018`
+- Snap counts: `>= 2012`
 
 Configured seasons:
 - [`backend/util/constants.py`](../util/constants.py) -> `SEASONS`
 
 ## Processing Pipeline
 
-1. Extract roster metadata in one pass:
-- age
-- current eligibility
-- team
-- headshot URL
-- rookie flag
-
-2. Filter to regular season fantasy positions (`QB/RB/WR/TE`), then aggregate per player/season.
-
-3. Rename columns via `COLUMN_NAME_MAP` and append derived stats (`Yds/Rec`, `Yds/Rush`).
-
-4. Build season and weekly views:
-- `by_year` (season -> position -> DataFrame)
-- `player_weekly_stats` (player -> week records with snap share)
-
-5. Build searchable player metadata from roster fields:
-- `name`
-- `position`
-- `team`
-- `age`
-- `headshot_url`
-- `is_rookie`
-- `is_eligible`
+1. Load all stat sources in parallel (`_load_statistics_sources`) and rosters in parallel with source loading (`run`).
+2. Normalize each source to regular season + fantasy positions (`QB/RB/WR/TE`) and keep mapped columns.
+3. Merge all weekly sources onto base weekly player stats.
+4. Merge seasonal PFR sources onto base seasonal player stats.
+5. Add derived metrics (`Yds/Rec`, `Yds/Rush`) and interpreted metrics (canonical coalesced stats + percentiles + volume score).
+6. Build final cache views:
+- Seasonal (`build_seasonal_data`): season -> position -> DataFrame.
+- Weekly (`build_weekly_player_stats`): player -> list of weekly records.
+- Both views are cleaned for JSON safety (`NaN/inf` handling) during build.
+7. Build player metadata from rosters (`build_all_players`) filtered to only players that exist in stats outputs.
+8. Build alias map (`build_player_name_aliases`) so suffix variants resolve to one canonical stats name.
 
 ## Output Cache Shape
 
@@ -65,6 +62,11 @@ Public keys used by API routes:
 - `all_players`
 - `by_year`
 - `player_weekly_stats`
+- `player_name_aliases`
+
+Notes:
+- `all_players` is stats-backed (not full raw roster list).
+- Alias normalization ignores suffix tokens from `constants.NAME_SUFFIXES`.
 
 ## Related Files
 

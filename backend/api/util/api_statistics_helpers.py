@@ -7,13 +7,11 @@ from fastapi import HTTPException
 
 from backend.util import constants
 
-
-def get_all_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Return all cached players, optionally filtered by position."""
-    players = cast(List[Dict[str, Any]], stats_cache.get(constants.STATS["ALL_PLAYERS"], []))
-    if position_filter:
-        return [player for player in players if player.get("position") == position_filter]
-    return players
+def resolve_player_name(stats_cache: Dict[str, Any], requested_name: str) -> str:
+    """Resolve player names via stats-layer alias map."""
+    aliases = cast(Dict[str, str], stats_cache.get(constants.STATS["PLAYER_NAME_ALIASES"], {}))
+    key = requested_name.strip()
+    return aliases.get(key, aliases.get(key.lower(), key))
 
 def get_player_profile(stats_cache: Dict[str, Any], player_name: str, season: Optional[int] = None) -> Tuple[Optional[Dict[str, Any]], Optional[str], List[int], Optional[Dict[str, Any]]]:
     """Get player season stats, position, available seasons, and metadata row from cache."""
@@ -43,6 +41,13 @@ def find_player_team(player_name: str, depth_charts: Dict[str, Any]) -> Optional
         if isinstance(df, pd.DataFrame) and player_name in df.values:
             return team
     return None
+
+def get_all_players(stats_cache: Dict[str, Any], position_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Return all cached players, optionally filtered by position."""
+    players = cast(List[Dict[str, Any]], stats_cache.get(constants.STATS["ALL_PLAYERS"], []))
+    if position_filter:
+        return [player for player in players if player.get("position") == position_filter]
+    return players
 
 def resolve_chart_season(by_year: Dict[int, Dict[str, pd.DataFrame]], season: Optional[int]) -> Tuple[int, List[int], Dict[str, pd.DataFrame]]:
     """Resolve chart season and return available seasons and selected season data."""

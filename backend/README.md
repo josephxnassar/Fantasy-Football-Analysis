@@ -1,6 +1,6 @@
 # Backend
 
-Last verified: 2026-02-19
+Last verified: 2026-02-22
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-runtime-009688?logo=fastapi&logoColor=white)](api/api.py)
 [![SQLite](https://img.shields.io/badge/SQLite-cache-003B57?logo=sqlite&logoColor=white)](database/service/sqlite_service.py)
@@ -53,6 +53,12 @@ Canonical top-level cache names are in [`util/constants.py`](util/constants.py):
 - `Statistics`
 - `Schedules`
 - `ESPNDepthChart`
+
+Statistics cache keys:
+- `all_players`
+- `by_year`
+- `player_weekly_stats`
+- `player_name_aliases` (runtime key built by stats pipeline for alias lookup)
 
 Persistence service:
 - [`database/service/sqlite_service.py`](database/service/sqlite_service.py)

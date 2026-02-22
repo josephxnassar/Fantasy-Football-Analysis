@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Rectangle } from 'recharts';
 import { getChartData } from '../api';
-import { POSITION_STAT_GROUPS } from '../utils/statDefinitions';
+import { getStatLabel, POSITION_STAT_GROUPS } from '../utils/statDefinitions';
 import { TOP_N_OPTIONS } from '../utils/uiOptions';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import PlayerDetailsModal from './PlayerDetailsModal';
@@ -12,16 +12,16 @@ import './Charts.css';
 
 /** Default stat per position */
 const DEFAULT_STAT = {
-  QB: 'Pass Yds',
-  RB: 'Rush Yds',
-  WR: 'Rec Yds',
-  TE: 'Rec Yds',
-  Overall: 'PPR Pts',
+  QB: 'pass_yds',
+  RB: 'rush_yds',
+  WR: 'rec_yds',
+  TE: 'rec_yds',
+  Overall: 'fp_ppr',
 };
 
 const DERIVED_STAT_THRESHOLDS = {
-  'Yds/Rush': { volumeStat: 'Carries', minVolume: 100 },
-  'Yds/Rec': { volumeStat: 'Rec', minVolume: 50 },
+  'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
+  'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },
 };
 
 /** Build grouped options from POSITION_STAT_GROUPS */
@@ -39,7 +39,9 @@ function getStatOptions(position, statColumns = []) {
 function meetsDerivedThreshold(player, stat) {
   const threshold = DERIVED_STAT_THRESHOLDS[stat];
   if (!threshold) return true;
-  const volume = player?.stats?.[threshold.volumeStat];
+  const volume = threshold.volumeStats
+    .map((key) => player?.stats?.[key])
+    .find((value) => typeof value === 'number');
   return typeof volume === 'number' && volume >= threshold.minVolume;
 }
 
@@ -133,7 +135,7 @@ export default function Charts() {
         team: p.team,
         headshot_url: p.headshot_url,
         value: p.stats[stat],
-        statLabel: stat,
+        statLabel: getStatLabel(stat),
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, topN);
@@ -194,7 +196,7 @@ export default function Charts() {
             {statOptions.map(({ category, stats }) => (
               <optgroup key={category} label={category}>
                 {stats.map(s => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>{getStatLabel(s)}</option>
                 ))}
               </optgroup>
             ))}
