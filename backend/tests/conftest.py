@@ -92,10 +92,7 @@ def _build_statistics_cache() -> Dict[str, Any]:
                                                                       "Rec Yds": 112,
                                                                       "Rec TD": 1,
                                                                       "opponent_team": "CLE",
-                                                                      "Snap Share": 0.91}]},
-            constants.STATS["PLAYER_NAME_ALIASES"]: {"patrick mahomes ii": "Patrick Mahomes",
-                                                     "patrick mahomes": "Patrick Mahomes",
-                                                     "jamarr chase": "JaMarr Chase"}}
+                                                                      "Snap Share": 0.91}]}}
 
 def _build_schedules_cache() -> Dict[int, Dict[str, pd.DataFrame]]:
     kc_schedule = pd.DataFrame({"opponent": ["BAL", "BYE", "CIN"],

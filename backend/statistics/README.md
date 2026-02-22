@@ -4,7 +4,7 @@ Last verified: 2026-02-22
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
 
-Generates statistics caches consumed by the API (`all_players`, `by_year`, `player_weekly_stats`, `player_name_aliases`).
+Generates statistics caches consumed by the API (`all_players`, `by_year`, `player_weekly_stats`).
 
 ## Table of Contents
 
@@ -54,7 +54,6 @@ Configured seasons:
 - Weekly (`build_weekly_player_stats`): player -> list of weekly records.
 - Both views are cleaned for JSON safety (`NaN/inf` handling) during build.
 7. Build player metadata from rosters (`build_all_players`) filtered to only players that exist in stats outputs.
-8. Build alias map (`build_player_name_aliases`) so suffix variants resolve to one canonical stats name.
 
 ## Output Cache Shape
 
@@ -62,11 +61,9 @@ Public keys used by API routes:
 - `all_players`
 - `by_year`
 - `player_weekly_stats`
-- `player_name_aliases`
 
 Notes:
 - `all_players` is stats-backed (not full raw roster list).
-- Alias normalization ignores suffix tokens from `constants.NAME_SUFFIXES`.
 
 ## Related Files
 

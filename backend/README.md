@@ -58,7 +58,6 @@ Statistics cache keys:
 - `all_players`
 - `by_year`
 - `player_weekly_stats`
-- `player_name_aliases` (runtime key built by stats pipeline for alias lookup)
 
 Persistence service:
 - [`database/service/sqlite_service.py`](database/service/sqlite_service.py)

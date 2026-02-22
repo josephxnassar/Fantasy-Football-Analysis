@@ -57,12 +57,6 @@ def test_collect_stats_player_names_and_filter_all_players() -> None:
                                               valid_player_names=names)
     assert [player["name"] for player in players] == ["Kenneth Walker III"]
 
-def test_build_player_name_aliases_maps_roster_alias_to_canonical() -> None:
-    aliases = stats_helpers.build_player_name_aliases(roster_names={"Kenneth Walker", "Kenneth Walker III"},
-                                                      canonical_names={"Kenneth Walker III"})
-    assert aliases["Kenneth Walker"] == "Kenneth Walker III"
-    assert aliases["kenneth walker"] == "Kenneth Walker III"
-
 def test_build_seasonal_data_replaces_nan_values_for_json_safety() -> None:
     seasonal_df = pd.DataFrame({
         "season": [2025],

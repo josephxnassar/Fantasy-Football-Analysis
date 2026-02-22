@@ -29,12 +29,11 @@ def test_player_endpoint_returns_profile_weekly_stats_and_player_metadata(client
     assert payload["is_eligible"] is True
     assert payload["weekly_stats"][0]["week"] == 1
 
-def test_player_endpoint_resolves_stats_layer_alias(client_factory, app_caches) -> None:
+def test_player_endpoint_requires_canonical_name(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
         response = client.get("/api/player/patrick%20mahomes%20ii")
 
-    assert response.status_code == 200
-    assert response.json()["name"] == "Patrick Mahomes"
+    assert response.status_code == 404
 
 def test_schedule_and_depth_chart_endpoints_return_team_data(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:

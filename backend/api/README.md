@@ -41,7 +41,7 @@ Behavior:
 Routes rely on these caches and surface `503` when required caches are unavailable.
 
 Statistics route behavior:
-- `/api/player/{player_name}` resolves names via stats cache aliases (`player_name_aliases`) when available, then fetches profile/weekly data for the canonical name.
+- `/api/player/{player_name}` matches the provided player name directly against stats cache player names.
 - JSON-safe numeric cleanup is handled in the statistics pipeline output (not in API route code).
 
 ## Endpoint Index

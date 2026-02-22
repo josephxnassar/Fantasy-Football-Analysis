@@ -7,11 +7,6 @@ from fastapi import HTTPException
 
 from backend.util import constants
 
-def resolve_player_name(stats_cache: Dict[str, Any], requested_name: str) -> str:
-    """Resolve player names via stats-layer alias map."""
-    aliases = cast(Dict[str, str], stats_cache.get(constants.STATS["PLAYER_NAME_ALIASES"], {}))
-    key = requested_name.strip()
-    return aliases.get(key, aliases.get(key.lower(), key))
 
 def get_player_profile(stats_cache: Dict[str, Any], player_name: str, season: Optional[int] = None) -> Tuple[Optional[Dict[str, Any]], Optional[str], List[int], Optional[Dict[str, Any]]]:
     """Get player season stats, position, available seasons, and metadata row from cache."""

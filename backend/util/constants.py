@@ -18,11 +18,7 @@ STATS = {
     "ALL_PLAYERS": "all_players",
     "BY_YEAR": "by_year",
     "PLAYER_WEEKLY_STATS": "player_weekly_stats",
-    "PLAYER_NAME_ALIASES": "player_name_aliases",
 }
-
-# Name suffix tokens ignored for player alias normalization
-NAME_SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
 
 # Important fantasy skill positions
 POSITIONS = ['QB', 'RB', 'WR', 'TE']

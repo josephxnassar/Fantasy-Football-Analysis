@@ -1,7 +1,7 @@
 """Player statistics processing and cache generation."""
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Tuple, cast
 
 import nflreadpy as nfl
@@ -321,7 +321,6 @@ class Statistics(base_source.BaseSource):
         seasonal_data, weekly_stats = self._merge_and_partition_data(sources["player_weekly"], sources["player_seasonal"], sources["ff_opp_weekly"], sources["nextgen_pass_weekly"], sources["nextgen_rec_weekly"], sources["nextgen_rush_weekly"], sources["pfr_pass_weekly"], sources["pfr_rush_weekly"], sources["pfr_rec_weekly"], sources["pfr_pass_season"], sources["pfr_rush_season"], sources["pfr_rec_season"], sources["snap_counts"])
 
         stats_player_names = stats_helpers.collect_stats_player_names(seasonal_data, weekly_stats)
-        player_name_aliases = stats_helpers.build_player_name_aliases(set(player_positions.keys()), stats_player_names)
         all_players = stats_helpers.build_all_players(player_positions, eligible, player_ages, headshots, teams, rookies, valid_player_names=stats_player_names)
 
         self.set_cache(
@@ -329,6 +328,5 @@ class Statistics(base_source.BaseSource):
                 constants.STATS["ALL_PLAYERS"]: all_players,
                 constants.STATS["BY_YEAR"]: seasonal_data,
                 constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_stats,
-                constants.STATS["PLAYER_NAME_ALIASES"]: player_name_aliases,
             }
         )

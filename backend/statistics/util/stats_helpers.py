@@ -1,7 +1,6 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import logging
-import re
 from typing import Dict, Iterable, List, Mapping
 
 import pandas as pd
@@ -129,33 +128,6 @@ def collect_stats_player_names(seasonal_data: Dict[int, Dict[str, pd.DataFrame]]
         for df in season_map.values():
             names.update(str(name) for name in df.index)
     return names
-
-def build_player_name_aliases(roster_names: set[str], canonical_names: set[str]) -> Dict[str, str]:
-    """Build alias -> canonical name mapping from stats-backed names."""
-    groups: Dict[str, set[str]] = {}
-    for canonical in canonical_names:
-        norm = normalize_player_name(canonical)
-        if norm:
-            groups.setdefault(norm, set()).add(canonical)
-
-    canonical_by_norm = {norm: next(iter(names)) for norm, names in groups.items() if len(names) == 1}
-    aliases: Dict[str, str] = {}
-    for name in roster_names | canonical_names:
-        norm = normalize_player_name(name)
-        canonical = canonical_by_norm.get(norm)
-        if not canonical:
-            continue
-        aliases[name] = canonical
-        aliases[name.strip()] = canonical
-        aliases[name.lower()] = canonical
-        aliases[norm] = canonical
-    return aliases
-
-def normalize_player_name(name: str) -> str:
-    """Normalize player names for alias matching."""
-    cleaned = re.sub(r"[^a-z0-9 ]+", " ", name.lower())
-    tokens = [token for token in cleaned.split() if token and token not in constants.NAME_SUFFIXES]
-    return " ".join(tokens)
 
 def build_all_players(player_positions: Dict[str, str], eligible_players: set[str], player_ages: Dict[str, int], player_headshots: Dict[str, str], player_teams: Dict[str, str], player_rookies: Dict[str, bool], valid_player_names: set[str] | None = None) -> List[Dict]:
     """Build pre-assembled player list with player metadata for API consumption."""

@@ -18,7 +18,6 @@ from backend.api.util.api_statistics_helpers import (
     get_all_players,
     get_player_profile,
     resolve_chart_season,
-    resolve_player_name,
 )
 from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.api.util.search_helpers import filter_search_results
@@ -33,7 +32,7 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
     """Get detailed stats for a specific player"""
     caches = get_app_caches(request)
     stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
-    resolved_name = resolve_player_name(stats_cache, player_name)
+    resolved_name = player_name.strip()
     stats_dict, position, available_seasons, player_meta = get_player_profile(stats_cache, resolved_name, season)
     if not stats_dict or not position:
         raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
