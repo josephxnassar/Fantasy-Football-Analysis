@@ -55,7 +55,6 @@ export const STAT_META = {
 
   // Next Gen highlights.
   ng_pass_passer_rating: { label: 'Passer Rating', description: 'NFL passer rating (0–158.3). League average is around 90.', format: 'decimal1' },
-  ng_pass_cmp_pct_above_expectation: { label: 'CPOE (NG)', description: 'Actual minus expected completion %. Positive = completing tougher throws.', format: 'decimal2' },
   ng_pass_avg_time_to_throw: { label: 'Time To Throw', description: 'Average seconds from snap to throw. Quick (<2.5s) = short game; slow (>3.0s) = deep shots or pressure.', format: 'decimal2' },
   ng_rec_avg_separation: { label: 'Separation', description: 'Average yards of separation from the nearest defender at the throw. More = easier catches.', format: 'decimal2' },
   ng_rec_avg_yac_above_expectation: { label: 'YAC Over Exp', description: 'Actual minus expected yards after catch. Positive = creating extra yards beyond what the catch location would predict.', format: 'decimal2' },
@@ -112,7 +111,7 @@ export const PRODUCTION_GROUPS = {
 export const ADVANCED_GROUPS = {
   QB: {
     Efficiency: ['passing_epa', 'passing_cpoe', 'pacr'],
-    'Next Gen': ['ng_pass_passer_rating', 'ng_pass_cmp_pct_above_expectation', 'ng_pass_avg_time_to_throw'],
+    'Next Gen': ['ng_pass_passer_rating', 'ng_pass_avg_time_to_throw'],
     PFR: ['pfr_pass_pressure_pct', 'pfr_pass_bad_throw_pct'],
   },
   RB: {

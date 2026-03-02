@@ -74,4 +74,16 @@ describe('useTeamModalData', () => {
     expect(result.current.data).toEqual({ team: 'BUF' });
     expect(result.current.error).toBeNull();
   });
+
+  it('exposes error state when fetch fails', async () => {
+    const fetchFn = vi.fn().mockRejectedValue(new Error('Server error'));
+    const { result } = renderHook(() => useTeamModalData('KC', fetchFn, 'Failed to load data.'));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBe('Failed to load data.');
+    expect(result.current.data).toBeNull();
+  });
 });

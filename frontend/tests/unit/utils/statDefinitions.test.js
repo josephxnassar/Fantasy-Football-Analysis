@@ -4,8 +4,8 @@ import {
   formatStatForDisplay,
   getStatDefinition,
   getStatLabel,
-  normalizeStatsRecord,
 } from '../../../src/utils/statDefinitions';
+import { normalizeStatsRecord } from '../../../src/utils/statGrouping';
 
 describe('statDefinitions', () => {
   it('keeps canonical keys and drops unknown keys', () => {

@@ -1,17 +1,22 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
   const [selectedSeason, setSelectedSeason] = useState(null);
-
-  useEffect(() => {
-    setSelectedSeason(null);
-  }, [team]);
+  const prevTeamRef = useRef(team);
 
   const fetchSchedule = useCallback(
-    (t) => getTeamSchedule(t, selectedSeason),
+    (t) => {
+      // Reset season when team changes to avoid stale season on new team.
+      if (t !== prevTeamRef.current) {
+        prevTeamRef.current = t;
+        setSelectedSeason(null);
+        return getTeamSchedule(t, null);
+      }
+      return getTeamSchedule(t, selectedSeason);
+    },
     [selectedSeason]
   );
 

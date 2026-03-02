@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": false
+    "forceConsistentCasingInFileNames": false,
+    "lib": ["ES2020", "DOM"],
+    "types": ["vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }

@@ -6,6 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +30,7 @@ export const getPlayer = (playerName, season = null) => {
  */
 export const searchPlayers = (query, position = null) => {
   return api.get('/search', {
-    params: { q: query, position },
+    params: { q: query, ...(position && { position }) },
   });
 };
 

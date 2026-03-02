@@ -1,6 +1,4 @@
-import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../utils/statDefinitions';
-import { getStatColorClass } from '../../utils/statColorHelpers';
-import { StatTooltip } from '../common';
+import StatRow from './StatRow';
 
 function getWeekMatchupLabel(week) {
   // Supports both current and legacy opponent field names.
@@ -21,19 +19,9 @@ function renderWeeklyCategories(groupedStats) {
         <div key={category} className="stat-category-group">
           <div className="category-name">{category}</div>
           <div className="stats-table stats-table--compact">
-            {Object.entries(stats).map(([key, value]) => {
-              const colorClass = getStatColorClass(key, value);
-              const label = getStatLabel(key);
-              return (
-                <div key={key} className={`stat-row ${colorClass}`}>
-                  <span className="stat-label">
-                    {label}
-                    <StatTooltip label={label} description={getStatDefinition(key)} />
-                  </span>
-                  <span className="stat-value">{formatStatForDisplay(key, value)}</span>
-                </div>
-              );
-            })}
+            {Object.entries(stats).map(([key, value]) => (
+              <StatRow key={key} statKey={key} value={value} />
+            ))}
           </div>
         </div>
       ))}

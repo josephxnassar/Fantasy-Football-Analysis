@@ -24,9 +24,16 @@ export default function PlayerDetailsModal({
 
   if (!playerDetails && !loading) return null;
 
+  // Close only on true overlay click (not modal content click).
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-content">
         <button className="player-details-close-button" onClick={onClose}>×</button>
         
         {loading ? (
