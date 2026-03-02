@@ -51,7 +51,7 @@ api.add_middleware(CORSMiddleware,
 
 @api.exception_handler(CacheNotLoadedError)
 async def cache_not_loaded_handler(request: Request, exc: CacheNotLoadedError) -> JSONResponse:
-    logger.warning(f"[{exc.source}] {exc}")
+    logger.warning("[%s] %s", exc.source, exc)
     return JSONResponse(status_code=503, content={"detail": str(exc)})
 
 @api.exception_handler(PlayerNotFoundError)
@@ -60,7 +60,7 @@ async def player_not_found_handler(request: Request, exc: PlayerNotFoundError) -
 
 @api.exception_handler(FantasyFootballError)
 async def fantasy_error_handler(request: Request, exc: FantasyFootballError) -> JSONResponse:
-    logger.error(f"[{exc.source}] {exc}")
+    logger.error("[%s] %s", exc.source, exc)
     return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 # ==================== ROUTES ====================

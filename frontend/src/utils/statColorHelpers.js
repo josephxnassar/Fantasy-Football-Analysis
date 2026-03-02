@@ -38,9 +38,6 @@ const STAT_THRESHOLDS = {
   air_yards_share: 20,
   wopr: 0.6,
 
-  ydsrec: 12,
-  ydsrush: 5,
-
   ng_pass_passer_rating: 95,
   ng_pass_cmp_pct: 65,
   ng_rec_catch_pct: 70,
@@ -52,18 +49,6 @@ const STAT_THRESHOLDS = {
   pfr_rush_yac_att: 1.8,
   pfr_rec_ybc_r: 5,
   pfr_rec_yac_r: 4,
-
-  // Backward-compatible legacy labels
-  pprpts: 20,
-  nonpprpts: 15,
-  att: 35,
-  passyds: 300,
-  passtd: 3,
-  rushyds: 100,
-  rushtd: 1,
-  tgt: 10,
-  recyds: 100,
-  rectd: 1,
 };
 
 const LOWER_IS_BETTER_TOKENS = [

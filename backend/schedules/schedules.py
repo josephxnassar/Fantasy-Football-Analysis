@@ -17,8 +17,8 @@ class Schedules(BaseSource):
     
     def __init__(self, seasons: List[int]) -> None:
         super().__init__(seasons)
-        self.weeks_by_season: Dict[int, int] = {}  # Set by _load()
-        self.master_schedule: pd.DataFrame = self._load_schedules()
+        self.weeks_by_season: Dict[int, int] = {}
+        self.master_schedule: pd.DataFrame = pd.DataFrame()
 
     def _load_schedules(self) -> pd.DataFrame:
         """Load schedules from nflreadpy"""
@@ -28,7 +28,7 @@ class Schedules(BaseSource):
             self.weeks_by_season = reg_games.groupby('season')['week'].nunique().to_dict()
             return reg_games
         except Exception as e:
-            logger.error(f"Failed to load schedules: {e}")
+            logger.error("Failed to load schedules: %s", e)
             raise DataLoadError(f"Failed to load schedules: {e}", source="Schedules") from e
 
     def _fill_bye_weeks(self, df: pd.DataFrame, total_weeks: int) -> pd.DataFrame:
@@ -37,7 +37,7 @@ class Schedules(BaseSource):
             all_weeks = pd.Index(range(1, total_weeks + 1), name="week")
             return df.reindex(all_weeks, fill_value="BYE").sort_index()
         except Exception as e:
-            logger.error(f"Failed to fill bye weeks: {e}")
+            logger.error("Failed to fill bye weeks: %s", e)
             raise DataProcessingError(f"Failed to fill bye weeks: {e}", source="Schedules") from e
 
     def _create_combined_schedule(self) -> pd.DataFrame:
@@ -49,11 +49,12 @@ class Schedules(BaseSource):
             away_games["home_away"] = "AWAY"
             return pd.concat([home_games, away_games], ignore_index=True)
         except Exception as e:
-            logger.error(f"Failed to create combined schedule: {e}")
+            logger.error("Failed to create combined schedule: %s", e)
             raise DataProcessingError(f"Failed to create combined schedule: {e}", source="Schedules") from e
 
     def run(self) -> None:
         """Process schedules for all teams"""
+        self.master_schedule = self._load_schedules()
         schedules_by_year: Dict[int, Dict[str, pd.DataFrame]] = {}
         for (season, team), group in self._create_combined_schedule().groupby(['season', 'team']):
             try:
@@ -61,5 +62,5 @@ class Schedules(BaseSource):
                 team_schedule = self._fill_bye_weeks(group.drop(columns=['team', 'season']).set_index('week').sort_index(), total_weeks)
                 schedules_by_year.setdefault(int(season), {})[team] = team_schedule
             except Exception as e:
-                logger.warning(f"Skipping team '{team}' season '{season}': {e}")
+                logger.warning("Skipping team '%s' season '%s': %s", team, season, e)
         self.set_cache(schedules_by_year)

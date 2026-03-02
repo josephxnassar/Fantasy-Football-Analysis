@@ -47,14 +47,14 @@ class SQLService:
         logger.warning("Unsupported cache class '%s'; skipping save.", cls_name)
 
     @timed("SQLService.load_from_db")
-    def load_from_db(self, keys: List[str], cls_name: str) -> Dict[Any, Any]:
+    def load_from_db(self, cls_name: str) -> Dict[Any, Any]:
         """Load one cache object based on its class name."""
         if cls_name == constants.CACHE["STATISTICS"]:
             return self._load_statistics()
         if cls_name == constants.CACHE["SCHEDULES"]:
             return self._load_schedules()
         if cls_name == constants.CACHE["DEPTH_CHART"]:
-            return self._load_depth_charts(keys)
+            return self._load_depth_charts()
 
         logger.warning("Unsupported cache class '%s'; returning empty cache.", cls_name)
         return {}
@@ -148,11 +148,11 @@ class SQLService:
             self.db.save_table(f"{prefix}_{team}", df)
 
     @timed("SQLService._load_depth_charts")
-    def _load_depth_charts(self, keys: List[str]) -> Dict[str, pd.DataFrame]:
+    def _load_depth_charts(self) -> Dict[str, pd.DataFrame]:
         prefix = constants.CACHE["DEPTH_CHART"]
         charts: Dict[str, pd.DataFrame] = {}
 
-        for team in keys:
+        for team in constants.TEAMS:
             df = self._load_table_safe(f"{prefix}_{team}")
             if df is None or df.empty:
                 continue

@@ -56,6 +56,6 @@ class App:
 
     def load(self) -> None:
         """Load all caches from database"""
-        self.caches[constants.CACHE["DEPTH_CHART"]] = self.db.load_from_db(constants.TEAMS, constants.CACHE["DEPTH_CHART"])
-        self.caches[constants.CACHE["SCHEDULES"]] = self.db.load_from_db(constants.TEAMS, constants.CACHE["SCHEDULES"])
-        self.caches[constants.CACHE["STATISTICS"]] = self.db.load_from_db(constants.POSITIONS, constants.CACHE["STATISTICS"])
+        self.caches[constants.CACHE["DEPTH_CHART"]] = self.db.load_from_db(constants.CACHE["DEPTH_CHART"])
+        self.caches[constants.CACHE["SCHEDULES"]] = self.db.load_from_db(constants.CACHE["SCHEDULES"])
+        self.caches[constants.CACHE["STATISTICS"]] = self.db.load_from_db(constants.CACHE["STATISTICS"])

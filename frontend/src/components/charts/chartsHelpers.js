@@ -1,5 +1,7 @@
 import { getStatLabel } from '../../utils/statDefinitions';
 
+export const TOP_N_OPTIONS = [10, 20, 30, 50];
+
 // Default chart stat when switching positions.
 export const DEFAULT_STAT = {
   QB: 'pass_yds',

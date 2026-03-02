@@ -36,7 +36,7 @@ Statistics weekly rows are flattened with an internal key column (`__player_key`
 
 ## Load Rules
 
-`SQLService.load_from_db(keys, cls_name)` reconstructs runtime cache structures expected by API routes:
+`SQLService.load_from_db(cls_name)` reconstructs runtime cache structures expected by API routes:
 
 - Statistics:
   - `all_players`

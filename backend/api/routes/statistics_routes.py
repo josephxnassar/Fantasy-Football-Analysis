@@ -37,8 +37,9 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
     if not stats_dict or not position:
         raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
 
+    meta = player_meta or {}
     depth_charts = caches.get(constants.CACHE["DEPTH_CHART"], {})
-    player_team = (player_meta or {}).get("team")
+    player_team = meta.get("team")
     if isinstance(player_team, str):
         player_team = constants.TEAM_ABBR_NORMALIZATION.get(player_team, player_team)
     if player_team not in constants.TEAMS:
@@ -49,10 +50,10 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
                           team=player_team,
                           stats=stats_dict,
                           available_seasons=available_seasons,
-                          age=(player_meta or {}).get("age"),
-                          is_rookie=bool((player_meta or {}).get("is_rookie", False)),
-                          is_eligible=bool((player_meta or {}).get("is_eligible", True)),
-                          headshot_url=(player_meta or {}).get("headshot_url"),
+                          age=meta.get("age"),
+                          is_rookie=bool(meta.get("is_rookie", False)),
+                          is_eligible=bool(meta.get("is_eligible", True)),
+                          headshot_url=meta.get("headshot_url"),
                           weekly_stats=stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {}).get(resolved_name))
 
 @router.get("/search", response_model=SearchResponse)

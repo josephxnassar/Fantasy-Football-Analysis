@@ -3,6 +3,7 @@ import { SubTabNav } from '../common';
 import PlayerEfficiencyTab from './PlayerEfficiencyTab';
 import PlayerFantasyTab from './PlayerFantasyTab';
 import PlayerInterpretationTab from './PlayerInterpretationTab';
+import './PlayerStats.css';
 import PlayerOpportunityTab from './PlayerOpportunityTab';
 import StatsSeasonSelector from './StatsSeasonSelector';
 import StatsViewModeToggle from './StatsViewModeToggle';

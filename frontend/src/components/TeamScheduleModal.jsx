@@ -1,37 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getTeamSchedule } from '../api';
+import { useTeamModalData } from '../hooks/useTeamModalData';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
-  const [schedule, setSchedule] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedSeason, setSelectedSeason] = useState(null);
-
-  useEffect(() => {
-    // Fetch schedule whenever team or selected season changes.
-    const fetchSchedule = async () => {
-      if (!team) return;
-
-      try {
-        setLoading(true);
-        const response = await getTeamSchedule(team, selectedSeason);
-        setSchedule(response.data);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load schedule');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSchedule();
-  }, [team, selectedSeason]);
 
   useEffect(() => {
     setSelectedSeason(null);
   }, [team]);
+
+  const fetchSchedule = useCallback(
+    (t) => getTeamSchedule(t, selectedSeason),
+    [selectedSeason]
+  );
+
+  const { data: schedule, loading, error } = useTeamModalData(team, fetchSchedule, 'Failed to load schedule');
 
   if (!team) return null;
 

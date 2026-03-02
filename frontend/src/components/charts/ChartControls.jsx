@@ -1,5 +1,5 @@
 import { getStatLabel } from '../../utils/statDefinitions';
-import { TOP_N_OPTIONS } from '../../utils/uiOptions';
+import { TOP_N_OPTIONS } from './chartsHelpers';
 import { POSITION_OPTIONS } from './chartsHelpers';
 
 export default function ChartControls({

@@ -1,14 +1,9 @@
 /* Stat label/format API plus re-exported grouping helpers. */
 
 import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
-import { groupStatsByCategoryMap, groupStatsByPosition, normalizeStatsRecord } from './statGrouping';
+import { groupStatsByCategoryMap, groupStatsByPosition, hasDisplayValue, normalizeStatsRecord } from './statGrouping';
 
 export { groupStatsByCategoryMap, groupStatsByPosition, normalizeStatsRecord, POSITION_STAT_GROUPS };
-
-function hasDisplayValue(value) {
-  // Central display guard used by formatters and grouping utilities.
-  return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
-}
 
 export function getStatLabel(statName) {
   // Uses canonical metadata first; falls back to raw key if unknown.

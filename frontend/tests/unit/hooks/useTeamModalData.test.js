@@ -1,15 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../setup';
 import { useTeamModalData } from '../../../src/hooks/useTeamModalData';
-
-function deferred() {
-  let resolve;
-  const promise = new Promise((res) => {
-    resolve = res;
-  });
-  return { promise, resolve };
-}
 
 describe('useTeamModalData', () => {
   beforeEach(() => {

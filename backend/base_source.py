@@ -4,8 +4,6 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from backend.util import constants
-
 logger = logging.getLogger(__name__)
 
 class BaseSource(ABC):
@@ -14,10 +12,6 @@ class BaseSource(ABC):
     def __init__(self, seasons: List[int]) -> None:
         self.cache: Dict[Any, Any] = {}
         self.seasons: List[int] = seasons
-
-    def get_keys(self) -> List[str]:
-        """Return cache keys for this source"""
-        return constants.TEAMS
 
     def get_cache(self) -> Dict[Any, Any]:
         """Return cached data"""

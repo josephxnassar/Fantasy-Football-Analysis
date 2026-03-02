@@ -2,8 +2,8 @@
 
 import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
 
-function hasDisplayValue(value) {
-  // Shared null/NaN guard used across grouping helpers.
+export function hasDisplayValue(value) {
+  // Shared null/NaN guard used across grouping and formatting helpers.
   return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
 }
 

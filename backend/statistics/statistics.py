@@ -2,7 +2,7 @@
 
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, NamedTuple, Tuple, cast
 
 import nflreadpy as nfl
 import pandas as pd
@@ -15,6 +15,17 @@ from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
+
+class RosterData(NamedTuple):
+    """Extracted roster-level lookups produced by _extract_all_roster_data."""
+    positions: Dict[str, str]
+    ages: Dict[str, int]
+    eligible: set[str]
+    headshots: Dict[str, str]
+    teams: Dict[str, str]
+    rookies: Dict[str, bool]
+
+
 class Statistics(base_source.BaseSource):
     """Processes player statistics and builds stat caches."""
     
@@ -22,17 +33,18 @@ class Statistics(base_source.BaseSource):
         """Initialize with seasons"""
         super().__init__(seasons)
 
-    def get_keys(self) -> List[str]:
-        return constants.POSITIONS
-
     @timed("Statistics._load_rosters")
     def _load_rosters(self) -> pd.DataFrame:
         """Load roster data from nflreadpy"""
         try:
             return nfl.load_rosters(seasons=self.seasons).to_pandas()
         except Exception as e:
-            logger.error(f"Failed to load rosters: {e}")
-            raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e        
+            logger.error("Failed to load rosters: %s", e)
+            raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e
+
+    def _pfr_seasons(self, min_year: int = 2018) -> List[int]:
+        """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
+        return [s for s in self.seasons if s >= min_year]
 
     @timed("Statistics._load_player_weekly_stats")
     def _load_player_weekly_stats(self) -> pd.DataFrame:
@@ -42,7 +54,7 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.PLAYER_WEEKLY_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load player weekly stats: {e}")
+            logger.error("Failed to load player weekly stats: %s", e)
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
         
     @timed("Statistics._load_player_seasonal_stats")
@@ -55,7 +67,7 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.PLAYER_SEASONAL_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load player seasonal stats: {e}")
+            logger.error("Failed to load player seasonal stats: %s", e)
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
         
     @timed("Statistics._load_ff_opportunity_weekly")
@@ -69,7 +81,7 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.FF_OPP_WEEKLY_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load weekly fantasy opportunity stats: {e}")
+            logger.error("Failed to load weekly fantasy opportunity stats: %s", e)
             raise DataLoadError(f"Failed to load weekly fantasy opportunity stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_nextgen_passing_stats")
@@ -80,7 +92,7 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.NEXTGEN_PASS_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load Next Gen passing stats: {e}")
+            logger.error("Failed to load Next Gen passing stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen passing stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_nextgen_receiving_stats")
@@ -91,7 +103,7 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.NEXTGEN_REC_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load Next Gen receiving stats: {e}")
+            logger.error("Failed to load Next Gen receiving stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen receiving stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_nextgen_rushing_stats")
@@ -102,104 +114,83 @@ class Statistics(base_source.BaseSource):
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.NEXTGEN_RUSH_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load Next Gen rushing stats: {e}")
+            logger.error("Failed to load Next Gen rushing stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen rushing stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_pass_weekly")
     def _load_pfr_adv_pass_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced passing stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=pfr_seasons).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             return stats_helpers.select_columns(source, constants.PFR_PASS_WEEKLY_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load weekly PFR advanced pass stats: {e}")
+            logger.error("Failed to load weekly PFR advanced pass stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced pass stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_rush_weekly")
     def _load_pfr_adv_rush_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced rushing stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=pfr_seasons).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             return stats_helpers.select_columns(source, constants.PFR_RUSH_WEEKLY_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load weekly PFR advanced rush stats: {e}")
+            logger.error("Failed to load weekly PFR advanced rush stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced rush stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_rec_weekly")
     def _load_pfr_adv_rec_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced receiving stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=pfr_seasons).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             return stats_helpers.select_columns(source, constants.PFR_REC_WEEKLY_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load weekly PFR advanced receiving stats: {e}")
+            logger.error("Failed to load weekly PFR advanced receiving stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced receiving stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_pass_season")
     def _load_pfr_adv_pass_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced passing stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=pfr_seasons).to_pandas().rename(columns={"player": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name"})
             return stats_helpers.select_columns(source, constants.PFR_PASS_SEASON_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load seasonal PFR advanced pass stats: {e}")
+            logger.error("Failed to load seasonal PFR advanced pass stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced pass stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_rush_season")
     def _load_pfr_adv_rush_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced rushing stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=pfr_seasons).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
             return stats_helpers.select_columns(source, constants.PFR_RUSH_SEASON_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load seasonal PFR advanced rush stats: {e}")
+            logger.error("Failed to load seasonal PFR advanced rush stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced rush stats: {e}", source="Statistics") from e
 
     @timed("Statistics._load_pfr_adv_rec_season")
     def _load_pfr_adv_rec_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced receiving stats from nflreadpy."""
         try:
-            pfr_seasons = self.seasons
-            if min(self.seasons) < 2018:
-                pfr_seasons = [season for season in self.seasons if season >= 2018]
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=pfr_seasons).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
             return stats_helpers.select_columns(source, constants.PFR_REC_SEASON_COLUMN_MAP)
         except Exception as e:
-            logger.error(f"Failed to load seasonal PFR advanced receiving stats: {e}")
+            logger.error("Failed to load seasonal PFR advanced receiving stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced receiving stats: {e}", source="Statistics") from e
         
     @timed("Statistics._load_snap_counts")
     def _load_snap_counts(self) -> pd.DataFrame:
         """Load and normalize weekly regular-season snap counts."""
         try:
-            snap_seasons = self.seasons
-            if min(self.seasons) < 2012:
-                snap_seasons = [season for season in self.seasons if season >= 2012]
-            source = nfl.load_snap_counts(seasons=snap_seasons).to_pandas().rename(columns={"player": "player_display_name"})
+            source = nfl.load_snap_counts(seasons=self._pfr_seasons(2012)).to_pandas().rename(columns={"player": "player_display_name"})
             source = stats_helpers.filter_regular_and_position(source)
             source = stats_helpers.select_columns(source, constants.SNAP_COUNTS_COLUMN_MAP)
             return source.drop_duplicates(subset=["season", "week", "player_display_name", "position"])
         except Exception as e:
-            logger.error(f"Failed to load snap counts: {e}")
+            logger.error("Failed to load snap counts: %s", e)
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
     @timed("Statistics._extract_all_roster_data")
-    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[Dict[str, str], Dict[str, int], set[str], Dict[str, str], Dict[str, str], Dict[str, bool]]:
+    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> RosterData:
         """Extract all roster-based data in a single pass through the dataframe."""
         try:
             current_season = constants.CURRENT_SEASON
@@ -241,9 +232,9 @@ class Statistics(base_source.BaseSource):
                         rookies[name] = True
             logger.info("Positions: %s | Ages: %s | Eligible: %s | Headshots: %s | Player-Teams: %s | Rookies: %s", len(player_positions), len(player_ages), len(eligible_players), len(player_headshots), len(player_teams), sum(1 for v in rookies.values() if v))
             
-            return player_positions, player_ages, eligible_players, player_headshots, player_teams, rookies
+            return RosterData(player_positions, player_ages, eligible_players, player_headshots, player_teams, rookies)
         except Exception as e:
-            logger.error(f"Failed to extract roster data: {e}")
+            logger.error("Failed to extract roster data: %s", e)
             raise DataProcessingError(f"Failed to extract roster data: {e}", source="Statistics") from e
 
     @timed("Statistics._load_statistics_sources")
@@ -272,24 +263,24 @@ class Statistics(base_source.BaseSource):
         return results
 
     @timed("Statistics._partition_data")
-    def _merge_and_partition_data(self, player_weekly: pd.DataFrame, player_seasonal: pd.DataFrame, ff_opp_weekly: pd.DataFrame, nextgen_pass_weekly: pd.DataFrame, nextgen_rec_weekly: pd.DataFrame, nextgen_rush_weekly: pd.DataFrame, pfr_pass_weekly: pd.DataFrame, pfr_rush_weekly: pd.DataFrame, pfr_rec_weekly: pd.DataFrame, pfr_pass_season: pd.DataFrame, pfr_rush_season: pd.DataFrame, pfr_rec_season: pd.DataFrame, snap_counts: pd.DataFrame) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]]]:
+    def _merge_and_partition_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]]]:
         """Build cache views from pre-loaded statistics sources."""
         try:
-            weekly_df = player_weekly
-            seasonal_df = player_seasonal
+            weekly_df = sources["player_weekly"]
+            seasonal_df = sources["player_seasonal"]
 
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, snap_counts, ["season", "week", "game_id", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, ff_opp_weekly, ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, nextgen_pass_weekly, ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, nextgen_rec_weekly, ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, nextgen_rush_weekly, ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, pfr_pass_weekly, ["season", "week", "game_id", "player_display_name", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, pfr_rush_weekly, ["season", "week", "game_id", "player_display_name", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, pfr_rec_weekly, ["season", "week", "game_id", "player_display_name", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
+            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
 
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, pfr_pass_season, ["season", "player_display_name", "team"], "")
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, pfr_rush_season, ["season", "player_display_name", "team", "position"], "")
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, pfr_rec_season, ["season", "player_display_name", "team", "position"], "")
+            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_pass_season"], ["season", "player_display_name", "team"], "")
+            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_rush_season"], ["season", "player_display_name", "team", "position"], "")
+            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_rec_season"], ["season", "player_display_name", "team", "position"], "")
 
             weekly_df = stats_helpers.add_derived_stats(weekly_df)
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
@@ -301,7 +292,7 @@ class Statistics(base_source.BaseSource):
 
             return seasonal_data, weekly_player_stats
         except Exception as e:
-            logger.error(f"Failed to partition statistics data: {e}")
+            logger.error("Failed to partition statistics data: %s", e)
             raise DataProcessingError(f"Failed to partition statistics data: {e}", source="Statistics") from e
 
     @timed("Statistics.run")
@@ -317,11 +308,11 @@ class Statistics(base_source.BaseSource):
         rosters = cast(pd.DataFrame, results["rosters"])
         sources = cast(Dict[str, pd.DataFrame], results["sources"])
 
-        player_positions, player_ages, eligible, headshots, teams, rookies = self._extract_all_roster_data(rosters)
-        seasonal_data, weekly_stats = self._merge_and_partition_data(sources["player_weekly"], sources["player_seasonal"], sources["ff_opp_weekly"], sources["nextgen_pass_weekly"], sources["nextgen_rec_weekly"], sources["nextgen_rush_weekly"], sources["pfr_pass_weekly"], sources["pfr_rush_weekly"], sources["pfr_rec_weekly"], sources["pfr_pass_season"], sources["pfr_rush_season"], sources["pfr_rec_season"], sources["snap_counts"])
+        roster_data = self._extract_all_roster_data(rosters)
+        seasonal_data, weekly_stats = self._merge_and_partition_data(sources)
 
         stats_player_names = stats_helpers.collect_stats_player_names(seasonal_data, weekly_stats)
-        all_players = stats_helpers.build_all_players(player_positions, eligible, player_ages, headshots, teams, rookies, valid_player_names=stats_player_names)
+        all_players = stats_helpers.build_all_players(roster_data.positions, roster_data.eligible, roster_data.ages, roster_data.headshots, roster_data.teams, roster_data.rookies, valid_player_names=stats_player_names)
 
         self.set_cache(
             {
