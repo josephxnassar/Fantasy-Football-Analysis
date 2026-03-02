@@ -16,6 +16,18 @@
   font-weight: bold;
 }
 
+.app-header-title {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.app-header-title:hover {
+  opacity: 0.85;
+}
+
 .app-header p {
   margin: 10px 0 0 0;
   font-size: 1.1em;

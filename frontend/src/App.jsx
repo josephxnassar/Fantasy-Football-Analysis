@@ -1,13 +1,15 @@
 import { Suspense, lazy, useState } from 'react';
 import './App.css';
 import { ErrorBoundary, LoadingMessage } from './components/common';
+import LandingPage from './components/LandingPage';
 
 const Statistics = lazy(() => import('./components/Statistics'));
 const Schedules = lazy(() => import('./components/Schedules'));
 const DepthCharts = lazy(() => import('./components/DepthCharts'));
 
 function App() {
-  const [activeTab, setActiveTab] = useState('statistics');
+  // null = landing page, otherwise the active section tab.
+  const [activeTab, setActiveTab] = useState(null);
 
   // Resolve the currently selected top-level tab to its view component.
   const renderTab = () => {
@@ -19,10 +21,22 @@ function App() {
     }
   };
 
+  if (!activeTab) {
+    return <LandingPage onNavigate={setActiveTab} />;
+  }
+
   return (
     <div className="App">
       <header className="app-header">
-        <h1>Fantasy Football Analysis</h1>
+        <h1
+          className="app-header-title"
+          onClick={() => setActiveTab(null)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && setActiveTab(null)}
+        >
+          Fantasy Football Analysis
+        </h1>
         <p>Your one-stop hub for smarter fantasy decisions</p>
       </header>
 
