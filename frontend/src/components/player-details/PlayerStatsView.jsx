@@ -1,18 +1,16 @@
 import { useState } from 'react';
 import { SubTabNav } from '../common';
-import PlayerEfficiencyTab from './PlayerEfficiencyTab';
-import PlayerFantasyTab from './PlayerFantasyTab';
-import PlayerInterpretationTab from './PlayerInterpretationTab';
+import PlayerAdvancedTab from './PlayerAdvancedTab';
+import PlayerOverviewTab from './PlayerOverviewTab';
 import './PlayerStats.css';
-import PlayerOpportunityTab from './PlayerOpportunityTab';
+import PlayerUsageTab from './PlayerUsageTab';
 import StatsSeasonSelector from './StatsSeasonSelector';
 import StatsViewModeToggle from './StatsViewModeToggle';
 
 const STAT_TAB_CONFIG = [
-  { id: 'fantasy', label: 'Fantasy', component: PlayerFantasyTab },
-  { id: 'opportunity', label: 'Role & Opportunity', component: PlayerOpportunityTab },
-  { id: 'efficiency', label: 'Efficiency', component: PlayerEfficiencyTab },
-  { id: 'interpretation', label: 'Interpretation', component: PlayerInterpretationTab },
+  { id: 'overview', label: 'Overview', component: PlayerOverviewTab },
+  { id: 'usage', label: 'Usage', component: PlayerUsageTab },
+  { id: 'advanced', label: 'Advanced', component: PlayerAdvancedTab },
 ];
 
 const STATS_TABS = STAT_TAB_CONFIG.map(({ id, label }) => ({ id, label }));
@@ -25,13 +23,13 @@ export default function PlayerStatsView({
   const [viewMode, setViewMode] = useState('aggregate');
 
   // Active sub-tab inside the Statistics panel.
-  const [statsTab, setStatsTab] = useState('fantasy');
+  const [statsTab, setStatsTab] = useState('overview');
 
   const { availableSeasons, currentSeason, onSeasonChange } = seasonControls;
   const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
 
   // Resolve current tab component from config (fallback keeps UI resilient).
-  const ActiveTabComponent = STAT_TAB_CONFIG.find((tab) => tab.id === statsTab)?.component || PlayerFantasyTab;
+  const ActiveTabComponent = STAT_TAB_CONFIG.find((tab) => tab.id === statsTab)?.component || PlayerOverviewTab;
 
   // Shared tab context passed through tab/layout stack.
   const statsContext = { playerDetails, currentSeason, viewMode };

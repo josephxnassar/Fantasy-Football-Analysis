@@ -1,5 +1,6 @@
 import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../utils/statDefinitions';
 import { getStatColorClass } from '../../utils/statColorHelpers';
+import { StatTooltip } from '../common';
 
 export default function AggregateStatsGrid({ groupedStats }) {
   // Render each category as a horizontal stat-card row.
@@ -13,9 +14,13 @@ export default function AggregateStatsGrid({ groupedStats }) {
         <div className="stats-grid">
           {entries.map(([key, value]) => {
             const colorClass = getStatColorClass(key, value);
+            const label = getStatLabel(key);
             return (
-              <div key={key} className={`stat-item ${colorClass}`} title={getStatDefinition(key)}>
-                <span className="stat-label">{getStatLabel(key)}</span>
+              <div key={key} className={`stat-item ${colorClass}`}>
+                <span className="stat-label">
+                  {label}
+                  <StatTooltip label={label} description={getStatDefinition(key)} />
+                </span>
                 <span className="stat-value">{formatStatForDisplay(key, value)}</span>
               </div>
             );
