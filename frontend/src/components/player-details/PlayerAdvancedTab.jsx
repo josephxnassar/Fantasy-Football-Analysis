@@ -1,16 +1,16 @@
 import { groupStatsByCategoryMap } from '../../utils/statDefinitions';
-import { ADVANCED_CATEGORY_MAP } from './statTabConfigs';
+import { ADVANCED_GROUPS } from '../../utils/statMeta';
 import PlayerStatsTabLayout from './PlayerStatsTabLayout';
 
-// Advanced tab: efficiency metrics, Next Gen tracking, PFR detail (split by category).
-function groupAdvancedStats(record) {
-  return groupStatsByCategoryMap(record, ADVANCED_CATEGORY_MAP, { hideZero: true });
+function groupAdvancedStats(record, position) {
+  const groups = ADVANCED_GROUPS[position] || ADVANCED_GROUPS.Overall;
+  return groupStatsByCategoryMap(record, groups, { hideZero: true });
 }
 
 export default function PlayerAdvancedTab({ statsContext }) {
   return (
     <PlayerStatsTabLayout
-      title="Advanced Metrics"
+      title="Advanced"
       statsContext={statsContext}
       groupSeasonRecord={groupAdvancedStats}
       groupWeeklyRecord={groupAdvancedStats}

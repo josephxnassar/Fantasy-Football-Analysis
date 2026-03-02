@@ -8,7 +8,7 @@ export default function StatsSeasonSelector({
 
   return (
     <div className="year-selector">
-      <span className="year-label">View Stats:</span>
+      <span className="year-label">Season</span>
       <div className="year-buttons">
         {availableSeasons.map((season) => (
           <button

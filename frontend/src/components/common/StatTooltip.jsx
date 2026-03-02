@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './StatTooltip.css';
 
 /**
  * Rich tooltip popover for stat explanations.
  * Triggered by clicking an info icon next to a stat label.
- * Auto-positions to stay within the viewport.
+ * Rendered via portal with fixed positioning so ancestor
+ * overflow rules never clip the popover.
  */
 export default function StatTooltip({ label, description }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const popoverRef = useRef(null);
+  const [coords, setCoords] = useState(null);
 
   // Close when clicking outside.
   useEffect(() => {
@@ -26,20 +29,44 @@ export default function StatTooltip({ label, description }) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Auto-nudge popover if it overflows the viewport.
+  // Position the fixed popover relative to the trigger.
   useEffect(() => {
-    if (!open || !popoverRef.current) return;
-    const rect = popoverRef.current.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 8) {
-      popoverRef.current.style.left = 'auto';
-      popoverRef.current.style.right = '0';
+    if (!open || !triggerRef.current) return;
+    const trigger = triggerRef.current.getBoundingClientRect();
+    const popW = 260; // matches CSS width
+    const gap = 6;
+
+    // Prefer below the trigger, centered.
+    let top = trigger.bottom + gap;
+    let left = trigger.left + trigger.width / 2 - popW / 2;
+
+    // Clamp horizontally.
+    if (left < 8) left = 8;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+
+    // If it would overflow the bottom, flip above.
+    // Estimate popover height (will be corrected on next frame).
+    const estH = 120;
+    if (top + estH > window.innerHeight - 8) {
+      top = trigger.top - estH - gap;
     }
-    if (rect.bottom > window.innerHeight - 8) {
-      popoverRef.current.style.top = 'auto';
-      popoverRef.current.style.bottom = '100%';
-      popoverRef.current.style.marginBottom = '6px';
-    }
+
+    setCoords({ top, left });
   }, [open]);
+
+  // After render, refine vertical position with actual height.
+  useEffect(() => {
+    if (!open || !popoverRef.current || !triggerRef.current) return;
+    const pop = popoverRef.current.getBoundingClientRect();
+    const trigger = triggerRef.current.getBoundingClientRect();
+    const gap = 6;
+    if (pop.bottom > window.innerHeight - 8) {
+      setCoords((prev) => ({
+        ...prev,
+        top: trigger.top - pop.height - gap,
+      }));
+    }
+  }, [open, coords?.top]);
 
   if (!description) return null;
 
@@ -58,11 +85,17 @@ export default function StatTooltip({ label, description }) {
         </svg>
       </button>
 
-      {open && (
-        <div ref={popoverRef} className="stat-tooltip-popover" role="tooltip">
+      {open && coords && createPortal(
+        <div
+          ref={popoverRef}
+          className="stat-tooltip-popover"
+          role="tooltip"
+          style={{ top: coords.top, left: coords.left }}
+        >
           <div className="stat-tooltip-header">{label}</div>
           <div className="stat-tooltip-body">{description}</div>
-        </div>
+        </div>,
+        document.body,
       )}
     </span>
   );

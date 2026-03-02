@@ -20,18 +20,18 @@ function renderWeeklyCategories(groupedStats) {
       {categories.map(([category, stats]) => (
         <div key={category} className="stat-category-group">
           <div className="category-name">{category}</div>
-          <div className="category-stats">
+          <div className="stats-table stats-table--compact">
             {Object.entries(stats).map(([key, value]) => {
               const colorClass = getStatColorClass(key, value);
               const label = getStatLabel(key);
               return (
-                <span key={key} className={`week-stat-item ${colorClass}`}>
-                  <span className="week-stat-label">
+                <div key={key} className={`stat-row ${colorClass}`}>
+                  <span className="stat-label">
                     {label}
                     <StatTooltip label={label} description={getStatDefinition(key)} />
                   </span>
-                  <span className="week-stat-value">{formatStatForDisplay(key, value)}</span>
-                </span>
+                  <span className="stat-value">{formatStatForDisplay(key, value)}</span>
+                </div>
               );
             })}
           </div>

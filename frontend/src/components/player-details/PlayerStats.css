@@ -1,18 +1,22 @@
 /* Year Selector Styles */
 .year-selector {
-  margin: 1.5rem 0;
-  padding: 1rem;
+  padding: 0.5rem 0.75rem;
   background: var(--color-bg-light);
   border-radius: 8px;
   border: 1px solid var(--color-border-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .year-label {
-  display: block;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-slate);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
 }
 
 .year-buttons {
@@ -22,14 +26,14 @@
 }
 
 .year-button {
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.75rem;
   border: 2px solid var(--color-primary);
   background: var(--color-bg-white);
   color: var(--color-primary);
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   transition: all 0.2s ease;
 }
 
@@ -52,120 +56,108 @@
 
 /* Stat Section */
 .stats-section h3 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
   color: var(--color-text-primary);
-  font-size: 1.25rem;
-}
-
-.stats-section {
-  --stat-card-width: 220px;
+  font-size: 1.05rem;
 }
 
 .stat-category {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .category-title {
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--color-text-slate);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border-accent-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
-
-.stats-grid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.85rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
+  margin-bottom: 0.5rem;
   padding-bottom: 0.35rem;
-  overscroll-behavior-x: contain;
+  border-bottom: 1px solid var(--color-border-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.stat-item {
-  flex: 0 0 var(--stat-card-width);
-  background: var(--color-surface-accent);
-  border: 1px solid var(--color-border-accent-soft);
-  border-left-width: 3px;
-  border-left-color: var(--color-border-accent);
-  padding: 0.75rem;
+/* ── Compact table layout (shared by aggregate + weekly) ── */
+
+.stats-table {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--color-border-muted);
+  border: 1px solid var(--color-border-muted);
   border-radius: 8px;
-  min-height: 78px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.35rem;
-  cursor: help;
-  box-shadow: var(--shadow-surface-sm);
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  overflow: hidden;
 }
 
-.stat-item:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-surface-md);
-  border-color: var(--color-border-accent-hover);
+.stats-table--compact {
+  /* Tighter variant used inside weekly breakdown cards */
+  font-size: 0.85rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.65rem;
+  background: var(--color-bg-white);
+  gap: 0.75rem;
+  border-left: 3px solid var(--color-border-muted);
+  transition: background 0.12s ease;
+}
+
+.stat-row:hover {
+  background: var(--color-bg-light);
 }
 
 .stat-label {
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   color: var(--color-text-subtle);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.35px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
 }
 
 .stat-value {
-  display: block;
-  font-size: 1.35rem;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1.1;
   color: var(--color-text-strong);
+  white-space: nowrap;
+  text-align: right;
 }
 
-/* Stat Color Variants */
-.stat-item.stat-good,
-.week-stat-item.stat-good {
-  background: var(--color-surface-success);
-  border-color: var(--color-success-soft-border);
+/* ── Color variants (applied to .stat-row) ── */
+
+.stat-row.stat-good {
   border-left-color: var(--color-success-strong);
+  background: var(--color-surface-success);
 }
-
-.stat-item.stat-good .stat-value,
-.week-stat-item.stat-good .week-stat-value {
+.stat-row.stat-good .stat-value {
   color: var(--color-success-deep);
 }
 
-.stat-item.stat-medium,
-.week-stat-item.stat-medium {
-  background: var(--color-surface-warning);
-  border-color: var(--color-warning-soft-border);
+.stat-row.stat-medium {
   border-left-color: var(--color-warning-strong);
+  background: var(--color-surface-warning);
 }
-
-.stat-item.stat-medium .stat-value,
-.week-stat-item.stat-medium .week-stat-value {
+.stat-row.stat-medium .stat-value {
   color: var(--color-warning-deep);
 }
 
-.stat-item.stat-poor,
-.week-stat-item.stat-poor {
-  background: var(--color-surface-danger);
-  border-color: var(--color-danger-soft-border);
+.stat-row.stat-poor {
   border-left-color: var(--color-danger-strong);
+  background: var(--color-surface-danger);
 }
-
-.stat-item.stat-poor .stat-value,
-.week-stat-item.stat-poor .week-stat-value {
+.stat-row.stat-poor .stat-value {
   color: var(--color-danger-deep);
 }
 
-/* View Mode Toggle */
+/* ── View Mode Toggle ── */
+
 .view-mode-toggle {
   display: flex;
   gap: 0.5rem;
@@ -212,12 +204,12 @@
 
 /* Weekly Stats */
 .weekly-stats-container {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .weekly-breakdown {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
   background: var(--color-surface-accent);
   border-radius: 10px;
   border: 1px solid var(--color-border-info-soft);
@@ -274,46 +266,6 @@
   border-bottom: 1px solid var(--color-surface-muted);
 }
 
-.category-stats {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  padding-bottom: 0.25rem;
-  overscroll-behavior-x: contain;
-}
-
-.week-stat-item {
-  flex: 0 0 220px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.6rem;
-  background: var(--color-surface-accent);
-  padding: 0.5rem 0.6rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  border: 1px solid var(--color-border-accent-soft);
-  border-left-width: 3px;
-  box-shadow: var(--shadow-surface-subtle);
-  transition: all 0.2s;
-  cursor: help;
-}
-
-.week-stat-label {
-  color: var(--color-text-slate-muted);
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.week-stat-value {
-  white-space: nowrap;
-  font-weight: 800;
-  color: var(--color-text-strong);
-}
-
 .week-no-stats {
   color: var(--color-text-light);
   font-size: 0.9rem;
@@ -329,18 +281,3 @@
   padding: 2rem;
 }
 
-@media (max-width: 960px) {
-  .stats-section {
-    --stat-card-width: 200px;
-  }
-}
-
-@media (max-width: 640px) {
-  .stats-section {
-    --stat-card-width: 180px;
-  }
-
-  .week-stat-item {
-    flex-basis: 190px;
-  }
-}

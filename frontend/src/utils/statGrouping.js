@@ -1,6 +1,6 @@
 /* Canonical stat grouping/normalization utilities for modal tabs. */
 
-import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
+import { STAT_META } from './statMeta';
 
 export function hasDisplayValue(value) {
   // Shared null/NaN guard used across grouping and formatting helpers.
@@ -40,28 +40,6 @@ export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
     statKeys.forEach((statKey) => {
       const value = normalized[statKey];
       if (isVisibleStatValue(value, options)) {
-        orderedStats[statKey] = value;
-      }
-    });
-    if (Object.keys(orderedStats).length > 0) {
-      grouped[category] = orderedStats;
-    }
-  });
-
-  return grouped;
-}
-
-export function groupStatsByPosition(stats, position) {
-  // Fantasy tab grouping path: use position-specific default categories.
-  const grouped = {};
-  const positionGroups = POSITION_STAT_GROUPS[position] || POSITION_STAT_GROUPS.Overall;
-  const normalized = normalizeStatsRecord(stats);
-
-  Object.entries(positionGroups).forEach(([category, statKeys]) => {
-    const orderedStats = {};
-    statKeys.forEach((statKey) => {
-      const value = normalized[statKey];
-      if (hasDisplayValue(value)) {
         orderedStats[statKey] = value;
       }
     });

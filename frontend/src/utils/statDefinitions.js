@@ -1,9 +1,9 @@
 /* Stat label/format API plus re-exported grouping helpers. */
 
-import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
-import { groupStatsByCategoryMap, groupStatsByPosition, hasDisplayValue, normalizeStatsRecord } from './statGrouping';
+import { STAT_META } from './statMeta';
+import { groupStatsByCategoryMap, hasDisplayValue, normalizeStatsRecord } from './statGrouping';
 
-export { groupStatsByCategoryMap, groupStatsByPosition, normalizeStatsRecord, POSITION_STAT_GROUPS };
+export { groupStatsByCategoryMap, normalizeStatsRecord };
 
 export function getStatLabel(statName) {
   // Uses canonical metadata first; falls back to raw key if unknown.

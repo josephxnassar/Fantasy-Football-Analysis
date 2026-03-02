@@ -5,7 +5,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 
 import { useChartData } from '../hooks/useChartData';
 import { usePlayerDetails } from '../hooks/usePlayerDetails';
-import { POSITION_STAT_GROUPS } from '../utils/statDefinitions';
+import { PRODUCTION_GROUPS } from '../utils/statMeta';
 import { ErrorMessage, LoadingMessage } from './common';
 import ChartBarShape from './charts/ChartBarShape';
 import ChartControls from './charts/ChartControls';
@@ -40,7 +40,7 @@ export default function Charts() {
 
   // Build grouped stat picker options from available columns + position config.
   const statOptions = useMemo(
-    () => getStatOptions(position, chartData?.stat_columns || [], POSITION_STAT_GROUPS),
+    () => getStatOptions(position, chartData?.stat_columns || [], PRODUCTION_GROUPS),
     [position, chartData?.stat_columns]
   );
 

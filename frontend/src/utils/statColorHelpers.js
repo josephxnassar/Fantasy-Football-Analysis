@@ -4,15 +4,12 @@ const STAT_THRESHOLDS = {
   fp_ppr: 20,
   fp_std: 15,
   exp_fp: 15,
-  volume_score: 65,
 
   pass_att: 35,
   attempts: 35,
   completions: 24,
   pass_yds: 300,
-  passing_yards: 275,
   pass_td: 3,
-  passing_tds: 2,
 
   rush_att: 20,
   carries: 18,
@@ -29,25 +26,24 @@ const STAT_THRESHOLDS = {
   rec_td: 1,
   receiving_tds: 1,
 
-  passing_first_downs: 15,
-  rushing_first_downs: 5,
-  receiving_first_downs: 5,
-  sc_offense_snaps: 35,
-  sc_offense_pct: 60,
   target_share: 20,
-  air_yards_share: 20,
   wopr: 0.6,
 
+  fp_ppr_pct: 75,
+  pass_att_pct: 75,
+  pass_yds_pct: 75,
+  rush_att_pct: 75,
+  rush_yds_pct: 75,
+  targets_pct: 75,
+  rec_yds_pct: 75,
+  exp_fp_pct: 75,
+
   ng_pass_passer_rating: 95,
-  ng_pass_cmp_pct: 65,
   ng_rec_catch_pct: 70,
   ng_rec_avg_separation: 3,
-  ng_rush_avg_rush_yds: 4.5,
   ng_rush_rush_yds_over_exp_per_att: 0.5,
 
-  pfr_rush_ybc_att: 2.5,
   pfr_rush_yac_att: 1.8,
-  pfr_rec_ybc_r: 5,
   pfr_rec_yac_r: 4,
 };
 
