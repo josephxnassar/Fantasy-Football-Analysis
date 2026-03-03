@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-22
+Last verified: 2026-03-03
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
