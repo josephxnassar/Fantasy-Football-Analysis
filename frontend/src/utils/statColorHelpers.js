@@ -27,7 +27,11 @@ const STAT_THRESHOLDS = {
   receiving_tds: 1,
 
   target_share: 20,
+  air_yards_share: 20,
   wopr: 0.6,
+  sc_offense_pct: 70,
+
+  receiving_yards_after_catch: 40,
 
   fp_ppr_pct: 75,
   pass_att_pct: 75,
@@ -41,10 +45,16 @@ const STAT_THRESHOLDS = {
   ng_pass_passer_rating: 95,
   ng_rec_catch_pct: 70,
   ng_rec_avg_separation: 3,
+  ng_rec_avg_yac: 5,
   ng_rush_rush_yds_over_exp_per_att: 0.5,
 
   pfr_rush_yac_att: 1.8,
+  pfr_rush_yac: 40,
+  pfr_rush_ybc_att: 2,
   pfr_rec_yac_r: 4,
+  pfr_rec_yac: 300,
+  pfr_rec_adot: 10,
+  pfr_pass_on_tgt_pct: 78,
 };
 
 const LOWER_IS_BETTER_TOKENS = [

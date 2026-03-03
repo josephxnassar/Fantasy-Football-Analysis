@@ -42,12 +42,11 @@
   --color-success-strong: #22c55e;
   --color-success-deep: #166534;
   --color-warning-strong: #f59e0b;
-  --color-warning-deep: #92400e
+  --color-warning-deep: #92400e;
   --color-danger-deep: #991b1b;
   
   /* Status colors */
   --color-success: #28a745;
-  --color-success
   --color-warning: #ffc107;
   --color-warning-bg: linear-gradient(135deg, #fff3cd 0%, #fffbea 100%);
   --color-warning-text: #856404;
@@ -57,7 +56,8 @@
   --color-danger-text: #721c24;
   
   --color-info: #007bff;
-  --color-info-hover: #0
+  --color-info-hover: #0056b3;
+
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
