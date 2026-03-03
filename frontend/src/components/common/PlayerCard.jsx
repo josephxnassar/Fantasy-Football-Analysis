@@ -1,5 +1,6 @@
 /* Reusable player card component for search results */
 
+import './PlayerCard.css';
 import RookieBadge from './RookieBadge';
 import DetailBadge from './DetailBadge';
 

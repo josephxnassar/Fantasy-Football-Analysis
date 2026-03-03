@@ -28,6 +28,13 @@ function App() {
   return (
     <div className="App">
       <header className="app-header">
+        <button
+          className="app-home-button"
+          onClick={() => setActiveTab(null)}
+          title="Home"
+        >
+          🏠
+        </button>
         <h1
           className="app-header-title"
           onClick={() => setActiveTab(null)}

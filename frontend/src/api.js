@@ -71,3 +71,11 @@ export const getChartData = (position, season = null) => {
     params: { position, ...(season && { season }) },
   });
 };
+
+/**
+ * Fetch application overview metadata
+ * @returns Seasons, player counts, game logs, rookie count, and stat column count
+ */
+export const getAppInfo = () => {
+  return api.get('/app-info');
+};

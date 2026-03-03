@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { groupStatsByCategoryMap, normalizeStatsRecord } from '../../../src/utils/statGrouping';
+import { groupStatsByCategoryMap } from '../../../src/utils/statGrouping';
 import { PRODUCTION_GROUPS } from '../../../src/utils/statMeta';
 
 describe('groupStatsByCategoryMap', () => {

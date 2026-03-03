@@ -8,12 +8,15 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from backend.api.models import AppInfoResponse
 from backend.api.routes.depth_chart_routes import router as depth_chart_router
 from backend.api.routes.schedule_routes import router as schedule_router
 from backend.api.routes.statistics_routes import router as statistics_router
 from backend.api.routes.teams_routes import router as teams_router
+from backend.api.util.cache_helpers import get_app_caches, get_cache
 from backend.app import App
 from backend.config.settings import CORS_ALLOW_CREDENTIALS, CORS_ORIGINS
+from backend.util import constants
 from backend.util.exceptions import CacheNotLoadedError, FantasyFootballError, PlayerNotFoundError
 
 logger = logging.getLogger(__name__)
@@ -70,6 +73,42 @@ def read_root() -> Dict[str, str]:
     return {"status": "online",
             "message": "Fantasy Football Analysis API",
             "version": "0.1.0"}
+
+
+@api.get("/api/app-info", response_model=AppInfoResponse)
+def get_app_info(request: Request) -> AppInfoResponse:
+    """Return application overview metadata for the landing page."""
+    caches = get_app_caches(request)
+    stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
+    all_players = stats_cache.get(constants.STATS["ALL_PLAYERS"], [])
+    by_year = stats_cache.get(constants.STATS["BY_YEAR"], {})
+    weekly_stats = stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {})
+
+    # Players active in the current season
+    current_season_positions = by_year.get(constants.CURRENT_SEASON, {})
+    current_season_players = sum(len(df) for df in current_season_positions.values())
+
+    # Total weekly game logs across all players/seasons
+    total_game_logs = sum(len(weeks) for weeks in weekly_stats.values())
+
+    # Count rookies and stat columns
+    rookie_count = sum(1 for p in all_players if p.get("is_rookie"))
+    stat_columns = 0
+    for season_map in by_year.values():
+        for df in season_map.values():
+            stat_columns = max(stat_columns, len(df.columns))
+            break
+
+    return AppInfoResponse(
+        seasons=constants.SEASONS,
+        current_season=constants.CURRENT_SEASON,
+        total_players=len(all_players),
+        current_season_players=current_season_players,
+        total_game_logs=total_game_logs,
+        rookie_count=rookie_count,
+        stat_columns=stat_columns,
+    )
+
 
 api.include_router(statistics_router)
 api.include_router(teams_router)

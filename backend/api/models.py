@@ -5,6 +5,31 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class AppInfoResponse(BaseModel):
+    """Response for application overview metadata."""
+    seasons: List[int] = Field(..., description="Available season years")
+    current_season: int = Field(..., description="Most recent season")
+    total_players: int = Field(..., description="Total historical players tracked")
+    current_season_players: int = Field(..., description="Players active in the current season")
+    total_game_logs: int = Field(..., description="Total weekly game log records")
+    rookie_count: int = Field(..., description="Number of rookies in current data")
+    stat_columns: int = Field(..., description="Number of distinct stat metrics tracked per player")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "seasons": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+                "current_season": 2025,
+                "total_players": 1842,
+                "current_season_players": 520,
+                "total_game_logs": 85000,
+                "rookie_count": 120,
+                "stat_columns": 65,
+            }
+        }
+    )
+
+
 class PlayerResponse(BaseModel):
     """Response for individual player details."""
     name: str = Field(..., description="Player name")
