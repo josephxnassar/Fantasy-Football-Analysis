@@ -286,8 +286,10 @@ class Statistics(base_source.BaseSource):
 
             weekly_df = stats_helpers.add_derived_stats(weekly_df)
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
-            weekly_df = stats_helpers.add_interpreted_metrics(weekly_df, include_week=True)
-            seasonal_df = stats_helpers.add_interpreted_metrics(seasonal_df)
+            weekly_df = stats_helpers.coalesce_canonical_metrics(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
+            seasonal_df = stats_helpers.coalesce_canonical_metrics(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
+            weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
+            seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
 
             seasonal_data = stats_helpers.build_seasonal_data(seasonal_df)
             weekly_player_stats = stats_helpers.build_weekly_player_stats(weekly_df)

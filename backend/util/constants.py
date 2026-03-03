@@ -478,5 +478,5 @@ INTERPRETED_METRIC_SOURCES = {
     "exp_fp": ["ffo_total_fp_exp"],
 }
 
-INTERPRETED_PERCENTILE_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]
-INTERPRETED_VOLUME_SCORE_METRICS = ["pass_att_pct", "rush_att_pct", "targets_pct"]
+INTERPRETED_RANK_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]
+

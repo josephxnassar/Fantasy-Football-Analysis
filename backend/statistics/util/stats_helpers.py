@@ -77,17 +77,7 @@ def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
     return (df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1))
 
-def add_interpreted_metrics(df: pd.DataFrame, include_week: bool = False) -> pd.DataFrame:
-    """Add canonical metrics and position-context percentiles for interpretation."""
-    interpreted = _coalesce_metrics(df, constants.INTERPRETED_METRIC_SOURCES)
-    group_cols = ["season", "position"] + (["week"] if include_week else [])
-    interpreted = _add_group_percentiles(interpreted, constants.INTERPRETED_PERCENTILE_METRICS, group_cols)
-    score_cols = [col for col in constants.INTERPRETED_VOLUME_SCORE_METRICS if col in interpreted.columns]
-    if score_cols:
-        interpreted["volume_score"] = interpreted[score_cols].mean(axis=1).round(1)
-    return interpreted
-
-def _coalesce_metrics(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
+def coalesce_canonical_metrics(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
     """Create canonical metric columns from ordered source preferences."""
     interpreted = df.copy()
     for out_col, sources in metric_sources.items():
@@ -96,18 +86,19 @@ def _coalesce_metrics(df: pd.DataFrame, metric_sources: Mapping[str, List[str]])
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
     return interpreted
 
-def _add_group_percentiles(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
-    """Add percentile columns for metrics within contextual groups."""
-    interpreted = df.copy()
-    groups = [interpreted[col] for col in group_cols if col in interpreted.columns]
+def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
+    """Add positional rank columns for metrics within contextual groups (1 = best)."""
+    ranked = df.copy()
+    groups = [ranked[col] for col in group_cols if col in ranked.columns]
     if not groups:
-        return interpreted
+        return ranked
     for metric in metrics:
-        if metric not in interpreted.columns:
+        if metric not in ranked.columns:
             continue
-        numeric = pd.to_numeric(interpreted[metric], errors="coerce")
-        interpreted[f"{metric}_pct"] = numeric.groupby(groups).rank(pct=True, method="average").mul(100).round(1)
-    return interpreted
+        numeric = pd.to_numeric(ranked[metric], errors="coerce")
+        ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
+    return ranked
+
 
 def build_seasonal_data(seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.DataFrame]]:
     """Build season -> position -> DataFrame view for chart endpoints."""

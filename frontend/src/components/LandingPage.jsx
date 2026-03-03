@@ -8,7 +8,7 @@ const FEATURES = [
     icon: '📊',
     title: 'Player Statistics',
     description:
-      'Search any player and dive into season totals, weekly breakdowns, advanced metrics, and percentile rankings — all color-coded at a glance.',
+      'Search any player and dive into season totals, weekly breakdowns, advanced metrics, and position rankings — all color-coded at a glance.',
   },
   {
     id: 'schedules',

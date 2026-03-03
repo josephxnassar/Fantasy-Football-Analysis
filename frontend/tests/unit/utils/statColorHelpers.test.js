@@ -66,17 +66,17 @@ describe('getStatColorClass', () => {
     });
   });
 
-  describe('percentile stats', () => {
-    it('returns stat-good for high percentile values', () => {
-      expect(getStatColorClass('fp_ppr_pct', 80)).toBe('stat-good');
+  describe('rank stats', () => {
+    it('returns stat-good for top ranks', () => {
+      expect(getStatColorClass('fp_ppr_rank', 5)).toBe('stat-good');
     });
 
-    it('returns stat-medium for mid percentile values', () => {
-      expect(getStatColorClass('fp_ppr_pct', 50)).toBe('stat-medium');
+    it('returns stat-medium for mid ranks', () => {
+      expect(getStatColorClass('fp_ppr_rank', 15)).toBe('stat-medium');
     });
 
-    it('returns stat-poor for low percentile values', () => {
-      expect(getStatColorClass('fp_ppr_pct', 20)).toBe('stat-poor');
+    it('returns stat-poor for low ranks', () => {
+      expect(getStatColorClass('fp_ppr_rank', 25)).toBe('stat-poor');
     });
   });
 

@@ -26,14 +26,14 @@ const STAT_THRESHOLDS = {
 
   receiving_yards_after_catch: 40,
 
-  fp_ppr_pct: 75,
-  pass_att_pct: 75,
-  pass_yds_pct: 75,
-  rush_att_pct: 75,
-  rush_yds_pct: 75,
-  targets_pct: 75,
-  rec_yds_pct: 75,
-  exp_fp_pct: 75,
+  fp_ppr_rank: 10,
+  pass_att_rank: 10,
+  pass_yds_rank: 10,
+  rush_att_rank: 10,
+  rush_yds_rank: 10,
+  targets_rank: 10,
+  rec_yds_rank: 10,
+  exp_fp_rank: 10,
 
   ng_pass_passer_rating: 95,
   ng_rec_catch_pct: 70,
@@ -59,6 +59,7 @@ const LOWER_IS_BETTER_TOKENS = [
   'times_sacked',
   'times_pressured',
   'pressure_pct',
+  '_rank',
 ];
 
 function toKey(statName) {
@@ -115,6 +116,12 @@ export function getStatColorClass(statName, value) {
   const normalizedValue = normalizePercentageValue(statName, numeric);
 
   if (isLowerBetter(statName)) {
+    const lowerThreshold = getThreshold(statName);
+    if (lowerThreshold !== undefined) {
+      if (normalizedValue <= lowerThreshold) return 'stat-good';
+      if (normalizedValue <= lowerThreshold * 2) return 'stat-medium';
+      return 'stat-poor';
+    }
     if (isPercentMetric(statName)) {
       if (normalizedValue <= 10) return 'stat-good';
       if (normalizedValue <= 20) return 'stat-medium';
