@@ -1,11 +1,38 @@
 """Helper functions for statistics transformations and cache shaping."""
 
-from typing import Dict, Iterable, List, Mapping
+import re
+from typing import Dict, Iterable, List, Mapping, Tuple
 
 import pandas as pd
 
 from backend.util import constants
 
+_NAME_SUFFIX_RE = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")
+
+
+def _normalize_name(name: str) -> str:
+    """Reduce a player name to a canonical form for fuzzy matching."""
+    n = _NAME_SUFFIX_RE.sub("", name.strip())
+    return n.replace("'", "").replace(".", "").lower()
+
+def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
+    """Map PFR seasonal short names to base canonical names for merge compatibility."""
+    col = "player_display_name"
+    if col not in pfr_df.columns or col not in base_df.columns:
+        return pfr_df
+    base_names = base_df[col].dropna().unique()
+    norm_to_canonical = {_normalize_name(n): n for n in base_names}
+    aligned = pfr_df.copy()
+    aligned[col] = aligned[col].map(lambda n: norm_to_canonical.get(_normalize_name(n), n) if isinstance(n, str) else n)
+    return aligned
+
+def merge_pfr_seasonal(seasonal_df: pd.DataFrame, pfr_sources: List[Tuple[pd.DataFrame, List[str]]]) -> pd.DataFrame:
+    """Align PFR seasonal names to base canonical names and merge all sources."""
+    merged = seasonal_df
+    for pfr_df, join_keys in pfr_sources:
+        aligned = align_pfr_seasonal_names(pfr_df, merged)
+        merged = merge_prefixed(merged, aligned, join_keys, "")
+    return merged
 
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
@@ -137,7 +164,5 @@ def build_all_players(player_positions: Dict[str, str], eligible_players: set[st
             "team": player_teams.get(player_name),
             "is_rookie": player_rookies.get(player_name, False),
             "is_eligible": player_name in eligible_players,
-        }
-        for player_name in player_positions
-        if valid_player_names is None or player_name in valid_player_names
+        } for player_name in player_positions if valid_player_names is None or player_name in valid_player_names
     ]

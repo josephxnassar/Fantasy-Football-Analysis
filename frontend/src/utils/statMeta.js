@@ -91,7 +91,7 @@ export const PRODUCTION_GROUPS = {
     Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_yac', 'Yds/Rush', 'pfr_rush_yac_att', 'pfr_rush_ybc_att'],
     'Rushing Efficiency': ['rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_brk_tkl'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch'],
-    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct'],
+    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'pfr_rec_drop_pct', 'pfr_rec_yac_r'],
     Usage: ['target_share', 'wopr', 'sc_offense_pct'],
     Percentiles: ['fp_ppr_pct', 'exp_fp_pct', 'rush_att_pct', 'rush_yds_pct', 'targets_pct', 'rec_yds_pct'],
   },

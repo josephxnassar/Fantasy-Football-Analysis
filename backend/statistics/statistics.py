@@ -202,10 +202,9 @@ class Statistics(base_source.BaseSource):
             player_teams: Dict[str, str] = {}
             rookies: Dict[str, bool] = {}
             for row in rosters.itertuples(index=False):
-                name_raw = getattr(row, "full_name", None)
-                if not isinstance(name_raw, str) or not name_raw:
+                name = getattr(row, "full_name", None)
+                if not isinstance(name, str) or not name:
                     continue
-                name = name_raw
                 season_raw = getattr(row, "season", None)
                 season_int: int | None = None
                 if pd.notna(season_raw):
@@ -214,14 +213,15 @@ class Statistics(base_source.BaseSource):
                     except (TypeError, ValueError):
                         season_int = None
                 position = getattr(row, "position", None)
-                if position in constants.POSITIONS:
-                    player_positions[name] = position
-                if position in constants.POSITIONS and pd.notna(birth_date := getattr(row, "birth_date", None)):
+                if not isinstance(position, str) or position not in constants.POSITIONS:
+                    continue
+                player_positions[name] = position
+                if pd.notna(birth_date := getattr(row, "birth_date", None)):
                     birth_ts = pd.to_datetime(birth_date)
                     age = (today - birth_ts).days // 365
                     if age > 0:
                         player_ages[name] = int(age)
-                if season_int == current_season and position in constants.POSITIONS:
+                if season_int == current_season:
                     if getattr(row, "status", None) != "RET":
                         eligible_players.add(name)
                     if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
@@ -262,7 +262,7 @@ class Statistics(base_source.BaseSource):
                 results[futures[future]] = future.result()
         return results
 
-    @timed("Statistics._partition_data")
+    @timed("Statistics._merge_and_partition_data")
     def _merge_and_partition_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]]]:
         """Build cache views from pre-loaded statistics sources."""
         try:
@@ -278,9 +278,11 @@ class Statistics(base_source.BaseSource):
             weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
             weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
 
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_pass_season"], ["season", "player_display_name", "team"], "")
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_rush_season"], ["season", "player_display_name", "team", "position"], "")
-            seasonal_df = stats_helpers.merge_prefixed(seasonal_df, sources["pfr_rec_season"], ["season", "player_display_name", "team", "position"], "")
+            seasonal_df = stats_helpers.merge_pfr_seasonal(seasonal_df, [
+                (sources["pfr_pass_season"], ["season", "player_display_name", "team"]),
+                (sources["pfr_rush_season"], ["season", "player_display_name", "team", "position"]),
+                (sources["pfr_rec_season"], ["season", "player_display_name", "team", "position"]),
+            ])
 
             weekly_df = stats_helpers.add_derived_stats(weekly_df)
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
