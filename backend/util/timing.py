@@ -11,6 +11,7 @@ from backend.config.settings import TIMING_ENABLED
 
 F = TypeVar("F", bound=Callable[..., Any])
 
+
 class Timer:
     """Simple context manager for elapsed-time logging."""
 

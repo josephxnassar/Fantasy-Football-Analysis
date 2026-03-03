@@ -48,7 +48,7 @@ Configured seasons:
 2. Normalize each source to regular season + fantasy positions (`QB/RB/WR/TE`) and keep mapped columns.
 3. Merge all weekly sources onto base weekly player stats.
 4. Merge seasonal PFR sources onto base seasonal player stats.
-5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), coalesce canonical stat keys, and compute positional ranks.
+5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), resolve unified stat keys from source priorities, and compute positional ranks.
 6. Build final cache views:
 - Seasonal (`build_seasonal_data`): season -> position -> DataFrame.
 - Weekly (`build_weekly_player_stats`): player -> list of weekly records.

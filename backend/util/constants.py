@@ -479,4 +479,3 @@ INTERPRETED_METRIC_SOURCES = {
 }
 
 INTERPRETED_RANK_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]
-

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 _REQUEST_TIMEOUT = 10
 _MAX_WORKERS = 8
 
+
 class ESPNDepthChart(BaseSource):
     """Scrapes and parses ESPN depth charts for all NFL teams"""
     

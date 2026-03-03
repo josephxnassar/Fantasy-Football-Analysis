@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
+
 class BaseSource(ABC):
     """Abstract base for all data sources (Statistics, Schedules, DepthChart)"""
     

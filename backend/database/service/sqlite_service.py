@@ -13,6 +13,7 @@ from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
+
 class SQLService:
     """Persist and load the three supported cache types."""
 

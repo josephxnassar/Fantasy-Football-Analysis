@@ -38,6 +38,7 @@ class PlayerResponse(BaseModel):
         }
     )
 
+
 class PlayerSearchResult(BaseModel):
     """Player search result."""
     name: str = Field(..., description="Player name")
@@ -62,6 +63,7 @@ class PlayerSearchResult(BaseModel):
         }
     )
 
+
 class SearchResponse(BaseModel):
     """Response for player search"""
     query: str = Field(..., description="Search query")
@@ -81,6 +83,7 @@ class SearchResponse(BaseModel):
         }
     )
 
+
 class ChartPlayerEntry(BaseModel):
     """Single player entry for chart data"""
     name: str = Field(..., description="Player name")
@@ -88,6 +91,7 @@ class ChartPlayerEntry(BaseModel):
     team: Optional[str] = Field(None, description="Team abbreviation")
     headshot_url: Optional[str] = Field(None, description="URL to player headshot image")
     stats: Dict[str, float] = Field(..., description="Stat name → value mapping")
+
 
 class ChartDataResponse(BaseModel):
     """Response for chart data endpoint"""
@@ -116,6 +120,7 @@ class ChartDataResponse(BaseModel):
         }
     )
 
+
 class DivisionsResponse(BaseModel):
     """Response for NFL divisions structure"""
     divisions: Dict[str, Dict[str, List[str]]] = Field(..., description="NFL divisions by conference")
@@ -133,6 +138,7 @@ class DivisionsResponse(BaseModel):
         }
     )
 
+
 class TeamScheduleGame(BaseModel):
     """Single game in a team's schedule"""
     week: int = Field(..., description="Week number")
@@ -140,6 +146,7 @@ class TeamScheduleGame(BaseModel):
     home_away: Optional[str] = Field(None, description="HOME or AWAY (null for BYE)")
     
     model_config = ConfigDict(json_schema_extra={"example": {"week": 1, "opponent": "KC", "home_away": "AWAY"}})
+
 
 class TeamScheduleResponse(BaseModel):
     """Response for team schedule"""
@@ -166,6 +173,7 @@ class TeamScheduleResponse(BaseModel):
         }
     )
 
+
 class DepthChartEntry(BaseModel):
     """Single position row in a depth chart"""
     position: str = Field(..., description="Position abbreviation (QB, RB, WR, TE)")
@@ -185,6 +193,7 @@ class DepthChartEntry(BaseModel):
             }
         }
     )
+
 
 class TeamDepthChartResponse(BaseModel):
     """Response for a single team's depth chart"""

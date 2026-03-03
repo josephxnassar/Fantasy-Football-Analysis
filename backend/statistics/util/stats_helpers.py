@@ -1,7 +1,7 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import re
-from typing import Dict, Iterable, List, Mapping, Tuple
+from typing import Dict, Iterable, List, Mapping
 
 import pandas as pd
 
@@ -9,30 +9,6 @@ from backend.util import constants
 
 _NAME_SUFFIX_RE = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")
 
-
-def _normalize_name(name: str) -> str:
-    """Reduce a player name to a canonical form for fuzzy matching."""
-    n = _NAME_SUFFIX_RE.sub("", name.strip())
-    return n.replace("'", "").replace(".", "").lower()
-
-def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
-    """Map PFR seasonal short names to base canonical names for merge compatibility."""
-    col = "player_display_name"
-    if col not in pfr_df.columns or col not in base_df.columns:
-        return pfr_df
-    base_names = base_df[col].dropna().unique()
-    norm_to_canonical = {_normalize_name(n): n for n in base_names}
-    aligned = pfr_df.copy()
-    aligned[col] = aligned[col].map(lambda n: norm_to_canonical.get(_normalize_name(n), n) if isinstance(n, str) else n)
-    return aligned
-
-def merge_pfr_seasonal(seasonal_df: pd.DataFrame, pfr_sources: List[Tuple[pd.DataFrame, List[str]]]) -> pd.DataFrame:
-    """Align PFR seasonal names to base canonical names and merge all sources."""
-    merged = seasonal_df
-    for pfr_df, join_keys in pfr_sources:
-        aligned = align_pfr_seasonal_names(pfr_df, merged)
-        merged = merge_prefixed(merged, aligned, join_keys, "")
-    return merged
 
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
@@ -48,37 +24,40 @@ def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.Da
     present = [column for column in column_map if column in source.columns]
     return source[present].rename(columns={column: column_map[column] for column in present})
 
-def merge_prefixed(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str], prefix: str) -> pd.DataFrame:
-    """Left-join source onto base using available keys and prefix source metrics."""
+def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
+    """Left-join source onto base using available join keys."""
     join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
-    if source.empty or not join_keys:
-        return base
-    source_copy = source.drop_duplicates(subset=join_keys)
-    if prefix:
-        rename_map = {col: f"{prefix}{col}" for col in source_copy.columns if col not in join_keys}
-        source_copy = source_copy.rename(columns=rename_map)
-    return base.merge(source_copy, on=join_keys, how="left")
+    return base.merge(source.drop_duplicates(subset=join_keys), on=join_keys, how="left")
+
+def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
+    """Map PFR seasonal short names to base full names for merge compatibility."""
+    col = "player_display_name"
+    full_names = {_normalize_name(n): n for n in base_df[col].dropna().unique()}
+    name_map = {n: match for n in pfr_df[col].dropna().unique() if (match := full_names.get(_normalize_name(n)))}
+    aligned = pfr_df.copy()
+    aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
+    return aligned
+
+def _normalize_name(name: str) -> str:
+    """Reduce a player name to a normalized form for fuzzy matching."""
+    n = _NAME_SUFFIX_RE.sub("", name.strip())
+    return n.replace("'", "").replace(".", "").lower()
 
 def add_derived_stats(df: pd.DataFrame) -> pd.DataFrame:
-    """Add derived stats (Yds/Rec, Yds/Rush) from available stat column variants."""
-    source_options = {
-        "Yds/Rec": [("receiving_yards", "receptions"), ("Rec Yds", "Rec")],
-        "Yds/Rush": [("rushing_yards", "carries"), ("Rush Yds", "Carries")],
-    }
+    """Add derived stats (Yds/Rec, Yds/Rush) from available base columns."""
     derived = {}
-    for out_col, options in source_options.items():
-        for num_col, den_col in options:
-            if {num_col, den_col}.issubset(df.columns):
-                derived[out_col] = _safe_rate(df, num_col, den_col)
-                break
+    if {"receiving_yards", "receptions"}.issubset(df.columns):
+        derived["Yds/Rec"] = _safe_rate(df, "receiving_yards", "receptions")
+    if {"rushing_yards", "carries"}.issubset(df.columns):
+        derived["Yds/Rush"] = _safe_rate(df, "rushing_yards", "carries")
     return pd.concat([df, pd.DataFrame(derived, index=df.index)], axis=1) if derived else df
 
 def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
     return (df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1))
 
-def coalesce_canonical_metrics(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
-    """Create canonical metric columns from ordered source preferences."""
+def resolve_metric_sources(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
+    """Fill each unified stat column with the first non-null value from prioritized source columns."""
     interpreted = df.copy()
     for out_col, sources in metric_sources.items():
         cols = [col for col in sources if col in interpreted.columns]
@@ -99,21 +78,16 @@ def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[s
         ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
     return ranked
 
-
 def build_seasonal_data(seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.DataFrame]]:
     """Build season -> position -> DataFrame view for chart endpoints."""
-    seasonal_data: Dict[int, Dict[str, pd.DataFrame]] = {}
     drop_cols = ["season", "position", "player_id", "player_name", "position_group"]
-    for season, season_group in seasonal_df.groupby("season"):
-        season_map: Dict[str, pd.DataFrame] = {}
-        for position in constants.POSITIONS:
-            position_df = season_group.loc[season_group["position"] == position]
-            if position_df.empty:
-                continue
-            season_map[position] = _clean_numeric_stats(position_df.drop(columns=drop_cols, errors="ignore").drop_duplicates(subset=["player_display_name"]).set_index("player_display_name"))
-        if season_map:
-            seasonal_data[int(season)] = season_map
-    return seasonal_data
+    result: Dict[int, Dict[str, pd.DataFrame]] = {}
+    for (season, position), group in seasonal_df.groupby(["season", "position"]):
+        if position not in constants.POSITIONS:
+            continue
+        cleaned = _clean_numeric_stats(group.drop(columns=drop_cols, errors="ignore").drop_duplicates(subset=["player_display_name"]).set_index("player_display_name"))
+        result.setdefault(int(season), {})[position] = cleaned
+    return result
 
 def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Replace non-finite numeric values with 0 for JSON-safe chart payloads."""
@@ -126,9 +100,7 @@ def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_weekly_player_stats(weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
     """Build player -> weekly record list view for player modal."""
-    sort_cols = [col for col in ("season", "week", "player_display_name") if col in weekly_df.columns]
-    ordered = weekly_df.sort_values(sort_cols) if sort_cols else weekly_df
-    ordered = _clean_weekly_records(ordered)
+    ordered = _clean_weekly_records(weekly_df.sort_values(["season", "week", "player_display_name"]))
     return {player_name: group.drop(columns=["player_display_name"], errors="ignore").to_dict("records") for player_name, group in ordered.groupby("player_display_name", sort=False)}
 
 def _clean_weekly_records(df: pd.DataFrame) -> pd.DataFrame:

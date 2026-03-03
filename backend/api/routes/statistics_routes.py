@@ -27,6 +27,7 @@ from backend.util.exceptions import PlayerNotFoundError
 router = APIRouter(prefix="/api", tags=["statistics"])
 _VALID_CHART_POSITIONS = constants.POSITIONS + ["Overall"]
 
+
 @router.get("/player/{player_name}", response_model=PlayerResponse)
 def get_player(request: Request, player_name: str, season: Optional[int] = None) -> PlayerResponse:
     """Get detailed stats for a specific player"""

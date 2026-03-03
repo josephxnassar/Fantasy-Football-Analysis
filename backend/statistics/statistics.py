@@ -62,8 +62,7 @@ class Statistics(base_source.BaseSource):
         """Load and normalize seasonal regular-season player stats."""
         try:
             source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas()
-            if "team" not in source.columns and "recent_team" in source.columns:
-                source = source.rename(columns={"recent_team": "team"})
+            source = source.rename(columns={"recent_team": "team"})
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, constants.PLAYER_SEASONAL_COLUMN_MAP)
         except Exception as e:
@@ -231,7 +230,6 @@ class Statistics(base_source.BaseSource):
                     if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                         rookies[name] = True
             logger.info("Positions: %s | Ages: %s | Eligible: %s | Headshots: %s | Player-Teams: %s | Rookies: %s", len(player_positions), len(player_ages), len(eligible_players), len(player_headshots), len(player_teams), sum(1 for v in rookies.values() if v))
-            
             return RosterData(player_positions, player_ages, eligible_players, player_headshots, player_teams, rookies)
         except Exception as e:
             logger.error("Failed to extract roster data: %s", e)
@@ -269,25 +267,25 @@ class Statistics(base_source.BaseSource):
             weekly_df = sources["player_weekly"]
             seasonal_df = sources["player_seasonal"]
 
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
-            weekly_df = stats_helpers.merge_prefixed(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"], "")
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
 
-            seasonal_df = stats_helpers.merge_pfr_seasonal(seasonal_df, [
-                (sources["pfr_pass_season"], ["season", "player_display_name", "team"]),
-                (sources["pfr_rush_season"], ["season", "player_display_name", "team", "position"]),
-                (sources["pfr_rec_season"], ["season", "player_display_name", "team", "position"]),
-            ])
+            for pfr_key, join_keys in [("pfr_pass_season", ["season", "player_display_name", "team"]),
+                                        ("pfr_rush_season", ["season", "player_display_name", "team", "position"]),
+                                        ("pfr_rec_season", ["season", "player_display_name", "team", "position"])]:
+                aligned = stats_helpers.align_pfr_seasonal_names(sources[pfr_key], seasonal_df)
+                seasonal_df = stats_helpers.merge_source(seasonal_df, aligned, join_keys)
 
             weekly_df = stats_helpers.add_derived_stats(weekly_df)
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
-            weekly_df = stats_helpers.coalesce_canonical_metrics(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
-            seasonal_df = stats_helpers.coalesce_canonical_metrics(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
+            weekly_df = stats_helpers.resolve_metric_sources(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
+            seasonal_df = stats_helpers.resolve_metric_sources(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
             weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
             seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
 

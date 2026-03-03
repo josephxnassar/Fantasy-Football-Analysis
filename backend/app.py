@@ -13,6 +13,7 @@ from backend.util import constants
 
 logger = logging.getLogger(__name__)
 
+
 class App:
     """Orchestrates data fetching, caching, and loading for all sources"""
     
@@ -25,10 +26,10 @@ class App:
         if self.db.has_cached_data():
             self.load()
             return
-
-        logger.info("Cache tables missing; fetching fresh data and rebuilding cache.")
-        self.run()
-        self.save()
+        else:
+            logger.info("Cache tables missing; fetching fresh data and rebuilding cache.")
+            self.run()
+            self.save()
 
     def _get_depth_chart_source(self):
         source = DEPTH_CHART_SOURCE
@@ -36,8 +37,6 @@ class App:
             return NRPDepthChart()
         if source == "espn":
             return ESPNDepthChart()
-        logger.warning("Unknown DEPTH_CHART_SOURCE '%s'; defaulting to 'espn'.", source)
-        return ESPNDepthChart()
     
     def run(self) -> None:
         """Fetch fresh data from all sources"""

@@ -10,6 +10,7 @@ from backend.util import constants
 
 router = APIRouter(prefix="/api/schedules", tags=["schedules"])
 
+
 @router.get("/{team}", response_model=TeamScheduleResponse)
 def get_team_schedule(request: Request, team: str, season: Optional[int] = None) -> TeamScheduleResponse:
     """Get schedule for a specific team"""

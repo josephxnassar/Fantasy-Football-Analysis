@@ -7,6 +7,7 @@ from backend.util import constants
 
 router = APIRouter(prefix="/api/teams", tags=["teams"])
 
+
 @router.get("/divisions", response_model=DivisionsResponse)
 def get_divisions() -> DivisionsResponse:
     """Get NFL division structure for team browsing across features."""

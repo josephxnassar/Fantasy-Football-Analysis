@@ -12,6 +12,7 @@ from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
 
+
 class Schedules(BaseSource):
     """Processes NFL schedules with bye week handling"""
     

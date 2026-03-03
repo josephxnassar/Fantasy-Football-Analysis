@@ -6,10 +6,10 @@ from backend.statistics.util import stats_helpers
 pytestmark = pytest.mark.unit
 
 def test_add_derived_stats_handles_zero_division() -> None:
-    df = pd.DataFrame({"Rec Yds": [100.0, 0.0],
-                       "Rec": [5.0, 0.0],
-                       "Rush Yds": [80.0, 20.0],
-                       "Carries": [20.0, 0.0]})
+    df = pd.DataFrame({"receiving_yards": [100.0, 0.0],
+                       "receptions": [5.0, 0.0],
+                       "rushing_yards": [80.0, 20.0],
+                       "carries": [20.0, 0.0]})
 
     result = stats_helpers.add_derived_stats(df)
 

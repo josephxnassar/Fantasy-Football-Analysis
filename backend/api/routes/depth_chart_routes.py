@@ -10,6 +10,7 @@ from backend.util import constants
 
 router = APIRouter(prefix="/api/depth-charts", tags=["depth_charts"])
 
+
 def _normalize_depth_value(value: object) -> str | None:
     if pd.isna(value):
         return None
