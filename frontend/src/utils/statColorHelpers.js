@@ -6,25 +6,18 @@ const STAT_THRESHOLDS = {
   exp_fp: 15,
 
   pass_att: 35,
-  attempts: 35,
   completions: 24,
   pass_yds: 300,
   pass_td: 3,
 
   rush_att: 20,
-  carries: 18,
   rush_yds: 100,
-  rushing_yards: 85,
   rush_td: 1,
-  rushing_tds: 1,
 
   rec: 8,
-  receptions: 6,
   targets: 10,
   rec_yds: 100,
-  receiving_yards: 85,
   rec_td: 1,
-  receiving_tds: 1,
 
   target_share: 20,
   air_yards_share: 20,

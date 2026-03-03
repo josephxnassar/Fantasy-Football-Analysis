@@ -7,7 +7,6 @@ export function usePlayerDetails() {
   // Full player payload used by PlayerDetailsModal.
   const [playerDetails, setPlayerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [detailsError, setDetailsError] = useState(null);
 
   // Season selector state for the active player.
   const [playerAvailableSeasons, setPlayerAvailableSeasons] = useState([]);
@@ -41,7 +40,6 @@ export function usePlayerDetails() {
       if (!mountedRef.current || requestId !== playerRequestIdRef.current) return;
 
       setPlayerDetails(response.data);
-      setDetailsError(null);
 
       const seasons = response.data.available_seasons || [];
       setPlayerAvailableSeasons(seasons);
@@ -51,9 +49,6 @@ export function usePlayerDetails() {
       setCurrentSeason(mostRecentSeason);
     } catch (err) {
       console.error(`Failed to load player details: ${err.message}`);
-      if (mountedRef.current && requestId === playerRequestIdRef.current) {
-        setDetailsError('Failed to load player details');
-      }
     } finally {
       if (mountedRef.current && requestId === playerRequestIdRef.current) {
         setLoadingDetails(false);
@@ -74,12 +69,8 @@ export function usePlayerDetails() {
       const response = await getPlayer(currentPlayerName, season);
       if (!mountedRef.current || requestId !== seasonRequestIdRef.current) return;
       setPlayerDetails(response.data);
-      setDetailsError(null);
     } catch (err) {
       console.error(`Failed to load season data: ${err.message}`);
-      if (mountedRef.current && requestId === seasonRequestIdRef.current) {
-        setDetailsError('Failed to load season data');
-      }
     } finally {
       if (mountedRef.current && requestId === seasonRequestIdRef.current) {
         setLoadingDetails(false);
@@ -92,7 +83,6 @@ export function usePlayerDetails() {
     playerRequestIdRef.current += 1;
     seasonRequestIdRef.current += 1;
     setLoadingDetails(false);
-    setDetailsError(null);
     setPlayerDetails(null);
     setCurrentPlayerName(null);
     setCurrentSeason(null);
@@ -102,7 +92,6 @@ export function usePlayerDetails() {
   return {
     playerDetails,
     loadingDetails,
-    detailsError,
     availableSeasons: playerAvailableSeasons,
     currentSeason,
     handlePlayerClick,

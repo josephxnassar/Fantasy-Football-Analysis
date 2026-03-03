@@ -1,4 +1,4 @@
-import { memo, useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import './DivisionBrowser.css';
 
 function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →' }) {
@@ -45,17 +45,6 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
     [divisions]
   );
 
-  const handleDivisionSelect = useCallback((div) => {
-    setExpandedDivision(div);
-  }, []);
-
-  const handleTeamSelect = useCallback(
-    (team) => {
-      onTeamSelect(team);
-    },
-    [onTeamSelect]
-  );
-
   if (loading) {
     return <div className="loading">Loading divisions...</div>;
   }
@@ -85,7 +74,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
           <button
             key={div}
             className={`division-button ${expandedDivision === div ? 'active' : ''}`}
-            onClick={() => handleDivisionSelect(div)}
+            onClick={() => setExpandedDivision(div)}
           >
             {div}
           </button>
@@ -98,7 +87,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
           <div
             key={team}
             className="team-card"
-            onClick={() => handleTeamSelect(team)}
+            onClick={() => onTeamSelect(team)}
           >
             <div className="team-abbr">{team}</div>
             <div className="team-name">{teamNames[team] || team}</div>
@@ -110,4 +99,4 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
   );
 }
 
-export default memo(DivisionBrowser);
+export default DivisionBrowser;

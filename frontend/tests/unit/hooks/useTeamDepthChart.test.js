@@ -77,7 +77,7 @@ describe('useTeamDepthChart', () => {
     expect(result.current.teamDepthChart).toEqual({ team: 'BUF' });
   });
 
-  it('exposes error state when fetch fails', async () => {
+  it('clears loading state when fetch fails', async () => {
     getTeamDepthChart.mockRejectedValueOnce(new Error('Server error'));
 
     const { result } = renderHook(() => useTeamDepthChart('KC'));
@@ -86,7 +86,6 @@ describe('useTeamDepthChart', () => {
       expect(result.current.depthChartLoading).toBe(false);
     });
 
-    expect(result.current.depthChartError).toBe('Failed to load depth chart');
     expect(result.current.teamDepthChart).toBeNull();
   });
 });

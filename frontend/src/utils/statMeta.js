@@ -8,24 +8,17 @@ export const STAT_META = {
 
   // Passing.
   completions: { label: 'Comp', description: 'Completed passes.', format: 'int' },
-  attempts: { label: 'Pass Att', description: 'Total passing attempts.', format: 'int' },
   pass_att: { label: 'Pass Att', description: 'Total passing attempts.', format: 'int' },
   pass_yds: { label: 'Pass Yds', description: 'Total passing yards through the air.', format: 'int' },
   pass_td: { label: 'Pass TD', description: 'Passing touchdowns thrown.', format: 'int' },
   passing_interceptions: { label: 'INT', description: 'Interceptions thrown. Each costs roughly 2 fantasy points in standard scoring.', format: 'int' },
 
   // Rushing.
-  carries: { label: 'Carries', description: 'Total rushing attempts.', format: 'int' },
   rush_att: { label: 'Carries', description: 'Total rushing attempts.', format: 'int' },
-  rushing_yards: { label: 'Rush Yds', description: 'Total rushing yards.', format: 'int' },
   rush_yds: { label: 'Rush Yds', description: 'Total rushing yards.', format: 'int' },
-  rushing_tds: { label: 'Rush TD', description: 'Rushing touchdowns scored.', format: 'int' },
   rush_td: { label: 'Rush TD', description: 'Rushing touchdowns scored.', format: 'int' },
 
   // Receiving.
-  receptions: { label: 'Rec', description: 'Total catches. Worth 1 point each in PPR formats.', format: 'int' },
-  receiving_yards: { label: 'Rec Yds', description: 'Total receiving yards.', format: 'int' },
-  receiving_tds: { label: 'Rec TD', description: 'Receiving touchdowns scored.', format: 'int' },
   rec: { label: 'Rec', description: 'Total catches. Worth 1 point each in PPR formats.', format: 'int' },
   targets: { label: 'Tgt', description: 'Times a pass was thrown to this player — a key indicator of offensive involvement.', format: 'int' },
   rec_yds: { label: 'Rec Yds', description: 'Total receiving yards.', format: 'int' },
@@ -98,6 +91,7 @@ export const PRODUCTION_GROUPS = {
     Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_yac', 'Yds/Rush', 'pfr_rush_yac_att', 'pfr_rush_ybc_att'],
     'Rushing Efficiency': ['rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_brk_tkl'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch'],
+    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct'],
     Usage: ['target_share', 'wopr', 'sc_offense_pct'],
     Percentiles: ['fp_ppr_pct', 'exp_fp_pct', 'rush_att_pct', 'rush_yds_pct', 'targets_pct', 'rec_yds_pct'],
   },
@@ -108,6 +102,7 @@ export const PRODUCTION_GROUPS = {
     'Route Running': ['ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
     'After the Catch': ['ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r', 'pfr_rec_brk_tkl'],
     Rushing: ['rush_att', 'rush_yds', 'rush_td'],
+    'Rushing Efficiency': ['rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_brk_tkl'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
     Percentiles: ['fp_ppr_pct', 'exp_fp_pct', 'targets_pct', 'rec_yds_pct'],
   },
@@ -118,6 +113,7 @@ export const PRODUCTION_GROUPS = {
     'Route Running': ['ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
     'After the Catch': ['ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r', 'pfr_rec_brk_tkl'],
     Rushing: ['rush_att', 'rush_yds', 'rush_td'],
+    'Rushing Efficiency': ['rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_brk_tkl'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
     Percentiles: ['fp_ppr_pct', 'exp_fp_pct', 'targets_pct', 'rec_yds_pct'],
   },

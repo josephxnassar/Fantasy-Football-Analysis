@@ -6,7 +6,6 @@ import { getTeamDepthChart } from '../api';
 export function useTeamDepthChart(team) {
   const [teamDepthChart, setTeamDepthChart] = useState(null);
   const [depthChartLoading, setDepthChartLoading] = useState(false);
-  const [depthChartError, setDepthChartError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -14,7 +13,6 @@ export function useTeamDepthChart(team) {
     if (!team) {
       if (!cancelled) {
         setTeamDepthChart(null);
-        setDepthChartError(null);
         setDepthChartLoading(false);
       }
       return;
@@ -29,13 +27,11 @@ export function useTeamDepthChart(team) {
         const response = await getTeamDepthChart(team);
         if (!cancelled) {
           setTeamDepthChart(response.data);
-          setDepthChartError(null);
         }
       } catch (err) {
         console.error(`Failed to load depth chart: ${err.message}`);
         if (!cancelled) {
           setTeamDepthChart(null);
-          setDepthChartError('Failed to load depth chart');
         }
       } finally {
         if (!cancelled) {
@@ -51,5 +47,5 @@ export function useTeamDepthChart(team) {
     };
   }, [team]);
 
-  return { teamDepthChart, depthChartLoading, depthChartError };
+  return { teamDepthChart, depthChartLoading };
 }
