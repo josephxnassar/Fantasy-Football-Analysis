@@ -90,7 +90,7 @@ export const PRODUCTION_GROUPS = {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
     Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_yac', 'pfr_rush_brk_tkl'],
     'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_yac_att', 'pfr_rush_ybc_att'],
-    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl'],
     'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'pfr_rec_drop_pct', 'pfr_rec_yac_r'],
     Usage: ['target_share', 'wopr', 'sc_offense_pct'],
     Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'rush_att_rank', 'rush_yds_rank', 'targets_rank', 'rec_yds_rank'],

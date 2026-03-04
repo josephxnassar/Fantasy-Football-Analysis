@@ -43,6 +43,22 @@ describe('groupStatsByCategoryMap', () => {
     expect(grouped.Usage).toHaveProperty('wopr', 0.55);
   });
 
+  it('groups RB receiving broken tackles when data exists', () => {
+    const stats = {
+      targets: 62,
+      rec: 49,
+      rec_yds: 388,
+      receiving_yards_after_catch: 271,
+      pfr_rec_brk_tkl: 8,
+    };
+
+    const grouped = groupStatsByCategoryMap(stats, PRODUCTION_GROUPS.RB);
+
+    expect(grouped.Receiving).toHaveProperty('targets', 62);
+    expect(grouped.Receiving).toHaveProperty('receiving_yards_after_catch', 271);
+    expect(grouped.Receiving).toHaveProperty('pfr_rec_brk_tkl', 8);
+  });
+
   it('excludes categories where no stats have data', () => {
     const stats = { fp_ppr: 200.0 };
     const grouped = groupStatsByCategoryMap(stats, PRODUCTION_GROUPS.RB);
