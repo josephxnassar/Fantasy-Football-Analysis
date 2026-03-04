@@ -60,7 +60,8 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
 
       <div className="team-grid">
         {teams.map((team) => (
-          <div
+          <button
+            type="button"
             key={team}
             className="team-card"
             onClick={() => onTeamSelect(team)}
@@ -68,7 +69,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
             <div className="team-abbr">{team}</div>
             <div className="team-name">{teamNames[team] || team}</div>
             <div className="team-action">{actionLabel}</div>
-          </div>
+          </button>
         ))}
       </div>
     </div>

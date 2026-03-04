@@ -32,6 +32,7 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
         }
       } catch (err) {
         if (!cancelled) {
+          setData(null);
           setError(defaultErrorMessage);
         }
         console.error(err);

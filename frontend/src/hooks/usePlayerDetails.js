@@ -17,12 +17,9 @@ export function usePlayerDetails() {
   // Request tokens prevent stale async responses from overwriting fresh state.
   const playerRequestIdRef = useRef(0);
   const seasonRequestIdRef = useRef(0);
-  const mountedRef = useRef(true);
 
   useEffect(() => {
-    mountedRef.current = true;
     return () => {
-      mountedRef.current = false;
       playerRequestIdRef.current += 1;
       seasonRequestIdRef.current += 1;
     };
@@ -39,7 +36,7 @@ export function usePlayerDetails() {
       setCurrentPlayerName(playerName);
 
       const response = await getPlayer(playerName);
-      if (!mountedRef.current || requestId !== playerRequestIdRef.current) return;
+      if (requestId !== playerRequestIdRef.current) return;
 
       setPlayerDetails(response.data);
 
@@ -50,7 +47,7 @@ export function usePlayerDetails() {
       const mostRecentSeason = seasons.length > 0 ? seasons[0] : null;
       setCurrentSeason(mostRecentSeason);
     } catch (err) {
-      if (mountedRef.current && requestId === playerRequestIdRef.current) {
+      if (requestId === playerRequestIdRef.current) {
         setDetailsError('Failed to load player details.');
         setPlayerDetails(null);
         setCurrentPlayerName(null);
@@ -59,7 +56,7 @@ export function usePlayerDetails() {
       }
       console.error(`Failed to load player details: ${err.message}`);
     } finally {
-      if (mountedRef.current && requestId === playerRequestIdRef.current) {
+      if (requestId === playerRequestIdRef.current) {
         setLoadingDetails(false);
       }
     }
@@ -76,17 +73,17 @@ export function usePlayerDetails() {
       setDetailsError(null);
 
       const response = await getPlayer(currentPlayerName, season);
-      if (!mountedRef.current || requestId !== seasonRequestIdRef.current) return;
+      if (requestId !== seasonRequestIdRef.current) return;
       setPlayerDetails(response.data);
       setCurrentSeason(season);
       setPlayerAvailableSeasons(response.data.available_seasons || []);
     } catch (err) {
-      if (mountedRef.current && requestId === seasonRequestIdRef.current) {
+      if (requestId === seasonRequestIdRef.current) {
         setDetailsError(`Failed to load ${season} season data.`);
       }
       console.error(`Failed to load season data: ${err.message}`);
     } finally {
-      if (mountedRef.current && requestId === seasonRequestIdRef.current) {
+      if (requestId === seasonRequestIdRef.current) {
         setLoadingDetails(false);
       }
     }

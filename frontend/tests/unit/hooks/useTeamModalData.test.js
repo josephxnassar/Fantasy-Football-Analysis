@@ -87,4 +87,31 @@ describe('useTeamModalData', () => {
     expect(result.current.error).toBe('Failed to load data.');
     expect(result.current.data).toBeNull();
   });
+
+  it('clears stale data when a refetch fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce({ data: { team: 'KC', opponents: ['BUF'] } })
+      .mockRejectedValueOnce(new Error('Server error'));
+
+    const { result, rerender } = renderHook(
+      ({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'),
+      { initialProps: { team: 'KC' } }
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.data).toEqual({ team: 'KC', opponents: ['BUF'] });
+
+    rerender({ team: 'BUF' });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBe('Failed to load data.');
+    expect(result.current.data).toBeNull();
+  });
 });

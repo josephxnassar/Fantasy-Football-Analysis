@@ -40,11 +40,11 @@ function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
         )}
 
         {filteredTeams.map((team) => (
-          <div key={team} className="team-item" onClick={() => onTeamSelect(team)}>
+          <button type="button" key={team} className="team-item" onClick={() => onTeamSelect(team)}>
             <span className="team-item-abbr">{team}</span>
             <span className="team-item-name">{teamNames[team] || team}</span>
             <span className="team-item-arrow">→</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

@@ -6,7 +6,8 @@ import DetailBadge from './DetailBadge';
 
 export default function PlayerCard({ player, onPlayerClick }) {
   return (
-    <div
+    <button
+      type="button"
       className="player-card"
       onClick={() => onPlayerClick(player.name, player)}
     >
@@ -21,6 +22,6 @@ export default function PlayerCard({ player, onPlayerClick }) {
           {player.age && <DetailBadge>Age {player.age}</DetailBadge>}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
