@@ -24,7 +24,9 @@ function Statistics({ onPlayerClick }) {
 
   return (
     <div className="statistics-container">
-      <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
+      <div className="statistics-header">
+        <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
+      </div>
 
       <div className="statistics-content">
         <Suspense fallback={<LoadingMessage message="Loading statistics..." />}>

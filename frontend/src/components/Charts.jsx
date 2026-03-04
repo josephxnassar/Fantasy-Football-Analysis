@@ -47,60 +47,72 @@ export default function Charts({ onPlayerClick }) {
 
   return (
     <div className="charts-container">
-      <h1>Stat Charts</h1>
+      <div className="charts-stage">
+        <div className="charts-panel charts-panel--header">
+          <div className="charts-copy">
+            <p className="charts-kicker">Leaderboard View</p>
+            <h1>Stat Charts</h1>
+            <p className="charts-description">
+              Compare leaders by position, season, and key production metric.
+            </p>
+          </div>
 
-      <ChartControls
-        position={position}
-        setPosition={setPosition}
-        chartData={chartData}
-        season={season}
-        setSeason={setSeason}
-        stat={stat}
-        setStat={setStat}
-        statOptions={statOptions}
-        topN={topN}
-        setTopN={setTopN}
-      />
-
-      {barData.length === 0 ? (
-        <p className="charts-no-data">No data available for the selected stat.</p>
-      ) : (
-        <div className="chart-wrapper">
-          {/* Height scales with row count so labels remain readable. */}
-          <ResponsiveContainer width="100%" height={chartHeight}>
-            <BarChart
-              data={barData}
-              layout="vertical"
-              margin={{ top: 10, right: 40, bottom: 10, left: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" horizontal={false} />
-              <XAxis
-                type="number"
-                tick={{ fontSize: 12 }}
-                stroke="var(--color-text-muted)"
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={150}
-                tick={{ fontSize: 12, cursor: 'pointer' }}
-                stroke="var(--color-text-muted)"
-                onClick={(e) => {
-                  // Clicking a player label opens the player modal.
-                  if (e?.value) onPlayerClick(e.value);
-                }}
-              />
-              <Tooltip cursor={false} content={<ChartTooltip />} />
-              <Bar
-                dataKey="value"
-                shape={(shapeProps) => (
-                  <ChartBarShape {...shapeProps} onBarClick={onPlayerClick} />
-                )}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartControls
+            position={position}
+            setPosition={setPosition}
+            chartData={chartData}
+            season={season}
+            setSeason={setSeason}
+            stat={stat}
+            setStat={setStat}
+            statOptions={statOptions}
+            topN={topN}
+            setTopN={setTopN}
+          />
         </div>
-      )}
+
+        {barData.length === 0 ? (
+          <div className="charts-panel">
+            <p className="charts-no-data">No data available for the selected stat.</p>
+          </div>
+        ) : (
+          <div className="charts-panel chart-wrapper">
+            {/* Height scales with row count so labels remain readable. */}
+            <ResponsiveContainer width="100%" height={chartHeight}>
+              <BarChart
+                data={barData}
+                layout="vertical"
+                margin={{ top: 10, right: 40, bottom: 10, left: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" horizontal={false} />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 12 }}
+                  stroke="var(--color-text-muted)"
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={150}
+                  tick={{ fontSize: 12, cursor: 'pointer' }}
+                  stroke="var(--color-text-muted)"
+                  onClick={(e) => {
+                    // Clicking a player label opens the player modal.
+                    if (e?.value) onPlayerClick(e.value);
+                  }}
+                />
+                <Tooltip cursor={false} content={<ChartTooltip />} />
+                <Bar
+                  dataKey="value"
+                  shape={(shapeProps) => (
+                    <ChartBarShape {...shapeProps} onBarClick={onPlayerClick} />
+                  )}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
