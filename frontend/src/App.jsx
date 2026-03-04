@@ -2,6 +2,8 @@ import { Suspense, lazy, useState } from 'react';
 import './App.css';
 import { ErrorBoundary, LoadingMessage } from './components/common';
 import LandingPage from './components/LandingPage';
+import PlayerDetailsModal from './components/PlayerDetailsModal';
+import { usePlayerDetails } from './hooks/usePlayerDetails';
 
 const Statistics = lazy(() => import('./components/Statistics'));
 const Schedules = lazy(() => import('./components/Schedules'));
@@ -11,18 +13,43 @@ function App() {
   // null = landing page, otherwise the active section tab.
   const [activeTab, setActiveTab] = useState(null);
 
+  // Centralised player-modal state shared across all views.
+  const {
+    playerDetails,
+    loadingDetails,
+    availableSeasons,
+    currentSeason,
+    handlePlayerClick,
+    handleSeasonChange,
+    closeDetails,
+  } = usePlayerDetails();
+
   // Resolve the currently selected top-level tab to its view component.
   const renderTab = () => {
     switch (activeTab) {
-      case 'statistics': return <Statistics />;
+      case 'statistics': return <Statistics onPlayerClick={handlePlayerClick} />;
       case 'schedules': return <Schedules />;
       case 'depth-charts': return <DepthCharts />;
-      default: return <Statistics />;
+      default: return <Statistics onPlayerClick={handlePlayerClick} />;
     }
   };
 
   if (!activeTab) {
-    return <LandingPage onNavigate={setActiveTab} />;
+    return (
+      <>
+        <LandingPage onNavigate={setActiveTab} onPlayerClick={handlePlayerClick} />
+        {(playerDetails || loadingDetails) && (
+          <PlayerDetailsModal
+            playerDetails={playerDetails}
+            loading={loadingDetails}
+            onClose={closeDetails}
+            availableSeasons={availableSeasons}
+            currentSeason={currentSeason}
+            onSeasonChange={handleSeasonChange}
+          />
+        )}
+      </>
+    );
   }
 
   return (
@@ -103,6 +130,17 @@ function App() {
           </Suspense>
         </ErrorBoundary>
       </main>
+
+      {(playerDetails || loadingDetails) && (
+        <PlayerDetailsModal
+          playerDetails={playerDetails}
+          loading={loadingDetails}
+          onClose={closeDetails}
+          availableSeasons={availableSeasons}
+          currentSeason={currentSeason}
+          onSeasonChange={handleSeasonChange}
+        />
+      )}
     </div>
   );
 }

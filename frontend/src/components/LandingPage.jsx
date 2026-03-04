@@ -1,25 +1,19 @@
 /* Landing page component — composes sub-components into an info hub. */
 
-import { usePlayerDetails } from '../hooks/usePlayerDetails';
-import PlayerDetailsModal from './PlayerDetailsModal';
-import { HeroSection, QuickSearch, FeatureCards, AtAGlance, DataSources } from './landing';
+import PlayerSearch from './PlayerSearch';
+import { HeroSection, FeatureCards, AtAGlance, DataSources } from './landing';
 import './LandingPage.css';
 
-export default function LandingPage({ onNavigate }) {
-  const {
-    playerDetails,
-    loadingDetails,
-    availableSeasons,
-    currentSeason,
-    handlePlayerClick,
-    handleSeasonChange,
-    closeDetails,
-  } = usePlayerDetails();
-
+export default function LandingPage({ onNavigate, onPlayerClick }) {
   return (
     <div className="landing">
       <HeroSection />
-      <QuickSearch onPlayerClick={handlePlayerClick} />
+      <PlayerSearch
+        onPlayerClick={onPlayerClick}
+        className="landing-search"
+        heading="Quick Player Search"
+        maxResults={6}
+      />
       <FeatureCards onNavigate={onNavigate} />
       <AtAGlance />
       <DataSources />
@@ -27,17 +21,6 @@ export default function LandingPage({ onNavigate }) {
       <footer className="landing-footer">
         <p>Built for fantasy analysis — not affiliated with the NFL or any team.</p>
       </footer>
-
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-        />
-      )}
     </div>
   );
 }

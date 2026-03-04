@@ -1,29 +1,24 @@
-/* Player search component with live results */
+/* Reusable player search form with results grid */
 
 import { useState } from 'react';
 import { searchPlayers } from '../api';
-import PlayerDetailsModal from './PlayerDetailsModal';
-import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import { ErrorMessage, EmptyStateMessage, PlayerCard } from './common';
 import './PlayerSearch.css';
 
-export default function PlayerSearch() {
+/**
+ * @param {Object} props
+ * @param {Function} props.onPlayerClick — called with player name when a result is clicked
+ * @param {string}  [props.className]   — optional wrapper class for context-specific styling
+ * @param {string}  [props.heading]     — section heading (default: "Search Players")
+ * @param {number}  [props.maxResults]  — cap displayed results (default: show all)
+ */
+export default function PlayerSearch({ onPlayerClick, className, heading = 'Search Players', maxResults }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  const { 
-    playerDetails, 
-    loadingDetails,
-    availableSeasons,
-    currentSeason,
-    handlePlayerClick,
-    handleSeasonChange,
-    closeDetails 
-  } = usePlayerDetails();
 
-  // Execute player search and update result/error state for the modal list.
+  // Execute player search and update result/error state.
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim() || searchQuery.length < 2) {
@@ -44,10 +39,14 @@ export default function PlayerSearch() {
     }
   };
 
+  const displayResults = searchResults?.results && maxResults
+    ? searchResults.results.slice(0, maxResults)
+    : searchResults?.results;
+
   return (
-    <div className="player-search-container">
+    <div className={`player-search-container ${className || ''}`}>
       <div className="search-section">
-        <h2>Search Players</h2>
+        <h2>{heading}</h2>
         <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
@@ -68,11 +67,11 @@ export default function PlayerSearch() {
             <h3>Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
-                {searchResults.results.map((player) => (
+                {displayResults.map((player) => (
                   <PlayerCard
                     key={player.name}
                     player={player}
-                    onPlayerClick={handlePlayerClick}
+                    onPlayerClick={onPlayerClick}
                   />
                 ))}
               </div>
@@ -82,17 +81,6 @@ export default function PlayerSearch() {
           </div>
         )}
       </div>
-
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-        />
-      )}
     </div>
   );
 }

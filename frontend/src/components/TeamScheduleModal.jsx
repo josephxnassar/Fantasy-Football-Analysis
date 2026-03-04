@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
+import { ModalOverlay } from './common';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
@@ -24,15 +25,8 @@ export default function TeamScheduleModal({ team, onClose }) {
 
   if (!team) return null;
 
-  // Close only on true overlay click (not modal content click).
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className="schedule-modal-overlay" onClick={handleOverlayClick}>
+    <ModalOverlay className="schedule-modal-overlay" onClose={onClose}>
       <div className="schedule-modal-content">
         <button className="schedule-close-button" onClick={onClose}>×</button>
         
@@ -82,6 +76,6 @@ export default function TeamScheduleModal({ team, onClose }) {
           </>
         )}
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

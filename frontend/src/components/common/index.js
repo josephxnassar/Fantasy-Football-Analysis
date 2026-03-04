@@ -1,5 +1,6 @@
 /* Barrel export for common components */
 
+export { default as ModalOverlay } from './ModalOverlay';
 export { default as PlayerCard } from './PlayerCard';
 export { default as RookieBadge } from './RookieBadge';
 export { default as SubTabNav } from './SubTabNav';

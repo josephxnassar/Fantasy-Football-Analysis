@@ -1,8 +1,9 @@
 /* Player details modal with stats and season selection */
 
 import { useState } from 'react';
-import { useTeamDepthChart } from '../hooks/useTeamDepthChart';
-import { SubTabNav } from './common';
+import { getTeamDepthChart } from '../api';
+import { useTeamModalData } from '../hooks/useTeamModalData';
+import { ModalOverlay, SubTabNav } from './common';
 import PlayerHeader from './player-details/PlayerHeader';
 import PlayerStatsView from './player-details/PlayerStatsView';
 import PlayerDepthChartTab from './player-details/PlayerDepthChartTab';
@@ -20,19 +21,14 @@ export default function PlayerDetailsModal({
   const [modalTab, setModalTab] = useState('statistics');
 
   // Depth chart follows the player's current team from player payload.
-  const { teamDepthChart, depthChartLoading } = useTeamDepthChart(playerDetails?.team);
+  const { data: teamDepthChart, loading: depthChartLoading } = useTeamModalData(
+    playerDetails?.team, getTeamDepthChart, 'Failed to load depth chart'
+  );
 
   if (!playerDetails && !loading) return null;
 
-  // Close only on true overlay click (not modal content click).
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
+    <ModalOverlay onClose={onClose}>
       <div className="modal-content">
         <button className="player-details-close-button" onClick={onClose}>×</button>
         
@@ -74,6 +70,6 @@ export default function PlayerDetailsModal({
           </>
         )}
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

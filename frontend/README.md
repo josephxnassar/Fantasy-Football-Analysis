@@ -43,6 +43,8 @@ npm run build
 
 ## UI Navigation Model
 
+The app opens on a **Landing Page** ([`src/components/LandingPage.jsx`](src/components/LandingPage.jsx)) with quick search, feature cards, at-a-glance stats, and data source attribution. A home button (🏠) in the header returns to the landing page.
+
 Top-level tabs in [`src/App.jsx`](src/App.jsx):
 - `Statistics`
 - `Schedules`
@@ -64,6 +66,7 @@ Schedules and Depth Charts share the same team navigation pattern via [`src/comp
 | Hooks | [`src/hooks/`](src/hooks) |
 | Feature components | [`src/components/`](src/components) |
 | Reusable components | [`src/components/common/`](src/components/common) |
+| Landing page sub-components | [`src/components/landing/`](src/components/landing) |
 | Player modal sub-components | [`src/components/player-details/`](src/components/player-details) |
 | Utilities | [`src/utils/`](src/utils) |
 | Stat utilities | [`src/utils/statDefinitions.js`](src/utils/statDefinitions.js), [`src/utils/statMeta.js`](src/utils/statMeta.js), [`src/utils/statGrouping.js`](src/utils/statGrouping.js), [`src/utils/statColorHelpers.js`](src/utils/statColorHelpers.js) |

@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import './DivisionBrowser.css';
 
-function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →' }) {
-  const [expandedConference, setExpandedConference] = useState('AFC');
-  const [expandedDivision, setExpandedDivision] = useState('North');
+function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →', defaultConference = 'AFC', defaultDivision = 'North' }) {
+  const [expandedConference, setExpandedConference] = useState(defaultConference);
+  const [expandedDivision, setExpandedDivision] = useState(defaultDivision);
 
   // Derived lists for current conference/division selection.
   const conferences = useMemo(() => Object.keys(divisions || {}), [divisions]);

@@ -51,6 +51,7 @@ Local base URL: `http://localhost:8000`
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/` | API status |
+| `GET` | `/api/app-info` | App metadata (seasons, player counts, game logs) |
 | `GET` | `/api/player/{player_name}` | Player profile + stats + weekly data |
 | `GET` | `/api/search` | Name search (optional position filter) |
 | `GET` | `/api/chart-data` | Chart payload by position/season |

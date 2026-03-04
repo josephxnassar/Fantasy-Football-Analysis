@@ -10,15 +10,15 @@ const TABS = [
   { id: 'search', label: 'Player Search' },
 ];
 
-function Statistics() {
+function Statistics({ onPlayerClick }) {
   const [activeSubTab, setActiveSubTab] = useState('charts');
 
   // Render the active statistics sub-tab content.
   const renderContent = () => {
     switch (activeSubTab) {
-      case 'search': return <PlayerSearch />;
-      case 'charts': return <Charts />;
-      default: return <Charts />;
+      case 'search': return <PlayerSearch onPlayerClick={onPlayerClick} />;
+      case 'charts': return <Charts onPlayerClick={onPlayerClick} />;
+      default: return <Charts onPlayerClick={onPlayerClick} />;
     }
   };
 

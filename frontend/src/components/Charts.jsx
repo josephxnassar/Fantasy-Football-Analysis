@@ -4,17 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { useChartData } from '../hooks/useChartData';
-import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import { PRODUCTION_GROUPS } from '../utils/statMeta';
 import { ErrorMessage, LoadingMessage } from './common';
 import ChartBarShape from './charts/ChartBarShape';
 import ChartControls from './charts/ChartControls';
 import { buildBarData, DEFAULT_STAT, getChartHeight, getStatOptions } from './charts/chartsHelpers';
 import ChartTooltip from './charts/ChartTooltip';
-import PlayerDetailsModal from './PlayerDetailsModal';
 import './Charts.css';
 
-export default function Charts() {
+export default function Charts({ onPlayerClick }) {
   // UI controls for the chart query.
   const [position, setPosition] = useState('Overall');
   const [season, setSeason] = useState(null);
@@ -23,17 +21,6 @@ export default function Charts() {
 
   // Server payload for selected position + season.
   const { chartData, loading, error } = useChartData(position, season);
-
-  // Shared player-modal state/handlers reused from search/chart clicks.
-  const {
-    playerDetails,
-    loadingDetails,
-    availableSeasons: playerSeasons,
-    currentSeason: playerSeason,
-    handlePlayerClick,
-    handleSeasonChange: handlePlayerSeasonChange,
-    closeDetails,
-  } = usePlayerDetails();
 
   // Flatten API rows into sorted chart bars for the selected stat.
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
@@ -100,30 +87,19 @@ export default function Charts() {
                 stroke="var(--color-text-muted)"
                 onClick={(e) => {
                   // Clicking a player label opens the player modal.
-                  if (e?.value) handlePlayerClick(e.value);
+                  if (e?.value) onPlayerClick(e.value);
                 }}
               />
               <Tooltip cursor={false} content={<ChartTooltip />} />
               <Bar
                 dataKey="value"
                 shape={(shapeProps) => (
-                  <ChartBarShape {...shapeProps} onBarClick={handlePlayerClick} />
+                  <ChartBarShape {...shapeProps} onBarClick={onPlayerClick} />
                 )}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      )}
-
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={playerSeasons}
-          currentSeason={playerSeason}
-          onSeasonChange={handlePlayerSeasonChange}
-        />
       )}
     </div>
   );
