@@ -1,5 +1,3 @@
-/* Landing page component — composes sub-components into an info hub. */
-
 import PlayerSearch from './PlayerSearch';
 import { HeroSection, FeatureCards, AtAGlance, DataSources } from './landing';
 import './LandingPage.css';

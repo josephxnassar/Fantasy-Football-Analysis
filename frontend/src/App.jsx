@@ -9,11 +9,20 @@ const Statistics = lazy(() => import('./components/Statistics'));
 const Schedules = lazy(() => import('./components/Schedules'));
 const DepthCharts = lazy(() => import('./components/DepthCharts'));
 
-function App() {
-  // null = landing page, otherwise the active section tab.
-  const [activeTab, setActiveTab] = useState(null);
+const DEFAULT_TAB = 'statistics';
+const TAB_COMPONENTS = {
+  statistics: Statistics,
+  schedules: Schedules,
+  'depth-charts': DepthCharts,
+};
+const NAV_TABS = [
+  { id: 'statistics', label: 'Statistics' },
+  { id: 'schedules', label: 'Schedules' },
+  { id: 'depth-charts', label: 'Depth Charts' },
+];
 
-  // Centralised player-modal state shared across all views.
+function App() {
+  const [activeTab, setActiveTab] = useState(null);
   const {
     playerDetails,
     loadingDetails,
@@ -24,32 +33,26 @@ function App() {
     handleSeasonChange,
     closeDetails,
   } = usePlayerDetails();
-
-  // Resolve the currently selected top-level tab to its view component.
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'statistics': return <Statistics onPlayerClick={handlePlayerClick} />;
-      case 'schedules': return <Schedules />;
-      case 'depth-charts': return <DepthCharts />;
-      default: return <Statistics onPlayerClick={handlePlayerClick} />;
-    }
-  };
+  const ActiveTabComponent = TAB_COMPONENTS[activeTab] || Statistics;
+  const showPlayerModal = playerDetails || loadingDetails || detailsError;
+  const playerModal = showPlayerModal ? (
+    <PlayerDetailsModal
+      playerDetails={playerDetails}
+      loading={loadingDetails}
+      error={detailsError}
+      onClose={closeDetails}
+      availableSeasons={availableSeasons}
+      currentSeason={currentSeason}
+      onSeasonChange={handleSeasonChange}
+    />
+  ) : null;
+  const goHome = () => setActiveTab(null);
 
   if (!activeTab) {
     return (
       <>
         <LandingPage onNavigate={setActiveTab} onPlayerClick={handlePlayerClick} />
-        {(playerDetails || loadingDetails || detailsError) && (
-          <PlayerDetailsModal
-            playerDetails={playerDetails}
-            loading={loadingDetails}
-            error={detailsError}
-            onClose={closeDetails}
-            availableSeasons={availableSeasons}
-            currentSeason={currentSeason}
-            onSeasonChange={handleSeasonChange}
-          />
-        )}
+        {playerModal}
       </>
     );
   }
@@ -59,17 +62,17 @@ function App() {
       <header className="app-header">
         <button
           className="app-home-button"
-          onClick={() => setActiveTab(null)}
+          onClick={goHome}
           title="Home"
         >
           🏠
         </button>
         <h1
           className="app-header-title"
-          onClick={() => setActiveTab(null)}
+          onClick={goHome}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setActiveTab(null)}
+          onKeyDown={(e) => e.key === 'Enter' && goHome()}
         >
           Fantasy Football Analysis
         </h1>
@@ -78,31 +81,22 @@ function App() {
 
       <nav className="app-nav">
         <div className="nav-container">
-          <button
-            className={`nav-button ${activeTab === 'statistics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('statistics')}
-          >
-            Statistics
-          </button>
-          <button
-            className={`nav-button ${activeTab === 'schedules' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedules')}
-          >
-            Schedules
-          </button>
-          <button
-            className={`nav-button ${activeTab === 'depth-charts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('depth-charts')}
-          >
-            Depth Charts
-          </button>
+          {NAV_TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              className={`nav-button ${activeTab === id ? 'active' : ''}`}
+              onClick={() => setActiveTab(id)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </nav>
 
       <main>
         <ErrorBoundary
           resetKey={activeTab}
-          onReset={() => setActiveTab('statistics')}
+          onReset={() => setActiveTab(DEFAULT_TAB)}
           fallbackRender={({ resetErrorBoundary }) => (
             <div className="tab-error-fallback">
               <h2>This section crashed.</h2>
@@ -111,7 +105,7 @@ function App() {
                 <button
                   className="tab-error-btn secondary"
                   onClick={() => {
-                    setActiveTab('statistics');
+                    setActiveTab(DEFAULT_TAB);
                     resetErrorBoundary();
                   }}
                 >
@@ -128,22 +122,12 @@ function App() {
           )}
         >
           <Suspense fallback={<LoadingMessage message="Loading section..." />}>
-            {renderTab()}
+            <ActiveTabComponent onPlayerClick={handlePlayerClick} />
           </Suspense>
         </ErrorBoundary>
       </main>
 
-      {(playerDetails || loadingDetails || detailsError) && (
-        <PlayerDetailsModal
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          error={detailsError}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-        />
-      )}
+      {playerModal}
     </div>
   );
 }

@@ -1,18 +1,8 @@
-/* Reusable player search form with results grid */
-
 import { useState } from 'react';
 import { searchPlayers } from '../api';
 import { ErrorMessage, EmptyStateMessage, PlayerCard } from './common';
 import './PlayerSearch.css';
 
-/**
- * @param {Object} props
- * @param {Function} props.onPlayerClick — called with player name when a result is clicked
- * @param {string}  [props.className]   — optional wrapper class for context-specific styling
- * @param {string}  [props.heading]     — section heading (default: "Search Players")
- * @param {number}  [props.maxResults]  — cap displayed results (default: show all)
- * @param {string}  [props.variant]     — visual variant name (default: "default")
- */
 export default function PlayerSearch({
   onPlayerClick,
   className,
@@ -25,7 +15,6 @@ export default function PlayerSearch({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Execute player search and update result/error state.
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim() || searchQuery.length < 2) {
@@ -46,9 +35,8 @@ export default function PlayerSearch({
     }
   };
 
-  const displayResults = searchResults?.results && maxResults
-    ? searchResults.results.slice(0, maxResults)
-    : searchResults?.results;
+  const results = searchResults?.results ?? [];
+  const displayResults = maxResults ? results.slice(0, maxResults) : results;
 
   const containerClassName = [
     'player-search-container',
@@ -80,13 +68,7 @@ export default function PlayerSearch({
             <h3 className="results-count">Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
-                {displayResults.map((player) => (
-                  <PlayerCard
-                    key={player.name}
-                    player={player}
-                    onPlayerClick={onPlayerClick}
-                  />
-                ))}
+                {displayResults.map((player) => <PlayerCard key={player.name} player={player} onPlayerClick={onPlayerClick} />)}
               </div>
             ) : (
               <EmptyStateMessage message={`No players found matching "${searchQuery}"`} />
