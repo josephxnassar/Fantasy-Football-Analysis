@@ -54,6 +54,7 @@ Top-level tabs in [`src/App.jsx`](src/App.jsx):
 
 Statistics sub-tabs in [`src/components/Statistics.jsx`](src/components/Statistics.jsx):
 - Charts
+- Rankings (category + stat weighted scoring)
 - Player Search
 
 Schedules and Depth Charts share the same team navigation pattern via [`src/components/TeamBrowser.jsx`](src/components/TeamBrowser.jsx):

@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../setup';
-import { useChartData } from '../../../src/hooks/useChartData';
+import { __resetChartDataCache, useChartData } from '../../../src/hooks/useChartData';
 import { getChartData } from '../../../src/api';
 
 vi.mock('../../../src/api', () => ({
@@ -12,6 +12,7 @@ vi.mock('../../../src/api', () => ({
 describe('useChartData', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    __resetChartDataCache();
   });
 
   it('loads chart data for a position and season', async () => {
@@ -80,5 +81,25 @@ describe('useChartData', () => {
     });
 
     expect(result.current.chartData).toEqual({ labels: ['RB Player'] });
+  });
+
+  it('reuses cached payload for identical position + season', async () => {
+    getChartData.mockResolvedValueOnce({
+      data: { labels: ['Cached Player'] },
+    });
+
+    const first = renderHook(() => useChartData('WR', 2025));
+    await waitFor(() => {
+      expect(first.result.current.loading).toBe(false);
+    });
+    first.unmount();
+
+    const second = renderHook(() => useChartData('WR', 2025));
+    await waitFor(() => {
+      expect(second.result.current.loading).toBe(false);
+    });
+
+    expect(getChartData).toHaveBeenCalledTimes(1);
+    expect(second.result.current.chartData).toEqual({ labels: ['Cached Player'] });
   });
 });

@@ -14,6 +14,7 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 - Advanced stat exploration (EPA, air-yards share, WOPR, etc.)
 - Team schedules and depth charts
 - Chart-ready seasonal stat exploration
+- Weighted custom rankings by position/season
 - Stats-backed canonical player naming in search/player lists
 
 ## Table of Contents

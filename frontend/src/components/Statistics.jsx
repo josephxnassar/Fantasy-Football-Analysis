@@ -4,15 +4,23 @@ import './Statistics.css';
 
 const PlayerSearch = lazy(() => import('./PlayerSearch'));
 const Charts = lazy(() => import('./Charts'));
+const Rankings = lazy(() => import('./Rankings'));
 
 const TABS = [
+  { id: 'rankings', label: 'Rankings' },
   { id: 'charts', label: 'Charts' },
   { id: 'search', label: 'Player Search' },
 ];
 
+const TAB_COMPONENTS = {
+  charts: Charts,
+  rankings: Rankings,
+  search: PlayerSearch,
+};
+
 function Statistics({ onPlayerClick }) {
-  const [activeSubTab, setActiveSubTab] = useState('charts');
-  const ActiveSubTab = activeSubTab === 'search' ? PlayerSearch : Charts;
+  const [activeSubTab, setActiveSubTab] = useState('rankings');
+  const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Rankings;
 
   return (
     <div className="statistics-container">

@@ -1,6 +1,8 @@
 import { getStatLabel } from '../../utils/statDefinitions';
+import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../../utils/leaderboardOptions';
+import { meetsStatThreshold } from '../../utils/statThresholds';
 
-export const TOP_N_OPTIONS = [10, 20, 30, 50];
+export { POSITION_OPTIONS, TOP_N_OPTIONS };
 
 // Default chart stat when switching positions.
 export const DEFAULT_STAT = {
@@ -10,31 +12,6 @@ export const DEFAULT_STAT = {
   TE: 'rec_yds',
   Overall: 'fp_ppr',
 };
-
-export const POSITION_OPTIONS = ['Overall', 'QB', 'RB', 'WR', 'TE'];
-
-const STAT_THRESHOLDS = {
-  'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
-  'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },
-  receiving_epa: { volumeStats: ['targets'], minVolume: 50 },
-  racr: { volumeStats: ['targets'], minVolume: 50 },
-  pfr_rec_drop_pct: { volumeStats: ['targets', 'pfr_rec_tgt'], minVolume: 50 },
-  ng_rec_avg_separation: { volumeStats: ['targets', 'ng_rec_targets'], minVolume: 50 },
-  pfr_rec_adot: { volumeStats: ['targets', 'pfr_rec_tgt'], minVolume: 50 },
-  ng_rec_catch_pct: { volumeStats: ['targets', 'ng_rec_targets'], minVolume: 50 },
-  ng_rec_avg_yac: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
-  ng_rec_avg_yac_above_expectation: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
-  pfr_rec_yac_r: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
-};
-
-function meetsStatThreshold(player, stat) {
-  const threshold = STAT_THRESHOLDS[stat];
-  if (!threshold) return true;
-  const volume = threshold.volumeStats
-    .map((key) => player?.stats?.[key])
-    .find((value) => typeof value === 'number');
-  return typeof volume === 'number' && volume >= threshold.minVolume;
-}
 
 export function getStatOptions(position, statColumns = [], positionStatGroups) {
   // Keeps the stat picker aligned with what backend actually returned.

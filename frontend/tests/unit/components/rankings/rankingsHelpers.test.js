@@ -1,0 +1,89 @@
+import { describe, expect, it } from 'vitest';
+
+import { RANKING_GROUPS } from '../../../../src/utils/rankingMeta';
+import { buildRankings, getRankableGroups } from '../../../../src/components/rankings/rankingsHelpers';
+
+describe('rankingsHelpers', () => {
+  it('filters unavailable stats from rankable groups', () => {
+    const groups = getRankableGroups(
+      'RB',
+      ['fp_ppr', 'rush_yds', 'rush_att_rank'],
+      RANKING_GROUPS
+    );
+
+    expect(groups).toEqual([
+      { category: 'Rushing Production', stats: ['rush_yds'] },
+    ]);
+  });
+
+  it('ranks players with sample-size thresholds applied', () => {
+    const players = [
+      {
+        name: 'Small Sample',
+        position: 'WR',
+        team: 'KC',
+        stats: {
+          ng_rec_avg_separation: 4.2,
+          targets: 12,
+        },
+      },
+      {
+        name: 'Qualified A',
+        position: 'WR',
+        team: 'MIN',
+        stats: {
+          ng_rec_avg_separation: 3.4,
+          targets: 95,
+        },
+      },
+      {
+        name: 'Qualified B',
+        position: 'WR',
+        team: 'DET',
+        stats: {
+          ng_rec_avg_separation: 2.8,
+          targets: 105,
+        },
+      },
+    ];
+
+    const rankableGroups = [
+      { category: 'Route & Separation', stats: ['ng_rec_avg_separation'] },
+    ];
+
+    const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 2 }, {}, 10);
+
+    expect(ranked.map((row) => row.name)).toEqual(['Qualified A', 'Qualified B']);
+    expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
+  });
+
+  it('treats lower-is-better metrics as inverse for scoring', () => {
+    const players = [
+      {
+        name: 'Lower Drop',
+        position: 'WR',
+        team: 'LAR',
+        stats: {
+          pfr_rec_drop_pct: 2,
+          targets: 90,
+        },
+      },
+      {
+        name: 'Higher Drop',
+        position: 'WR',
+        team: 'BUF',
+        stats: {
+          pfr_rec_drop_pct: 8,
+          targets: 90,
+        },
+      },
+    ];
+
+    const rankableGroups = [{ category: 'Receiving Efficiency', stats: ['pfr_rec_drop_pct'] }];
+
+    const ranked = buildRankings(players, rankableGroups, { 'Receiving Efficiency': 1 }, {}, 10);
+
+    expect(ranked[0].name).toBe('Lower Drop');
+    expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
+  });
+});
