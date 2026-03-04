@@ -53,7 +53,7 @@ export default function Charts({ onPlayerClick }) {
             <p className="charts-kicker">Leaderboard View</p>
             <h1>Stat Charts</h1>
             <p className="charts-description">
-              Compare leaders by position, season, and key production metric.
+              Compare leaders by position, season, and key production metric. Advanced rate stats use minimum sample filters.
             </p>
           </div>
 

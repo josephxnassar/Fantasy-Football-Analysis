@@ -46,6 +46,7 @@
 .charts-description {
   margin: 0;
   max-width: 42rem;
+  font-size: 0.82rem;
   color: var(--color-text-subtle);
   line-height: 1.45;
 }

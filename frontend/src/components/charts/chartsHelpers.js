@@ -13,15 +13,22 @@ export const DEFAULT_STAT = {
 
 export const POSITION_OPTIONS = ['Overall', 'QB', 'RB', 'WR', 'TE'];
 
-// Derived rate stats need minimum volume before we chart them.
-const DERIVED_STAT_THRESHOLDS = {
+const STAT_THRESHOLDS = {
   'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
   'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },
+  receiving_epa: { volumeStats: ['targets'], minVolume: 50 },
+  racr: { volumeStats: ['targets'], minVolume: 50 },
+  pfr_rec_drop_pct: { volumeStats: ['targets', 'pfr_rec_tgt'], minVolume: 50 },
+  ng_rec_avg_separation: { volumeStats: ['targets', 'ng_rec_targets'], minVolume: 50 },
+  pfr_rec_adot: { volumeStats: ['targets', 'pfr_rec_tgt'], minVolume: 50 },
+  ng_rec_catch_pct: { volumeStats: ['targets', 'ng_rec_targets'], minVolume: 50 },
+  ng_rec_avg_yac: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
+  ng_rec_avg_yac_above_expectation: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
+  pfr_rec_yac_r: { volumeStats: ['rec', 'receptions', 'ng_rec_rec', 'pfr_rec_rec'], minVolume: 40 },
 };
 
-// Guard derived rates from tiny-sample noise.
-function meetsDerivedThreshold(player, stat) {
-  const threshold = DERIVED_STAT_THRESHOLDS[stat];
+function meetsStatThreshold(player, stat) {
+  const threshold = STAT_THRESHOLDS[stat];
   if (!threshold) return true;
   const volume = threshold.volumeStats
     .map((key) => player?.stats?.[key])
@@ -42,10 +49,9 @@ export function getStatOptions(position, statColumns = [], positionStatGroups) {
 }
 
 export function buildBarData(players = [], stat, topN) {
-  // Normalize player rows into bar-chart payload + top-N ordering.
   if (!Array.isArray(players)) return [];
   return players
-    .filter((player) => player.stats[stat] != null && meetsDerivedThreshold(player, stat))
+    .filter((player) => player.stats[stat] != null && meetsStatThreshold(player, stat))
     .map((player) => ({
       name: player.name,
       position: player.position,
