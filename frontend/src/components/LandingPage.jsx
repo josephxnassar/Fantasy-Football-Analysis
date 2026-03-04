@@ -10,9 +10,9 @@ export default function LandingPage({ onNavigate, onPlayerClick }) {
       <HeroSection />
       <PlayerSearch
         onPlayerClick={onPlayerClick}
-        className="landing-search"
         heading="Quick Player Search"
         maxResults={6}
+        variant="landing"
       />
       <FeatureCards onNavigate={onNavigate} />
       <AtAGlance />

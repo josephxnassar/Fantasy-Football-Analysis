@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getAppInfo } from '../api';
 
 let cachedAppInfo = null;
+let appInfoRequestPromise = null;
 
 export function useAppInfo() {
   const [data, setData] = useState(cachedAppInfo);
@@ -11,12 +12,28 @@ export function useAppInfo() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (cachedAppInfo) return;
-
     let cancelled = false;
+
+    if (cachedAppInfo) {
+      if (!cancelled) {
+        setData(cachedAppInfo);
+        setError(null);
+        setLoading(false);
+      }
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const fetchInfo = async () => {
       try {
-        const response = await getAppInfo();
+        if (!cancelled) {
+          setLoading(true);
+        }
+        if (!appInfoRequestPromise) {
+          appInfoRequestPromise = getAppInfo();
+        }
+        const response = await appInfoRequestPromise;
         cachedAppInfo = response.data;
         if (!cancelled) {
           setData(response.data);
@@ -31,6 +48,7 @@ export function useAppInfo() {
         if (!cancelled) {
           setLoading(false);
         }
+        appInfoRequestPromise = null;
       }
     };
     fetchInfo();

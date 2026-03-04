@@ -76,6 +76,7 @@ describe('useTeamModalData', () => {
   });
 
   it('exposes error state when fetch fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const fetchFn = vi.fn().mockRejectedValue(new Error('Server error'));
     const { result } = renderHook(() => useTeamModalData('KC', fetchFn, 'Failed to load data.'));
 

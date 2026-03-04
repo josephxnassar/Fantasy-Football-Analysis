@@ -11,8 +11,15 @@ import './PlayerSearch.css';
  * @param {string}  [props.className]   — optional wrapper class for context-specific styling
  * @param {string}  [props.heading]     — section heading (default: "Search Players")
  * @param {number}  [props.maxResults]  — cap displayed results (default: show all)
+ * @param {string}  [props.variant]     — visual variant name (default: "default")
  */
-export default function PlayerSearch({ onPlayerClick, className, heading = 'Search Players', maxResults }) {
+export default function PlayerSearch({
+  onPlayerClick,
+  className,
+  heading = 'Search Players',
+  maxResults,
+  variant = 'default',
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,10 +50,16 @@ export default function PlayerSearch({ onPlayerClick, className, heading = 'Sear
     ? searchResults.results.slice(0, maxResults)
     : searchResults?.results;
 
+  const containerClassName = [
+    'player-search-container',
+    `player-search--${variant}`,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`player-search-container ${className || ''}`}>
+    <div className={containerClassName}>
       <div className="search-section">
-        <h2>{heading}</h2>
+        <h2 className="search-heading">{heading}</h2>
         <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
@@ -64,7 +77,7 @@ export default function PlayerSearch({ onPlayerClick, className, heading = 'Sear
 
         {searchResults && (
           <div className="results-section">
-            <h3>Found {searchResults.count} players</h3>
+            <h3 className="results-count">Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
                 {displayResults.map((player) => (

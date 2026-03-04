@@ -7,6 +7,7 @@ export function usePlayerDetails() {
   // Full player payload used by PlayerDetailsModal.
   const [playerDetails, setPlayerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
 
   // Season selector state for the active player.
   const [playerAvailableSeasons, setPlayerAvailableSeasons] = useState([]);
@@ -34,8 +35,9 @@ export function usePlayerDetails() {
 
     try {
       setLoadingDetails(true);
+      setDetailsError(null);
       setCurrentPlayerName(playerName);
-      
+
       const response = await getPlayer(playerName);
       if (!mountedRef.current || requestId !== playerRequestIdRef.current) return;
 
@@ -43,11 +45,18 @@ export function usePlayerDetails() {
 
       const seasons = response.data.available_seasons || [];
       setPlayerAvailableSeasons(seasons);
-      
+
       // API season list is sorted descending; first entry is most recent.
       const mostRecentSeason = seasons.length > 0 ? seasons[0] : null;
       setCurrentSeason(mostRecentSeason);
     } catch (err) {
+      if (mountedRef.current && requestId === playerRequestIdRef.current) {
+        setDetailsError('Failed to load player details.');
+        setPlayerDetails(null);
+        setCurrentPlayerName(null);
+        setCurrentSeason(null);
+        setPlayerAvailableSeasons([]);
+      }
       console.error(`Failed to load player details: ${err.message}`);
     } finally {
       if (mountedRef.current && requestId === playerRequestIdRef.current) {
@@ -61,15 +70,20 @@ export function usePlayerDetails() {
 
     // Track season request separately so rapid season clicks stay safe.
     const requestId = ++seasonRequestIdRef.current;
-    
+
     try {
       setLoadingDetails(true);
-      setCurrentSeason(season);
-      
+      setDetailsError(null);
+
       const response = await getPlayer(currentPlayerName, season);
       if (!mountedRef.current || requestId !== seasonRequestIdRef.current) return;
       setPlayerDetails(response.data);
+      setCurrentSeason(season);
+      setPlayerAvailableSeasons(response.data.available_seasons || []);
     } catch (err) {
+      if (mountedRef.current && requestId === seasonRequestIdRef.current) {
+        setDetailsError(`Failed to load ${season} season data.`);
+      }
       console.error(`Failed to load season data: ${err.message}`);
     } finally {
       if (mountedRef.current && requestId === seasonRequestIdRef.current) {
@@ -83,6 +97,7 @@ export function usePlayerDetails() {
     playerRequestIdRef.current += 1;
     seasonRequestIdRef.current += 1;
     setLoadingDetails(false);
+    setDetailsError(null);
     setPlayerDetails(null);
     setCurrentPlayerName(null);
     setCurrentSeason(null);
@@ -92,10 +107,11 @@ export function usePlayerDetails() {
   return {
     playerDetails,
     loadingDetails,
+    detailsError,
     availableSeasons: playerAvailableSeasons,
     currentSeason,
     handlePlayerClick,
     handleSeasonChange,
-    closeDetails
+    closeDetails,
   };
 }

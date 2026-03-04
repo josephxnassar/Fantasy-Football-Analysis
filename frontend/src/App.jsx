@@ -17,6 +17,7 @@ function App() {
   const {
     playerDetails,
     loadingDetails,
+    detailsError,
     availableSeasons,
     currentSeason,
     handlePlayerClick,
@@ -38,10 +39,11 @@ function App() {
     return (
       <>
         <LandingPage onNavigate={setActiveTab} onPlayerClick={handlePlayerClick} />
-        {(playerDetails || loadingDetails) && (
+        {(playerDetails || loadingDetails || detailsError) && (
           <PlayerDetailsModal
             playerDetails={playerDetails}
             loading={loadingDetails}
+            error={detailsError}
             onClose={closeDetails}
             availableSeasons={availableSeasons}
             currentSeason={currentSeason}
@@ -131,10 +133,11 @@ function App() {
         </ErrorBoundary>
       </main>
 
-      {(playerDetails || loadingDetails) && (
+      {(playerDetails || loadingDetails || detailsError) && (
         <PlayerDetailsModal
           playerDetails={playerDetails}
           loading={loadingDetails}
+          error={detailsError}
           onClose={closeDetails}
           availableSeasons={availableSeasons}
           currentSeason={currentSeason}

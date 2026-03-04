@@ -1,10 +1,29 @@
 /* Summary stat tiles showing app data coverage */
 
+import { ErrorMessage, LoadingMessage } from '../common';
 import { useAppInfo } from '../../hooks/useAppInfo';
 import './AtAGlance.css';
 
 export default function AtAGlance() {
-  const { data: appInfo } = useAppInfo();
+  const { data: appInfo, loading, error } = useAppInfo();
+
+  if (loading) {
+    return (
+      <section className="landing-section">
+        <h2 className="section-heading">At a Glance</h2>
+        <LoadingMessage message="Loading app info..." />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="landing-section">
+        <h2 className="section-heading">At a Glance</h2>
+        <ErrorMessage message={error} />
+      </section>
+    );
+  }
 
   if (!appInfo) return null;
 

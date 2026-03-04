@@ -45,6 +45,51 @@ describe('usePlayerDetails', () => {
 
     expect(getPlayer).toHaveBeenNthCalledWith(2, 'Patrick Mahomes', 2024);
     expect(result.current.playerDetails.stats['Pass Yds']).toBe(4000);
+    expect(result.current.detailsError).toBeNull();
+  });
+
+  it('keeps the current season data when a season change fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPlayer
+      .mockResolvedValueOnce({
+        data: {
+          name: 'Patrick Mahomes',
+          stats: { 'Pass Yds': 4300 },
+          available_seasons: [2025, 2024],
+        },
+      })
+      .mockRejectedValueOnce(new Error('Season request failed'));
+
+    const { result } = renderHook(() => usePlayerDetails());
+
+    await act(async () => {
+      await result.current.handlePlayerClick('Patrick Mahomes');
+    });
+
+    await act(async () => {
+      await result.current.handleSeasonChange(2024);
+    });
+
+    expect(result.current.currentSeason).toBe(2025);
+    expect(result.current.playerDetails.stats['Pass Yds']).toBe(4300);
+    expect(result.current.detailsError).toBe('Failed to load 2024 season data.');
+  });
+
+  it('exposes an error and clears stale state when the initial player load fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPlayer.mockRejectedValueOnce(new Error('Player request failed'));
+
+    const { result } = renderHook(() => usePlayerDetails());
+
+    await act(async () => {
+      await result.current.handlePlayerClick('Patrick Mahomes');
+    });
+
+    expect(result.current.loadingDetails).toBe(false);
+    expect(result.current.playerDetails).toBeNull();
+    expect(result.current.currentSeason).toBeNull();
+    expect(result.current.availableSeasons).toEqual([]);
+    expect(result.current.detailsError).toBe('Failed to load player details.');
   });
 
   it('resets hook state when closing details', async () => {
@@ -69,5 +114,6 @@ describe('usePlayerDetails', () => {
     expect(result.current.playerDetails).toBeNull();
     expect(result.current.currentSeason).toBeNull();
     expect(result.current.availableSeasons).toEqual([]);
+    expect(result.current.detailsError).toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 # Frontend
 
-Last verified: 2026-03-03
+Last verified: 2026-03-04
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](vite.config.js)
@@ -45,6 +45,8 @@ npm run build
 
 The app opens on a **Landing Page** ([`src/components/LandingPage.jsx`](src/components/LandingPage.jsx)) with quick search, feature cards, at-a-glance stats, and data source attribution. A home button (🏠) in the header returns to the landing page.
 
+[`src/App.jsx`](src/App.jsx) owns a single shared player-details modal that is reused by landing-page search, statistics search, and charts. The modal's team depth chart loads on demand only when the **Depth Chart** tab is opened.
+
 Top-level tabs in [`src/App.jsx`](src/App.jsx):
 - `Statistics`
 - `Schedules`
@@ -67,6 +69,7 @@ Schedules and Depth Charts share the same team navigation pattern via [`src/comp
 | Feature components | [`src/components/`](src/components) |
 | Reusable components | [`src/components/common/`](src/components/common) |
 | Landing page sub-components | [`src/components/landing/`](src/components/landing) |
+| Shared player modal flow | [`src/App.jsx`](src/App.jsx), [`src/hooks/usePlayerDetails.js`](src/hooks/usePlayerDetails.js), [`src/components/PlayerDetailsModal.jsx`](src/components/PlayerDetailsModal.jsx) |
 | Player modal sub-components | [`src/components/player-details/`](src/components/player-details) |
 | Utilities | [`src/utils/`](src/utils) |
 | Stat utilities | [`src/utils/statDefinitions.js`](src/utils/statDefinitions.js), [`src/utils/statMeta.js`](src/utils/statMeta.js), [`src/utils/statGrouping.js`](src/utils/statGrouping.js), [`src/utils/statColorHelpers.js`](src/utils/statColorHelpers.js) |
