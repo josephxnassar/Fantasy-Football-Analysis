@@ -5,8 +5,11 @@ import { getTeamDepthChart } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
 import { ErrorMessage, ModalOverlay, SubTabNav } from './common';
 import PlayerHeader from './player-details/PlayerHeader';
-import PlayerStatsView from './player-details/PlayerStatsView';
+import PlayerOverviewTab from './player-details/PlayerOverviewTab';
 import PlayerDepthChartTab from './player-details/PlayerDepthChartTab';
+import StatsSeasonSelector from './player-details/StatsSeasonSelector';
+import StatsViewModeToggle from './player-details/StatsViewModeToggle';
+import './player-details/PlayerStats.css';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ 
@@ -20,6 +23,7 @@ export default function PlayerDetailsModal({
 }) {
   // Local modal tab state: stats view or team depth-chart view.
   const [modalTab, setModalTab] = useState('statistics');
+  const [viewMode, setViewMode] = useState('aggregate');
 
   // Depth chart is loaded on demand only when that tab is opened.
   const { data: teamDepthChart, loading: depthChartLoading, error: depthChartError } = useTeamModalData(
@@ -27,14 +31,14 @@ export default function PlayerDetailsModal({
     getTeamDepthChart,
     'Failed to load depth chart'
   );
+  const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
+  const showStatsActions = modalTab === 'statistics' && (availableSeasons.length > 1 || hasWeeklyData);
 
   if (!playerDetails && !loading && !error) return null;
 
   return (
     <ModalOverlay onClose={onClose}>
       <div className="modal-content">
-        <button className="player-details-close-button" onClick={onClose}>×</button>
-
         {loading ? (
           <div className="loading">Loading player details...</div>
         ) : (
@@ -42,27 +46,50 @@ export default function PlayerDetailsModal({
             {error && <ErrorMessage message={error} />}
 
             {playerDetails ? (
-              <>
-                <PlayerHeader playerDetails={playerDetails} />
-                <div className="player-details">
-                  {/* Top-level content tabs inside the player modal. */}
-                  <SubTabNav
-                    tabs={[
-                      { id: 'statistics', label: 'Statistics' },
-                      { id: 'depth-chart', label: 'Depth Chart' },
-                    ]}
-                    activeTab={modalTab}
-                    onTabChange={setModalTab}
-                  />
+              <div className="player-dashboard">
+                <div className="player-dashboard-header">
+                  <PlayerHeader playerDetails={playerDetails} />
 
+                  <div className="player-dashboard-tabs">
+                    <SubTabNav
+                      tabs={[
+                        { id: 'statistics', label: 'Statistics' },
+                        { id: 'depth-chart', label: 'Depth Chart' },
+                      ]}
+                      activeTab={modalTab}
+                      onTabChange={setModalTab}
+                    />
+                  </div>
+
+                  {showStatsActions && (
+                    <div className="player-dashboard-controls">
+                      <StatsSeasonSelector
+                        availableSeasons={availableSeasons}
+                        currentSeason={currentSeason}
+                        onSeasonChange={onSeasonChange}
+                      />
+
+                      <StatsViewModeToggle
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        hasWeeklyData={hasWeeklyData}
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    className="player-details-close-button"
+                    onClick={onClose}
+                    aria-label="Close player details"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="player-details-body">
                   {modalTab === 'statistics' && (
-                    <PlayerStatsView
-                      playerDetails={playerDetails}
-                      seasonControls={{
-                        availableSeasons,
-                        onSeasonChange,
-                        currentSeason,
-                      }}
+                    <PlayerOverviewTab
+                      statsContext={{ playerDetails, currentSeason, viewMode }}
                     />
                   )}
 
@@ -75,7 +102,7 @@ export default function PlayerDetailsModal({
                     />
                   )}
                 </div>
-              </>
+              </div>
             ) : (
               <p className="player-details-no-data">No player details available.</p>
             )}

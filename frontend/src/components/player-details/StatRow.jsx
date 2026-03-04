@@ -9,7 +9,7 @@ export default function StatRow({ statKey, value }) {
   return (
     <div className={`stat-row ${colorClass}`}>
       <span className="stat-label">
-        {label}
+        <span className="stat-label-text" title={label}>{label}</span>
         <StatTooltip label={label} description={getStatDefinition(statKey)} />
       </span>
       <span className="stat-value">{formatStatForDisplay(statKey, value)}</span>

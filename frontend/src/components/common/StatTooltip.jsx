@@ -79,7 +79,7 @@ export default function StatTooltip({ label, description }) {
         aria-label={`Info about ${label}`}
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
       >
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
           <text x="8" y="12" textAnchor="middle" fill="currentColor" fontSize="10" fontWeight="600">i</text>
         </svg>

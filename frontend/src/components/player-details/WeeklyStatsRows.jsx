@@ -1,4 +1,4 @@
-import StatRow from './StatRow';
+import AggregateStatsGrid from './AggregateStatsGrid';
 
 function getWeekMatchupLabel(week) {
   // Supports both current and legacy opponent field names.
@@ -6,27 +6,8 @@ function getWeekMatchupLabel(week) {
   return opponent ? `vs ${opponent}` : null;
 }
 
-function renderWeeklyCategories(groupedStats) {
-  // Drop empty categories so each week only shows useful stat groups.
-  const categories = Object.entries(groupedStats).filter(([, stats]) => Object.keys(stats).length > 0);
-  if (!categories.length) {
-    return <p className="week-no-stats">No stats recorded</p>;
-  }
-
-  return (
-    <div className="week-categories">
-      {categories.map(([category, stats]) => (
-        <div key={category} className="stat-category-group">
-          <div className="category-name">{category}</div>
-          <div className="stats-table stats-table--compact">
-            {Object.entries(stats).map(([key, value]) => (
-              <StatRow key={key} statKey={key} value={value} />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+function hasWeeklyCategories(groupedStats) {
+  return Object.values(groupedStats || {}).some((stats) => Object.keys(stats).length > 0);
 }
 
 export default function WeeklyStatsRows({
@@ -67,7 +48,11 @@ export default function WeeklyStatsRows({
               <h4 className="week-header">Week {week.week}</h4>
               {matchupLabel && <span className="week-matchup-badge">{matchupLabel}</span>}
             </div>
-            {renderWeeklyCategories(groupedStats)}
+            {hasWeeklyCategories(groupedStats) ? (
+              <AggregateStatsGrid groupedStats={groupedStats} />
+            ) : (
+              <p className="week-no-stats">No stats recorded</p>
+            )}
           </div>
         );
       })}

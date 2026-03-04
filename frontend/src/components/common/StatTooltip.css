@@ -4,8 +4,9 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin-left: 4px;
+  margin-left: 2px;
   vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .stat-tooltip-trigger {
@@ -18,7 +19,7 @@
   opacity: 0.6;
   transition: opacity 0.15s, color 0.15s;
   border-radius: 50%;
-  padding: 1px;
+  padding: 0;
 }
 
 .stat-tooltip-trigger:hover,
