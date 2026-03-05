@@ -14,6 +14,7 @@ export default function ChartControls({
   statOptions,
   showStatControl = true,
   showPositionControl = true,
+  showSeasonControl = true,
   trendPlayer,
   setTrendPlayer,
   trendPlayerOptions = [],
@@ -66,7 +67,7 @@ export default function ChartControls({
         </div>
       )}
 
-      {chartData?.available_seasons?.length > 1 && (
+      {showSeasonControl && chartData?.available_seasons?.length > 1 && (
         <div className="control-group">
           <label>Season:</label>
           <select value={season ?? chartData.season} onChange={(e) => setSeason(Number(e.target.value))}>

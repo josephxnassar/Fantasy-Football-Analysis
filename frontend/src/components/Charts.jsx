@@ -38,12 +38,13 @@ export default function Charts({ onPlayerClick }) {
   const [topN, setTopN] = useState(chartUiState.topN || 20);
   const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
   const effectivePosition = view === 'trend' ? 'Overall' : position;
+  const effectiveSeason = view === 'trend' ? null : season;
 
   // Server payload for selected position + season.
-  const { chartData, loading, error } = useChartData(effectivePosition, season);
+  const { chartData, loading, error } = useChartData(effectivePosition, effectiveSeason);
   const consistencyEnabled = view === 'consistency-upside';
   const trendEnabled = view === 'trend';
-  const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(effectivePosition, season, Math.max(topN, 20), consistencyEnabled);
+  const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(effectivePosition, effectiveSeason, topN, consistencyEnabled);
   const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(effectivePosition, trendPlayer, stat, trendEnabled);
 
   // Flatten API rows into sorted chart bars for the selected stat.
@@ -126,6 +127,7 @@ export default function Charts({ onPlayerClick }) {
             statOptions={statOptions}
             showStatControl={VIEWS_USING_STAT.has(view)}
             showPositionControl={view !== 'trend'}
+            showSeasonControl={view !== 'trend'}
             trendPlayer={trendPlayer}
             setTrendPlayer={setTrendPlayer}
             trendPlayerOptions={trendPlayerOptions}
