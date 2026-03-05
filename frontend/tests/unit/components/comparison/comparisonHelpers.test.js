@@ -70,6 +70,16 @@ describe('buildComparisonRows', () => {
     expect(getWinningSlotIdsForStat('passing_interceptions', slots)).toEqual(new Set([2]));
   });
 
+  it('marks lower time-to-throw as winner', () => {
+    const slots = [
+      { id: 1, stats: { ng_pass_avg_time_to_throw: 2.82 } },
+      { id: 2, stats: { ng_pass_avg_time_to_throw: 2.44 } },
+      { id: 3, stats: { ng_pass_avg_time_to_throw: 2.67 } },
+    ];
+
+    expect(getWinningSlotIdsForStat('ng_pass_avg_time_to_throw', slots)).toEqual(new Set([2]));
+  });
+
   it('does not mark winners for complete ties', () => {
     const slots = [
       { id: 1, stats: { fp_ppr: 200 } },

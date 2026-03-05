@@ -32,6 +32,8 @@ describe('statDefinitions', () => {
     expect(formatStatForDisplay('pass_att', 32.8)).toBe(33);
     expect(formatStatForDisplay('fp_ppr', 21.44)).toBe('21.4');
     expect(formatStatForDisplay('passing_epa', 0.1234)).toBe('0.12');
+    expect(formatStatForDisplay('sc_offense_pct', 0.823)).toBe('82.3%');
+    expect(formatStatForDisplay('sc_offense_pct', 82.3)).toBe('82.3%');
   });
 
   it('returns empty definition for unknown stats', () => {

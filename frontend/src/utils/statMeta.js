@@ -29,7 +29,7 @@ export const STAT_META = {
   target_share: { label: 'Target Share', description: 'Percentage of the team\'s pass targets going to this player. 20%+ is elite for WRs.', format: 'decimal2' },
   air_yards_share: { label: 'Air Yard Share', description: 'Percentage of team air yards targeted to this player. High share signals a key role in the pass game.', format: 'decimal2' },
   wopr: { label: 'WOPR', description: 'Weighted Opportunity Rating — combines target share and air yard share into a single receiving usage score.', format: 'decimal2' },
-  sc_offense_pct: { label: 'Snap %', description: 'Percentage of offensive snaps played. 80%+ indicates a true every-down role.', format: 'decimal1' },
+  sc_offense_pct: { label: 'Snap %', description: 'Percentage of offensive snaps played. 80%+ indicates a true every-down role.', format: 'percent1' },
 
   // Position ranks (within same position + season, 1 = best).
   fp_ppr_rank: { label: 'PPR Pts Rank', description: 'Position rank for PPR fantasy points among the same position. 1 = best at the position.', format: 'int' },

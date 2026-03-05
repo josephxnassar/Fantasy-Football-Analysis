@@ -31,6 +31,8 @@ def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None
         "ng_pass_att": [30, 20, 0, 99],
         "ng_rec_avg_separation": [float("nan"), float("nan"), 2.6, float("nan")],
         "ng_rec_targets": [0, 0, 10, 0],
+        "sc_offense_pct": [0.9, 0.7, 0.85, 0.95],
+        "sc_offense_snaps": [60, 40, 65, 70],
     })
 
     rollups = stats_helpers.build_weekly_season_rollups(weekly_df)
@@ -40,6 +42,7 @@ def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None
     assert qb_2025["exp_fp"] == pytest.approx(35.0)
     assert qb_2025["ng_pass_passer_rating"] == pytest.approx(92.0)
     assert qb_2025["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
+    assert qb_2025["sc_offense_pct"] == pytest.approx(0.82)
     assert wr_2025["ng_rec_avg_separation"] == pytest.approx(2.6)
 
 def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
@@ -50,6 +53,7 @@ def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
         "exp_fp": [float("nan")],
         "ng_pass_passer_rating": [97.4],
         "ng_pass_avg_time_to_throw": [float("nan")],
+        "sc_offense_pct": [float("nan")],
     })
     weekly_df = pd.DataFrame({
         "season": [2025, 2025],
@@ -59,6 +63,8 @@ def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
         "ng_pass_passer_rating": [100.0, 80.0],
         "ng_pass_avg_time_to_throw": [2.4, 2.8],
         "ng_pass_att": [30, 20],
+        "sc_offense_pct": [0.9, 0.7],
+        "sc_offense_snaps": [60, 40],
     })
 
     merged = stats_helpers.merge_weekly_rollups_into_seasonal(seasonal_df, weekly_df)
@@ -67,6 +73,7 @@ def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
     assert row["exp_fp"] == pytest.approx(35.0)
     assert row["ng_pass_passer_rating"] == pytest.approx(97.4)
     assert row["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
+    assert row["sc_offense_pct"] == pytest.approx(0.82)
 
 def test_build_all_players_includes_expected_fields() -> None:
     positions = {"A": "QB", "B": "WR"}

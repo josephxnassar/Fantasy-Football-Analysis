@@ -26,6 +26,9 @@ export function formatStatForDisplay(statName, value) {
   if (format === 'int') return Math.round(value);
   if (format === 'decimal1') return value.toFixed(1);
   if (format === 'decimal2') return value.toFixed(2);
-  if (format === 'percent1') return `${value.toFixed(1)}%`;
+  if (format === 'percent1') {
+    const normalizedPercent = Math.abs(value) <= 1 ? value * 100 : value;
+    return `${normalizedPercent.toFixed(1)}%`;
+  }
   return Number.isInteger(value) ? value : value.toFixed(2);
 }

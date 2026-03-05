@@ -1,7 +1,7 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import re
-from typing import Dict, Iterable, List, Mapping
+from typing import Dict, Iterable, List, Mapping, cast
 
 import pandas as pd
 
@@ -52,6 +52,11 @@ _WEEKLY_SEASON_ROLLUP_SPECS: Dict[str, Dict[str, object]] = {
         "value_keys": ("ng_rush_efficiency",),
         "reducer": "weighted_mean",
         "weight_keys": ("ng_rush_rush_att", "rush_att", "carries"),
+    },
+    "sc_offense_pct": {
+        "value_keys": ("sc_offense_pct",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("sc_offense_snaps",),
     },
 }
 _WEEKLY_ROLLUP_GROUP_KEYS = ["season", "position", "player_display_name"]
@@ -147,10 +152,12 @@ def build_weekly_season_rollups(weekly_df: pd.DataFrame) -> pd.DataFrame:
 
     rollups: List[pd.Series] = []
     for stat_key, spec in _WEEKLY_SEASON_ROLLUP_SPECS.items():
-        value_col = _first_present_column(weekly_df, spec.get("value_keys", ()))
+        value_keys = cast(Iterable[str], spec.get("value_keys", ()))
+        value_col = _first_present_column(weekly_df, value_keys)
         if not value_col:
             continue
-        weight_col = _first_present_column(weekly_df, spec.get("weight_keys", ()))
+        weight_keys = cast(Iterable[str], spec.get("weight_keys", ()))
+        weight_col = _first_present_column(weekly_df, weight_keys)
         reducer = str(spec.get("reducer", "mean"))
         rollup_series = _build_grouped_rollup(weekly_df, value_col, reducer, weight_col).rename(stat_key)
         rollups.append(rollup_series)

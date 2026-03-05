@@ -9,6 +9,7 @@ const LOWER_IS_BETTER_TOKENS = [
   'times_sacked',
   'times_pressured',
   'pressure_pct',
+  'time_to_throw',
   '_rank',
 ];
 
