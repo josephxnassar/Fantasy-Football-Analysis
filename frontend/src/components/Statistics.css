@@ -15,28 +15,6 @@
   border-bottom: 1px solid var(--color-border-light);
 }
 
-.statistics-header .sub-nav {
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0;
-  background: transparent;
-  border-bottom: 0;
-}
-
-.statistics-header .sub-nav-button {
-  padding: 0.62rem 1rem;
-  border-radius: 12px 12px 0 0;
-  border-bottom-color: transparent;
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.statistics-header .sub-nav-button.active {
-  background: var(--color-bg-white);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-light);
-  box-shadow: 0 -4px 14px rgba(102, 126, 234, 0.12);
-}
-
 .statistics-content {
   padding: 1rem;
   background: var(--color-bg-white);

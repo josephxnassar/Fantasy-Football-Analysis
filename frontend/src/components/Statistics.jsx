@@ -25,7 +25,12 @@ function Statistics({ onPlayerClick }) {
   return (
     <div className="statistics-container">
       <div className="statistics-header">
-        <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
+        <SubTabNav
+          tabs={TABS}
+          activeTab={activeSubTab}
+          onTabChange={setActiveSubTab}
+          variant="statistics"
+        />
       </div>
 
       <div className="statistics-content">

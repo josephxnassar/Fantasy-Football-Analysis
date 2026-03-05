@@ -58,6 +58,7 @@ export default function PlayerDetailsModal({
                       ]}
                       activeTab={modalTab}
                       onTabChange={setModalTab}
+                      variant="compact"
                     />
                   </div>
 

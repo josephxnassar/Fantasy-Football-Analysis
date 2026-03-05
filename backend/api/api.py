@@ -95,9 +95,11 @@ def get_app_info(request: Request) -> AppInfoResponse:
     rookie_count = sum(1 for p in all_players if p.get("is_rookie"))
     stat_columns = 0
     for season_map in by_year.values():
+        if not isinstance(season_map, dict):
+            continue
         for df in season_map.values():
-            stat_columns = max(stat_columns, len(df.columns))
-            break
+            if hasattr(df, "columns"):
+                stat_columns = max(stat_columns, len(df.columns))
 
     return AppInfoResponse(
         seasons=constants.SEASONS,

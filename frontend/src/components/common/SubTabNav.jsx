@@ -1,12 +1,22 @@
-/* Reusable sub-navigation component for tab switching within content sections. Uses shared .sub-nav styles from index.css. */
+/* Reusable sub-navigation component for tab switching within content sections. */
 
-function SubTabNav({ tabs, activeTab, onTabChange }) {
+import './SubTabNav.css';
+
+function SubTabNav({ tabs, activeTab, onTabChange, variant = 'default', className }) {
+  const navClassName = [
+    'sub-tab-nav',
+    variant !== 'default' ? `sub-tab-nav--${variant}` : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className="sub-nav">
+    <div className={navClassName}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          className={`sub-nav-button ${activeTab === tab.id ? 'active' : ''}`}
+          className={`sub-tab-nav__button ${activeTab === tab.id ? 'is-active' : ''}`}
           onClick={() => onTabChange(tab.id)}
         >
           {tab.label}

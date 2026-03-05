@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+import pandas as pd
 import pytest
 
 from backend.util import constants
@@ -85,3 +86,23 @@ def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> Non
 
     assert response.status_code == 503
     assert "not loaded" in response.json()["detail"].lower()
+
+def test_app_info_uses_max_stat_columns_across_all_positions(client_factory, app_caches) -> None:
+    custom_caches = deepcopy(app_caches)
+    custom_caches[constants.CACHE["STATISTICS"]][constants.STATS["BY_YEAR"]] = {
+        2025: {
+            "WR": pd.DataFrame({"Rec": [109], "Rec Yds": [1462]}, index=pd.Index(["JaMarr Chase"], name="player_display_name")),
+            "QB": pd.DataFrame({"Comp": [401],
+                                "Att": [590],
+                                "Pass Yds": [4280],
+                                "Pass TD": [32],
+                                "INT": [11]}, index=pd.Index(["Patrick Mahomes"], name="player_display_name")),
+        }
+    }
+
+    with client_factory(custom_caches) as client:
+        response = client.get("/api/app-info")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["stat_columns"] == 5
