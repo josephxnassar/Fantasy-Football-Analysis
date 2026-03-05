@@ -9,7 +9,7 @@ export default function DepthChartModal({ team, onClose }) {
   if (!team) return null;
 
   return (
-    <ModalOverlay className="depth-chart-modal-overlay" onClose={onClose}>
+    <ModalOverlay onClose={onClose}>
       <div className="depth-chart-modal-content">
         <button className="depth-chart-close-button" onClick={onClose}>×</button>
 

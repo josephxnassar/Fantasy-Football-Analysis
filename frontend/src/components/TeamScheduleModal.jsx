@@ -26,7 +26,7 @@ export default function TeamScheduleModal({ team, onClose }) {
   if (!team) return null;
 
   return (
-    <ModalOverlay className="schedule-modal-overlay" onClose={onClose}>
+    <ModalOverlay onClose={onClose}>
       <div className="schedule-modal-content">
         <button className="schedule-close-button" onClick={onClose}>×</button>
         

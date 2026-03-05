@@ -37,7 +37,7 @@ export default function PlayerDetailsModal({
   if (!playerDetails && !loading && !error) return null;
 
   return (
-    <ModalOverlay onClose={onClose}>
+    <ModalOverlay className="modal-overlay--player-details" onClose={onClose}>
       <div className="modal-content">
         {loading ? (
           <div className="loading">Loading player details...</div>
