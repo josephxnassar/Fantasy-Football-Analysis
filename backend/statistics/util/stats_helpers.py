@@ -8,6 +8,53 @@ import pandas as pd
 from backend.util import constants
 
 _NAME_SUFFIX_RE = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")
+_WEEKLY_SEASON_ROLLUP_SPECS: Dict[str, Dict[str, object]] = {
+    "exp_fp": {
+        "value_keys": ("exp_fp", "ffo_total_fp_exp"),
+        "reducer": "sum",
+    },
+    "ng_pass_passer_rating": {
+        "value_keys": ("ng_pass_passer_rating",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_pass_att", "pass_att", "attempts"),
+    },
+    "ng_pass_avg_time_to_throw": {
+        "value_keys": ("ng_pass_avg_time_to_throw",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_pass_att", "pass_att", "attempts"),
+    },
+    "ng_rec_avg_separation": {
+        "value_keys": ("ng_rec_avg_separation",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rec_targets", "targets"),
+    },
+    "ng_rec_avg_yac": {
+        "value_keys": ("ng_rec_avg_yac",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rec_rec", "rec", "receptions"),
+    },
+    "ng_rec_avg_yac_above_expectation": {
+        "value_keys": ("ng_rec_avg_yac_above_expectation",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rec_rec", "rec", "receptions"),
+    },
+    "ng_rec_catch_pct": {
+        "value_keys": ("ng_rec_catch_pct",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rec_targets", "targets"),
+    },
+    "ng_rush_rush_yds_over_exp_per_att": {
+        "value_keys": ("ng_rush_rush_yds_over_exp_per_att",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rush_rush_att", "rush_att", "carries"),
+    },
+    "ng_rush_efficiency": {
+        "value_keys": ("ng_rush_efficiency",),
+        "reducer": "weighted_mean",
+        "weight_keys": ("ng_rush_rush_att", "rush_att", "carries"),
+    },
+}
+_WEEKLY_ROLLUP_GROUP_KEYS = ["season", "position", "player_display_name"]
 
 
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
@@ -64,6 +111,75 @@ def resolve_metric_sources(df: pd.DataFrame, metric_sources: Mapping[str, List[s
         if cols:
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
     return interpreted
+
+def _first_present_column(df: pd.DataFrame, candidates: Iterable[str]) -> str | None:
+    for candidate in candidates:
+        if candidate in df.columns:
+            return candidate
+    return None
+
+def _build_grouped_rollup(
+    weekly_df: pd.DataFrame,
+    value_col: str,
+    reducer: str,
+    weight_col: str | None,
+) -> pd.Series:
+    value = pd.to_numeric(weekly_df[value_col], errors="coerce")
+    grouped_value = value.groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS])
+
+    if reducer == "sum":
+        return grouped_value.sum(min_count=1)
+
+    if reducer == "weighted_mean" and weight_col:
+        weight = pd.to_numeric(weekly_df[weight_col], errors="coerce")
+        valid_weights = weight.where(weight > 0)
+        weighted_sum = (value * valid_weights).groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS]).sum(min_count=1)
+        weight_sum = valid_weights.groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS]).sum(min_count=1)
+        weighted = weighted_sum.div(weight_sum.where(weight_sum > 0))
+        return weighted.where(weight_sum > 0, grouped_value.mean())
+
+    return grouped_value.mean()
+
+def build_weekly_season_rollups(weekly_df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate selected weekly metrics into season-level player stats."""
+    if weekly_df.empty or any(key not in weekly_df.columns for key in _WEEKLY_ROLLUP_GROUP_KEYS):
+        return pd.DataFrame(columns=[*_WEEKLY_ROLLUP_GROUP_KEYS])
+
+    rollups: List[pd.Series] = []
+    for stat_key, spec in _WEEKLY_SEASON_ROLLUP_SPECS.items():
+        value_col = _first_present_column(weekly_df, spec.get("value_keys", ()))
+        if not value_col:
+            continue
+        weight_col = _first_present_column(weekly_df, spec.get("weight_keys", ()))
+        reducer = str(spec.get("reducer", "mean"))
+        rollup_series = _build_grouped_rollup(weekly_df, value_col, reducer, weight_col).rename(stat_key)
+        rollups.append(rollup_series)
+
+    if not rollups:
+        return pd.DataFrame(columns=[*_WEEKLY_ROLLUP_GROUP_KEYS])
+
+    return pd.concat(rollups, axis=1).reset_index()
+
+def merge_weekly_rollups_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame) -> pd.DataFrame:
+    """Merge weekly-derived season rollups into seasonal rows, filling only missing values."""
+    rollups = build_weekly_season_rollups(weekly_df)
+    if rollups.empty:
+        return seasonal_df
+
+    metric_cols = [column for column in rollups.columns if column not in _WEEKLY_ROLLUP_GROUP_KEYS]
+    renamed = rollups.rename(columns={column: f"weekly_rollup_{column}" for column in metric_cols})
+    merged = seasonal_df.merge(renamed, on=_WEEKLY_ROLLUP_GROUP_KEYS, how="left")
+
+    for metric in metric_cols:
+        rollup_col = f"weekly_rollup_{metric}"
+        rollup_numeric = pd.to_numeric(merged[rollup_col], errors="coerce")
+        if metric in merged.columns:
+            base_numeric = pd.to_numeric(merged[metric], errors="coerce")
+            merged[metric] = base_numeric.where(base_numeric.notna(), rollup_numeric)
+        else:
+            merged[metric] = rollup_numeric
+
+    return merged.drop(columns=[f"weekly_rollup_{metric}" for metric in metric_cols], errors="ignore")
 
 def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""

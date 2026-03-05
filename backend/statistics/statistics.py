@@ -286,6 +286,7 @@ class Statistics(base_source.BaseSource):
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
             weekly_df = stats_helpers.resolve_metric_sources(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
             seasonal_df = stats_helpers.resolve_metric_sources(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
+            seasonal_df = stats_helpers.merge_weekly_rollups_into_seasonal(seasonal_df, weekly_df)
             weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
             seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
 

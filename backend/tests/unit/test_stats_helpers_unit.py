@@ -20,6 +20,54 @@ def test_add_derived_stats_handles_zero_division() -> None:
     assert result.loc[0, "Yds/Rush"] == 4.0
     assert result.loc[1, "Yds/Rush"] == 0.0
 
+def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None:
+    weekly_df = pd.DataFrame({
+        "season": [2025, 2025, 2025, 2024],
+        "position": ["QB", "QB", "WR", "QB"],
+        "player_display_name": ["Patrick Mahomes", "Patrick Mahomes", "JaMarr Chase", "Patrick Mahomes"],
+        "exp_fp": [18.5, 16.5, 7.0, 100.0],
+        "ng_pass_passer_rating": [100.0, 80.0, float("nan"), 10.0],
+        "ng_pass_avg_time_to_throw": [2.4, 2.8, float("nan"), 5.0],
+        "ng_pass_att": [30, 20, 0, 99],
+        "ng_rec_avg_separation": [float("nan"), float("nan"), 2.6, float("nan")],
+        "ng_rec_targets": [0, 0, 10, 0],
+    })
+
+    rollups = stats_helpers.build_weekly_season_rollups(weekly_df)
+    qb_2025 = rollups[(rollups["season"] == 2025) & (rollups["player_display_name"] == "Patrick Mahomes")].iloc[0]
+    wr_2025 = rollups[(rollups["season"] == 2025) & (rollups["player_display_name"] == "JaMarr Chase")].iloc[0]
+
+    assert qb_2025["exp_fp"] == pytest.approx(35.0)
+    assert qb_2025["ng_pass_passer_rating"] == pytest.approx(92.0)
+    assert qb_2025["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
+    assert wr_2025["ng_rec_avg_separation"] == pytest.approx(2.6)
+
+def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
+    seasonal_df = pd.DataFrame({
+        "season": [2025],
+        "position": ["QB"],
+        "player_display_name": ["Patrick Mahomes"],
+        "exp_fp": [float("nan")],
+        "ng_pass_passer_rating": [97.4],
+        "ng_pass_avg_time_to_throw": [float("nan")],
+    })
+    weekly_df = pd.DataFrame({
+        "season": [2025, 2025],
+        "position": ["QB", "QB"],
+        "player_display_name": ["Patrick Mahomes", "Patrick Mahomes"],
+        "exp_fp": [20.0, 15.0],
+        "ng_pass_passer_rating": [100.0, 80.0],
+        "ng_pass_avg_time_to_throw": [2.4, 2.8],
+        "ng_pass_att": [30, 20],
+    })
+
+    merged = stats_helpers.merge_weekly_rollups_into_seasonal(seasonal_df, weekly_df)
+    row = merged.iloc[0]
+
+    assert row["exp_fp"] == pytest.approx(35.0)
+    assert row["ng_pass_passer_rating"] == pytest.approx(97.4)
+    assert row["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
+
 def test_build_all_players_includes_expected_fields() -> None:
     positions = {"A": "QB", "B": "WR"}
     eligible = {"A"}

@@ -43,6 +43,7 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
     stats_dict, position, available_seasons, player_meta = get_player_profile(stats_cache, resolved_name, season)
     if not stats_dict or not position:
         raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
+    weekly_stats = stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {}).get(resolved_name)
 
     meta = player_meta or {}
     depth_charts = caches.get(constants.CACHE["DEPTH_CHART"], {})
@@ -61,7 +62,7 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
                           is_rookie=bool(meta.get("is_rookie", False)),
                           is_eligible=bool(meta.get("is_eligible", True)),
                           headshot_url=meta.get("headshot_url"),
-                          weekly_stats=stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {}).get(resolved_name))
+                          weekly_stats=weekly_stats)
 
 @router.get("/search", response_model=SearchResponse)
 def search_players(request: Request, q: str, position: Optional[str] = None) -> SearchResponse:
