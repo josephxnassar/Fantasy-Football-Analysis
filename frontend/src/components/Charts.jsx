@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { useChartData } from '../hooks/useChartData';
+import { useLocalStorageObject } from '../hooks/useLocalStorageObject';
 import { PRODUCTION_GROUPS } from '../utils/statMeta';
 import { ErrorMessage, LoadingMessage } from './common';
 import ChartBarShape from './charts/ChartBarShape';
@@ -12,12 +13,17 @@ import { buildBarData, DEFAULT_STAT, getChartHeight, getStatOptions } from './ch
 import ChartTooltip from './charts/ChartTooltip';
 import './Charts.css';
 
+const CHART_UI_STORAGE_KEY = 'chartsUiV1';
+
 export default function Charts({ onPlayerClick }) {
+  const [chartUiState, setChartUiState] = useLocalStorageObject(CHART_UI_STORAGE_KEY, {});
+  const initialPosition = chartUiState.position || 'Overall';
+
   // UI controls for the chart query.
-  const [position, setPosition] = useState('Overall');
+  const [position, setPosition] = useState(initialPosition);
   const [season, setSeason] = useState(null);
-  const [stat, setStat] = useState(DEFAULT_STAT.Overall);
-  const [topN, setTopN] = useState(20);
+  const [stat, setStat] = useState(chartUiState.stat || DEFAULT_STAT[initialPosition] || DEFAULT_STAT.Overall);
+  const [topN, setTopN] = useState(chartUiState.topN || 20);
 
   // Server payload for selected position + season.
   const { chartData, loading, error } = useChartData(position, season);
@@ -39,6 +45,10 @@ export default function Charts({ onPlayerClick }) {
       setStat(filteredStats[0]);
     }
   }, [statOptions, stat]);
+
+  useEffect(() => {
+    setChartUiState({ position, topN, stat });
+  }, [position, topN, stat, setChartUiState]);
 
   const chartHeight = getChartHeight(barData.length);
 

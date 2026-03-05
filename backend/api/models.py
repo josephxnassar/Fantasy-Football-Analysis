@@ -113,6 +113,7 @@ class ChartPlayerEntry(BaseModel):
     """Single player entry for chart data"""
     name: str = Field(..., description="Player name")
     position: Optional[str] = Field(None, description="Player position")
+    age: Optional[int] = Field(None, description="Player age")
     team: Optional[str] = Field(None, description="Team abbreviation")
     headshot_url: Optional[str] = Field(None, description="URL to player headshot image")
     stats: Dict[str, float] = Field(..., description="Stat name → value mapping")

@@ -105,7 +105,7 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
                                  stat_columns=[],
                                  players=[])
 
-    players = build_position_chart_players(df, player_meta_by_name)
+    players = build_position_chart_players(df, position, player_meta_by_name)
     stat_columns = sorted(df.select_dtypes(include="number").columns.tolist())
     typed_players = [ChartPlayerEntry(**player) for player in players]
 

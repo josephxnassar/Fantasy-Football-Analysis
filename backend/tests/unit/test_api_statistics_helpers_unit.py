@@ -3,6 +3,7 @@ from fastapi import HTTPException
 
 from backend.api.util.api_statistics_helpers import (
     build_overall_chart_players,
+    build_position_chart_players,
     find_player_team,
     get_player_profile,
     resolve_chart_season,
@@ -38,6 +39,16 @@ def test_build_overall_chart_players_aggregates_across_positions(stats_cache) ->
     assert {"QB", "WR"}.issubset(positions)
     assert "Pass Yds" in stat_columns
     assert "Rec Yds" in stat_columns
+
+def test_build_position_chart_players_includes_position_and_age(stats_cache) -> None:
+    season_data = stats_cache["by_year"][2025]
+    players_by_name = {player["name"]: player for player in stats_cache["all_players"]}
+
+    players = build_position_chart_players(season_data["QB"], "QB", players_by_name)
+
+    assert players[0]["name"] == "Patrick Mahomes"
+    assert players[0]["position"] == "QB"
+    assert players[0]["age"] == 30
 
 def test_find_player_team_from_depth_charts(depth_chart_cache) -> None:
     team = find_player_team("Patrick Mahomes", depth_chart_cache)

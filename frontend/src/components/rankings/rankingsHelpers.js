@@ -110,6 +110,7 @@ export function buildRankings(
         name: player.name,
         team: player.team,
         position: player.position,
+        age: player.age,
         score: score / totalWeight,
       };
     })

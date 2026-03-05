@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useChartData } from '../hooks/useChartData';
+import { useLocalStorageObject } from '../hooks/useLocalStorageObject';
 import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../utils/leaderboardOptions';
 import { RANKING_GROUPS } from '../utils/rankingMeta';
 import { getStatLabel } from '../utils/statDefinitions';
-import { ErrorMessage, LoadingMessage } from './common';
+import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
 import {
   buildRankings,
   DEFAULT_CATEGORY_WEIGHT,
@@ -18,34 +19,23 @@ import WeightScale from './rankings/WeightScale';
 import './Rankings.css';
 
 const STORAGE_KEY = 'rankingsWeightsV1';
+const UI_STORAGE_KEY = 'rankingsUiV1';
 const EMPTY_WEIGHTS = Object.freeze({});
 
-function loadWeightProfiles() {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
 export default function Rankings({ onPlayerClick }) {
-  const [position, setPosition] = useState('Overall');
+  const [uiState, setUiState] = useLocalStorageObject(UI_STORAGE_KEY, {});
+  const [weightProfiles, setWeightProfiles] = useLocalStorageObject(STORAGE_KEY, {});
+  const [position, setPosition] = useState(uiState.position || 'Overall');
   const [season, setSeason] = useState(null);
-  const [topN, setTopN] = useState(20);
-  const [selectedPreset, setSelectedPreset] = useState('balanced');
+  const [topN, setTopN] = useState(uiState.topN || 20);
+  const [selectedPreset, setSelectedPreset] = useState(uiState.selectedPreset || 'balanced');
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [weightProfiles, setWeightProfiles] = useState(loadWeightProfiles);
 
   const { chartData, loading, error } = useChartData(position, season);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(weightProfiles));
-  }, [weightProfiles]);
+    setUiState({ position, topN, selectedPreset });
+  }, [position, topN, selectedPreset, setUiState]);
 
   const rankableGroups = useMemo(
     () => getRankableGroups(position, chartData?.stat_columns || [], RANKING_GROUPS),
@@ -127,7 +117,13 @@ export default function Rankings({ onPlayerClick }) {
 
           <div className="rankings-controls">
             <div className="control-group">
-              <label>Position:</label>
+              <label className="control-label-with-help">
+                <span>Position:</span>
+                <StatTooltip
+                  label="Overall vs Position"
+                  description="Overall is a cross-position score, so ordering can differ from position-specific views."
+                />
+              </label>
               <select value={position} onChange={(e) => setPosition(e.target.value)}>
                 {POSITION_OPTIONS.map((option) => (
                   <option key={option} value={option}>
@@ -241,6 +237,7 @@ export default function Rankings({ onPlayerClick }) {
                       <th>Player</th>
                       <th>Team</th>
                       <th>Pos</th>
+                      <th>Age</th>
                       <th>Score</th>
                     </tr>
                   </thead>
@@ -261,6 +258,7 @@ export default function Rankings({ onPlayerClick }) {
                           </td>
                           <td>{player.team || '-'}</td>
                           <td>{player.position || '-'}</td>
+                          <td>{player.age ?? '-'}</td>
                           <td className={scoreValue >= 0 ? 'score-positive' : 'score-negative'}>
                             {scoreValue > 0 ? '+' : ''}
                             {scoreValue.toFixed(1)}

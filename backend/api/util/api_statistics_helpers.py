@@ -55,13 +55,15 @@ def resolve_chart_season(by_year: Dict[int, Dict[str, pd.DataFrame]], season: Op
     target_season = season if season is not None else available[0]
     return target_season, available, by_year.get(target_season, {})
 
-def build_position_chart_players(df: pd.DataFrame, players_by_name: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+def build_position_chart_players(df: pd.DataFrame, position: str, players_by_name: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Build chart rows for a single position DataFrame."""
     players: List[Dict[str, Any]] = []
     numeric_stats = df.select_dtypes(include="number").to_dict(orient="index")
     for player_name, stats in numeric_stats.items():
         player_meta = players_by_name.get(player_name, {})
         players.append({"name": player_name,
+                        "position": position,
+                        "age": player_meta.get("age"),
                         "team": player_meta.get("team"),
                         "headshot_url": player_meta.get("headshot_url"),
                         "stats": stats})
@@ -80,6 +82,7 @@ def build_overall_chart_players(season_data: Dict[str, pd.DataFrame], players_by
             stat_columns.update(stats.keys())
             players.append({"name": player_name,
                             "position": position,
+                            "age": player_meta.get("age"),
                             "team": player_meta.get("team"),
                             "headshot_url": player_meta.get("headshot_url"),
                             "stats": stats})

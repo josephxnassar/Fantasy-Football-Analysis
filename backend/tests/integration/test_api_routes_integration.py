@@ -58,9 +58,23 @@ def test_chart_data_endpoint_returns_overall_and_stat_columns(client_factory, ap
     assert response.status_code == 200
     payload = response.json()
     names = {player["name"] for player in payload["players"]}
+    players_by_name = {player["name"]: player for player in payload["players"]}
     assert {"Patrick Mahomes", "JaMarr Chase"}.issubset(names)
     assert "Pass Yds" in payload["stat_columns"]
     assert "Rec Yds" in payload["stat_columns"]
+    assert players_by_name["Patrick Mahomes"]["position"] == "QB"
+    assert players_by_name["Patrick Mahomes"]["age"] == 30
+
+def test_chart_data_endpoint_for_position_includes_position_and_age(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/chart-data", params={"position": "QB", "season": 2025})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["position"] == "QB"
+    assert payload["players"][0]["name"] == "Patrick Mahomes"
+    assert payload["players"][0]["position"] == "QB"
+    assert payload["players"][0]["age"] == 30
 
 def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> None:
     empty_stats_caches = deepcopy(app_caches)

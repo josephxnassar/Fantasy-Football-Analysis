@@ -21,6 +21,7 @@ describe('rankingsHelpers', () => {
       {
         name: 'Small Sample',
         position: 'WR',
+        age: 26,
         team: 'KC',
         stats: {
           ng_rec_avg_separation: 4.2,
@@ -30,6 +31,7 @@ describe('rankingsHelpers', () => {
       {
         name: 'Qualified A',
         position: 'WR',
+        age: 24,
         team: 'MIN',
         stats: {
           ng_rec_avg_separation: 3.4,
@@ -39,6 +41,7 @@ describe('rankingsHelpers', () => {
       {
         name: 'Qualified B',
         position: 'WR',
+        age: 25,
         team: 'DET',
         stats: {
           ng_rec_avg_separation: 2.8,
@@ -54,6 +57,7 @@ describe('rankingsHelpers', () => {
     const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 2 }, {}, 10);
 
     expect(ranked.map((row) => row.name)).toEqual(['Qualified A', 'Qualified B']);
+    expect(ranked[0].age).toBe(24);
     expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
   });
 
