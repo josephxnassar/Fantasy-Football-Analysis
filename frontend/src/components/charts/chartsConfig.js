@@ -17,7 +17,7 @@ export const VIEW_META = {
   },
   'consistency-upside': {
     kicker: 'Average vs Upside',
-    description: 'Compare weekly average output and weekly ceiling to find players who combine dependable points with game-breaking upside.',
+    description: 'Compare weekly average output and weekly ceiling to find players who combine dependable points with game-breaking upside. Points closer to the top-right are better.',
   },
   trend: {
     kicker: 'Season Trends',

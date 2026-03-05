@@ -23,6 +23,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.1rem;
+  width: min(100%, 1040px);
+  margin: 0 auto;
   background:
     radial-gradient(circle at top right, rgba(102, 126, 234, 0.14), transparent 28%),
     linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
@@ -120,7 +122,10 @@
 .rankings-body {
   display: grid;
   grid-template-columns: minmax(340px, 1fr) minmax(360px, 1.1fr);
+  align-items: start;
   gap: 0.85rem;
+  width: min(100%, 1040px);
+  margin: 0 auto;
 }
 
 .rankings-panel--weights,

@@ -21,6 +21,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.1rem;
+  width: min(100%, 1000px);
+  margin: 0 auto;
   background:
     radial-gradient(circle at top right, rgba(102, 126, 234, 0.14), transparent 28%),
     linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
@@ -98,6 +100,16 @@
 .direct-comparison-panel--selectors,
 .direct-comparison-panel--table {
   padding: 0.75rem;
+}
+
+.direct-comparison-panel--selectors {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+}
+
+.direct-comparison-panel--table {
+  width: min(100%, 1000px);
+  margin: 0 auto;
 }
 
 .direct-comparison-panel h2 {

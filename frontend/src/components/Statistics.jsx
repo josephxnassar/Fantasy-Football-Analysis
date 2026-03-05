@@ -5,24 +5,24 @@ import './Statistics.css';
 const PlayerSearch = lazy(() => import('./PlayerSearch'));
 const Charts = lazy(() => import('./Charts'));
 const Rankings = lazy(() => import('./Rankings'));
-const DirectComparison = lazy(() => import('./DirectComparison'));
+const PlayerComparison = lazy(() => import('./PlayerComparison'));
 
 const TABS = [
-  { id: 'rankings', label: 'Rankings' },
   { id: 'charts', label: 'Charts' },
-  { id: 'comparison', label: 'Direct Comparison' },
+  { id: 'rankings', label: 'Rankings' },
+  { id: 'comparison', label: 'Player Comparison' },
   { id: 'search', label: 'Player Search' },
 ];
 
 const TAB_COMPONENTS = {
   charts: Charts,
-  comparison: DirectComparison,
+  comparison: PlayerComparison,
   rankings: Rankings,
   search: PlayerSearch,
 };
 
 function Statistics({ onPlayerClick }) {
-  const [activeSubTab, setActiveSubTab] = useState('rankings');
+  const [activeSubTab, setActiveSubTab] = useState('charts');
   const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Rankings;
 
   return (

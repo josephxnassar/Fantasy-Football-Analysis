@@ -13,7 +13,7 @@ import {
   getWinningSlotIdsForStat,
   getWinningSlotIdsForWeeks,
 } from './comparison/comparisonHelpers';
-import './DirectComparison.css';
+import './PlayerComparison.css';
 
 const MAX_COMPARE_PLAYERS = 3;
 const EMPTY_SLOT = {
@@ -44,7 +44,7 @@ function formatComparisonValue(statKey, value) {
   return formatStatForDisplay(statKey, value);
 }
 
-export default function DirectComparison({ onPlayerClick }) {
+export default function PlayerComparison({ onPlayerClick }) {
   const [positionProfile, setPositionProfile] = useState('Overall');
   const [comparisonSlots, setComparisonSlots] = useState(createInitialSlots);
   const [selectionError, setSelectionError] = useState(null);
@@ -167,8 +167,8 @@ export default function DirectComparison({ onPlayerClick }) {
       <div className="direct-comparison-stage">
         <div className="direct-comparison-panel direct-comparison-panel--header">
           <div className="direct-comparison-copy">
-            <p className="direct-comparison-kicker">Direct Comparison</p>
-            <h1>Player Comparisons</h1>
+            <p className="direct-comparison-kicker">Player Comparison</p>
+            <h1>Player Comparison</h1>
             <p className="direct-comparison-subtitle">
               Pick a position pool, choose up to {MAX_COMPARE_PLAYERS} players, then select each player&apos;s season.
             </p>

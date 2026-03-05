@@ -10,7 +10,7 @@ import { getStatLabel } from '../utils/statDefinitions';
 import { PRODUCTION_GROUPS } from '../utils/statMeta';
 import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
 import ChartControls from './charts/ChartControls';
-import AvgVsUpsideChart from './charts/AvgVsUpsideChart';
+import AverageVsUpsideChart from './charts/AverageVsUpsideChart';
 import LeaderboardChart from './charts/LeaderboardChart';
 import SeasonTrendsChart from './charts/SeasonTrendsChart';
 import {
@@ -101,7 +101,7 @@ export default function Charts({ onPlayerClick }) {
   return (
     <div className="charts-container">
       <div className="charts-stage">
-        <div className="charts-panel charts-panel--header">
+        <div className={`charts-panel charts-panel--header ${view === 'leaderboard' ? 'charts-panel--leaderboard' : ''}`}>
           <div className="charts-copy">
             <div className="charts-kicker-with-help">
               <p className="charts-kicker">{activeViewMeta.kicker}</p>
@@ -143,7 +143,7 @@ export default function Charts({ onPlayerClick }) {
         )}
 
         {view === 'consistency-upside' && (
-          <AvgVsUpsideChart data={consistencyData?.players || []} onPlayerClick={onPlayerClick} />
+          <AverageVsUpsideChart data={consistencyData?.players || []} onPlayerClick={onPlayerClick} />
         )}
 
         {view === 'trend' && (

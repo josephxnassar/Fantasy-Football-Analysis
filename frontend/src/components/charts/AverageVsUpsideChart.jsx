@@ -1,6 +1,6 @@
 import { ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
 
-export default function AvgVsUpsideChart({ data, onPlayerClick }) {
+export default function AverageVsUpsideChart({ data, onPlayerClick }) {
   if (!data.length) {
     return <p className="charts-no-data">No weekly data available for this season.</p>;
   }

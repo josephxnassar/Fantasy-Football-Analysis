@@ -7,7 +7,7 @@ import ChartTooltip from './ChartTooltip';
 export default function LeaderboardChart({ data, onPlayerClick }) {
   if (!data.length) {
     return (
-      <div className="charts-panel">
+      <div className="charts-panel charts-panel--leaderboard">
         <p className="charts-no-data">No data available for the selected stat.</p>
       </div>
     );
@@ -16,7 +16,7 @@ export default function LeaderboardChart({ data, onPlayerClick }) {
   const chartHeight = getChartHeight(data.length);
 
   return (
-    <div className="charts-panel chart-wrapper">
+    <div className="charts-panel charts-panel--leaderboard chart-wrapper">
       {/* Height scales with row count so labels remain readable. */}
       <ResponsiveContainer width="100%" height={chartHeight}>
         <BarChart
