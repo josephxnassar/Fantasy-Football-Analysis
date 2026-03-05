@@ -1,4 +1,5 @@
 import { meetsStatThreshold } from '../../utils/statThresholds';
+import { isLowerBetterStat } from '../../utils/statDirection';
 
 export const DEFAULT_CATEGORY_WEIGHT = 1;
 export const DEFAULT_STAT_WEIGHT = 0;
@@ -11,23 +12,6 @@ export const WEIGHT_LABELS = {
   1: 'More',
   2: 'Much More',
 };
-
-const LOWER_IS_BETTER_TOKENS = [
-  'interception',
-  '_int',
-  'fumble',
-  'drop',
-  'bad_throw',
-  'times_sacked',
-  'times_pressured',
-  'pressure_pct',
-  '_rank',
-];
-
-function isLowerBetter(stat) {
-  const key = String(stat || '').toLowerCase();
-  return LOWER_IS_BETTER_TOKENS.some((token) => key.includes(token));
-}
 
 function toNumber(value) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -80,7 +64,7 @@ export function buildRankings(
     statRanges.set(stat, {
       min: Math.min(...values),
       max: Math.max(...values),
-      lowerIsBetter: isLowerBetter(stat),
+      lowerIsBetter: isLowerBetterStat(stat),
     });
   }
 

@@ -15,6 +15,7 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 - Team schedules and depth charts
 - Chart-ready seasonal stat exploration
 - Weighted custom rankings by position/season
+- Direct side-by-side player comparison (up to 3 players, with per-player season selection)
 - Stats-backed canonical player naming in search/player lists
 
 ## Table of Contents

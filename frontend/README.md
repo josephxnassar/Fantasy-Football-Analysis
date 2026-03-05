@@ -55,6 +55,7 @@ Top-level tabs in [`src/App.jsx`](src/App.jsx):
 Statistics sub-tabs in [`src/components/Statistics.jsx`](src/components/Statistics.jsx):
 - Charts
 - Rankings (category + stat weighted scoring)
+- Direct Comparison (up to 3 player-season columns with production-profile stat rows)
 - Player Search
 
 Charts tab views in [`src/components/Charts.jsx`](src/components/Charts.jsx):

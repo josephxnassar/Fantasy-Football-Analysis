@@ -1,5 +1,7 @@
 /* Stat color-coding helpers - returns CSS class from stat thresholds. */
 
+import { isLowerBetterStat } from './statDirection';
+
 const STAT_THRESHOLDS = {
   fp_ppr: 20,
   fp_std: 15,
@@ -50,18 +52,6 @@ const STAT_THRESHOLDS = {
   pfr_pass_on_tgt_pct: 78,
 };
 
-const LOWER_IS_BETTER_TOKENS = [
-  'interception',
-  '_int',
-  'fumble',
-  'drop',
-  'bad_throw',
-  'times_sacked',
-  'times_pressured',
-  'pressure_pct',
-  '_rank',
-];
-
 function toKey(statName) {
   // Normalize stat key for consistent lookup logic.
   return String(statName || '').trim().toLowerCase();
@@ -70,12 +60,6 @@ function toKey(statName) {
 function compactKey(statName) {
   // Removes punctuation for fallback threshold matches.
   return toKey(statName).replace(/[^a-z0-9]/g, '');
-}
-
-function isLowerBetter(statName) {
-  // Detect turnover/error-style stats where lower values are better.
-  const key = toKey(statName);
-  return LOWER_IS_BETTER_TOKENS.some((token) => key.includes(token));
 }
 
 function isPercentMetric(statName) {
@@ -115,7 +99,7 @@ export function getStatColorClass(statName, value) {
 
   const normalizedValue = normalizePercentageValue(statName, numeric);
 
-  if (isLowerBetter(statName)) {
+  if (isLowerBetterStat(statName)) {
     const lowerThreshold = getThreshold(statName);
     if (lowerThreshold !== undefined) {
       if (normalizedValue <= lowerThreshold) return 'stat-good';

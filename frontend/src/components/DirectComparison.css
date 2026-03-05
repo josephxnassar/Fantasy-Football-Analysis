@@ -1,0 +1,301 @@
+.direct-comparison-container {
+  width: 100%;
+}
+
+.direct-comparison-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.direct-comparison-panel {
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+  box-shadow: var(--shadow-surface-card);
+}
+
+.direct-comparison-panel--header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  background:
+    radial-gradient(circle at top right, rgba(102, 126, 234, 0.14), transparent 28%),
+    linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
+}
+
+.direct-comparison-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.direct-comparison-kicker {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-slate);
+}
+
+.direct-comparison-copy h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1.65rem;
+}
+
+.direct-comparison-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-subtle);
+}
+
+.direct-comparison-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.direct-comparison-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 182px;
+}
+
+.direct-comparison-control-group label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  color: var(--color-text-slate);
+}
+
+.direct-comparison-control-group select {
+  padding: 0.62rem 0.82rem;
+  border: 1px solid var(--color-border-accent-soft);
+  border-radius: 12px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  cursor: pointer;
+  min-width: 0;
+  width: 100%;
+  color: var(--color-text-primary);
+}
+
+.direct-comparison-selection-count {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-slate);
+  font-weight: 600;
+}
+
+.direct-comparison-panel--selectors,
+.direct-comparison-panel--table {
+  padding: 0.75rem;
+}
+
+.direct-comparison-panel h2 {
+  margin: 0 0 0.65rem;
+  font-size: 1.08rem;
+  color: var(--color-text-primary);
+}
+
+.direct-comparison-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.direct-comparison-slot-card {
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 0.68rem;
+  background: var(--color-surface-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.direct-comparison-slot-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.direct-comparison-slot-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.direct-comparison-slot-field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.32px;
+  text-transform: uppercase;
+  color: var(--color-text-slate);
+}
+
+.direct-comparison-slot-field select {
+  border: 1px solid var(--color-border-accent-soft);
+  background: var(--color-bg-white);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  padding: 0.4rem 0.52rem;
+  font-size: 0.82rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.direct-comparison-slot-meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.direct-comparison-player-status,
+.direct-comparison-player-error {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+.direct-comparison-player-status {
+  color: var(--color-text-muted);
+}
+
+.direct-comparison-player-error {
+  color: var(--color-danger);
+}
+
+.direct-comparison-table-wrapper {
+  overflow-x: auto;
+}
+
+.direct-comparison-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.direct-comparison-table th,
+.direct-comparison-table td {
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 0.36rem 0.4rem;
+  text-align: left;
+  font-size: 0.8rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.direct-comparison-table thead th {
+  color: var(--color-text-slate);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.7rem;
+}
+
+.direct-comparison-column-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.direct-comparison-player-link {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary-dark);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 6px;
+  transition: color 0.16s ease, background-color 0.16s ease;
+}
+
+.direct-comparison-player-link:hover {
+  color: var(--color-primary);
+  background: rgba(102, 126, 234, 0.12);
+}
+
+.direct-comparison-player-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  color: var(--color-primary);
+  background: rgba(102, 126, 234, 0.12);
+}
+
+.direct-comparison-column-header small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.direct-comparison-wins-label {
+  color: var(--color-success-deep) !important;
+  font-weight: 700;
+}
+
+.direct-comparison-category-row th {
+  background: var(--color-surface-accent);
+  color: var(--color-text-slate);
+  font-size: 0.68rem;
+  letter-spacing: 0.35px;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.direct-comparison-stat-cell {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.direct-comparison-stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12rem;
+}
+
+.direct-comparison-value-missing {
+  color: var(--color-text-muted);
+}
+
+.direct-comparison-value-winner {
+  background: linear-gradient(90deg, #d5f9e2 0%, #b9f3cf 100%);
+  border-left: 3px solid var(--color-success-strong);
+  color: var(--color-success-deep);
+  font-weight: 800;
+}
+
+@media (max-width: 1100px) {
+  .direct-comparison-slot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .direct-comparison-panel--header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .direct-comparison-controls {
+    align-items: stretch;
+  }
+
+  .direct-comparison-control-group {
+    width: 100%;
+  }
+
+  .direct-comparison-selection-count {
+    text-align: left;
+  }
+}
