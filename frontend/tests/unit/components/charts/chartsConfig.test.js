@@ -10,7 +10,7 @@ describe('chartsConfig', () => {
   it('uses expected chart view labels', () => {
     expect(CHART_VIEW_OPTIONS).toEqual([
       { value: 'leaderboard', label: 'Leaderboard' },
-      { value: 'consistency-upside', label: 'Avg vs Upside' },
+      { value: 'consistency-upside', label: 'Average vs Upside' },
       { value: 'trend', label: 'Season Trends' },
     ]);
   });
@@ -22,7 +22,7 @@ describe('chartsConfig', () => {
       expect(typeof VIEW_META[value].description).toBe('string');
       expect(VIEW_META[value].description.length).toBeGreaterThan(0);
     });
-    expect(VIEW_META['consistency-upside'].kicker).toBe('Avg vs Upside');
+    expect(VIEW_META['consistency-upside'].kicker).toBe('Average vs Upside');
     expect(VIEW_META.trend.kicker).toBe('Season Trends');
   });
 

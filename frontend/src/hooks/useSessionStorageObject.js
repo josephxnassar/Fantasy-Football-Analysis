@@ -1,11 +1,11 @@
-/* Hook for JSON object persistence in localStorage. */
+/* Hook for JSON object persistence in sessionStorage. */
 
 import { useEffect, useState } from 'react';
 
 function safeLoad(key, fallback) {
   if (typeof window === 'undefined') return fallback;
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = window.sessionStorage.getItem(key);
     if (!raw) return fallback;
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === 'object') return parsed;
@@ -15,12 +15,12 @@ function safeLoad(key, fallback) {
   }
 }
 
-export function useLocalStorageObject(key, defaultValue = {}) {
+export function useSessionStorageObject(key, defaultValue = {}) {
   const [value, setValue] = useState(() => safeLoad(key, defaultValue));
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(key, JSON.stringify(value));
+    window.sessionStorage.setItem(key, JSON.stringify(value));
   }, [key, value]);
 
   return [value, setValue];

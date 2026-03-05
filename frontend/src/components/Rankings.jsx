@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useChartData } from '../hooks/useChartData';
-import { useLocalStorageObject } from '../hooks/useLocalStorageObject';
+import { useSessionStorageObject } from '../hooks/useSessionStorageObject';
 import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../utils/leaderboardOptions';
 import { RANKING_GROUPS } from '../utils/rankingMeta';
 import { getStatLabel } from '../utils/statDefinitions';
@@ -18,13 +18,13 @@ import { buildPresetProfile, RANKING_PRESETS } from './rankings/rankingPresets';
 import WeightScale from './rankings/WeightScale';
 import './Rankings.css';
 
-const STORAGE_KEY = 'rankingsWeightsV1';
-const UI_STORAGE_KEY = 'rankingsUiV1';
+const STORAGE_KEY = 'rankingsWeights';
+const UI_STORAGE_KEY = 'rankingsUi';
 const EMPTY_WEIGHTS = Object.freeze({});
 
 export default function Rankings({ onPlayerClick }) {
-  const [uiState, setUiState] = useLocalStorageObject(UI_STORAGE_KEY, {});
-  const [weightProfiles, setWeightProfiles] = useLocalStorageObject(STORAGE_KEY, {});
+  const [uiState, setUiState] = useSessionStorageObject(UI_STORAGE_KEY, {});
+  const [weightProfiles, setWeightProfiles] = useSessionStorageObject(STORAGE_KEY, {});
   const [position, setPosition] = useState(uiState.position || 'Overall');
   const [season, setSeason] = useState(null);
   const [topN, setTopN] = useState(uiState.topN || 20);

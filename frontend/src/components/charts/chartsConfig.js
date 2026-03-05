@@ -4,7 +4,7 @@ export { POSITION_OPTIONS, TOP_N_OPTIONS };
 
 export const CHART_VIEW_OPTIONS = [
   { value: 'leaderboard', label: 'Leaderboard' },
-  { value: 'consistency-upside', label: 'Avg vs Upside' },
+  { value: 'consistency-upside', label: 'Average vs Upside' },
   { value: 'trend', label: 'Season Trends' },
 ];
 
@@ -16,7 +16,7 @@ export const VIEW_META = {
     description: 'Compare leaders by position, season, and key production metric. Advanced rate stats use minimum sample filters.',
   },
   'consistency-upside': {
-    kicker: 'Avg vs Upside',
+    kicker: 'Average vs Upside',
     description: 'Compare weekly average output and weekly ceiling to find players who combine dependable points with game-breaking upside.',
   },
   trend: {

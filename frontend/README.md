@@ -59,10 +59,10 @@ Statistics sub-tabs in [`src/components/Statistics.jsx`](src/components/Statisti
 
 Charts tab views in [`src/components/Charts.jsx`](src/components/Charts.jsx):
 - Leaderboard (horizontal bar)
-- Avg vs Upside scatter
+- Average vs Upside scatter
 - Season Trends line (single selected player)
 
-Charts and Rankings remember key control selections locally in the browser (for example, chart view, position/top-N, selected stat, trend player, and ranking weights) via `localStorage`.
+Charts and Rankings remember key control selections for the current browser session (for example, chart view, position/top-N, selected stat, trend player, and ranking weights) via `sessionStorage`.
 
 Schedules and Depth Charts share the same team navigation pattern via [`src/components/TeamBrowser.jsx`](src/components/TeamBrowser.jsx):
 - Division Browser

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useChartData } from '../hooks/useChartData';
 import { useConsistencyData } from '../hooks/useConsistencyData';
-import { useLocalStorageObject } from '../hooks/useLocalStorageObject';
+import { useSessionStorageObject } from '../hooks/useSessionStorageObject';
 import { useSeasonChartData } from '../hooks/useSeasonChartData';
 import { getStatLabel } from '../utils/statDefinitions';
 import { PRODUCTION_GROUPS } from '../utils/statMeta';
@@ -24,10 +24,10 @@ import {
 } from './charts/chartsHelpers';
 import './Charts.css';
 
-const CHART_UI_STORAGE_KEY = 'chartsUiV2';
+const CHART_UI_STORAGE_KEY = 'chartsUi';
 
 export default function Charts({ onPlayerClick }) {
-  const [chartUiState, setChartUiState] = useLocalStorageObject(CHART_UI_STORAGE_KEY, {});
+  const [chartUiState, setChartUiState] = useSessionStorageObject(CHART_UI_STORAGE_KEY, {});
   const initialPosition = chartUiState.position || 'Overall';
 
   // UI controls for the chart query.
@@ -91,7 +91,7 @@ export default function Charts({ onPlayerClick }) {
 
   if (loading) return <LoadingMessage message="Loading chart data..." />;
   if (error) return <ErrorMessage message={error} />;
-  if (consistencyEnabled && consistencyLoading) return <LoadingMessage message="Loading Avg vs Upside chart..." />;
+  if (consistencyEnabled && consistencyLoading) return <LoadingMessage message="Loading Average vs Upside chart..." />;
   if (consistencyEnabled && consistencyError) return <ErrorMessage message={consistencyError} />;
   if (trendEnabled && trendLoading) return <LoadingMessage message="Loading season trends..." />;
   if (trendEnabled && trendError) return <ErrorMessage message={trendError} />;
