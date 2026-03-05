@@ -1,5 +1,3 @@
-/* Reusable error and loading state messages */
-
 export function LoadingMessage({ message = 'Loading...' }) {
   return <div className="loading">{message}</div>;
 }

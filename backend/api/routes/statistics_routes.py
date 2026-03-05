@@ -7,12 +7,18 @@ from fastapi import APIRouter, HTTPException, Request
 from backend.api.models import (
     ChartDataResponse,
     ChartPlayerEntry,
+    ConsistencyChartEntry,
+    ConsistencyChartResponse,
     PlayerResponse,
     PlayerSearchResult,
+    PlayerTrendPoint,
+    PlayerTrendResponse,
     SearchResponse,
 )
 from backend.api.util.api_statistics_helpers import (
+    build_consistency_chart_players,
     build_overall_chart_players,
+    build_player_trend_points,
     build_position_chart_players,
     find_player_team,
     get_all_players,
@@ -27,6 +33,7 @@ from backend.util.exceptions import PlayerNotFoundError
 router = APIRouter(prefix="/api", tags=["statistics"])
 _VALID_CHART_POSITIONS = constants.POSITIONS + ["Overall"]
 
+
 @router.get("/player/{player_name}", response_model=PlayerResponse)
 def get_player(request: Request, player_name: str, season: Optional[int] = None) -> PlayerResponse:
     """Get detailed stats for a specific player"""
@@ -36,19 +43,26 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
     stats_dict, position, available_seasons, player_meta = get_player_profile(stats_cache, resolved_name, season)
     if not stats_dict or not position:
         raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
+    weekly_stats = stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {}).get(resolved_name)
 
+    meta = player_meta or {}
     depth_charts = caches.get(constants.CACHE["DEPTH_CHART"], {})
+    player_team = meta.get("team")
+    if isinstance(player_team, str):
+        player_team = constants.TEAM_ABBR_NORMALIZATION.get(player_team, player_team)
+    if player_team not in constants.TEAMS:
+        player_team = find_player_team(resolved_name, depth_charts)
 
     return PlayerResponse(name=resolved_name,
                           position=position,
-                          team=(player_meta or {}).get("team") or find_player_team(resolved_name, depth_charts),
+                          team=player_team,
                           stats=stats_dict,
                           available_seasons=available_seasons,
-                          age=(player_meta or {}).get("age"),
-                          is_rookie=bool((player_meta or {}).get("is_rookie", False)),
-                          is_eligible=bool((player_meta or {}).get("is_eligible", True)),
-                          headshot_url=(player_meta or {}).get("headshot_url"),
-                          weekly_stats=stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {}).get(resolved_name))
+                          age=meta.get("age"),
+                          is_rookie=bool(meta.get("is_rookie", False)),
+                          is_eligible=bool(meta.get("is_eligible", True)),
+                          headshot_url=meta.get("headshot_url"),
+                          weekly_stats=weekly_stats)
 
 @router.get("/search", response_model=SearchResponse)
 def search_players(request: Request, q: str, position: Optional[str] = None) -> SearchResponse:
@@ -98,7 +112,7 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
                                  stat_columns=[],
                                  players=[])
 
-    players = build_position_chart_players(df, player_meta_by_name)
+    players = build_position_chart_players(df, position, player_meta_by_name)
     stat_columns = sorted(df.select_dtypes(include="number").columns.tolist())
     typed_players = [ChartPlayerEntry(**player) for player in players]
 
@@ -107,3 +121,59 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
                              available_seasons=available,
                              stat_columns=stat_columns,
                              players=typed_players)
+
+@router.get("/consistency-data", response_model=ConsistencyChartResponse)
+def get_consistency_data(request: Request, position: str, season: Optional[int] = None, top_n: int = 40) -> ConsistencyChartResponse:
+    """Get weekly consistency/upside chart data for top seasonal performers."""
+    if position not in _VALID_CHART_POSITIONS:
+        raise HTTPException(status_code=400,
+                            detail=f"Invalid position. Must be one of: {', '.join(_VALID_CHART_POSITIONS)}")
+    if top_n < 5 or top_n > 200:
+        raise HTTPException(status_code=400, detail="top_n must be between 5 and 200")
+
+    caches = get_app_caches(request)
+    stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
+    by_year = stats_cache.get(constants.STATS["BY_YEAR"], {})
+    target_season, available, season_data = resolve_chart_season(by_year, season)
+    all_players = get_all_players(stats_cache)
+    player_meta_by_name = {player["name"]: player for player in all_players if player.get("name")}
+    weekly_by_player = stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {})
+
+    players = build_consistency_chart_players(season_data, weekly_by_player, player_meta_by_name, position, target_season, top_n)
+    typed_players = [ConsistencyChartEntry(**player) for player in players]
+
+    return ConsistencyChartResponse(season=target_season,
+                                    position=position,
+                                    available_seasons=available,
+                                    players=typed_players)
+
+
+@router.get("/player-trend", response_model=PlayerTrendResponse)
+def get_player_trend(request: Request, player_name: str, position: str, stat: str) -> PlayerTrendResponse:
+    """Get season trend points for one player and one stat."""
+    if position not in _VALID_CHART_POSITIONS:
+        raise HTTPException(status_code=400,
+                            detail=f"Invalid position. Must be one of: {', '.join(_VALID_CHART_POSITIONS)}")
+
+    resolved_name = player_name.strip()
+    resolved_stat = stat.strip()
+    if not resolved_name:
+        raise HTTPException(status_code=400, detail="player_name is required")
+    if not resolved_stat:
+        raise HTTPException(status_code=400, detail="stat is required")
+
+    caches = get_app_caches(request)
+    stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
+    all_players = get_all_players(stats_cache)
+    if not any(player.get("name") == resolved_name for player in all_players):
+        raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
+
+    by_year = stats_cache.get(constants.STATS["BY_YEAR"], {})
+    available_seasons, points = build_player_trend_points(by_year, resolved_name, position, resolved_stat)
+    typed_points = [PlayerTrendPoint(**point) for point in points]
+
+    return PlayerTrendResponse(player_name=resolved_name,
+                               position=position,
+                               stat=resolved_stat,
+                               available_seasons=available_seasons,
+                               points=typed_points)

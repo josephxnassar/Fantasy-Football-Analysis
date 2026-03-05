@@ -4,9 +4,8 @@ import {
   formatStatForDisplay,
   getStatDefinition,
   getStatLabel,
-  groupStatsByPosition,
-  normalizeStatsRecord,
 } from '../../../src/utils/statDefinitions';
+import { normalizeStatsRecord } from '../../../src/utils/statGrouping';
 
 describe('statDefinitions', () => {
   it('keeps canonical keys and drops unknown keys', () => {
@@ -29,30 +28,12 @@ describe('statDefinitions', () => {
     expect(normalized.unknown_metric).toBeUndefined();
   });
 
-  it('groups canonical stats by configured QB categories', () => {
-    const grouped = groupStatsByPosition(
-      {
-        fp_ppr: 312.4,
-        pass_att: 520,
-        pass_yds: 4102,
-        pass_td: 31,
-        rush_att: 22,
-        rush_yds: 121,
-      },
-      'QB'
-    );
-
-    expect(grouped.Core.fp_ppr).toBe(312.4);
-    expect(grouped.Core.fp_ppr_pct).toBeUndefined();
-    expect(grouped.Passing.pass_att).toBe(520);
-    expect(grouped.Passing.pass_yds).toBe(4102);
-    expect(grouped.Rushing.rush_yds).toBe(121);
-  });
-
   it('formats stat values based on stat meta format', () => {
     expect(formatStatForDisplay('pass_att', 32.8)).toBe(33);
     expect(formatStatForDisplay('fp_ppr', 21.44)).toBe('21.4');
-    expect(formatStatForDisplay('fp_ppr_pct', 91.26)).toBe('91.3%');
+    expect(formatStatForDisplay('passing_epa', 0.1234)).toBe('0.12');
+    expect(formatStatForDisplay('sc_offense_pct', 0.823)).toBe('82.3%');
+    expect(formatStatForDisplay('sc_offense_pct', 82.3)).toBe('82.3%');
   });
 
   it('returns empty definition for unknown stats', () => {
@@ -61,7 +42,7 @@ describe('statDefinitions', () => {
 
   it('returns friendly labels for canonical keys', () => {
     expect(getStatLabel('pass_yds')).toBe('Pass Yds');
-    expect(getStatLabel('targets_pct')).toBe('Target Percentile');
+    expect(getStatLabel('target_share')).toBe('Target Share');
   });
 
   it('does not expose a removed redraft_rating display definition', () => {

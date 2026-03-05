@@ -32,3 +32,6 @@ dist/
 .eslintcache/
 
 # Note: uv.lock and package-lock.json are intentionally committed for reproducibility
+
+# AI project intelligence
+claude.md

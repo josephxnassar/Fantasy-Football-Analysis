@@ -1,6 +1,6 @@
 # Statistics Module
 
-Last verified: 2026-02-22
+Last verified: 2026-03-03
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
 
@@ -47,8 +47,8 @@ Configured seasons:
 1. Load all stat sources in parallel (`_load_statistics_sources`) and rosters in parallel with source loading (`run`).
 2. Normalize each source to regular season + fantasy positions (`QB/RB/WR/TE`) and keep mapped columns.
 3. Merge all weekly sources onto base weekly player stats.
-4. Merge seasonal PFR sources onto base seasonal player stats.
-5. Add derived metrics (`Yds/Rec`, `Yds/Rush`) and interpreted metrics (canonical coalesced stats + percentiles + volume score).
+4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
+5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), resolve unified stat keys from source priorities, roll selected weekly-only metrics up into seasonal player rows, and compute positional ranks.
 6. Build final cache views:
 - Seasonal (`build_seasonal_data`): season -> position -> DataFrame.
 - Weekly (`build_weekly_player_stats`): player -> list of weekly records.

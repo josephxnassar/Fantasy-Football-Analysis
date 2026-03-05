@@ -29,6 +29,16 @@ TEAMS = ["ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
          "LV" , "LAC", "LAR", "MIA", "MIN", "NE" , "NO" , "NYG", 
          "NYJ", "PHI", "PIT", "SF" , "SEA", "TB" , "TEN", "WSH"]
 
+# Normalize historical/alternate abbreviations to canonical team codes.
+TEAM_ABBR_NORMALIZATION = {
+    "LA": "LAR",
+    "STL": "LAR",
+    "WAS": "WSH",
+    "OAK": "LV",
+    "SD": "LAC",
+    "JAC": "JAX",
+}
+
 # NFL Division Structure
 NFL_DIVISIONS = {
     "AFC": {
@@ -126,68 +136,9 @@ PLAYER_WEEKLY_COLUMN_MAP = {
     "fantasy_points_ppr": "fantasy_points_ppr",
 }
 
-PLAYER_SEASONAL_COLUMN_MAP = {
-    "season": "season",
-    "player_id": "player_id",
-    "player_name": "player_name",
-    "player_display_name": "player_display_name",
-    "position": "position",
-    "position_group": "position_group",
-    "team": "team",
-    "completions": "completions",
-    "attempts": "attempts",
-    "passing_yards": "passing_yards",
-    "passing_tds": "passing_tds",
-    "passing_interceptions": "passing_interceptions",
-    "sacks_suffered": "sacks_suffered",
-    "sack_yards_lost": "sack_yards_lost",
-    "sack_fumbles": "sack_fumbles",
-    "sack_fumbles_lost": "sack_fumbles_lost",
-    "passing_air_yards": "passing_air_yards",
-    "passing_yards_after_catch": "passing_yards_after_catch",
-    "passing_first_downs": "passing_first_downs",
-    "passing_epa": "passing_epa",
-    "passing_cpoe": "passing_cpoe",
-    "passing_2pt_conversions": "passing_2pt_conversions",
-    "pacr": "pacr",
-    "carries": "carries",
-    "rushing_yards": "rushing_yards",
-    "rushing_tds": "rushing_tds",
-    "rushing_fumbles": "rushing_fumbles",
-    "rushing_fumbles_lost": "rushing_fumbles_lost",
-    "rushing_first_downs": "rushing_first_downs",
-    "rushing_epa": "rushing_epa",
-    "rushing_2pt_conversions": "rushing_2pt_conversions",
-    "receptions": "receptions",
-    "targets": "targets",
-    "receiving_yards": "receiving_yards",
-    "receiving_tds": "receiving_tds",
-    "receiving_fumbles": "receiving_fumbles",
-    "receiving_fumbles_lost": "receiving_fumbles_lost",
-    "receiving_air_yards": "receiving_air_yards",
-    "receiving_yards_after_catch": "receiving_yards_after_catch",
-    "receiving_first_downs": "receiving_first_downs",
-    "receiving_epa": "receiving_epa",
-    "receiving_2pt_conversions": "receiving_2pt_conversions",
-    "racr": "racr",
-    "target_share": "target_share",
-    "air_yards_share": "air_yards_share",
-    "wopr": "wopr",
-    "misc_yards": "misc_yards",
-    "fumble_recovery_own": "fumble_recovery_own",
-    "fumble_recovery_yards_own": "fumble_recovery_yards_own",
-    "fumble_recovery_opp": "fumble_recovery_opp",
-    "fumble_recovery_yards_opp": "fumble_recovery_yards_opp",
-    "fumble_recovery_tds": "fumble_recovery_tds",
-    "penalties": "penalties",
-    "penalty_yards": "penalty_yards",
-    "punt_returns": "punt_returns",
-    "punt_return_yards": "punt_return_yards",
-    "kickoff_returns": "kickoff_returns",
-    "kickoff_return_yards": "kickoff_return_yards",
-    "fantasy_points": "fantasy_points",
-    "fantasy_points_ppr": "fantasy_points_ppr",
-}
+# Seasonal map is the same as weekly, minus week-only columns.
+_WEEKLY_ONLY_KEYS = {"week", "game_id", "opponent_team"}
+PLAYER_SEASONAL_COLUMN_MAP = {k: v for k, v in PLAYER_WEEKLY_COLUMN_MAP.items() if k not in _WEEKLY_ONLY_KEYS}
 
 FF_OPP_WEEKLY_COLUMN_MAP = {
     "season": "season",
@@ -353,18 +304,18 @@ PFR_PASS_WEEKLY_COLUMN_MAP = {
     "opponent": "pfr_pass_opponent",
     "player_display_name": "player_display_name",
     "pfr_player_id": "pfr_pass_pfr_player_id",
-    "passing_drops": "pfr_pass_passing_drops",
-    "passing_drop_pct": "pfr_pass_passing_drop_pct",
+    "passing_drops": "pfr_pass_drops",
+    "passing_drop_pct": "pfr_pass_drop_pct",
     "receiving_drop": "pfr_pass_receiving_drop",
     "receiving_drop_pct": "pfr_pass_receiving_drop_pct",
-    "passing_bad_throws": "pfr_pass_passing_bad_throws",
-    "passing_bad_throw_pct": "pfr_pass_passing_bad_throw_pct",
+    "passing_bad_throws": "pfr_pass_bad_throws",
+    "passing_bad_throw_pct": "pfr_pass_bad_throw_pct",
     "times_sacked": "pfr_pass_times_sacked",
     "times_blitzed": "pfr_pass_times_blitzed",
     "times_hurried": "pfr_pass_times_hurried",
     "times_hit": "pfr_pass_times_hit",
     "times_pressured": "pfr_pass_times_pressured",
-    "times_pressured_pct": "pfr_pass_times_pressured_pct",
+    "times_pressured_pct": "pfr_pass_pressure_pct",
     "def_times_blitzed": "pfr_pass_def_times_blitzed",
     "def_times_hurried": "pfr_pass_def_times_hurried",
     "def_times_hitqb": "pfr_pass_def_times_hitqb",
@@ -380,12 +331,12 @@ PFR_RUSH_WEEKLY_COLUMN_MAP = {
     "opponent": "pfr_rush_opponent",
     "player_display_name": "player_display_name",
     "pfr_player_id": "pfr_rush_pfr_player_id",
-    "carries": "pfr_rush_car",
-    "rushing_yards_before_contact": "pfr_rush_rushing_yds_before_contact",
-    "rushing_yards_before_contact_avg": "pfr_rush_rushing_yds_before_contact_avg",
-    "rushing_yards_after_contact": "pfr_rush_rushing_yds_after_contact",
-    "rushing_yards_after_contact_avg": "pfr_rush_rushing_yds_after_contact_avg",
-    "rushing_broken_tackles": "pfr_rush_rushing_broken_tackles",
+    "carries": "pfr_rush_att",
+    "rushing_yards_before_contact": "pfr_rush_ybc",
+    "rushing_yards_before_contact_avg": "pfr_rush_ybc_att",
+    "rushing_yards_after_contact": "pfr_rush_yac",
+    "rushing_yards_after_contact_avg": "pfr_rush_yac_att",
+    "rushing_broken_tackles": "pfr_rush_brk_tkl",
     "receiving_broken_tackles": "pfr_rush_receiving_broken_tackles",
 }
 
@@ -400,13 +351,13 @@ PFR_REC_WEEKLY_COLUMN_MAP = {
     "player_display_name": "player_display_name",
     "pfr_player_id": "pfr_rec_pfr_player_id",
     "rushing_broken_tackles": "pfr_rec_rushing_broken_tackles",
-    "receiving_broken_tackles": "pfr_rec_receiving_broken_tackles",
+    "receiving_broken_tackles": "pfr_rec_brk_tkl",
     "passing_drops": "pfr_rec_passing_drops",
     "passing_drop_pct": "pfr_rec_passing_drop_pct",
-    "receiving_drop": "pfr_rec_receiving_drop",
-    "receiving_drop_pct": "pfr_rec_receiving_drop_pct",
-    "receiving_int": "pfr_rec_receiving_int",
-    "receiving_rat": "pfr_rec_receiving_rat",
+    "receiving_drop": "pfr_rec_drop",
+    "receiving_drop_pct": "pfr_rec_drop_pct",
+    "receiving_int": "pfr_rec_int",
+    "receiving_rat": "pfr_rec_rat",
 }
 
 PFR_PASS_SEASON_COLUMN_MAP = {
@@ -527,5 +478,4 @@ INTERPRETED_METRIC_SOURCES = {
     "exp_fp": ["ffo_total_fp_exp"],
 }
 
-INTERPRETED_PERCENTILE_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]
-INTERPRETED_VOLUME_SCORE_METRICS = ["pass_att_pct", "rush_att_pct", "targets_pct"]
+INTERPRETED_RANK_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]

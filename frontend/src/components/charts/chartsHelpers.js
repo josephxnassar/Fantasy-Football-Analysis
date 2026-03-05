@@ -1,30 +1,8 @@
 import { getStatLabel } from '../../utils/statDefinitions';
-
-export const DEFAULT_STAT = {
-  QB: 'pass_yds',
-  RB: 'rush_yds',
-  WR: 'rec_yds',
-  TE: 'rec_yds',
-  Overall: 'fp_ppr',
-};
-
-export const POSITION_OPTIONS = ['Overall', 'QB', 'RB', 'WR', 'TE'];
-
-const DERIVED_STAT_THRESHOLDS = {
-  'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
-  'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },
-};
-
-function meetsDerivedThreshold(player, stat) {
-  const threshold = DERIVED_STAT_THRESHOLDS[stat];
-  if (!threshold) return true;
-  const volume = threshold.volumeStats
-    .map((key) => player?.stats?.[key])
-    .find((value) => typeof value === 'number');
-  return typeof volume === 'number' && volume >= threshold.minVolume;
-}
+import { meetsStatThreshold } from '../../utils/statThresholds';
 
 export function getStatOptions(position, statColumns = [], positionStatGroups) {
+  // Keeps the stat picker aligned with what backend actually returned.
   const groups = positionStatGroups[position];
   if (!groups) return [];
   return Object.entries(groups)
@@ -38,7 +16,7 @@ export function getStatOptions(position, statColumns = [], positionStatGroups) {
 export function buildBarData(players = [], stat, topN) {
   if (!Array.isArray(players)) return [];
   return players
-    .filter((player) => player.stats[stat] != null && meetsDerivedThreshold(player, stat))
+    .filter((player) => player.stats[stat] != null && meetsStatThreshold(player, stat))
     .map((player) => ({
       name: player.name,
       position: player.position,
@@ -52,5 +30,6 @@ export function buildBarData(players = [], stat, topN) {
 }
 
 export function getChartHeight(rowCount) {
+  // Dynamic sizing avoids clipping labels as row count grows.
   return Math.max(400, rowCount * 32 + 60);
 }

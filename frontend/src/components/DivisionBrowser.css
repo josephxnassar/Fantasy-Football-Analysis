@@ -88,16 +88,21 @@
   background: var(--color-bg-white);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
+  width: 100%;
   padding: var(--spacing-lg);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  appearance: none;
+  font: inherit;
 }
 
-.team-card:hover {
+.team-card:hover,
+.team-card:focus-visible {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   border-color: var(--color-primary);
+  outline: none;
 }
 
 .team-abbr {

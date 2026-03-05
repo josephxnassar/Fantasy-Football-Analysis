@@ -3,14 +3,10 @@ import './TeamSearch.css';
 
 function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
   const [query, setQuery] = useState('');
-
+  const queryLower = query.toLowerCase();
   const filteredTeams = allTeams.filter((team) => {
-    const searchLower = query.toLowerCase();
     const teamNameLower = (teamNames[team] || '').toLowerCase();
-    return (
-      team.toLowerCase().includes(searchLower) ||
-      teamNameLower.includes(searchLower)
-    );
+    return team.toLowerCase().includes(queryLower) || teamNameLower.includes(queryLower);
   });
 
   if (loading) {
@@ -42,17 +38,13 @@ function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
         {filteredTeams.length === 0 && query && (
           <div className="empty-state">No teams found matching "{query}"</div>
         )}
-        
+
         {filteredTeams.map((team) => (
-          <div
-            key={team}
-            className="team-item"
-            onClick={() => onTeamSelect(team)}
-          >
+          <button type="button" key={team} className="team-item" onClick={() => onTeamSelect(team)}>
             <span className="team-item-abbr">{team}</span>
             <span className="team-item-name">{teamNames[team] || team}</span>
             <span className="team-item-arrow">→</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

@@ -1,27 +1,19 @@
-/* Player search component with live results */
-
 import { useState } from 'react';
 import { searchPlayers } from '../api';
-import PlayerDetailsModal from './PlayerDetailsModal';
-import { usePlayerDetails } from '../hooks/usePlayerDetails';
 import { ErrorMessage, EmptyStateMessage, PlayerCard } from './common';
 import './PlayerSearch.css';
 
-export default function PlayerSearch() {
+export default function PlayerSearch({
+  onPlayerClick,
+  className,
+  heading = 'Search Players',
+  maxResults,
+  variant = 'default',
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  const { 
-    playerDetails, 
-    loadingDetails,
-    availableSeasons,
-    currentSeason,
-    handlePlayerClick,
-    handleSeasonChange,
-    closeDetails 
-  } = usePlayerDetails();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -43,10 +35,19 @@ export default function PlayerSearch() {
     }
   };
 
+  const results = searchResults?.results ?? [];
+  const displayResults = maxResults ? results.slice(0, maxResults) : results;
+
+  const containerClassName = [
+    'player-search-container',
+    `player-search--${variant}`,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className="player-search-container">
+    <div className={containerClassName}>
       <div className="search-section">
-        <h2>Search Players</h2>
+        <h2 className="search-heading">{heading}</h2>
         <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
@@ -64,16 +65,10 @@ export default function PlayerSearch() {
 
         {searchResults && (
           <div className="results-section">
-            <h3>Found {searchResults.count} players</h3>
+            <h3 className="results-count">Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
-                {searchResults.results.map((player) => (
-                  <PlayerCard
-                    key={player.name}
-                    player={player}
-                    onPlayerClick={handlePlayerClick}
-                  />
-                ))}
+                {displayResults.map((player) => <PlayerCard key={player.name} player={player} onPlayerClick={onPlayerClick} />)}
               </div>
             ) : (
               <EmptyStateMessage message={`No players found matching "${searchQuery}"`} />
@@ -81,17 +76,6 @@ export default function PlayerSearch() {
           </div>
         )}
       </div>
-
-      {(playerDetails || loadingDetails) && (
-        <PlayerDetailsModal
-          playerDetails={playerDetails}
-          loading={loadingDetails}
-          onClose={closeDetails}
-          availableSeasons={availableSeasons}
-          currentSeason={currentSeason}
-          onSeasonChange={handleSeasonChange}
-        />
-      )}
     </div>
   );
 }

@@ -5,9 +5,7 @@ function Schedules() {
   return (
     <TeamBrowser
       actionLabel="View Schedule →"
-      renderModal={(team, onClose) => (
-        <TeamScheduleModal team={team} onClose={onClose} />
-      )}
+      renderModal={(team, onClose) => <TeamScheduleModal team={team} onClose={onClose} />}
     />
   );
 }

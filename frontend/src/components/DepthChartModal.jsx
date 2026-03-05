@@ -1,6 +1,6 @@
 import { getTeamDepthChart } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
-import { DepthChartTable } from './common';
+import { DepthChartTable, ModalOverlay } from './common';
 import './DepthChartModal.css';
 
 export default function DepthChartModal({ team, onClose }) {
@@ -8,14 +8,8 @@ export default function DepthChartModal({ team, onClose }) {
 
   if (!team) return null;
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className="depth-chart-modal-overlay" onClick={handleOverlayClick}>
+    <ModalOverlay onClose={onClose}>
       <div className="depth-chart-modal-content">
         <button className="depth-chart-close-button" onClick={onClose}>×</button>
 
@@ -36,6 +30,6 @@ export default function DepthChartModal({ team, onClose }) {
           </>
         )}
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

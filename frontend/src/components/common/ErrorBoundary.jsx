@@ -4,25 +4,30 @@ import './ErrorBoundary.css';
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
+    // Local error state controls fallback rendering for this subtree only.
     this.state = { hasError: false, error: null };
     this.handleReset = this.handleReset.bind(this);
   }
 
   static getDerivedStateFromError(error) {
+    // Trigger fallback UI after render-time errors.
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
+    // Keep detailed diagnostics in console during development.
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   componentDidUpdate(prevProps) {
+    // Parent can reset this boundary by changing resetKey.
     if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
       this.setState({ hasError: false, error: null });
     }
   }
 
   handleReset() {
+    // Manual reset path exposed to fallback UI.
     this.setState({ hasError: false, error: null });
     if (typeof this.props.onReset === 'function') {
       this.props.onReset();
@@ -31,6 +36,7 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      // Custom fallback renderer can reuse reset callback.
       if (typeof this.props.fallbackRender === 'function') {
         return this.props.fallbackRender({
           error: this.state.error,

@@ -28,6 +28,7 @@ export function useDivisions() {
     }
 
     const fetchDivisions = async () => {
+      // Load divisions once and share the payload across consumers.
       try {
         if (!cancelled) {
           setLoading(true);

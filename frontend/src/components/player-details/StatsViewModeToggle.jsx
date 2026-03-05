@@ -1,4 +1,5 @@
 export default function StatsViewModeToggle({ viewMode, setViewMode, hasWeeklyData }) {
+  // Weekly toggle appears only when week-level rows exist for the active season.
   if (!hasWeeklyData) return null;
 
   return (

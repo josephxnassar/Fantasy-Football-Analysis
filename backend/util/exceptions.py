@@ -1,4 +1,5 @@
-"""Custom exception hierarchy for the Fantasy Football backend.
+"""
+Custom exception hierarchy for the Fantasy Football backend.
 
 Hierarchy:
     FantasyFootballError (base)
@@ -16,21 +17,26 @@ class FantasyFootballError(Exception):
         self.source: str = source
         super().__init__(message)
 
+
 class DataLoadError(FantasyFootballError):
     """Failed to load data from an external source (nflreadpy, file system)"""
     pass
+
 
 class DataProcessingError(FantasyFootballError):
     """Failed during data transformation, aggregation, or computation"""
     pass
 
+
 class ScrapingError(FantasyFootballError):
     """Failed to scrape or parse web data (ESPN depth charts)"""
     pass
 
+
 class CacheNotLoadedError(FantasyFootballError):
     """Required cache data is not loaded or is empty"""
     pass
+
 
 class PlayerNotFoundError(FantasyFootballError):
     """Player could not be found in any data source"""

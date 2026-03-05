@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 _REQUEST_TIMEOUT = 10
 _MAX_WORKERS = 8
 
+
 class ESPNDepthChart(BaseSource):
     """Scrapes and parses ESPN depth charts for all NFL teams"""
     
@@ -31,7 +32,7 @@ class ESPNDepthChart(BaseSource):
             response.raise_for_status()
             return BeautifulSoup(response.text, "html.parser")
         except Exception as e:
-            logger.error(f"Failed to fetch depth chart for '{team}': {e}")
+            logger.error("Failed to fetch depth chart for '%s': %s", team, e)
             raise ScrapingError(f"Failed to fetch depth chart for '{team}': {e}", source="ESPNDepthChart") from e
 
     def _parse_soup(self, soup: BeautifulSoup) -> Tuple[List[str], List[str]]:
@@ -54,7 +55,7 @@ class ESPNDepthChart(BaseSource):
 
             return positions, players
         except Exception as e:
-            logger.error(f"Failed to parse depth chart HTML: {e}")
+            logger.error("Failed to parse depth chart HTML: %s", e)
             raise ScrapingError(f"Failed to parse depth chart HTML: {e}", source="ESPNDepthChart") from e
 
     def _create_depth_chart(self, positions: List[str], players: List[str]) -> pd.DataFrame:
@@ -80,7 +81,7 @@ class ESPNDepthChart(BaseSource):
 
             return pd.DataFrame(rows).set_index("position").replace(r'(Q|D|O|IR|PUP|NFI|SUS)$', '', regex=True)
         except Exception as e:
-            logger.error(f"Failed to create depth chart: {e}")
+            logger.error("Failed to create depth chart: %s", e)
             raise ScrapingError(f"Failed to create depth chart: {e}", source="ESPNDepthChart") from e
 
     def _fetch_team_depth_chart(self, team: str) -> Tuple[str, Optional[pd.DataFrame]]:
@@ -90,7 +91,7 @@ class ESPNDepthChart(BaseSource):
             positions, players = self._parse_soup(soup)
             return team, self._create_depth_chart(positions, players).rename_axis(team)
         except Exception as e:
-            logger.warning(f"Skipping team '{team}': {e}")
+            logger.warning("Skipping team '%s': %s", team, e)
             return team, None
 
     def run(self) -> None:

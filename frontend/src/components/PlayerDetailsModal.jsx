@@ -1,68 +1,115 @@
 /* Player details modal with stats and season selection */
 
 import { useState } from 'react';
-import { useTeamDepthChart } from '../hooks/useTeamDepthChart';
-import { SubTabNav } from './common';
+import { getTeamDepthChart } from '../api';
+import { useTeamModalData } from '../hooks/useTeamModalData';
+import { ErrorMessage, ModalOverlay, SubTabNav } from './common';
 import PlayerHeader from './player-details/PlayerHeader';
-import PlayerStatsView from './player-details/PlayerStatsView';
+import PlayerOverviewTab from './player-details/PlayerOverviewTab';
 import PlayerDepthChartTab from './player-details/PlayerDepthChartTab';
+import StatsSeasonSelector from './player-details/StatsSeasonSelector';
+import StatsViewModeToggle from './player-details/StatsViewModeToggle';
+import './player-details/PlayerStats.css';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ 
   playerDetails, 
   loading, 
+  error,
   onClose, 
   availableSeasons = [],
   onSeasonChange,
-  currentSeason
+  currentSeason,
 }) {
-  const [modalTab, setModalTab] = useState('statistics'); // 'statistics' or 'depth-chart'
-  const { teamDepthChart, depthChartLoading } = useTeamDepthChart(playerDetails?.team);
+  // Local modal tab state: stats view or team depth-chart view.
+  const [modalTab, setModalTab] = useState('statistics');
+  const [viewMode, setViewMode] = useState('aggregate');
 
-  if (!playerDetails && !loading) return null;
+  // Depth chart is loaded on demand only when that tab is opened.
+  const { data: teamDepthChart, loading: depthChartLoading, error: depthChartError } = useTeamModalData(
+    modalTab === 'depth-chart' ? playerDetails?.team : null,
+    getTeamDepthChart,
+    'Failed to load depth chart'
+  );
+  const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
+  const showStatsActions = modalTab === 'statistics' && (availableSeasons.length > 1 || hasWeeklyData);
+
+  if (!playerDetails && !loading && !error) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="player-details-close-button" onClick={onClose}>×</button>
-        
+    <ModalOverlay className="modal-overlay--player-details" onClose={onClose}>
+      <div className="modal-content">
         {loading ? (
           <div className="loading">Loading player details...</div>
         ) : (
           <>
-            <PlayerHeader playerDetails={playerDetails} />
-            <div className="player-details">
-              <SubTabNav
-                tabs={[
-                  { id: 'statistics', label: 'Statistics' },
-                  { id: 'depth-chart', label: 'Depth Chart' },
-                ]}
-                activeTab={modalTab}
-                onTabChange={setModalTab}
-              />
+            {error && <ErrorMessage message={error} />}
 
-              {modalTab === 'statistics' && (
-                <PlayerStatsView
-                  playerDetails={playerDetails}
-                  seasonControls={{
-                    availableSeasons,
-                    onSeasonChange,
-                    currentSeason,
-                  }}
-                />
-              )}
+            {playerDetails ? (
+              <div className="player-dashboard">
+                <div className="player-dashboard-header">
+                  <PlayerHeader playerDetails={playerDetails} />
 
-              {modalTab === 'depth-chart' && (
-                <PlayerDepthChartTab
-                  depthChartLoading={depthChartLoading}
-                  teamDepthChart={teamDepthChart}
-                  playerName={playerDetails?.name}
-                />
-              )}
-            </div>
+                  <div className="player-dashboard-tabs">
+                    <SubTabNav
+                      tabs={[
+                        { id: 'statistics', label: 'Statistics' },
+                        { id: 'depth-chart', label: 'Depth Chart' },
+                      ]}
+                      activeTab={modalTab}
+                      onTabChange={setModalTab}
+                      variant="compact"
+                    />
+                  </div>
+
+                  {showStatsActions && (
+                    <div className="player-dashboard-controls">
+                      <StatsSeasonSelector
+                        availableSeasons={availableSeasons}
+                        currentSeason={currentSeason}
+                        onSeasonChange={onSeasonChange}
+                      />
+
+                      <StatsViewModeToggle
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        hasWeeklyData={hasWeeklyData}
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    className="player-details-close-button"
+                    onClick={onClose}
+                    aria-label="Close player details"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="player-details-body">
+                  {modalTab === 'statistics' && (
+                    <PlayerOverviewTab
+                      statsContext={{ playerDetails, currentSeason, viewMode }}
+                    />
+                  )}
+
+                  {modalTab === 'depth-chart' && (
+                    <PlayerDepthChartTab
+                      depthChartLoading={depthChartLoading}
+                      depthChartError={depthChartError}
+                      teamDepthChart={teamDepthChart}
+                      playerName={playerDetails?.name}
+                    />
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="player-details-no-data">No player details available.</p>
+            )}
           </>
         )}
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

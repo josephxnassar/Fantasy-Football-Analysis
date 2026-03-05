@@ -1,6 +1,6 @@
 # API Layer
 
-Last verified: 2026-02-22
+Last verified: 2026-03-05
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-routes-009688?logo=fastapi&logoColor=white)](api.py)
 [![Pydantic](https://img.shields.io/badge/Pydantic-models-E92063)](models.py)
@@ -51,9 +51,12 @@ Local base URL: `http://localhost:8000`
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/` | API status |
+| `GET` | `/api/app-info` | App metadata (seasons, player counts, game logs) |
 | `GET` | `/api/player/{player_name}` | Player profile + stats + weekly data |
 | `GET` | `/api/search` | Name search (optional position filter) |
 | `GET` | `/api/chart-data` | Chart payload by position/season |
+| `GET` | `/api/consistency-data` | Weekly consistency/upside chart payload by position/season (powers frontend `Avg vs Upside`) |
+| `GET` | `/api/player-trend` | Single-player season trend points by position/stat |
 | `GET` | `/api/teams/divisions` | Division + team-name metadata |
 | `GET` | `/api/schedules/{team}` | Team schedule by season |
 | `GET` | `/api/depth-charts/{team}` | Team depth chart |

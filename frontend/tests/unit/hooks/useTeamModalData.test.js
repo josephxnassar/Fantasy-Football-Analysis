@@ -1,15 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../setup';
 import { useTeamModalData } from '../../../src/hooks/useTeamModalData';
-
-function deferred() {
-  let resolve;
-  const promise = new Promise((res) => {
-    resolve = res;
-  });
-  return { promise, resolve };
-}
 
 describe('useTeamModalData', () => {
   beforeEach(() => {
@@ -80,5 +73,45 @@ describe('useTeamModalData', () => {
 
     expect(result.current.data).toEqual({ team: 'BUF' });
     expect(result.current.error).toBeNull();
+  });
+
+  it('exposes error state when fetch fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const fetchFn = vi.fn().mockRejectedValue(new Error('Server error'));
+    const { result } = renderHook(() => useTeamModalData('KC', fetchFn, 'Failed to load data.'));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBe('Failed to load data.');
+    expect(result.current.data).toBeNull();
+  });
+
+  it('clears stale data when a refetch fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce({ data: { team: 'KC', opponents: ['BUF'] } })
+      .mockRejectedValueOnce(new Error('Server error'));
+
+    const { result, rerender } = renderHook(
+      ({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'),
+      { initialProps: { team: 'KC' } }
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.data).toEqual({ team: 'KC', opponents: ['BUF'] });
+
+    rerender({ team: 'BUF' });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBe('Failed to load data.');
+    expect(result.current.data).toBeNull();
   });
 });

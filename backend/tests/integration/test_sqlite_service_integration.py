@@ -24,9 +24,9 @@ def test_sqlite_service_round_trip_for_all_cache_families(tmp_path, stats_cache,
 
         assert service.has_cached_data() is True
 
-        loaded_stats = service.load_from_db([], constants.CACHE["STATISTICS"])
-        loaded_schedules = service.load_from_db([], constants.CACHE["SCHEDULES"])
-        loaded_depth = service.load_from_db(constants.TEAMS, constants.CACHE["DEPTH_CHART"])
+        loaded_stats = service.load_from_db(constants.CACHE["STATISTICS"])
+        loaded_schedules = service.load_from_db(constants.CACHE["SCHEDULES"])
+        loaded_depth = service.load_from_db(constants.CACHE["DEPTH_CHART"])
 
         assert loaded_stats[constants.STATS["ALL_PLAYERS"]][0]["name"] == "Patrick Mahomes"
         retired = next(player for player in loaded_stats[constants.STATS["ALL_PLAYERS"]] if player["name"] == "Retired Veteran")

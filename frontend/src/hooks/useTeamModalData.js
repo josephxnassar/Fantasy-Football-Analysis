@@ -20,6 +20,7 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
         return;
       }
 
+      // Generic team-data fetch path used by team modal components.
       try {
         if (!cancelled) {
           setLoading(true);
@@ -31,6 +32,7 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
         }
       } catch (err) {
         if (!cancelled) {
+          setData(null);
           setError(defaultErrorMessage);
         }
         console.error(err);

@@ -4,7 +4,7 @@
   margin: 0 auto;
 }
 
-.search-section h2 {
+.search-heading {
   color: var(--color-text-primary);
   margin-bottom: 20px;
   font-size: 28px;
@@ -56,8 +56,8 @@
   margin-top: 30px;
 }
 
-.results-section h3 {
-  color: #333;
+.results-count {
+  color: var(--color-text-primary);
   margin-bottom: 15px;
 }
 
@@ -67,45 +67,63 @@
   gap: 16px;
 }
 
-.player-card {
-  background: var(--color-bg-white);
-  padding: 18px;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-  border: 2px solid transparent;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.player-search--landing {
+  width: 100%;
+  max-width: 1000px;
+  padding: 40px 24px 0;
 }
 
-.player-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-primary);
-  transform: translateY(-2px);
+.player-search--landing .search-heading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 6px;
 }
 
-.player-card-left {
-  display: flex;
-  flex-direction: column;
+.player-search--landing .search-form {
+  max-width: 500px;
+  margin-bottom: 16px;
 }
 
-.player-name-search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
+.player-search--landing .player-search-input {
+  padding: 10px 14px;
+  font-size: 15px;
+  border-width: 1px;
+  font-family: inherit;
 }
 
-.player-details-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
-  font-size: 12px;
-  color: #4b5563;
+.player-search--landing .search-button {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.player-search--landing .search-button:disabled {
+  background: var(--color-primary);
+  opacity: 0.6;
+}
+
+.player-search--landing .results-count {
+  display: none;
+}
+
+.player-search--landing .results-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .player-search--landing .results-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+
+  .player-search--landing .search-form {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 960px) {
+  .player-search--landing .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

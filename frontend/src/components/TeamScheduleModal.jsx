@@ -1,47 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../api';
+import { useTeamModalData } from '../hooks/useTeamModalData';
+import { ModalOverlay } from './common';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
-  const [schedule, setSchedule] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedSeason, setSelectedSeason] = useState(null);
+  const prevTeamRef = useRef(team);
 
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      if (!team) return;
-
-      try {
-        setLoading(true);
-        const response = await getTeamSchedule(team, selectedSeason);
-        setSchedule(response.data);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load schedule');
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const fetchSchedule = useCallback(
+    (t) => {
+      // Reset season when team changes to avoid stale season on new team.
+      if (t !== prevTeamRef.current) {
+        prevTeamRef.current = t;
+        setSelectedSeason(null);
+        return getTeamSchedule(t, null);
       }
-    };
+      return getTeamSchedule(t, selectedSeason);
+    },
+    [selectedSeason]
+  );
 
-    fetchSchedule();
-  }, [team, selectedSeason]);
-
-  useEffect(() => {
-    setSelectedSeason(null);
-  }, [team]);
+  const { data: schedule, loading, error } = useTeamModalData(team, fetchSchedule, 'Failed to load schedule');
 
   if (!team) return null;
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className="schedule-modal-overlay" onClick={handleOverlayClick}>
+    <ModalOverlay onClose={onClose}>
       <div className="schedule-modal-content">
         <button className="schedule-close-button" onClick={onClose}>×</button>
         
@@ -91,6 +76,6 @@ export default function TeamScheduleModal({ team, onClose }) {
           </>
         )}
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

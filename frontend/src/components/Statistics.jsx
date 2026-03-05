@@ -4,30 +4,41 @@ import './Statistics.css';
 
 const PlayerSearch = lazy(() => import('./PlayerSearch'));
 const Charts = lazy(() => import('./Charts'));
+const Rankings = lazy(() => import('./Rankings'));
+const PlayerComparison = lazy(() => import('./PlayerComparison'));
 
 const TABS = [
   { id: 'charts', label: 'Charts' },
+  { id: 'rankings', label: 'Rankings' },
+  { id: 'comparison', label: 'Player Comparison' },
   { id: 'search', label: 'Player Search' },
 ];
 
-function Statistics() {
-  const [activeSubTab, setActiveSubTab] = useState('charts');
+const TAB_COMPONENTS = {
+  charts: Charts,
+  comparison: PlayerComparison,
+  rankings: Rankings,
+  search: PlayerSearch,
+};
 
-  const renderContent = () => {
-    switch (activeSubTab) {
-      case 'search': return <PlayerSearch />;
-      case 'charts': return <Charts />;
-      default: return <Charts />;
-    }
-  };
+function Statistics({ onPlayerClick }) {
+  const [activeSubTab, setActiveSubTab] = useState('charts');
+  const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Rankings;
 
   return (
     <div className="statistics-container">
-      <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
+      <div className="statistics-header">
+        <SubTabNav
+          tabs={TABS}
+          activeTab={activeSubTab}
+          onTabChange={setActiveSubTab}
+          variant="statistics"
+        />
+      </div>
 
       <div className="statistics-content">
         <Suspense fallback={<LoadingMessage message="Loading statistics..." />}>
-          {renderContent()}
+          <ActiveSubTab onPlayerClick={onPlayerClick} />
         </Suspense>
       </div>
     </div>

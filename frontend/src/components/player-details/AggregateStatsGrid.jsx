@@ -1,26 +1,28 @@
-import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../utils/statDefinitions';
-import { getStatColorClass } from '../../utils/statColorHelpers';
+import StatRow from './StatRow';
 
 export default function AggregateStatsGrid({ groupedStats }) {
-  return Object.entries(groupedStats).map(([category, stats]) => {
-    const entries = Object.entries(stats);
-    if (!entries.length) return null;
+  const categories = Object.entries(groupedStats)
+    .map(([category, stats]) => ({
+      category,
+      entries: Object.entries(stats),
+    }))
+    .filter(({ entries }) => entries.length > 0);
 
-    return (
-      <div key={category} className="stat-category">
-        <h4 className="category-title">{category}</h4>
-        <div className="stats-grid">
-          {entries.map(([key, value]) => {
-            const colorClass = getStatColorClass(key, value);
-            return (
-              <div key={key} className={`stat-item ${colorClass}`} title={getStatDefinition(key)}>
-                <span className="stat-label">{getStatLabel(key)}</span>
-                <span className="stat-value">{formatStatForDisplay(key, value)}</span>
-              </div>
-            );
-          })}
+  return (
+    <div
+      className="aggregate-stats-grid"
+      style={{ '--stat-category-count': categories.length }}
+    >
+      {categories.map(({ category, entries }) => (
+        <div key={category} className="stat-category">
+          <h4 className="category-title">{category}</h4>
+          <div className="stats-table">
+            {entries.map(([key, value]) => (
+              <StatRow key={key} statKey={key} value={value} />
+            ))}
+          </div>
         </div>
-      </div>
-    );
-  });
+      ))}
+    </div>
+  );
 }

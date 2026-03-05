@@ -6,6 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +30,7 @@ export const getPlayer = (playerName, season = null) => {
  */
 export const searchPlayers = (query, position = null) => {
   return api.get('/search', {
-    params: { q: query, position },
+    params: { q: query, ...(position && { position }) },
   });
 };
 
@@ -69,4 +70,36 @@ export const getChartData = (position, season = null) => {
   return api.get('/chart-data', {
     params: { position, ...(season && { season }) },
   });
+};
+
+/**
+ * Fetch weekly consistency/upside chart data.
+ * @param {string} position - Position filter (QB, RB, WR, TE, Overall)
+ * @param {number|null} season - Season year or null for most recent
+ * @param {number} topN - Number of top seasonal players to evaluate
+ */
+export const getConsistencyData = (position, season = null, topN = 40) => {
+  return api.get('/consistency-data', {
+    params: { position, top_n: topN, ...(season && { season }) },
+  });
+};
+
+/**
+ * Fetch season trend points for one player/stat.
+ * @param {string} playerName - Player name
+ * @param {string} position - Position scope (QB, RB, WR, TE, Overall)
+ * @param {string} stat - Stat key/column
+ */
+export const getPlayerTrendData = (playerName, position, stat) => {
+  return api.get('/player-trend', {
+    params: { player_name: playerName, position, stat },
+  });
+};
+
+/**
+ * Fetch application overview metadata
+ * @returns Seasons, player counts, game logs, rookie count, and stat column count
+ */
+export const getAppInfo = () => {
+  return api.get('/app-info');
 };

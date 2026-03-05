@@ -2,6 +2,7 @@ import AggregateStatsGrid from './AggregateStatsGrid';
 import WeeklyStatsRows from './WeeklyStatsRows';
 
 function hasStats(groupedStats) {
+  // Category object is considered non-empty when any category has one+ stat keys.
   return Object.values(groupedStats || {}).some((stats) => Object.keys(stats).length > 0);
 }
 
@@ -14,6 +15,8 @@ export default function PlayerStatsTabLayout({
   emptyWeeklyText = 'No weekly data available',
 }) {
   const { playerDetails, currentSeason, viewMode } = statsContext;
+
+  // Tab-specific grouping function shapes seasonal record into display categories.
   const groupedSeasonStats = groupSeasonRecord(playerDetails?.stats || {}, playerDetails?.position);
 
   return (

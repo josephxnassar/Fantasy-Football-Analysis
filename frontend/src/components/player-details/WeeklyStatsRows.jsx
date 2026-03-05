@@ -1,37 +1,13 @@
-import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../utils/statDefinitions';
-import { getStatColorClass } from '../../utils/statColorHelpers';
+import AggregateStatsGrid from './AggregateStatsGrid';
 
 function getWeekMatchupLabel(week) {
+  // Supports both current and legacy opponent field names.
   const opponent = week?.opponent_team ?? week?.team_opponent;
   return opponent ? `vs ${opponent}` : null;
 }
 
-function renderWeeklyCategories(groupedStats) {
-  const categories = Object.entries(groupedStats).filter(([, stats]) => Object.keys(stats).length > 0);
-  if (!categories.length) {
-    return <p className="week-no-stats">No stats recorded</p>;
-  }
-
-  return (
-    <div className="week-categories">
-      {categories.map(([category, stats]) => (
-        <div key={category} className="stat-category-group">
-          <div className="category-name">{category}</div>
-          <div className="category-stats">
-            {Object.entries(stats).map(([key, value]) => {
-              const colorClass = getStatColorClass(key, value);
-              return (
-                <span key={key} className={`week-stat-item ${colorClass}`} title={getStatDefinition(key)}>
-                  <span className="week-stat-label">{getStatLabel(key)}</span>
-                  <span className="week-stat-value">{formatStatForDisplay(key, value)}</span>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+function hasWeeklyCategories(groupedStats) {
+  return Object.values(groupedStats || {}).some((stats) => Object.keys(stats).length > 0);
 }
 
 export default function WeeklyStatsRows({
@@ -59,6 +35,7 @@ export default function WeeklyStatsRows({
   return (
     <div className="weekly-stats-container">
       {seasonWeeks.map((week, idx) => {
+        // Tab-specific grouper controls which weekly stats render for this tab.
         const groupedStats = groupWeeklyRecord(week, playerDetails.position);
         const matchupLabel = getWeekMatchupLabel(week);
         const weekKey = week.game_id
@@ -71,7 +48,11 @@ export default function WeeklyStatsRows({
               <h4 className="week-header">Week {week.week}</h4>
               {matchupLabel && <span className="week-matchup-badge">{matchupLabel}</span>}
             </div>
-            {renderWeeklyCategories(groupedStats)}
+            {hasWeeklyCategories(groupedStats) ? (
+              <AggregateStatsGrid groupedStats={groupedStats} />
+            ) : (
+              <p className="week-no-stats">No stats recorded</p>
+            )}
           </div>
         );
       })}

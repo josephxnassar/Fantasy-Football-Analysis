@@ -1,18 +1,21 @@
 /* Canonical stat grouping/normalization utilities for modal tabs. */
 
-import { POSITION_STAT_GROUPS, STAT_META } from './statMeta';
+import { STAT_META } from './statMeta';
 
-function hasDisplayValue(value) {
+export function hasDisplayValue(value) {
+  // Shared null/NaN guard used across grouping and formatting helpers.
   return value !== null && value !== undefined && !(typeof value === 'number' && Number.isNaN(value));
 }
 
 function isVisibleStatValue(value, options = {}) {
+  // Optional hideZero flag removes placeholder zeros from UI cards.
   if (!hasDisplayValue(value)) return false;
   if (options.hideZero && typeof value === 'number' && value === 0) return false;
   return true;
 }
 
 export function normalizeStatsRecord(stats) {
+  // Keep only known, displayable stat keys from the backend payload.
   const normalized = {};
   if (!stats || typeof stats !== 'object') return normalized;
 
@@ -27,6 +30,7 @@ export function normalizeStatsRecord(stats) {
 }
 
 export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
+  // Generic grouping helper driven by explicit category -> stat key lists.
   const grouped = {};
   if (!stats || typeof stats !== 'object') return grouped;
   const normalized = normalizeStatsRecord(stats);
@@ -36,27 +40,6 @@ export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
     statKeys.forEach((statKey) => {
       const value = normalized[statKey];
       if (isVisibleStatValue(value, options)) {
-        orderedStats[statKey] = value;
-      }
-    });
-    if (Object.keys(orderedStats).length > 0) {
-      grouped[category] = orderedStats;
-    }
-  });
-
-  return grouped;
-}
-
-export function groupStatsByPosition(stats, position) {
-  const grouped = {};
-  const positionGroups = POSITION_STAT_GROUPS[position] || POSITION_STAT_GROUPS.Overall;
-  const normalized = normalizeStatsRecord(stats);
-
-  Object.entries(positionGroups).forEach(([category, statKeys]) => {
-    const orderedStats = {};
-    statKeys.forEach((statKey) => {
-      const value = normalized[statKey];
-      if (hasDisplayValue(value)) {
         orderedStats[statKey] = value;
       }
     });

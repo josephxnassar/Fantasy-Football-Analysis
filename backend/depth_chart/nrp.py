@@ -24,14 +24,14 @@ class NRPDepthChart(BaseSource):
         try:
             return nfl.load_depth_charts(seasons=self.seasons).to_pandas()
         except Exception as e:
-            logger.error(f"Failed to load depth charts from nflreadpy: {e}")
+            logger.error("Failed to load depth charts from nflreadpy: %s", e)
             raise DataLoadError(f"Failed to load depth charts from nflreadpy: {e}", source="NRPDepthChart") from e
 
     def _latest_team_rows(self, raw: pd.DataFrame) -> pd.DataFrame:
         """Keep latest snapshot rows per team for fantasy positions."""
         try:
             depth = raw.copy()
-            depth["team"] = depth["team"].replace({"LA": "LAR", "WAS": "WSH"})
+            depth["team"] = depth["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
             depth = depth.loc[depth["team"].isin(constants.TEAMS) & depth["pos_abb"].isin(constants.POSITIONS)]
             depth = depth.dropna(subset=["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"])
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
@@ -45,7 +45,7 @@ class NRPDepthChart(BaseSource):
             depth["pos_slot"] = depth["pos_slot"].astype(int)
             return depth
         except Exception as e:
-            logger.error(f"Failed to normalize nflreadpy depth chart rows: {e}")
+            logger.error("Failed to normalize nflreadpy depth chart rows: %s", e)
             raise DataProcessingError(f"Failed to normalize nflreadpy depth chart rows: {e}", source="NRPDepthChart") from e
 
     def _create_depth_chart(self, team_rows: pd.DataFrame) -> pd.DataFrame:
@@ -68,7 +68,7 @@ class NRPDepthChart(BaseSource):
                 return pd.DataFrame(columns=["starter", "2nd", "3rd", "4th"]).rename_axis("position")
             return pd.DataFrame(rows).set_index("position")
         except Exception as e:
-            logger.error(f"Failed to create NRP depth chart dataframe: {e}")
+            logger.error("Failed to create NRP depth chart dataframe: %s", e)
             raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
 
     def run(self) -> None:
@@ -80,7 +80,7 @@ class NRPDepthChart(BaseSource):
         for team in constants.TEAMS:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
-                logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
+                logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)
                 continue
             team_depth_charts[team] = self._create_depth_chart(team_rows).rename_axis(team)
 
