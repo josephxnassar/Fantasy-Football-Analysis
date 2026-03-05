@@ -146,6 +146,49 @@ class ChartDataResponse(BaseModel):
         }
     )
 
+class ConsistencyChartEntry(BaseModel):
+    """Single player entry for consistency/upside scatter chart."""
+    name: str = Field(..., description="Player name")
+    position: Optional[str] = Field(None, description="Player position")
+    age: Optional[int] = Field(None, description="Player age")
+    team: Optional[str] = Field(None, description="Team abbreviation")
+    headshot_url: Optional[str] = Field(None, description="URL to player headshot image")
+    games: int = Field(..., description="Weekly game count included in the profile")
+    avg_fp_ppr: float = Field(..., description="Average weekly PPR fantasy points")
+    ceiling_fp_ppr: float = Field(..., description="Highest weekly PPR fantasy points")
+    volatility_fp_ppr: float = Field(..., description="Weekly PPR standard deviation")
+
+
+class ConsistencyChartResponse(BaseModel):
+    """Response for consistency/upside chart data endpoint."""
+    season: int = Field(..., description="Season year")
+    position: str = Field(..., description="Position: QB, RB, WR, TE, or Overall")
+    available_seasons: List[int] = Field(..., description="Available seasons to choose from")
+    players: List[ConsistencyChartEntry] = Field(..., description="Weekly consistency/upside player profiles")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "season": 2025,
+                "position": "WR",
+                "available_seasons": [2025, 2024, 2023],
+                "players": [
+                    {
+                        "name": "Ja'Marr Chase",
+                        "position": "WR",
+                        "age": 25,
+                        "team": "CIN",
+                        "headshot_url": "https://example.com/images/jamarre-chase.png",
+                        "games": 17,
+                        "avg_fp_ppr": 19.8,
+                        "ceiling_fp_ppr": 35.7,
+                        "volatility_fp_ppr": 6.2,
+                    }
+                ],
+            }
+        }
+    )
+
 
 class DivisionsResponse(BaseModel):
     """Response for NFL divisions structure"""

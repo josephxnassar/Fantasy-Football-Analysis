@@ -77,6 +77,29 @@ def test_chart_data_endpoint_for_position_includes_position_and_age(client_facto
     assert payload["players"][0]["position"] == "QB"
     assert payload["players"][0]["age"] == 30
 
+def test_consistency_data_endpoint_returns_weekly_profiles(client_factory, app_caches) -> None:
+    custom_caches = deepcopy(app_caches)
+    custom_caches[constants.CACHE["STATISTICS"]][constants.STATS["PLAYER_WEEKLY_STATS"]] = {
+        "Patrick Mahomes": [
+            {"season": 2025, "week": 1, "fp_ppr": 24.8},
+            {"season": 2025, "week": 2, "fp_ppr": 19.2},
+        ],
+        "JaMarr Chase": [
+            {"season": 2025, "week": 1, "fp_ppr": 21.4},
+            {"season": 2025, "week": 2, "fp_ppr": 33.9},
+        ],
+    }
+
+    with client_factory(custom_caches) as client:
+        response = client.get("/api/consistency-data", params={"position": "Overall", "season": 2025, "top_n": 20})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["season"] == 2025
+    assert payload["position"] == "Overall"
+    assert any(player["name"] == "Patrick Mahomes" for player in payload["players"])
+    assert all("avg_fp_ppr" in player and "ceiling_fp_ppr" in player for player in payload["players"])
+
 def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> None:
     empty_stats_caches = deepcopy(app_caches)
     empty_stats_caches[constants.CACHE["STATISTICS"]] = {}

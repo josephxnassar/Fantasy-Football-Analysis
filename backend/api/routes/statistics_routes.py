@@ -7,11 +7,14 @@ from fastapi import APIRouter, HTTPException, Request
 from backend.api.models import (
     ChartDataResponse,
     ChartPlayerEntry,
+    ConsistencyChartEntry,
+    ConsistencyChartResponse,
     PlayerResponse,
     PlayerSearchResult,
     SearchResponse,
 )
 from backend.api.util.api_statistics_helpers import (
+    build_consistency_chart_players,
     build_overall_chart_players,
     build_position_chart_players,
     find_player_team,
@@ -114,3 +117,28 @@ def get_chart_data(request: Request, position: str, season: Optional[int] = None
                              available_seasons=available,
                              stat_columns=stat_columns,
                              players=typed_players)
+
+@router.get("/consistency-data", response_model=ConsistencyChartResponse)
+def get_consistency_data(request: Request, position: str, season: Optional[int] = None, top_n: int = 40) -> ConsistencyChartResponse:
+    """Get weekly consistency/upside chart data for top seasonal performers."""
+    if position not in _VALID_CHART_POSITIONS:
+        raise HTTPException(status_code=400,
+                            detail=f"Invalid position. Must be one of: {', '.join(_VALID_CHART_POSITIONS)}")
+    if top_n < 5 or top_n > 200:
+        raise HTTPException(status_code=400, detail="top_n must be between 5 and 200")
+
+    caches = get_app_caches(request)
+    stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
+    by_year = stats_cache.get(constants.STATS["BY_YEAR"], {})
+    target_season, available, season_data = resolve_chart_season(by_year, season)
+    all_players = get_all_players(stats_cache)
+    player_meta_by_name = {player["name"]: player for player in all_players if player.get("name")}
+    weekly_by_player = stats_cache.get(constants.STATS["PLAYER_WEEKLY_STATS"], {})
+
+    players = build_consistency_chart_players(season_data, weekly_by_player, player_meta_by_name, position, target_season, top_n)
+    typed_players = [ConsistencyChartEntry(**player) for player in players]
+
+    return ConsistencyChartResponse(season=target_season,
+                                    position=position,
+                                    available_seasons=available,
+                                    players=typed_players)

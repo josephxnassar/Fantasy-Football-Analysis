@@ -19,7 +19,7 @@
 
 .rankings-panel--header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.1rem;
@@ -44,18 +44,16 @@
   color: var(--color-text-slate);
 }
 
+.rankings-kicker-with-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
 .rankings-panel h1 {
   margin: 0;
   color: var(--color-text-primary);
   font-size: 1.65rem;
-}
-
-.rankings-description {
-  margin: 0;
-  max-width: 42rem;
-  font-size: 0.82rem;
-  color: var(--color-text-subtle);
-  line-height: 1.45;
 }
 
 .rankings-controls {

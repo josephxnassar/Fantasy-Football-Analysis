@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildBarData } from '../../../../src/components/charts/chartsHelpers';
+import {
+  buildBarData,
+  buildPlayerTrendSeries,
+} from '../../../../src/components/charts/chartsHelpers';
 
 describe('buildBarData', () => {
   it('filters route-running metrics by minimum target volume', () => {
@@ -60,6 +63,47 @@ describe('buildBarData', () => {
         name: 'Qualified Starter',
         value: 6.4,
       }),
+    ]);
+  });
+
+  it('builds season-by-season trend rows for a selected player', () => {
+    const seasonPayloads = [
+      {
+        season: 2025,
+        players: [
+          { name: 'Player A', stats: { fp_ppr: 310 } },
+          { name: 'Player B', stats: { fp_ppr: 290 } },
+        ],
+      },
+      {
+        season: 2024,
+        players: [
+          { name: 'Player A', stats: { fp_ppr: 275 } },
+        ],
+      },
+    ];
+
+    expect(buildPlayerTrendSeries(seasonPayloads, 'Player A', 'fp_ppr')).toEqual([
+      { season: 2024, value: 275 },
+      { season: 2025, value: 310 },
+    ]);
+  });
+
+  it('uses null values when selected player is missing for a season', () => {
+    const seasonPayloads = [
+      {
+        season: 2025,
+        players: [{ name: 'Player A', stats: { fp_ppr: 310 } }],
+      },
+      {
+        season: 2024,
+        players: [{ name: 'Player B', stats: { fp_ppr: 280 } }],
+      },
+    ];
+
+    expect(buildPlayerTrendSeries(seasonPayloads, 'Player A', 'fp_ppr')).toEqual([
+      { season: 2024, value: null },
+      { season: 2025, value: 310 },
     ]);
   });
 });

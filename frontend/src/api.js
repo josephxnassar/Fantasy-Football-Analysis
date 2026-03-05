@@ -73,6 +73,18 @@ export const getChartData = (position, season = null) => {
 };
 
 /**
+ * Fetch weekly consistency/upside chart data.
+ * @param {string} position - Position filter (QB, RB, WR, TE, Overall)
+ * @param {number|null} season - Season year or null for most recent
+ * @param {number} topN - Number of top seasonal players to evaluate
+ */
+export const getConsistencyData = (position, season = null, topN = 40) => {
+  return api.get('/consistency-data', {
+    params: { position, top_n: topN, ...(season && { season }) },
+  });
+};
+
+/**
  * Fetch application overview metadata
  * @returns Seasons, player counts, game logs, rookie count, and stat column count
  */

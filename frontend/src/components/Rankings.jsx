@@ -108,11 +108,15 @@ export default function Rankings({ onPlayerClick }) {
       <div className="rankings-stage">
         <div className="rankings-panel rankings-panel--header">
           <div className="rankings-copy">
-            <p className="rankings-kicker">Custom Weights</p>
+            <div className="rankings-kicker-with-help">
+              <p className="rankings-kicker">Custom Weights</p>
+              <StatTooltip
+                label="Custom Weights"
+                description="Set category and stat priorities on a -2 to +2 scale. Category and stat weights both shape the final rank."
+                iconSize={14}
+              />
+            </div>
             <h1>Player Rankings</h1>
-            <p className="rankings-description">
-              Set category and stat priorities on a -2 to +2 scale. Category and stat weights both shape the final rank.
-            </p>
           </div>
 
           <div className="rankings-controls">

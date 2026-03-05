@@ -1,7 +1,10 @@
+from copy import deepcopy
+
 import pytest
 from fastapi import HTTPException
 
 from backend.api.util.api_statistics_helpers import (
+    build_consistency_chart_players,
     build_overall_chart_players,
     build_position_chart_players,
     find_player_team,
@@ -53,3 +56,31 @@ def test_build_position_chart_players_includes_position_and_age(stats_cache) -> 
 def test_find_player_team_from_depth_charts(depth_chart_cache) -> None:
     team = find_player_team("Patrick Mahomes", depth_chart_cache)
     assert team == "KC"
+
+def test_build_consistency_chart_players_uses_weekly_points(stats_cache) -> None:
+    season_data = stats_cache["by_year"][2025]
+    players_by_name = {player["name"]: player for player in stats_cache["all_players"]}
+    weekly_by_player = deepcopy(stats_cache["player_weekly_stats"])
+    weekly_by_player["Patrick Mahomes"] = [
+        {"season": 2025, "week": 1, "fp_ppr": 24.8},
+        {"season": 2025, "week": 2, "fp_ppr": 19.2},
+    ]
+    weekly_by_player["JaMarr Chase"] = [
+        {"season": 2025, "week": 1, "fp_ppr": 21.4},
+        {"season": 2025, "week": 2, "fp_ppr": 33.9},
+    ]
+
+    players = build_consistency_chart_players(
+        season_data=season_data,
+        weekly_by_player=weekly_by_player,
+        players_by_name=players_by_name,
+        position="Overall",
+        season=2025,
+        top_n=10,
+    )
+
+    names = {player["name"] for player in players}
+    assert {"Patrick Mahomes", "JaMarr Chase"}.issubset(names)
+    mahomes = next(player for player in players if player["name"] == "Patrick Mahomes")
+    assert mahomes["games"] == 2
+    assert mahomes["avg_fp_ppr"] == 22.0

@@ -1,32 +1,50 @@
-/* Bar chart tab — single-stat horizontal bar chart with position/season controls. */
+/* Multi-view charts tab for leaderboards, trends, and profile scatter plots. */
 
 import { useEffect, useMemo, useState } from 'react';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { useChartData } from '../hooks/useChartData';
+import { useConsistencyData } from '../hooks/useConsistencyData';
 import { useLocalStorageObject } from '../hooks/useLocalStorageObject';
+import { useSeasonChartData } from '../hooks/useSeasonChartData';
+import { getStatLabel } from '../utils/statDefinitions';
 import { PRODUCTION_GROUPS } from '../utils/statMeta';
-import { ErrorMessage, LoadingMessage } from './common';
-import ChartBarShape from './charts/ChartBarShape';
+import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
 import ChartControls from './charts/ChartControls';
-import { buildBarData, DEFAULT_STAT, getChartHeight, getStatOptions } from './charts/chartsHelpers';
-import ChartTooltip from './charts/ChartTooltip';
+import AvgVsUpsideChart from './charts/AvgVsUpsideChart';
+import LeaderboardChart from './charts/LeaderboardChart';
+import SeasonTrendsChart from './charts/SeasonTrendsChart';
+import {
+  DEFAULT_STAT,
+  VIEW_META,
+  VIEWS_USING_STAT,
+} from './charts/chartsConfig';
+import {
+  buildBarData,
+  buildPlayerTrendSeries,
+  getStatOptions,
+} from './charts/chartsHelpers';
 import './Charts.css';
 
-const CHART_UI_STORAGE_KEY = 'chartsUiV1';
+const CHART_UI_STORAGE_KEY = 'chartsUiV2';
 
 export default function Charts({ onPlayerClick }) {
   const [chartUiState, setChartUiState] = useLocalStorageObject(CHART_UI_STORAGE_KEY, {});
   const initialPosition = chartUiState.position || 'Overall';
 
   // UI controls for the chart query.
+  const [view, setView] = useState(chartUiState.view || 'leaderboard');
   const [position, setPosition] = useState(initialPosition);
   const [season, setSeason] = useState(null);
   const [stat, setStat] = useState(chartUiState.stat || DEFAULT_STAT[initialPosition] || DEFAULT_STAT.Overall);
   const [topN, setTopN] = useState(chartUiState.topN || 20);
+  const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
 
   // Server payload for selected position + season.
   const { chartData, loading, error } = useChartData(position, season);
+  const consistencyEnabled = view === 'consistency-upside';
+  const trendEnabled = view === 'trend';
+  const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(position, season, Math.max(topN, 20), consistencyEnabled);
+  const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(position, trendEnabled);
 
   // Flatten API rows into sorted chart bars for the selected stat.
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
@@ -36,38 +54,71 @@ export default function Charts({ onPlayerClick }) {
     () => getStatOptions(position, chartData?.stat_columns || [], PRODUCTION_GROUPS),
     [position, chartData?.stat_columns]
   );
+  const availableStatOptions = useMemo(() => statOptions.flatMap(({ stats }) => stats), [statOptions]);
+  const rankedTrendPlayers = useMemo(
+    () => buildBarData(chartData?.players, stat, chartData?.players?.length || 0).map((row) => row.name),
+    [chartData?.players, stat]
+  );
+  const trendPlayerOptions = useMemo(
+    () => rankedTrendPlayers.slice().sort((a, b) => a.localeCompare(b)),
+    [rankedTrendPlayers]
+  );
+  const trendSeries = useMemo(
+    () => buildPlayerTrendSeries(trendData?.season_payloads || [], trendPlayer, stat),
+    [trendData?.season_payloads, trendPlayer, stat]
+  );
 
   useEffect(() => {
     // Keep selected stat valid when position/season payload changes.
-    const filteredStats = statOptions.flatMap(({ stats }) => stats);
-    if (!filteredStats.length) return;
-    if (!filteredStats.includes(stat)) {
-      setStat(filteredStats[0]);
+    if (!availableStatOptions.length) return;
+    if (!availableStatOptions.includes(stat)) {
+      setStat(availableStatOptions[0]);
     }
-  }, [statOptions, stat]);
+  }, [availableStatOptions, stat]);
 
   useEffect(() => {
-    setChartUiState({ position, topN, stat });
-  }, [position, topN, stat, setChartUiState]);
+    if (view !== 'trend') return;
+    if (!trendPlayerOptions.length) {
+      if (trendPlayer) setTrendPlayer('');
+      return;
+    }
+    if (!trendPlayer || !trendPlayerOptions.includes(trendPlayer)) {
+      setTrendPlayer(rankedTrendPlayers[0] || trendPlayerOptions[0]);
+    }
+  }, [view, trendPlayerOptions, rankedTrendPlayers, trendPlayer]);
 
-  const chartHeight = getChartHeight(barData.length);
+  useEffect(() => {
+    setChartUiState({ view, position, topN, stat, trendPlayer });
+  }, [view, position, topN, stat, trendPlayer, setChartUiState]);
+
+  const activeViewMeta = VIEW_META[view] || VIEW_META.leaderboard;
 
   if (loading) return <LoadingMessage message="Loading chart data..." />;
   if (error) return <ErrorMessage message={error} />;
+  if (consistencyEnabled && consistencyLoading) return <LoadingMessage message="Loading consistency chart..." />;
+  if (consistencyEnabled && consistencyError) return <ErrorMessage message={consistencyError} />;
+  if (trendEnabled && trendLoading) return <LoadingMessage message="Loading season trends..." />;
+  if (trendEnabled && trendError) return <ErrorMessage message={trendError} />;
 
   return (
     <div className="charts-container">
       <div className="charts-stage">
         <div className="charts-panel charts-panel--header">
           <div className="charts-copy">
-            <p className="charts-kicker">Leaderboard View</p>
+            <div className="charts-kicker-with-help">
+              <p className="charts-kicker">{activeViewMeta.kicker}</p>
+              <StatTooltip
+                label={activeViewMeta.kicker}
+                description={activeViewMeta.description}
+                iconSize={14}
+              />
+            </div>
             <h1>Stat Charts</h1>
-            <p className="charts-description">
-              Compare leaders by position, season, and key production metric. Advanced rate stats use minimum sample filters.
-            </p>
           </div>
 
           <ChartControls
+            view={view}
+            setView={setView}
             position={position}
             setPosition={setPosition}
             chartData={chartData}
@@ -76,51 +127,32 @@ export default function Charts({ onPlayerClick }) {
             stat={stat}
             setStat={setStat}
             statOptions={statOptions}
+            showStatControl={VIEWS_USING_STAT.has(view)}
+            trendPlayer={trendPlayer}
+            setTrendPlayer={setTrendPlayer}
+            trendPlayerOptions={trendPlayerOptions}
+            showTrendPlayerControl={view === 'trend'}
             topN={topN}
             setTopN={setTopN}
+            showTopNControl={view !== 'trend'}
           />
         </div>
 
-        {barData.length === 0 ? (
-          <div className="charts-panel">
-            <p className="charts-no-data">No data available for the selected stat.</p>
-          </div>
-        ) : (
-          <div className="charts-panel chart-wrapper">
-            {/* Height scales with row count so labels remain readable. */}
-            <ResponsiveContainer width="100%" height={chartHeight}>
-              <BarChart
-                data={barData}
-                layout="vertical"
-                margin={{ top: 10, right: 40, bottom: 10, left: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" horizontal={false} />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 12 }}
-                  stroke="var(--color-text-muted)"
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={150}
-                  tick={{ fontSize: 12, cursor: 'pointer' }}
-                  stroke="var(--color-text-muted)"
-                  onClick={(e) => {
-                    // Clicking a player label opens the player modal.
-                    if (e?.value) onPlayerClick(e.value);
-                  }}
-                />
-                <Tooltip cursor={false} content={<ChartTooltip />} />
-                <Bar
-                  dataKey="value"
-                  shape={(shapeProps) => (
-                    <ChartBarShape {...shapeProps} onBarClick={onPlayerClick} />
-                  )}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        {view === 'leaderboard' && (
+          <LeaderboardChart data={barData} onPlayerClick={onPlayerClick} />
+        )}
+
+        {view === 'consistency-upside' && (
+          <AvgVsUpsideChart data={consistencyData?.players || []} onPlayerClick={onPlayerClick} />
+        )}
+
+        {view === 'trend' && (
+          <SeasonTrendsChart
+            data={trendSeries}
+            playerName={trendPlayer}
+            statLabel={getStatLabel(stat)}
+            onPlayerClick={onPlayerClick}
+          />
         )}
       </div>
     </div>

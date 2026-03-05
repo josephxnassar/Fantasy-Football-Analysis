@@ -8,7 +8,7 @@ import './StatTooltip.css';
  * Rendered via portal with fixed positioning so ancestor
  * overflow rules never clip the popover.
  */
-export default function StatTooltip({ label, description }) {
+export default function StatTooltip({ label, description, iconSize = 12 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const popoverRef = useRef(null);
@@ -79,7 +79,7 @@ export default function StatTooltip({ label, description }) {
         aria-label={`Info about ${label}`}
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
       >
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <svg width={iconSize} height={iconSize} viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
           <text x="8" y="12" textAnchor="middle" fill="currentColor" fontSize="10" fontWeight="600">i</text>
         </svg>

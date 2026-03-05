@@ -1,17 +1,5 @@
 import { getStatLabel } from '../../utils/statDefinitions';
-import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../../utils/leaderboardOptions';
 import { meetsStatThreshold } from '../../utils/statThresholds';
-
-export { POSITION_OPTIONS, TOP_N_OPTIONS };
-
-// Default chart stat when switching positions.
-export const DEFAULT_STAT = {
-  QB: 'pass_yds',
-  RB: 'rush_yds',
-  WR: 'rec_yds',
-  TE: 'rec_yds',
-  Overall: 'fp_ppr',
-};
 
 export function getStatOptions(position, statColumns = [], positionStatGroups) {
   // Keeps the stat picker aligned with what backend actually returned.
@@ -39,6 +27,25 @@ export function buildBarData(players = [], stat, topN) {
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, topN);
+}
+
+function isFiniteNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+export function buildPlayerTrendSeries(seasonPayloads = [], playerName, stat) {
+  if (!Array.isArray(seasonPayloads) || !playerName) return [];
+  return seasonPayloads
+    .slice()
+    .sort((a, b) => a.season - b.season)
+    .map((seasonPayload) => {
+      const player = (seasonPayload.players || []).find((seasonPlayer) => seasonPlayer.name === playerName);
+      const value = player?.stats?.[stat];
+      return {
+        season: seasonPayload.season,
+        value: isFiniteNumber(value) ? value : null,
+      };
+    });
 }
 
 export function getChartHeight(rowCount) {
