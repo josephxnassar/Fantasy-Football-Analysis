@@ -13,6 +13,7 @@ export default function ChartControls({
   setStat,
   statOptions,
   showStatControl = true,
+  showPositionControl = true,
   trendPlayer,
   setTrendPlayer,
   trendPlayerOptions = [],
@@ -35,16 +36,18 @@ export default function ChartControls({
         </select>
       </div>
 
-      <div className="control-group">
-        <label>Position:</label>
-        <select value={position} onChange={(e) => setPosition(e.target.value)}>
-          {POSITION_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
+      {showPositionControl && (
+        <div className="control-group">
+          <label>Position:</label>
+          <select value={position} onChange={(e) => setPosition(e.target.value)}>
+            {POSITION_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {showTrendPlayerControl && (
         <div className="control-group">

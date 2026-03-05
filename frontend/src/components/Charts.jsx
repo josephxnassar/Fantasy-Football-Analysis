@@ -37,21 +37,22 @@ export default function Charts({ onPlayerClick }) {
   const [stat, setStat] = useState(chartUiState.stat || DEFAULT_STAT[initialPosition] || DEFAULT_STAT.Overall);
   const [topN, setTopN] = useState(chartUiState.topN || 20);
   const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
+  const effectivePosition = view === 'trend' ? 'Overall' : position;
 
   // Server payload for selected position + season.
-  const { chartData, loading, error } = useChartData(position, season);
+  const { chartData, loading, error } = useChartData(effectivePosition, season);
   const consistencyEnabled = view === 'consistency-upside';
   const trendEnabled = view === 'trend';
-  const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(position, season, Math.max(topN, 20), consistencyEnabled);
-  const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(position, trendPlayer, stat, trendEnabled);
+  const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(effectivePosition, season, Math.max(topN, 20), consistencyEnabled);
+  const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(effectivePosition, trendPlayer, stat, trendEnabled);
 
   // Flatten API rows into sorted chart bars for the selected stat.
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
 
   // Build grouped stat picker options from available columns + position config.
   const statOptions = useMemo(
-    () => getStatOptions(position, chartData?.stat_columns || [], PRODUCTION_GROUPS),
-    [position, chartData?.stat_columns]
+    () => getStatOptions(effectivePosition, chartData?.stat_columns || [], PRODUCTION_GROUPS),
+    [effectivePosition, chartData?.stat_columns]
   );
   const availableStatOptions = useMemo(() => statOptions.flatMap(({ stats }) => stats), [statOptions]);
   const rankedTrendPlayers = useMemo(
@@ -124,6 +125,7 @@ export default function Charts({ onPlayerClick }) {
             setStat={setStat}
             statOptions={statOptions}
             showStatControl={VIEWS_USING_STAT.has(view)}
+            showPositionControl={view !== 'trend'}
             trendPlayer={trendPlayer}
             setTrendPlayer={setTrendPlayer}
             trendPlayerOptions={trendPlayerOptions}
