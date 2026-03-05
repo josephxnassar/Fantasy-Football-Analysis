@@ -95,7 +95,7 @@ export default function Charts({ onPlayerClick }) {
 
   if (loading) return <LoadingMessage message="Loading chart data..." />;
   if (error) return <ErrorMessage message={error} />;
-  if (consistencyEnabled && consistencyLoading) return <LoadingMessage message="Loading consistency chart..." />;
+  if (consistencyEnabled && consistencyLoading) return <LoadingMessage message="Loading Avg vs Upside chart..." />;
   if (consistencyEnabled && consistencyError) return <ErrorMessage message={consistencyError} />;
   if (trendEnabled && trendLoading) return <LoadingMessage message="Loading season trends..." />;
   if (trendEnabled && trendError) return <ErrorMessage message={trendError} />;
