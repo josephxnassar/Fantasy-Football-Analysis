@@ -56,6 +56,7 @@ Local base URL: `http://localhost:8000`
 | `GET` | `/api/search` | Name search (optional position filter) |
 | `GET` | `/api/chart-data` | Chart payload by position/season |
 | `GET` | `/api/consistency-data` | Weekly consistency/upside chart payload by position/season (powers frontend `Avg vs Upside`) |
+| `GET` | `/api/player-trend` | Single-player season trend points by position/stat |
 | `GET` | `/api/teams/divisions` | Division + team-name metadata |
 | `GET` | `/api/schedules/{team}` | Team schedule by season |
 | `GET` | `/api/depth-charts/{team}` | Team depth chart |

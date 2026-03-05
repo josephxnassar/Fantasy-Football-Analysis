@@ -150,3 +150,38 @@ def build_consistency_chart_players(season_data: Dict[str, pd.DataFrame], weekly
                            "volatility_fp_ppr": round(pstdev(weekly_points), 2)})
 
     return chart_rows
+
+
+def build_player_trend_points(by_year: Dict[int, Dict[str, pd.DataFrame]], player_name: str, position: str, stat: str) -> Tuple[List[int], List[Dict[str, Any]]]:
+    """Build season-by-season trend points for a single player's selected stat."""
+    available_seasons = sorted(by_year.keys(), reverse=True)
+    if not available_seasons:
+        raise HTTPException(status_code=404, detail="No seasonal data available")
+
+    stat_seen = False
+    points: List[Dict[str, Optional[float]]] = []
+
+    for season in sorted(available_seasons):
+        season_data = by_year.get(season, {})
+        frames = season_data.items() if position == "Overall" else [(position, season_data.get(position))]
+        value: Optional[float] = None
+
+        for _, df in frames:
+            if not isinstance(df, pd.DataFrame) or df.empty:
+                continue
+            if stat in df.columns:
+                stat_seen = True
+            if stat not in df.columns or player_name not in df.index:
+                continue
+
+            numeric = pd.to_numeric(df.at[player_name, stat], errors="coerce")
+            if pd.notna(numeric):
+                value = float(numeric)
+            break
+
+        points.append({"season": season, "value": value})
+
+    if not stat_seen:
+        raise HTTPException(status_code=400, detail=f"Invalid stat '{stat}' for position '{position}'")
+
+    return available_seasons, points

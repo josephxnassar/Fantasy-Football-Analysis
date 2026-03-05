@@ -29,25 +29,6 @@ export function buildBarData(players = [], stat, topN) {
     .slice(0, topN);
 }
 
-function isFiniteNumber(value) {
-  return typeof value === 'number' && Number.isFinite(value);
-}
-
-export function buildPlayerTrendSeries(seasonPayloads = [], playerName, stat) {
-  if (!Array.isArray(seasonPayloads) || !playerName) return [];
-  return seasonPayloads
-    .slice()
-    .sort((a, b) => a.season - b.season)
-    .map((seasonPayload) => {
-      const player = (seasonPayload.players || []).find((seasonPlayer) => seasonPlayer.name === playerName);
-      const value = player?.stats?.[stat];
-      return {
-        season: seasonPayload.season,
-        value: isFiniteNumber(value) ? value : null,
-      };
-    });
-}
-
 export function getChartHeight(rowCount) {
   // Dynamic sizing avoids clipping labels as row count grows.
   return Math.max(400, rowCount * 32 + 60);

@@ -1,51 +1,33 @@
-/* Hook for loading all seasonal chart payloads for trend visualizations. */
+/* Hook for loading single-player season trend points. */
 
 import { useEffect, useState } from 'react';
 
-import { getChartData } from '../api';
+import { getPlayerTrendData } from '../api';
 
 const seasonChartCache = new Map();
 const seasonChartInFlight = new Map();
 
-async function fetchAllSeasonPayloads(position) {
-  if (!seasonChartInFlight.has(position)) {
-    const request = (async () => {
-      const latestResponse = await getChartData(position, null);
-      const latest = latestResponse.data;
-      const availableSeasons = latest.available_seasons || [latest.season];
-      const payloadsBySeason = new Map([[latest.season, latest]]);
-
-      const missingSeasonRequests = availableSeasons
-        .filter((season) => season !== latest.season)
-        .map(async (season) => {
-          const response = await getChartData(position, season);
-          return response.data;
-        });
-
-      const missingPayloads = await Promise.all(missingSeasonRequests);
-      missingPayloads.forEach((payload) => {
-        payloadsBySeason.set(payload.season, payload);
-      });
-
-      const payload = {
-        seasons: availableSeasons,
-        season_payloads: availableSeasons
-          .map((season) => payloadsBySeason.get(season))
-          .filter(Boolean),
-      };
-      seasonChartCache.set(position, payload);
-      return payload;
-    })().finally(() => {
-      seasonChartInFlight.delete(position);
-    });
-
-    seasonChartInFlight.set(position, request);
-  }
-
-  return seasonChartInFlight.get(position);
+function getCacheKey(position, playerName, stat) {
+  return `${position}:${playerName}:${stat}`;
 }
 
-export function useSeasonChartData(position, enabled) {
+async function fetchPlayerTrendPayload(playerName, position, stat, key) {
+  if (!seasonChartInFlight.has(key)) {
+    const request = getPlayerTrendData(playerName, position, stat)
+      .then((response) => {
+        seasonChartCache.set(key, response.data);
+        return response.data;
+      })
+      .finally(() => {
+        seasonChartInFlight.delete(key);
+      });
+    seasonChartInFlight.set(key, request);
+  }
+
+  return seasonChartInFlight.get(key);
+}
+
+export function useSeasonChartData(position, playerName, stat, enabled) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(Boolean(enabled));
   const [error, setError] = useState(null);
@@ -53,7 +35,8 @@ export function useSeasonChartData(position, enabled) {
   useEffect(() => {
     let cancelled = false;
 
-    if (!enabled) {
+    if (!enabled || !playerName || !stat) {
+      setData(null);
       setLoading(false);
       setError(null);
       return () => {
@@ -61,7 +44,8 @@ export function useSeasonChartData(position, enabled) {
       };
     }
 
-    const cached = seasonChartCache.get(position);
+    const cacheKey = getCacheKey(position, playerName, stat);
+    const cached = seasonChartCache.get(cacheKey);
     if (cached) {
       setData(cached);
       setLoading(false);
@@ -74,7 +58,7 @@ export function useSeasonChartData(position, enabled) {
     const fetchData = async () => {
       try {
         if (!cancelled) setLoading(true);
-        const payload = await fetchAllSeasonPayloads(position);
+        const payload = await fetchPlayerTrendPayload(playerName, position, stat, cacheKey);
         if (!cancelled) {
           setData(payload);
           setError(null);
@@ -91,7 +75,12 @@ export function useSeasonChartData(position, enabled) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, position]);
+  }, [enabled, playerName, position, stat]);
 
   return { data, loading, error };
+}
+
+export function __resetSeasonChartDataCache() {
+  seasonChartCache.clear();
+  seasonChartInFlight.clear();
 }

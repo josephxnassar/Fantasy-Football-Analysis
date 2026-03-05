@@ -85,6 +85,18 @@ export const getConsistencyData = (position, season = null, topN = 40) => {
 };
 
 /**
+ * Fetch season trend points for one player/stat.
+ * @param {string} playerName - Player name
+ * @param {string} position - Position scope (QB, RB, WR, TE, Overall)
+ * @param {string} stat - Stat key/column
+ */
+export const getPlayerTrendData = (playerName, position, stat) => {
+  return api.get('/player-trend', {
+    params: { player_name: playerName, position, stat },
+  });
+};
+
+/**
  * Fetch application overview metadata
  * @returns Seasons, player counts, game logs, rookie count, and stat column count
  */

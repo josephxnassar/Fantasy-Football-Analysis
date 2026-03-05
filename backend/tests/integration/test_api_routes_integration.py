@@ -100,6 +100,30 @@ def test_consistency_data_endpoint_returns_weekly_profiles(client_factory, app_c
     assert any(player["name"] == "Patrick Mahomes" for player in payload["players"])
     assert all("avg_fp_ppr" in player and "ceiling_fp_ppr" in player for player in payload["players"])
 
+
+def test_player_trend_endpoint_returns_single_player_series(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/player-trend", params={"player_name": "Patrick Mahomes", "position": "QB", "stat": "Pass Yds"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["player_name"] == "Patrick Mahomes"
+    assert payload["position"] == "QB"
+    assert payload["stat"] == "Pass Yds"
+    assert payload["available_seasons"] == [2025, 2024]
+    assert payload["points"] == [
+        {"season": 2024, "value": 4065.0},
+        {"season": 2025, "value": 4280.0},
+    ]
+
+
+def test_player_trend_endpoint_rejects_unknown_stat(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/player-trend", params={"player_name": "Patrick Mahomes", "position": "QB", "stat": "not_a_stat"})
+
+    assert response.status_code == 400
+    assert "Invalid stat" in response.json()["detail"]
+
 def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> None:
     empty_stats_caches = deepcopy(app_caches)
     empty_stats_caches[constants.CACHE["STATISTICS"]] = {}

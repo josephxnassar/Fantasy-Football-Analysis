@@ -190,6 +190,36 @@ class ConsistencyChartResponse(BaseModel):
     )
 
 
+class PlayerTrendPoint(BaseModel):
+    """Single season point for a player's trend chart."""
+    season: int = Field(..., description="Season year")
+    value: Optional[float] = Field(None, description="Selected stat value for the season")
+
+
+class PlayerTrendResponse(BaseModel):
+    """Response for single-player season trend endpoint."""
+    player_name: str = Field(..., description="Player name")
+    position: str = Field(..., description="Position scope used to query data")
+    stat: str = Field(..., description="Selected stat column key")
+    available_seasons: List[int] = Field(..., description="Available seasons in descending order")
+    points: List[PlayerTrendPoint] = Field(..., description="Season points in ascending season order")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "player_name": "Patrick Mahomes",
+                "position": "QB",
+                "stat": "Pass Yds",
+                "available_seasons": [2025, 2024],
+                "points": [
+                    {"season": 2024, "value": 4065.0},
+                    {"season": 2025, "value": 4280.0},
+                ],
+            }
+        }
+    )
+
+
 class DivisionsResponse(BaseModel):
     """Response for NFL divisions structure"""
     divisions: Dict[str, Dict[str, List[str]]] = Field(..., description="NFL divisions by conference")

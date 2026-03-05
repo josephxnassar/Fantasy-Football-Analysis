@@ -20,7 +20,6 @@ import {
 } from './charts/chartsConfig';
 import {
   buildBarData,
-  buildPlayerTrendSeries,
   getStatOptions,
 } from './charts/chartsHelpers';
 import './Charts.css';
@@ -44,7 +43,7 @@ export default function Charts({ onPlayerClick }) {
   const consistencyEnabled = view === 'consistency-upside';
   const trendEnabled = view === 'trend';
   const { data: consistencyData, loading: consistencyLoading, error: consistencyError } = useConsistencyData(position, season, Math.max(topN, 20), consistencyEnabled);
-  const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(position, trendEnabled);
+  const { data: trendData, loading: trendLoading, error: trendError } = useSeasonChartData(position, trendPlayer, stat, trendEnabled);
 
   // Flatten API rows into sorted chart bars for the selected stat.
   const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
@@ -63,10 +62,7 @@ export default function Charts({ onPlayerClick }) {
     () => rankedTrendPlayers.slice().sort((a, b) => a.localeCompare(b)),
     [rankedTrendPlayers]
   );
-  const trendSeries = useMemo(
-    () => buildPlayerTrendSeries(trendData?.season_payloads || [], trendPlayer, stat),
-    [trendData?.season_payloads, trendPlayer, stat]
-  );
+  const trendSeries = trendData?.points || [];
 
   useEffect(() => {
     // Keep selected stat valid when position/season payload changes.

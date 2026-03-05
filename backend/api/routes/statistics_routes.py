@@ -11,11 +11,14 @@ from backend.api.models import (
     ConsistencyChartResponse,
     PlayerResponse,
     PlayerSearchResult,
+    PlayerTrendPoint,
+    PlayerTrendResponse,
     SearchResponse,
 )
 from backend.api.util.api_statistics_helpers import (
     build_consistency_chart_players,
     build_overall_chart_players,
+    build_player_trend_points,
     build_position_chart_players,
     find_player_team,
     get_all_players,
@@ -142,3 +145,34 @@ def get_consistency_data(request: Request, position: str, season: Optional[int] 
                                     position=position,
                                     available_seasons=available,
                                     players=typed_players)
+
+
+@router.get("/player-trend", response_model=PlayerTrendResponse)
+def get_player_trend(request: Request, player_name: str, position: str, stat: str) -> PlayerTrendResponse:
+    """Get season trend points for one player and one stat."""
+    if position not in _VALID_CHART_POSITIONS:
+        raise HTTPException(status_code=400,
+                            detail=f"Invalid position. Must be one of: {', '.join(_VALID_CHART_POSITIONS)}")
+
+    resolved_name = player_name.strip()
+    resolved_stat = stat.strip()
+    if not resolved_name:
+        raise HTTPException(status_code=400, detail="player_name is required")
+    if not resolved_stat:
+        raise HTTPException(status_code=400, detail="stat is required")
+
+    caches = get_app_caches(request)
+    stats_cache = get_cache(caches, constants.CACHE["STATISTICS"])
+    all_players = get_all_players(stats_cache)
+    if not any(player.get("name") == resolved_name for player in all_players):
+        raise PlayerNotFoundError(f"Player '{player_name}' not found", source="api")
+
+    by_year = stats_cache.get(constants.STATS["BY_YEAR"], {})
+    available_seasons, points = build_player_trend_points(by_year, resolved_name, position, resolved_stat)
+    typed_points = [PlayerTrendPoint(**point) for point in points]
+
+    return PlayerTrendResponse(player_name=resolved_name,
+                               position=position,
+                               stat=resolved_stat,
+                               available_seasons=available_seasons,
+                               points=typed_points)

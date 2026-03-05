@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from backend.api.util.api_statistics_helpers import (
     build_consistency_chart_players,
     build_overall_chart_players,
+    build_player_trend_points,
     build_position_chart_players,
     find_player_team,
     get_player_profile,
@@ -84,3 +85,35 @@ def test_build_consistency_chart_players_uses_weekly_points(stats_cache) -> None
     mahomes = next(player for player in players if player["name"] == "Patrick Mahomes")
     assert mahomes["games"] == 2
     assert mahomes["avg_fp_ppr"] == 22.0
+
+
+def test_build_player_trend_points_returns_ordered_points(stats_cache) -> None:
+    by_year = stats_cache["by_year"]
+
+    available_seasons, points = build_player_trend_points(
+        by_year=by_year,
+        player_name="Patrick Mahomes",
+        position="QB",
+        stat="Pass Yds",
+    )
+
+    assert available_seasons == [2025, 2024]
+    assert points == [
+        {"season": 2024, "value": 4065.0},
+        {"season": 2025, "value": 4280.0},
+    ]
+
+
+def test_build_player_trend_points_rejects_unknown_stat(stats_cache) -> None:
+    by_year = stats_cache["by_year"]
+
+    with pytest.raises(HTTPException) as exc_info:
+        build_player_trend_points(
+            by_year=by_year,
+            player_name="Patrick Mahomes",
+            position="QB",
+            stat="not_a_stat",
+        )
+
+    assert exc_info.value.status_code == 400
+    assert "Invalid stat" in exc_info.value.detail
