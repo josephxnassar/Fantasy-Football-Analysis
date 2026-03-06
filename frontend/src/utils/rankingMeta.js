@@ -5,6 +5,7 @@ export const RANKING_GROUPS = {
     'Positional Dominance': ['fp_ppr_rank', 'exp_fp_rank'],
     'Volume Dominance': ['pass_att_rank', 'rush_att_rank', 'targets_rank'],
     'Yardage Dominance': ['pass_yds_rank', 'rush_yds_rank', 'rec_yds_rank'],
+    'Touchdown Dominance': ['pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
   },
   QB: {
     'Passing Volume': ['pass_att', 'completions', 'pass_yds', 'pass_td'],

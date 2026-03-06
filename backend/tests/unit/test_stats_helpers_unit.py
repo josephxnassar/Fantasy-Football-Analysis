@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from backend.statistics.util import stats_helpers
+from backend.util import constants
 
 pytestmark = pytest.mark.unit
 
@@ -227,3 +228,29 @@ def test_add_group_ranks_skips_missing_metrics() -> None:
 
     assert "fp_ppr_rank" in result.columns
     assert "nonexistent_rank" not in result.columns
+
+
+def test_add_group_ranks_includes_touchdown_rank_metrics() -> None:
+    df = pd.DataFrame({
+        "season": [2025, 2025],
+        "position": ["QB", "QB"],
+        "fp_ppr": [330.0, 290.0],
+        "pass_att": [500.0, 480.0],
+        "pass_yds": [4100.0, 3800.0],
+        "pass_td": [35.0, 28.0],
+        "rush_att": [70.0, 45.0],
+        "rush_yds": [400.0, 220.0],
+        "rush_td": [6.0, 2.0],
+        "rec_yds": [0.0, 0.0],
+        "rec_td": [0.0, 0.0],
+        "targets": [0.0, 0.0],
+        "exp_fp": [320.0, 275.0],
+    })
+
+    result = stats_helpers.add_group_ranks(df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
+
+    assert "pass_td_rank" in result.columns
+    assert "rush_td_rank" in result.columns
+    assert "rec_td_rank" in result.columns
+    assert result["pass_td_rank"].tolist() == [1, 2]
+    assert result["rush_td_rank"].tolist() == [1, 2]

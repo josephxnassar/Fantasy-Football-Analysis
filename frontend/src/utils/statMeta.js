@@ -35,10 +35,13 @@ export const STAT_META = {
   fp_ppr_rank: { label: 'PPR Pts Rank', description: 'Position rank for PPR fantasy points among the same position. 1 = best at the position.', format: 'int' },
   pass_att_rank: { label: 'Pass Att Rank', description: 'Position rank for passing attempts among QBs — measures volume relative to peers.', format: 'int' },
   pass_yds_rank: { label: 'Pass Yds Rank', description: 'Position rank for passing yards among QBs.', format: 'int' },
+  pass_td_rank: { label: 'Pass TD Rank', description: 'Position rank for passing touchdowns among QBs.', format: 'int' },
   rush_att_rank: { label: 'Carries Rank', description: 'Position rank for rushing attempts — shows workload relative to position peers.', format: 'int' },
   rush_yds_rank: { label: 'Rush Yds Rank', description: 'Position rank for rushing yards among same position.', format: 'int' },
+  rush_td_rank: { label: 'Rush TD Rank', description: 'Position rank for rushing touchdowns among same position.', format: 'int' },
   targets_rank: { label: 'Targets Rank', description: 'Position rank for targets — shows how heavily targeted vs. same position.', format: 'int' },
   rec_yds_rank: { label: 'Rec Yds Rank', description: 'Position rank for receiving yards among same position.', format: 'int' },
+  rec_td_rank: { label: 'Rec TD Rank', description: 'Position rank for receiving touchdowns among same position.', format: 'int' },
   exp_fp_rank: { label: 'Exp Pts Rank', description: 'Position rank for expected fantasy points — compares opportunity quality vs. peers.', format: 'int' },
 
   // Efficiency.
@@ -84,7 +87,7 @@ export const PRODUCTION_GROUPS = {
     'Passing Efficiency': ['passing_epa', 'passing_cpoe', 'ng_pass_passer_rating', 'pacr'],
     'Accuracy & Pressure': ['pfr_pass_bad_throw_pct', 'pfr_pass_on_tgt_pct', 'pfr_pass_pressure_pct', 'ng_pass_avg_time_to_throw'],
     Rushing: ['rush_att', 'rush_yds', 'rush_td'],
-    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'pass_att_rank', 'pass_yds_rank', 'rush_att_rank', 'rush_yds_rank'],
+    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'pass_att_rank', 'pass_yds_rank', 'pass_td_rank', 'rush_att_rank', 'rush_yds_rank', 'rush_td_rank'],
   },
   RB: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
@@ -93,7 +96,7 @@ export const PRODUCTION_GROUPS = {
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl'],
     'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'pfr_rec_drop_pct', 'pfr_rec_yac_r'],
     Usage: ['target_share', 'wopr', 'sc_offense_pct'],
-    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'rush_att_rank', 'rush_yds_rank', 'targets_rank', 'rec_yds_rank'],
+    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'rush_att_rank', 'rush_yds_rank', 'rush_td_rank', 'targets_rank', 'rec_yds_rank', 'rec_td_rank'],
   },
   WR: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
@@ -102,7 +105,7 @@ export const PRODUCTION_GROUPS = {
     Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
     'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
-    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'targets_rank', 'rec_yds_rank'],
+    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'targets_rank', 'rec_yds_rank', 'rec_td_rank'],
   },
   TE: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
@@ -111,13 +114,13 @@ export const PRODUCTION_GROUPS = {
     Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
     'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
-    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'targets_rank', 'rec_yds_rank'],
+    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'targets_rank', 'rec_yds_rank', 'rec_td_rank'],
   },
   Overall: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
     Passing: ['completions', 'pass_att', 'pass_yds', 'pass_td', 'passing_interceptions'],
     Rushing: ['rush_att', 'rush_yds', 'rush_td'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td'],
-    Rankings: ['fp_ppr_rank', 'exp_fp_rank'],
+    Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
   },
 };
