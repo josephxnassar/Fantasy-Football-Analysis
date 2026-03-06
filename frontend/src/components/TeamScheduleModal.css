@@ -128,7 +128,7 @@
 }
 
 .game-opponent.home {
-  color: var(--color-success-text);
+  color: var(--color-success-deep);
 }
 
 .game-opponent.away {

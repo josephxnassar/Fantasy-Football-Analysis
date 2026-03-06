@@ -13,10 +13,6 @@ vi.mock('../../../src/components/player-details/PlayerHeader', () => ({
   default: () => <div>Player Header</div>,
 }));
 
-vi.mock('../../../src/components/player-details/PlayerStatsView', () => ({
-  default: () => <div>Stats View</div>,
-}));
-
 vi.mock('../../../src/components/player-details/PlayerDepthChartTab', () => ({
   default: () => <div>Depth Chart View</div>,
 }));

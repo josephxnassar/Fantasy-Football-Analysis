@@ -1,0 +1,23 @@
+.state-message {
+  padding: 20px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+}
+
+.state-message--loading {
+  font-size: 18px;
+  color: var(--color-text-muted);
+}
+
+.state-message--error {
+  font-size: 18px;
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid #f5c6cb;
+}
+
+.state-message--empty {
+  font-size: 16px;
+  color: var(--color-text-light);
+  font-style: italic;
+}

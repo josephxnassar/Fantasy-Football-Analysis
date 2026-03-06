@@ -146,7 +146,7 @@
 }
 
 .stat-row.stat-poor {
-  border-left-color: var(--color-danger-strong);
+  border-left-color: var(--color-danger);
   background: var(--color-surface-danger);
 }
 .stat-row.stat-poor .stat-value {
