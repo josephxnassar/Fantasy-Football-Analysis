@@ -9,7 +9,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $scriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-Set-Location $scriptDir
+$repoRoot = Split-Path -Parent -Path $scriptDir
+Set-Location $repoRoot
 
 function Invoke-QualityStep {
     param(
@@ -32,7 +33,7 @@ function Invoke-QualityStep {
     Write-Host "PASSED: $Name" -ForegroundColor Green
 }
 
-Write-Host "Running full quality gate from $scriptDir" -ForegroundColor Yellow
+Write-Host "Running full quality gate from $repoRoot" -ForegroundColor Yellow
 
 Invoke-QualityStep "Backend lint (ruff)" { uv run ruff check backend }
 Invoke-QualityStep "Backend type check (mypy)" { uv run mypy }

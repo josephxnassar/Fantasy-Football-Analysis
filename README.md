@@ -63,8 +63,13 @@ Prerequisites:
 Windows one-command startup:
 
 ```powershell
-.\dev-startup.ps1
+.\scripts\dev-startup.ps1
 ```
+
+Useful startup flags:
+- `-SetupOnly` prepares dependencies but does not launch servers.
+- `-SkipPythonSync` skips `uv sync`.
+- `-SkipFrontendInstall` skips `npm install`.
 
 Manual startup:
 
@@ -114,6 +119,18 @@ cd frontend
 npm run dev
 ```
 
+Clean local cache/build artifacts:
+
+```powershell
+.\scripts\clean.ps1
+```
+
+Dry-run cleanup (show what would be removed):
+
+```powershell
+.\scripts\clean.ps1 -DryRun
+```
+
 ## Quality Checks
 
 Static analysis configuration files:
@@ -123,13 +140,13 @@ Static analysis configuration files:
 Run full local quality gate (recommended before PR/deploy):
 
 ```powershell
-.\quality-gate.ps1
+.\scripts\quality-gate.ps1
 ```
 
 Optional fast pass (skip frontend build):
 
 ```powershell
-.\quality-gate.ps1 -SkipBuild
+.\scripts\quality-gate.ps1 -SkipBuild
 ```
 
 Backend quality checks:
@@ -225,8 +242,9 @@ backend/
 frontend/
   src/            React components, hooks, utils
   public/         static assets
-dev-startup.ps1   Windows bootstrap/start script
-quality-gate.ps1  Full local lint/type/test/build gate
+scripts/dev-startup.ps1    Windows bootstrap/start script
+scripts/quality-gate.ps1   Full local lint/type/test/build gate
+scripts/clean.ps1          Local cache/build cleanup script
 pyproject.toml    Python deps/project metadata
 frontend/package.json  frontend deps/scripts
 ```
