@@ -478,4 +478,16 @@ INTERPRETED_METRIC_SOURCES = {
     "exp_fp": ["ffo_total_fp_exp"],
 }
 
-INTERPRETED_RANK_METRICS = ["fp_ppr", "pass_att", "pass_yds", "rush_att", "rush_yds", "rec_yds", "targets", "exp_fp"]
+INTERPRETED_RANK_METRICS = [
+    "fp_ppr",
+    "pass_att",
+    "pass_yds",
+    "pass_td",
+    "rush_att",
+    "rush_yds",
+    "rush_td",
+    "rec_yds",
+    "rec_td",
+    "targets",
+    "exp_fp",
+]

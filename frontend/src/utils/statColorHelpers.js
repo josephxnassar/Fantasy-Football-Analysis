@@ -31,10 +31,13 @@ const STAT_THRESHOLDS = {
   fp_ppr_rank: 10,
   pass_att_rank: 10,
   pass_yds_rank: 10,
+  pass_td_rank: 10,
   rush_att_rank: 10,
   rush_yds_rank: 10,
+  rush_td_rank: 10,
   targets_rank: 10,
   rec_yds_rank: 10,
+  rec_td_rank: 10,
   exp_fp_rank: 10,
 
   ng_pass_passer_rating: 95,

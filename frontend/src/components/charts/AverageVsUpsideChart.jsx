@@ -1,6 +1,6 @@
 import { ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
 
-export default function AverageVsUpsideChart({ data, onPlayerClick }) {
+export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPlayerSeasonClick }) {
   if (!data.length) {
     return <p className="charts-no-data">No weekly data available for this season.</p>;
   }
@@ -53,7 +53,15 @@ export default function AverageVsUpsideChart({ data, onPlayerClick }) {
             fill="#3c90d4"
             onClick={(point) => {
               const playerName = point?.payload?.name || point?.name;
-              if (playerName) onPlayerClick?.(playerName);
+              if (!playerName) return;
+
+              const selectedSeason = Number(season);
+              if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
+                onPlayerSeasonClick(playerName, selectedSeason);
+                return;
+              }
+
+              onPlayerClick?.(playerName);
             }}
           />
         </ScatterChart>

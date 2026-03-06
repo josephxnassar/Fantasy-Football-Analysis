@@ -90,4 +90,17 @@ describe('rankingsHelpers', () => {
     expect(ranked[0].name).toBe('Lower Drop');
     expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
   });
+
+  it('includes touchdown rank category when TD rank stats are available for Overall', () => {
+    const groups = getRankableGroups(
+      'Overall',
+      ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
+      RANKING_GROUPS
+    );
+
+    expect(groups).toEqual([
+      { category: 'Positional Dominance', stats: ['fp_ppr_rank', 'exp_fp_rank'] },
+      { category: 'Touchdown Dominance', stats: ['pass_td_rank', 'rush_td_rank', 'rec_td_rank'] },
+    ]);
+  });
 });

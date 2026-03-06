@@ -30,6 +30,7 @@ function App() {
     availableSeasons,
     currentSeason,
     handlePlayerClick,
+    handlePlayerSeasonClick,
     handleSeasonChange,
     closeDetails,
   } = usePlayerDetails();
@@ -122,7 +123,10 @@ function App() {
           )}
         >
           <Suspense fallback={<LoadingMessage message="Loading section..." />}>
-            <ActiveTabComponent onPlayerClick={handlePlayerClick} />
+            <ActiveTabComponent
+              onPlayerClick={handlePlayerClick}
+              onPlayerSeasonClick={handlePlayerSeasonClick}
+            />
           </Suspense>
         </ErrorBoundary>
       </main>
