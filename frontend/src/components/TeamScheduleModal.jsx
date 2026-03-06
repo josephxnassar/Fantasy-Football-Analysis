@@ -6,6 +6,7 @@ import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
   const [selectedSeason, setSelectedSeason] = useState(null);
+  const [expandedWeek, setExpandedWeek] = useState(null);
   const prevTeamRef = useRef(team);
 
   const fetchSchedule = useCallback(
@@ -14,6 +15,7 @@ export default function TeamScheduleModal({ team, onClose }) {
       if (t !== prevTeamRef.current) {
         prevTeamRef.current = t;
         setSelectedSeason(null);
+        setExpandedWeek(null);
         return getTeamSchedule(t, null);
       }
       return getTeamSchedule(t, selectedSeason);
@@ -22,6 +24,23 @@ export default function TeamScheduleModal({ team, onClose }) {
   );
 
   const { data: schedule, loading, error } = useTeamModalData(team, fetchSchedule, 'Failed to load schedule');
+
+  const handleSeasonChange = (event) => {
+    setSelectedSeason(Number(event.target.value));
+    setExpandedWeek(null);
+  };
+
+  const toggleGameDetails = (week, isBye) => {
+    if (isBye) return;
+    setExpandedWeek((previousWeek) => (previousWeek === week ? null : week));
+  };
+
+  const getResultLabel = (game) => {
+    if (!game?.winner) return null;
+    if (game.winner === 'TIE') return 'TIE';
+    if (game.winner === schedule.team) return 'W';
+    return 'L';
+  };
 
   if (!team) return null;
 
@@ -45,7 +64,7 @@ export default function TeamScheduleModal({ team, onClose }) {
                   <select
                     id="schedule-season"
                     value={selectedSeason ?? schedule.season}
-                    onChange={(e) => setSelectedSeason(Number(e.target.value))}
+                    onChange={handleSeasonChange}
                   >
                     {schedule.available_seasons.map((season) => (
                       <option key={season} value={season}>{season}</option>
@@ -62,15 +81,45 @@ export default function TeamScheduleModal({ team, onClose }) {
             
             <div className="schedule-grid">
               {schedule.schedule.map((game) => (
-                <div 
+                <button
+                  type="button"
                   key={game.week} 
-                  className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : ''}`}
+                  className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${expandedWeek === game.week ? 'expanded' : ''}`}
+                  onClick={() => toggleGameDetails(game.week, game.opponent === 'BYE')}
                 >
                   <span className="game-week">Week {game.week}</span>
                   <span className={`game-opponent ${game.opponent === 'BYE' ? 'bye-text' : ''} ${game.home_away === 'AWAY' ? 'away' : game.home_away === 'HOME' ? 'home' : ''}`}>
                     {game.opponent === 'BYE' ? 'BYE' : `${game.home_away === 'AWAY' ? '@' : 'vs'} ${game.opponent}`}
                   </span>
-                </div>
+                  {game.opponent !== 'BYE' && getResultLabel(game) && (
+                    <span className={`game-result-pill ${getResultLabel(game) === 'W' ? 'win' : getResultLabel(game) === 'L' ? 'loss' : 'tie'}`}>
+                      {getResultLabel(game)}
+                    </span>
+                  )}
+
+                  {expandedWeek === game.week && game.opponent !== 'BYE' && (
+                    <div className="game-details">
+                      {game.team_score !== null && game.opponent_score !== null ? (
+                        <>
+                          <div className="game-scoreline">
+                            <span className={game.winner === schedule.team ? 'winner' : ''}>
+                              {schedule.team} {game.team_score}
+                            </span>
+                            <span className="game-score-separator">-</span>
+                            <span className={game.winner === game.opponent ? 'winner' : ''}>
+                              {game.opponent} {game.opponent_score}
+                            </span>
+                          </div>
+                          <div className="game-winner-line">
+                            Winner: {game.winner === 'TIE' ? 'Tie' : game.winner}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="game-winner-line">Score unavailable.</div>
+                      )}
+                    </div>
+                  )}
+                </button>
               ))}
             </div>
           </>

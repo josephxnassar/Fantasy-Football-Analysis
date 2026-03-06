@@ -243,8 +243,22 @@ class TeamScheduleGame(BaseModel):
     week: int = Field(..., description="Week number")
     opponent: str = Field(..., description="Opponent team abbreviation or BYE")
     home_away: Optional[str] = Field(None, description="HOME or AWAY (null for BYE)")
+    team_score: Optional[int] = Field(None, description="Final score for requested team")
+    opponent_score: Optional[int] = Field(None, description="Final score for opponent")
+    winner: Optional[str] = Field(None, description="Winning team abbreviation, TIE, or null if unavailable")
     
-    model_config = ConfigDict(json_schema_extra={"example": {"week": 1, "opponent": "KC", "home_away": "AWAY"}})
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "week": 1,
+                "opponent": "KC",
+                "home_away": "AWAY",
+                "team_score": 24,
+                "opponent_score": 27,
+                "winner": "KC",
+            }
+        }
+    )
 
 
 class TeamScheduleResponse(BaseModel):
@@ -264,8 +278,8 @@ class TeamScheduleResponse(BaseModel):
                 "season": 2025,
                 "available_seasons": [2025, 2024, 2023],
                 "schedule": [
-                    {"week": 1, "opponent": "BAL", "home_away": "HOME"},
-                    {"week": 2, "opponent": "CIN", "home_away": "AWAY"},
+                    {"week": 1, "opponent": "BAL", "home_away": "HOME", "team_score": 24, "opponent_score": 20, "winner": "KC"},
+                    {"week": 2, "opponent": "CIN", "home_away": "AWAY", "team_score": 17, "opponent_score": 21, "winner": "CIN"},
                 ],
                 "bye_week": 6,
             }

@@ -96,9 +96,13 @@ def _build_statistics_cache() -> Dict[str, Any]:
 
 def _build_schedules_cache() -> Dict[int, Dict[str, pd.DataFrame]]:
     kc_schedule = pd.DataFrame({"opponent": ["BAL", "BYE", "CIN"],
-                                "home_away": ["HOME", None, "AWAY"]}, index=pd.Index([1, 2, 3], name="week"))
+                                "home_away": ["HOME", None, "AWAY"],
+                                "team_score": [24, None, 17],
+                                "opponent_score": [20, None, 21]}, index=pd.Index([1, 2, 3], name="week"))
     cin_schedule = pd.DataFrame({"opponent": ["CLE", "PIT", "KC"],
-                                 "home_away": ["HOME", "AWAY", "HOME"]}, index=pd.Index([1, 2, 3], name="week"))
+                                 "home_away": ["HOME", "AWAY", "HOME"],
+                                 "team_score": [27, 20, 21],
+                                 "opponent_score": [14, 24, 17]}, index=pd.Index([1, 2, 3], name="week"))
     return {2025: {"KC": kc_schedule, "CIN": cin_schedule},
             2024: {"KC": kc_schedule.copy()}}
 

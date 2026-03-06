@@ -25,7 +25,7 @@ class Schedules(BaseSource):
         """Load schedules from nflreadpy"""
         try:
             df = nfl.load_schedules(seasons=self.seasons).to_pandas()
-            reg_games = (df[df['game_type'] == 'REG'][['season', 'week', 'away_team', 'home_team']].replace(constants.TEAM_ABBR_NORMALIZATION))
+            reg_games = (df[df['game_type'] == 'REG'][['season', 'week', 'away_team', 'home_team', 'away_score', 'home_score']].replace(constants.TEAM_ABBR_NORMALIZATION))
             self.weeks_by_season = reg_games.groupby('season')['week'].nunique().to_dict()
             return reg_games
         except Exception as e:
@@ -36,7 +36,11 @@ class Schedules(BaseSource):
         """Fill missing weeks with BYE placeholder"""
         try:
             all_weeks = pd.Index(range(1, total_weeks + 1), name="week")
-            return df.reindex(all_weeks, fill_value="BYE").sort_index()
+            filled = df.reindex(all_weeks).sort_index()
+            filled["opponent"] = filled["opponent"].fillna("BYE")
+            if "home_away" in filled.columns:
+                filled.loc[filled["opponent"] == "BYE", "home_away"] = None
+            return filled
         except Exception as e:
             logger.error("Failed to fill bye weeks: %s", e)
             raise DataProcessingError(f"Failed to fill bye weeks: {e}", source="Schedules") from e
@@ -46,9 +50,16 @@ class Schedules(BaseSource):
         try:
             home_games = self.master_schedule.rename(columns={'away_team': 'opponent', 'home_team': 'team'})
             home_games["home_away"] = "HOME"
+            home_games["team_score"] = home_games["home_score"]
+            home_games["opponent_score"] = home_games["away_score"]
+
             away_games = self.master_schedule.rename(columns={'home_team': 'opponent', 'away_team': 'team'})
             away_games["home_away"] = "AWAY"
-            return pd.concat([home_games, away_games], ignore_index=True)
+            away_games["team_score"] = away_games["away_score"]
+            away_games["opponent_score"] = away_games["home_score"]
+
+            combined = pd.concat([home_games, away_games], ignore_index=True)
+            return combined[["season", "week", "team", "opponent", "home_away", "team_score", "opponent_score"]]
         except Exception as e:
             logger.error("Failed to create combined schedule: %s", e)
             raise DataProcessingError(f"Failed to create combined schedule: {e}", source="Schedules") from e

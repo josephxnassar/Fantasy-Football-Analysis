@@ -49,6 +49,9 @@ def test_schedule_and_depth_chart_endpoints_return_team_data(client_factory, app
 
     assert schedule["bye_week"] == 2
     assert schedule["schedule"][1]["opponent"] == "BYE"
+    assert schedule["schedule"][0]["team_score"] == 24
+    assert schedule["schedule"][0]["opponent_score"] == 20
+    assert schedule["schedule"][0]["winner"] == "KC"
     assert depth["team"] == "KC"
     assert any(row["position"] == "QB" and row["starter"] == "Patrick Mahomes" for row in depth["depth_chart"])
 

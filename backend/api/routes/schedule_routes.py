@@ -1,4 +1,5 @@
 """Schedule API routes — team schedules"""
+import math
 from typing import Optional
 
 from fastapi import APIRouter, Request
@@ -9,6 +10,22 @@ from backend.api.util.team_helpers import get_team_schedule_entry, validate_team
 from backend.util import constants
 
 router = APIRouter(prefix="/api/schedules", tags=["schedules"])
+
+
+def _to_optional_int(value: object) -> Optional[int]:
+    """Convert scalar schedule values into nullable ints."""
+    if value is None:
+        return None
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        if not value or value.upper() == "BYE":
+            return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 @router.get("/{team}", response_model=TeamScheduleResponse)
@@ -25,10 +42,33 @@ def get_team_schedule(request: Request, team: str, season: Optional[int] = None)
     for week, row in team_schedule_df.iterrows():
         opponent = row.get('opponent', 'BYE')
         home_away = row.get('home_away')
+        team_score = _to_optional_int(row.get('team_score'))
+        opponent_score = _to_optional_int(row.get('opponent_score'))
+        winner: Optional[str] = None
+
         if opponent == 'BYE':
             bye_week = int(week)
             home_away = None
-        schedule.append(TeamScheduleGame(week=int(week), opponent=opponent, home_away=home_away))
+            team_score = None
+            opponent_score = None
+        elif team_score is not None and opponent_score is not None:
+            if team_score > opponent_score:
+                winner = team
+            elif opponent_score > team_score:
+                winner = opponent
+            else:
+                winner = "TIE"
+
+        schedule.append(
+            TeamScheduleGame(
+                week=int(week),
+                opponent=opponent,
+                home_away=home_away,
+                team_score=team_score,
+                opponent_score=opponent_score,
+                winner=winner,
+            )
+        )
 
     return TeamScheduleResponse(team=team,
                                 team_name=constants.TEAM_NAMES.get(team, team),
