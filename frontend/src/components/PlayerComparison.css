@@ -190,9 +190,18 @@
 }
 
 .direct-comparison-table {
-  width: max-content;
+  width: 100%;
   min-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
+}
+
+.direct-comparison-col-stat {
+  width: 26%;
+}
+
+.direct-comparison-col-player {
+  width: auto;
 }
 
 .direct-comparison-table th,
@@ -225,9 +234,14 @@
   background: transparent;
   color: var(--color-primary-dark);
   font: inherit;
+  display: block;
+  width: 100%;
   font-size: 0.84rem;
   font-weight: 700;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   padding: 0;
   border-radius: 6px;

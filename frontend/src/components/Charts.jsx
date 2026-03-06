@@ -140,7 +140,12 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
         </div>
 
         {view === 'leaderboard' && (
-          <LeaderboardChart data={barData} onPlayerClick={onPlayerClick} />
+          <LeaderboardChart
+            data={barData}
+            season={chartSeason}
+            onPlayerClick={onPlayerClick}
+            onPlayerSeasonClick={onPlayerSeasonClick}
+          />
         )}
 
         {view === 'consistency-upside' && (

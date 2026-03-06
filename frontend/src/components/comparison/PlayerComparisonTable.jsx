@@ -19,7 +19,18 @@ export default function PlayerComparisonTable({
   weeksWinners,
   winCountsBySlot,
   onPlayerClick,
+  onPlayerSeasonClick,
 }) {
+  const handlePlayerHeaderClick = (slot) => {
+    if (!slot?.playerName) return;
+    const selectedSeason = Number(slot.season);
+    if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
+      onPlayerSeasonClick(slot.playerName, selectedSeason);
+      return;
+    }
+    onPlayerClick?.(slot.playerName);
+  };
+
   if (selectedPlayers.length === 0) {
     return <EmptyStateMessage message="Select at least one player to compare." />;
   }
@@ -27,6 +38,12 @@ export default function PlayerComparisonTable({
   return (
     <div className="direct-comparison-table-wrapper">
       <table className="direct-comparison-table">
+        <colgroup>
+          <col className="direct-comparison-col-stat" />
+          {selectedPlayers.map((slot) => (
+            <col key={`col-${slot.id}`} className="direct-comparison-col-player" />
+          ))}
+        </colgroup>
         <thead>
           <tr>
             <th>Stat</th>
@@ -36,7 +53,8 @@ export default function PlayerComparisonTable({
                   <button
                     type="button"
                     className="direct-comparison-player-link"
-                    onClick={() => onPlayerClick?.(slot.playerName)}
+                    title={slot.playerName}
+                    onClick={() => handlePlayerHeaderClick(slot)}
                   >
                     {slot.playerName}
                   </button>

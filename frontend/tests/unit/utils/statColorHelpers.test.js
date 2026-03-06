@@ -67,6 +67,10 @@ describe('getStatColorClass', () => {
   });
 
   describe('rank stats', () => {
+    it('returns stat-no-data for zero rank values', () => {
+      expect(getStatColorClass('fp_ppr_rank', 0)).toBe('stat-no-data');
+    });
+
     it('returns stat-good for top ranks', () => {
       expect(getStatColorClass('fp_ppr_rank', 5)).toBe('stat-good');
     });

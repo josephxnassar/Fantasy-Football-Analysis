@@ -89,6 +89,10 @@ function getThreshold(statName) {
   return STAT_THRESHOLDS[key] ?? STAT_THRESHOLDS[compact];
 }
 
+function isRankMetric(statName) {
+  return toKey(statName).endsWith('_rank');
+}
+
 /**
  * Get color class for a stat value.
  * @param {string} statName - Stat key.
@@ -99,6 +103,7 @@ export function getStatColorClass(statName, value) {
   if (value === null || value === undefined || Number.isNaN(value)) return '';
   const numeric = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(numeric)) return '';
+  if (isRankMetric(statName) && numeric === 0) return 'stat-no-data';
 
   const normalizedValue = normalizePercentageValue(statName, numeric);
 

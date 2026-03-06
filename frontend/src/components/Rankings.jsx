@@ -22,7 +22,7 @@ const STORAGE_KEY = 'rankingsWeights';
 const UI_STORAGE_KEY = 'rankingsUi';
 const EMPTY_WEIGHTS = Object.freeze({});
 
-export default function Rankings({ onPlayerClick }) {
+export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
   const [uiState, setUiState] = useSessionStorageObject(UI_STORAGE_KEY, {});
   const [weightProfiles, setWeightProfiles] = useSessionStorageObject(STORAGE_KEY, {});
   const [position, setPosition] = useState(uiState.position || 'Overall');
@@ -50,6 +50,16 @@ export default function Rankings({ onPlayerClick }) {
     () => buildRankings(chartData?.players || [], rankableGroups, categoryWeights, statWeights, topN),
     [chartData?.players, rankableGroups, categoryWeights, statWeights, topN]
   );
+  const selectedSeason = season ?? chartData?.season ?? null;
+
+  const handlePlayerResultClick = (playerName) => {
+    const seasonNumber = Number(selectedSeason);
+    if (onPlayerSeasonClick && Number.isFinite(seasonNumber)) {
+      onPlayerSeasonClick(playerName, seasonNumber);
+      return;
+    }
+    onPlayerClick?.(playerName);
+  };
 
   const updateProfile = (updater) => {
     setWeightProfiles((previous) => {
@@ -255,7 +265,7 @@ export default function Rankings({ onPlayerClick }) {
                             <button
                               type="button"
                               className="ranking-player-button"
-                              onClick={() => onPlayerClick?.(player.name)}
+                              onClick={() => handlePlayerResultClick(player.name)}
                             >
                               {player.name}
                             </button>

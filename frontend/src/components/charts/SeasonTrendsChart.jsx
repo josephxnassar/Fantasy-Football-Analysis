@@ -51,9 +51,18 @@ export default function SeasonTrendsChart({ data, playerName, statLabel, onPlaye
   return (
     <div className="charts-panel chart-wrapper">
       <ResponsiveContainer width="100%" height={430}>
-        <LineChart data={data} margin={{ top: 12, right: 32, bottom: 12, left: 8 }}>
-          <XAxis dataKey="season" stroke="var(--color-text-muted)" tick={{ fontSize: 12 }} />
-          <YAxis stroke="var(--color-text-muted)" tick={{ fontSize: 12 }} />
+        <LineChart data={data} margin={{ top: 12, right: 32, bottom: 34, left: 16 }}>
+          <XAxis
+            dataKey="season"
+            stroke="var(--color-text-muted)"
+            tick={{ fontSize: 12 }}
+            label={{ value: 'Season', position: 'insideBottom', offset: -8 }}
+          />
+          <YAxis
+            stroke="var(--color-text-muted)"
+            tick={{ fontSize: 12 }}
+            label={{ value: statLabel, angle: -90, position: 'insideLeft' }}
+          />
           <Tooltip
             cursor={false}
             formatter={(value) => [value?.toLocaleString(), statLabel]}

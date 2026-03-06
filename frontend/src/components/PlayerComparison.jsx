@@ -6,7 +6,7 @@ import { ErrorMessage, LoadingMessage } from './common';
 import PlayerComparisonTable from './comparison/PlayerComparisonTable';
 import './PlayerComparison.css';
 
-export default function PlayerComparison({ onPlayerClick }) {
+export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick }) {
   const {
     positionProfile,
     comparisonSlots,
@@ -125,6 +125,7 @@ export default function PlayerComparison({ onPlayerClick }) {
             weeksWinners={weeksWinners}
             winCountsBySlot={winCountsBySlot}
             onPlayerClick={onPlayerClick}
+            onPlayerSeasonClick={onPlayerSeasonClick}
           />
         </div>
       </div>

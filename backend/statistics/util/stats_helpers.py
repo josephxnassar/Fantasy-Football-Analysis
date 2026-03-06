@@ -123,12 +123,7 @@ def _first_present_column(df: pd.DataFrame, candidates: Iterable[str]) -> str | 
             return candidate
     return None
 
-def _build_grouped_rollup(
-    weekly_df: pd.DataFrame,
-    value_col: str,
-    reducer: str,
-    weight_col: str | None,
-) -> pd.Series:
+def _build_grouped_rollup(weekly_df: pd.DataFrame, value_col: str, reducer: str, weight_col: str | None) -> pd.Series:
     value = pd.to_numeric(weekly_df[value_col], errors="coerce")
     grouped_value = value.groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS])
 

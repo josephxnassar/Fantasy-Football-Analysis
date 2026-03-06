@@ -8,13 +8,14 @@ export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPl
   return (
     <div className="charts-panel chart-wrapper">
       <ResponsiveContainer width="100%" height={420}>
-        <ScatterChart margin={{ top: 12, right: 22, bottom: 22, left: 8 }}>
+        <ScatterChart margin={{ top: 12, right: 22, bottom: 38, left: 16 }}>
           <XAxis
             type="number"
             dataKey="avg_fp_ppr"
             name="Weekly Avg PPR"
             stroke="var(--color-text-muted)"
             tick={{ fontSize: 12 }}
+            label={{ value: 'Weekly Average PPR', position: 'insideBottom', offset: -8 }}
           />
           <YAxis
             type="number"
@@ -22,6 +23,7 @@ export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPl
             name="Weekly Ceiling PPR"
             stroke="var(--color-text-muted)"
             tick={{ fontSize: 12 }}
+            label={{ value: 'Weekly Ceiling PPR', angle: -90, position: 'insideLeft' }}
           />
           <ZAxis type="number" dataKey="games" range={[48, 260]} />
           <Tooltip

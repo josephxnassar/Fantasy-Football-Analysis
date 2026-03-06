@@ -153,6 +153,14 @@
   color: var(--color-danger-deep);
 }
 
+.stat-row.stat-no-data {
+  border-left-color: var(--color-border-accent);
+  background: var(--color-surface-muted);
+}
+.stat-row.stat-no-data .stat-value {
+  color: var(--color-text-muted);
+}
+
 /* ── View Mode Toggle ── */
 
 .view-mode-toggle {
