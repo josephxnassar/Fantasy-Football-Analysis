@@ -123,6 +123,21 @@
   overflow-x: auto;
 }
 
+.chart-axis-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  margin-top: 0.15rem;
+  color: var(--color-text-muted);
+}
+
+.chart-axis-meta__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
 /* Prevent browser focus ring on SVG bar clicks */
 .chart-wrapper svg {
   outline: none;

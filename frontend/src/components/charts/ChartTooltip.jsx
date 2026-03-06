@@ -1,7 +1,10 @@
+import { formatStatForDisplay } from '../../utils/statDefinitions';
+
 export default function ChartTooltip({ active, payload }) {
   // Tooltip renders only for active hover events with payload data.
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
+  const displayValue = formatStatForDisplay(data.statKey, data.value);
 
   return (
     <div className="chart-tooltip">
@@ -25,7 +28,7 @@ export default function ChartTooltip({ active, payload }) {
       </div>
       <div className="chart-tooltip-stats">
         <div>
-          {data.statLabel}: <strong>{data.value?.toLocaleString()}</strong>
+          {data.statLabel}: <strong>{displayValue}</strong>
         </div>
       </div>
     </div>

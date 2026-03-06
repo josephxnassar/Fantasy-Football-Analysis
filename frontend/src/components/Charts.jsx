@@ -7,7 +7,7 @@ import { useConsistencyData } from '../hooks/useConsistencyData';
 import { useSessionStorageObject } from '../hooks/useSessionStorageObject';
 import { useSeasonChartData } from '../hooks/useSeasonChartData';
 import { getStatLabel } from '../utils/statDefinitions';
-import { PRODUCTION_GROUPS } from '../utils/statMeta';
+import { PRODUCTION_GROUPS_NO_RANKS } from '../utils/statMeta';
 import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
 import ChartControls from './charts/ChartControls';
 import AverageVsUpsideChart from './charts/AverageVsUpsideChart';
@@ -52,7 +52,7 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
 
   // Build grouped stat picker options from available columns + position config.
   const statOptions = useMemo(
-    () => getStatOptions(effectivePosition, chartData?.stat_columns || [], PRODUCTION_GROUPS),
+    () => getStatOptions(effectivePosition, chartData?.stat_columns || [], PRODUCTION_GROUPS_NO_RANKS),
     [effectivePosition, chartData?.stat_columns]
   );
   const availableStatOptions = useMemo(() => statOptions.flatMap(({ stats }) => stats), [statOptions]);
@@ -142,6 +142,7 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
         {view === 'leaderboard' && (
           <LeaderboardChart
             data={barData}
+            stat={stat}
             season={chartSeason}
             onPlayerClick={onPlayerClick}
             onPlayerSeasonClick={onPlayerSeasonClick}
@@ -161,6 +162,7 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
           <SeasonTrendsChart
             data={trendSeries}
             playerName={trendPlayer}
+            stat={stat}
             statLabel={getStatLabel(stat)}
             onPlayerClick={onPlayerClick}
             onPlayerSeasonClick={onPlayerSeasonClick}

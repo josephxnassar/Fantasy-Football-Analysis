@@ -1,10 +1,10 @@
 /* Helpers for ordering direct-comparison rows from production stat metadata. */
 
-import { PRODUCTION_GROUPS } from '../../utils/statMeta';
+import { PRODUCTION_GROUPS_NO_RANKS } from '../../utils/statMeta';
 import { isLowerBetterStat } from '../../utils/statDirection';
 
 export function buildComparisonRows(positionProfile = 'Overall') {
-  const profileGroups = PRODUCTION_GROUPS[positionProfile] || PRODUCTION_GROUPS.Overall;
+  const profileGroups = PRODUCTION_GROUPS_NO_RANKS[positionProfile] || PRODUCTION_GROUPS_NO_RANKS.Overall;
   const rows = [];
 
   Object.entries(profileGroups).forEach(([category, statKeys]) => {

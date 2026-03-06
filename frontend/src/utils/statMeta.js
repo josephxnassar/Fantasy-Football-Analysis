@@ -26,8 +26,8 @@ export const STAT_META = {
   receiving_yards_after_catch: { label: 'Rec YAC', description: 'Total receiving yards gained after the catch — shows how much a player creates with the ball in hand.', format: 'int' },
 
   // Usage.
-  target_share: { label: 'Target Share', description: 'Percentage of the team\'s pass targets going to this player. 20%+ is elite for WRs.', format: 'decimal2' },
-  air_yards_share: { label: 'Air Yard Share', description: 'Percentage of team air yards targeted to this player. High share signals a key role in the pass game.', format: 'decimal2' },
+  target_share: { label: 'Target Share', description: 'Percentage of the team\'s pass targets going to this player. 20%+ is elite for WRs.', format: 'percent1' },
+  air_yards_share: { label: 'Air Yard Share', description: 'Percentage of team air yards targeted to this player. High share signals a key role in the pass game.', format: 'percent1' },
   wopr: { label: 'WOPR', description: 'Weighted Opportunity Rating — combines target share and air yard share into a single receiving usage score.', format: 'decimal2' },
   sc_offense_pct: { label: 'Snap %', description: 'Percentage of offensive snaps played. 80%+ indicates a true every-down role.', format: 'percent1' },
 
@@ -60,20 +60,20 @@ export const STAT_META = {
   ng_rec_avg_separation: { label: 'Separation', description: 'Average yards of separation from the nearest defender at the throw. More = easier catches.', format: 'decimal2' },
   ng_rec_avg_yac: { label: 'Avg YAC', description: 'Average yards after catch per reception from Next Gen tracking. Pure YAC ability measure.', format: 'decimal1' },
   ng_rec_avg_yac_above_expectation: { label: 'YAC Over Exp', description: 'Actual minus expected yards after catch. Positive = creating extra yards beyond what the catch location would predict.', format: 'decimal2' },
-  ng_rec_catch_pct: { label: 'Catch %', description: 'Percentage of targets caught.', format: 'decimal1' },
+  ng_rec_catch_pct: { label: 'Catch %', description: 'Percentage of targets caught.', format: 'percent1' },
   ng_rush_rush_yds_over_exp_per_att: { label: 'RYOE/Att', description: 'Rushing yards over expectation per carry. The best per-play measure of rushing talent — removes O-line effects.', format: 'decimal2' },
   ng_rush_efficiency: { label: 'Rush Efficiency', description: 'Yards gained ÷ yards expected from blocking/alignment. Above 100% = beating blocks.', format: 'decimal2' },
 
   // PFR highlights.
-  pfr_pass_pressure_pct: { label: 'Pressure %', description: 'Percentage of dropbacks where the QB was pressured. Lower = better protection or quicker release.', format: 'decimal2' },
-  pfr_pass_bad_throw_pct: { label: 'Bad Throw %', description: 'Percentage of passes charted as uncatchable. Directly measures accuracy issues.', format: 'decimal2' },
-  pfr_pass_on_tgt_pct: { label: 'On-Target %', description: 'Percentage of passes rated on-target by PFR charting. Pure accuracy measure separate from completion %.', format: 'decimal1' },
+  pfr_pass_pressure_pct: { label: 'Pressure %', description: 'Percentage of dropbacks where the QB was pressured. Lower = better protection or quicker release.', format: 'percent1' },
+  pfr_pass_bad_throw_pct: { label: 'Bad Throw %', description: 'Percentage of passes charted as uncatchable. Directly measures accuracy issues.', format: 'percent1' },
+  pfr_pass_on_tgt_pct: { label: 'On-Target %', description: 'Percentage of passes rated on-target by PFR charting. Pure accuracy measure separate from completion %.', format: 'percent1' },
   pfr_rush_yac_att: { label: 'YAC/Att', description: 'Yards After Contact per carry — measures a back\'s power and elusiveness independent of blocking.', format: 'decimal2' },
   pfr_rush_yac: { label: 'Rush YAC', description: 'Total rushing yards gained after contact with a defender. Raw volume measure of a runner\'s power.', format: 'int' },
   pfr_rush_ybc_att: { label: 'YBC/Att', description: 'Yards Before Contact per carry — measures blocking and scheme effectiveness before the runner makes a play.', format: 'decimal2' },
   pfr_rush_brk_tkl: { label: 'Broken Tackles', description: 'Total broken tackles on rushing plays. Indicates physicality.', format: 'decimal1' },
   pfr_rec_adot: { label: 'ADOT', description: 'Average Depth of Target — how far downfield this player is targeted on average.', format: 'decimal1' },
-  pfr_rec_drop_pct: { label: 'Drop %', description: 'Percentage of catchable targets dropped. Lower = more reliable hands.', format: 'decimal2' },
+  pfr_rec_drop_pct: { label: 'Drop %', description: 'Percentage of catchable targets dropped. Lower = more reliable hands.', format: 'percent1' },
   pfr_rec_yac_r: { label: 'YAC/Rec', description: 'Yards After Catch per reception — measures ability to create with the ball in hand.', format: 'decimal2' },
   pfr_rec_yac: { label: 'Rec YAC', description: 'Total receiving yards gained after the catch from PFR charting.', format: 'int' },
   pfr_rec_brk_tkl: { label: 'Broken Tackles', description: 'Receiving broken tackles — tacklers evaded after the catch.', format: 'int' },
@@ -122,5 +122,46 @@ export const PRODUCTION_GROUPS = {
     Rushing: ['rush_att', 'rush_yds', 'rush_td'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td'],
     Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
+  },
+};
+
+// ── Leaderboard/comparison stat groups: production metrics without rank fields ──
+export const PRODUCTION_GROUPS_NO_RANKS = {
+  QB: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Passing: ['completions', 'pass_att', 'pass_yds', 'pass_td', 'passing_interceptions'],
+    'Passing Efficiency': ['passing_epa', 'passing_cpoe', 'ng_pass_passer_rating', 'pacr'],
+    'Accuracy & Pressure': ['pfr_pass_bad_throw_pct', 'pfr_pass_on_tgt_pct', 'pfr_pass_pressure_pct', 'ng_pass_avg_time_to_throw'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td'],
+  },
+  RB: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_yac', 'pfr_rush_brk_tkl'],
+    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency', 'pfr_rush_yac_att', 'pfr_rush_ybc_att'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl'],
+    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'pfr_rec_drop_pct', 'pfr_rec_yac_r'],
+    Usage: ['target_share', 'wopr', 'sc_offense_pct'],
+  },
+  WR: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl', 'ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
+    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct', 'ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
+    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency'],
+    Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
+  },
+  TE: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl', 'ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
+    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct', 'ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
+    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa', 'ng_rush_rush_yds_over_exp_per_att', 'ng_rush_efficiency'],
+    Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
+  },
+  Overall: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Passing: ['completions', 'pass_att', 'pass_yds', 'pass_td', 'passing_interceptions'],
+    Rushing: ['rush_att', 'rush_yds', 'rush_td'],
+    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td'],
   },
 };

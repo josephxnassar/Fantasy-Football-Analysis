@@ -18,6 +18,7 @@ export function buildBarData(players = [], stat, topN) {
   return players
     .filter((player) => player.stats[stat] != null && meetsStatThreshold(player, stat))
     .map((player) => ({
+      statKey: stat,
       name: player.name,
       position: player.position,
       team: player.team,

@@ -1,11 +1,14 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { StatTooltip } from '../common';
+import { formatStatForDisplay, getStatDefinition } from '../../utils/statDefinitions';
 import ChartBarShape from './ChartBarShape';
 import { getChartHeight } from './chartsHelpers';
 import ChartTooltip from './ChartTooltip';
 
-export default function LeaderboardChart({ data, season, onPlayerClick, onPlayerSeasonClick }) {
+export default function LeaderboardChart({ data, stat, season, onPlayerClick, onPlayerSeasonClick }) {
   const statAxisLabel = data?.[0]?.statLabel || 'Selected Stat';
+  const statDescription = getStatDefinition(stat);
 
   const handlePlayerSelection = (playerName) => {
     if (!playerName) return;
@@ -34,14 +37,14 @@ export default function LeaderboardChart({ data, season, onPlayerClick, onPlayer
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 10, right: 40, bottom: 34, left: 18 }}
+          margin={{ top: 10, right: 40, bottom: 20, left: 18 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" horizontal={false} />
           <XAxis
             type="number"
             tick={{ fontSize: 12 }}
             stroke="var(--color-text-muted)"
-            label={{ value: statAxisLabel, position: 'insideBottom', offset: -8 }}
+            tickFormatter={(value) => formatStatForDisplay(stat, value)}
           />
           <YAxis
             type="category"
@@ -64,6 +67,10 @@ export default function LeaderboardChart({ data, season, onPlayerClick, onPlayer
           />
         </BarChart>
       </ResponsiveContainer>
+      <div className="chart-axis-meta">
+        <span className="chart-axis-meta__label">{statAxisLabel}</span>
+        <StatTooltip label={statAxisLabel} description={statDescription} />
+      </div>
     </div>
   );
 }
