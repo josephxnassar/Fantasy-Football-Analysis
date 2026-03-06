@@ -118,6 +118,7 @@ Variables:
 Depth chart source:
 - `DEPTH_CHART_SOURCE=espn` uses live ESPN scraping.
 - `DEPTH_CHART_SOURCE=nrp` uses seasonal `nflreadpy` depth charts.
+- any other value fails fast at startup with a configuration error.
 
 Timing logs:
 - Standard file logs are separated into subfolders under `LOG_DIR`: `errors/errors.log`, `timing/`.

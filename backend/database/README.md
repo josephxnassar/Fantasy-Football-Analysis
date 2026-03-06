@@ -51,10 +51,15 @@ Statistics weekly rows are flattened with an internal key column (`__player_key`
 
 `SQLService.has_cached_data()` returns true only if:
 - `Statistics_all_players` exists
+- `Statistics_player_weekly_stats` exists
+- at least one `Statistics_<season>_<position>` table exists
 - at least one `Schedules_*` table exists
 - at least one `ESPNDepthChart_*` table exists
 
 If false, required cache families are missing and startup should trigger a cache rebuild via `App.initialize()`.
+
+`SQLService._load_table_safe(...)` only suppresses "no such table" reads.
+Other database errors are re-raised so startup fails fast instead of silently hydrating partial caches.
 
 ## Database Path
 

@@ -26,7 +26,40 @@ class SQLService:
         tables = set(self.db.list_tables())
         if not tables:
             return False
-        return (f"{constants.CACHE['STATISTICS']}_{constants.STATS['ALL_PLAYERS']}" in tables and any(t.startswith(f"{constants.CACHE['SCHEDULES']}_") for t in tables) and any(t.startswith(f"{constants.CACHE['DEPTH_CHART']}_") for t in tables))
+        return (
+            self._has_statistics_tables(tables)
+            and self._has_family_tables(tables, constants.CACHE["SCHEDULES"])
+            and self._has_family_tables(tables, constants.CACHE["DEPTH_CHART"])
+        )
+
+    @staticmethod
+    def _has_family_tables(tables: set[str], family_name: str) -> bool:
+        """Return True when at least one table exists for the given cache family prefix."""
+        return any(table.startswith(f"{family_name}_") for table in tables)
+
+    @staticmethod
+    def _has_statistics_tables(tables: set[str]) -> bool:
+        """
+        Return True when core statistics tables are present.
+
+        Required:
+        - all_players table
+        - player_weekly_stats table
+        - at least one seasonal position table (Statistics_<season>_<position>)
+        """
+        prefix = constants.CACHE["STATISTICS"]
+        all_players = f"{prefix}_{constants.STATS['ALL_PLAYERS']}"
+        weekly = f"{prefix}_{constants.STATS['PLAYER_WEEKLY_STATS']}"
+        if all_players not in tables or weekly not in tables:
+            return False
+
+        stats_prefix = f"{prefix}_"
+        seasonal_tables = [
+            table
+            for table in tables
+            if table.startswith(stats_prefix) and table not in {all_players, weekly}
+        ]
+        return bool(seasonal_tables)
 
     @timed("SQLService.save_to_db")
     def save_to_db(self, cache: Dict[Any, Any], cls_name: str) -> None:
@@ -169,7 +202,7 @@ class SQLService:
             if "no such table" in str(e).lower():
                 return None
             logger.error("Error loading table '%s': %s", table_name, e)
-            return None
+            raise
 
     def close(self) -> None:
         self.db.close()

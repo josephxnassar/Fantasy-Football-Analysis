@@ -37,6 +37,10 @@ class App:
             return NRPDepthChart()
         if source == "espn":
             return ESPNDepthChart()
+        raise ValueError(
+            "Invalid DEPTH_CHART_SOURCE configured. "
+            "Expected one of: espn, nrp."
+        )
     
     def run(self) -> None:
         """Fetch fresh data from all sources"""

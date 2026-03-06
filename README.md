@@ -120,6 +120,18 @@ Static analysis configuration files:
 - Python (`ruff`, `mypy`): [`pyproject.toml`](pyproject.toml)
 - Frontend (`eslint`): [`frontend/eslint.config.js`](frontend/eslint.config.js)
 
+Run full local quality gate (recommended before PR/deploy):
+
+```powershell
+.\quality-gate.ps1
+```
+
+Optional fast pass (skip frontend build):
+
+```powershell
+.\quality-gate.ps1 -SkipBuild
+```
+
 Backend quality checks:
 
 ```bash
@@ -214,6 +226,7 @@ frontend/
   src/            React components, hooks, utils
   public/         static assets
 dev-startup.ps1   Windows bootstrap/start script
+quality-gate.ps1  Full local lint/type/test/build gate
 pyproject.toml    Python deps/project metadata
 frontend/package.json  frontend deps/scripts
 ```

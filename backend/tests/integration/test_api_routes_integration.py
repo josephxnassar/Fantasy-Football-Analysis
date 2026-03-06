@@ -124,6 +124,58 @@ def test_player_trend_endpoint_rejects_unknown_stat(client_factory, app_caches) 
     assert response.status_code == 400
     assert "Invalid stat" in response.json()["detail"]
 
+
+def test_search_endpoint_rejects_short_query(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/search", params={"q": "a"})
+
+    assert response.status_code == 400
+    assert "at least 2 characters" in response.json()["detail"]
+
+
+@pytest.mark.parametrize("position", ["K", "DEF"])
+def test_chart_data_endpoint_rejects_invalid_position(client_factory, app_caches, position: str) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/chart-data", params={"position": position, "season": 2025})
+
+    assert response.status_code == 400
+    assert "Invalid position" in response.json()["detail"]
+
+
+@pytest.mark.parametrize("top_n", [3, 201])
+def test_consistency_data_endpoint_validates_top_n_range(client_factory, app_caches, top_n: int) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get(
+            "/api/consistency-data",
+            params={"position": "Overall", "season": 2025, "top_n": top_n},
+        )
+
+    assert response.status_code == 400
+    assert "top_n must be between 5 and 200" in response.json()["detail"]
+
+
+def test_player_trend_endpoint_rejects_unknown_player(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get(
+            "/api/player-trend",
+            params={"player_name": "Not A Real Player", "position": "QB", "stat": "Pass Yds"},
+        )
+
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
+def test_player_trend_endpoint_requires_stat(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get(
+            "/api/player-trend",
+            params={"player_name": "Patrick Mahomes", "position": "QB", "stat": "   "},
+        )
+
+    assert response.status_code == 400
+    assert "stat is required" in response.json()["detail"]
+
+
 def test_missing_statistics_cache_maps_to_503(client_factory, app_caches) -> None:
     empty_stats_caches = deepcopy(app_caches)
     empty_stats_caches[constants.CACHE["STATISTICS"]] = {}
