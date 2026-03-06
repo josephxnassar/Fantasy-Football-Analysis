@@ -21,7 +21,7 @@ def test_add_derived_stats_handles_zero_division() -> None:
     assert result.loc[0, "Yds/Rush"] == 4.0
     assert result.loc[1, "Yds/Rush"] == 0.0
 
-def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None:
+def test_aggregate_weekly_metrics_by_season_aggregates_with_expected_reducers() -> None:
     weekly_df = pd.DataFrame({
         "season": [2025, 2025, 2025, 2024],
         "position": ["QB", "QB", "WR", "QB"],
@@ -36,9 +36,13 @@ def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None
         "sc_offense_snaps": [60, 40, 65, 70],
     })
 
-    rollups = stats_helpers.build_weekly_season_rollups(weekly_df)
-    qb_2025 = rollups[(rollups["season"] == 2025) & (rollups["player_display_name"] == "Patrick Mahomes")].iloc[0]
-    wr_2025 = rollups[(rollups["season"] == 2025) & (rollups["player_display_name"] == "JaMarr Chase")].iloc[0]
+    weekly_aggregates = stats_helpers.aggregate_weekly_metrics_by_season(
+        weekly_df,
+        constants.WEEKLY_SUM_AGGREGATE_METRICS,
+        constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS,
+    )
+    qb_2025 = weekly_aggregates[(weekly_aggregates["season"] == 2025) & (weekly_aggregates["player_display_name"] == "Patrick Mahomes")].iloc[0]
+    wr_2025 = weekly_aggregates[(weekly_aggregates["season"] == 2025) & (weekly_aggregates["player_display_name"] == "JaMarr Chase")].iloc[0]
 
     assert qb_2025["exp_fp"] == pytest.approx(35.0)
     assert qb_2025["ng_pass_passer_rating"] == pytest.approx(92.0)
@@ -46,7 +50,7 @@ def test_build_weekly_season_rollups_aggregates_with_expected_reducers() -> None
     assert qb_2025["sc_offense_pct"] == pytest.approx(0.82)
     assert wr_2025["ng_rec_avg_separation"] == pytest.approx(2.6)
 
-def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
+def test_merge_weekly_aggregates_into_seasonal_fills_missing_values_only() -> None:
     seasonal_df = pd.DataFrame({
         "season": [2025],
         "position": ["QB"],
@@ -68,7 +72,12 @@ def test_merge_weekly_rollups_into_seasonal_fills_missing_values_only() -> None:
         "sc_offense_snaps": [60, 40],
     })
 
-    merged = stats_helpers.merge_weekly_rollups_into_seasonal(seasonal_df, weekly_df)
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
+        seasonal_df,
+        weekly_df,
+        constants.WEEKLY_SUM_AGGREGATE_METRICS,
+        constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS,
+    )
     row = merged.iloc[0]
 
     assert row["exp_fp"] == pytest.approx(35.0)
@@ -123,7 +132,7 @@ def test_build_seasonal_data_replaces_nan_values_for_json_safety() -> None:
         "receiving_yards": [120.0],
     })
 
-    seasonal_data = stats_helpers.build_seasonal_data(seasonal_df)
+    seasonal_data = stats_helpers.build_seasonal_data(seasonal_df, constants.POSITIONS)
     row = seasonal_data[2025]["WR"].loc["Test Receiver"]
     assert row["receiving_epa"] == 0.0
     assert row["team"] is None
@@ -169,30 +178,30 @@ def test_align_pfr_seasonal_names_passes_through_unmatched() -> None:
 
     assert list(aligned["player_display_name"]) == ["Unknown Player", "Patrick Mahomes"]
 
-# --- resolve_metric_sources ---
+# --- combine_aliases ---
 
-def test_resolve_metric_sources_uses_first_non_null() -> None:
+def test_combine_aliases_uses_first_non_null() -> None:
     df = pd.DataFrame({"primary": [100.0, float("nan")], "fallback": [90.0, 80.0]})
     metric_sources = {"out_col": ["primary", "fallback"]}
 
-    result = stats_helpers.resolve_metric_sources(df, metric_sources)
+    result = stats_helpers.combine_aliases(df, metric_sources)
 
     assert result.loc[0, "out_col"] == 100.0
     assert result.loc[1, "out_col"] == 80.0
 
-def test_resolve_metric_sources_skips_missing_source_columns() -> None:
+def test_combine_aliases_skips_missing_source_columns() -> None:
     df = pd.DataFrame({"col_a": [10.0]})
     metric_sources = {"out": ["missing_col", "col_a"]}
 
-    result = stats_helpers.resolve_metric_sources(df, metric_sources)
+    result = stats_helpers.combine_aliases(df, metric_sources)
 
     assert result.loc[0, "out"] == 10.0
 
-def test_resolve_metric_sources_all_null_stays_nan() -> None:
+def test_combine_aliases_all_null_stays_nan() -> None:
     df = pd.DataFrame({"src": [float("nan")]})
     metric_sources = {"out": ["src"]}
 
-    result = stats_helpers.resolve_metric_sources(df, metric_sources)
+    result = stats_helpers.combine_aliases(df, metric_sources)
 
     assert pd.isna(result.loc[0, "out"])
 

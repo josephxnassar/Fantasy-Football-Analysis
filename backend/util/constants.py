@@ -461,6 +461,22 @@ SNAP_COUNTS_COLUMN_MAP = {
     "st_pct": "sc_st_pct",
 }
 
+# Weekly-to-season aggregate config
+WEEKLY_SUM_AGGREGATE_METRICS = {
+    "exp_fp": ("exp_fp", "ffo_total_fp_exp"),
+}
+WEEKLY_WEIGHTED_AGGREGATE_METRICS = {
+    "ng_pass_passer_rating": (("ng_pass_passer_rating",), ("ng_pass_att", "pass_att", "attempts")),
+    "ng_pass_avg_time_to_throw": (("ng_pass_avg_time_to_throw",), ("ng_pass_att", "pass_att", "attempts")),
+    "ng_rec_avg_separation": (("ng_rec_avg_separation",), ("ng_rec_targets", "targets")),
+    "ng_rec_avg_yac": (("ng_rec_avg_yac",), ("ng_rec_rec", "rec", "receptions")),
+    "ng_rec_avg_yac_above_expectation": (("ng_rec_avg_yac_above_expectation",), ("ng_rec_rec", "rec", "receptions")),
+    "ng_rec_catch_pct": (("ng_rec_catch_pct",), ("ng_rec_targets", "targets")),
+    "ng_rush_rush_yds_over_exp_per_att": (("ng_rush_rush_yds_over_exp_per_att",), ("ng_rush_rush_att", "rush_att", "carries")),
+    "ng_rush_efficiency": (("ng_rush_efficiency",), ("ng_rush_rush_att", "rush_att", "carries")),
+    "sc_offense_pct": (("sc_offense_pct",), ("sc_offense_snaps",)),
+}
+
 # Interpretation metrics
 INTERPRETED_METRIC_SOURCES = {
     "pass_att": ["attempts", "ffo_pass_att", "ng_pass_att", "pfr_pass_pass_att"],

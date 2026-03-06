@@ -51,7 +51,7 @@ class Statistics(base_source.BaseSource):
         """Load and normalize weekly regular-season player stats."""
         try:
             source = nfl.load_player_stats(summary_level="week", seasons=self.seasons).to_pandas()
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.PLAYER_WEEKLY_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load player weekly stats: %s", e)
@@ -63,7 +63,7 @@ class Statistics(base_source.BaseSource):
         try:
             source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas()
             source = source.rename(columns={"recent_team": "team"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.PLAYER_SEASONAL_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load player seasonal stats: %s", e)
@@ -77,7 +77,7 @@ class Statistics(base_source.BaseSource):
             source["season"] = pd.to_numeric(source["season"], errors="coerce")
             source["week"] = pd.to_numeric(source["week"], errors="coerce")
             source = source.dropna(subset=["season", "week"]).astype({"season": "int32", "week": "int32"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.FF_OPP_WEEKLY_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load weekly fantasy opportunity stats: %s", e)
@@ -88,7 +88,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen passing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_PASS_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load Next Gen passing stats: %s", e)
@@ -99,7 +99,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen receiving stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_REC_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load Next Gen receiving stats: %s", e)
@@ -110,7 +110,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen rushing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_RUSH_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load Next Gen rushing stats: %s", e)
@@ -181,7 +181,7 @@ class Statistics(base_source.BaseSource):
         """Load and normalize weekly regular-season snap counts."""
         try:
             source = nfl.load_snap_counts(seasons=self._pfr_seasons(2012)).to_pandas().rename(columns={"player": "player_display_name"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             source = stats_helpers.select_columns(source, constants.SNAP_COUNTS_COLUMN_MAP)
             return source.drop_duplicates(subset=["season", "week", "player_display_name", "position"])
         except Exception as e:
@@ -284,13 +284,13 @@ class Statistics(base_source.BaseSource):
 
             weekly_df = stats_helpers.add_derived_stats(weekly_df)
             seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
-            weekly_df = stats_helpers.resolve_metric_sources(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
-            seasonal_df = stats_helpers.resolve_metric_sources(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
-            seasonal_df = stats_helpers.merge_weekly_rollups_into_seasonal(seasonal_df, weekly_df)
+            weekly_df = stats_helpers.combine_aliases(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
+            seasonal_df = stats_helpers.combine_aliases(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
+            seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, constants.WEEKLY_SUM_AGGREGATE_METRICS, constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS)
             weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
             seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
 
-            seasonal_data = stats_helpers.build_seasonal_data(seasonal_df)
+            seasonal_data = stats_helpers.build_seasonal_data(seasonal_df, constants.POSITIONS)
             weekly_player_stats = stats_helpers.build_weekly_player_stats(weekly_df)
 
             return seasonal_data, weekly_player_stats

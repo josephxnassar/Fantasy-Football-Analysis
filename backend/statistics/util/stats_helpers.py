@@ -1,114 +1,80 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import re
-from typing import Dict, Iterable, List, Mapping, cast
+from typing import Dict, Iterable, List, Mapping
 
 import pandas as pd
 
-from backend.util import constants
-
-_NAME_SUFFIX_RE = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")
-_WEEKLY_SEASON_ROLLUP_SPECS: Dict[str, Dict[str, object]] = {
-    "exp_fp": {
-        "value_keys": ("exp_fp", "ffo_total_fp_exp"),
-        "reducer": "sum",
-    },
-    "ng_pass_passer_rating": {
-        "value_keys": ("ng_pass_passer_rating",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_pass_att", "pass_att", "attempts"),
-    },
-    "ng_pass_avg_time_to_throw": {
-        "value_keys": ("ng_pass_avg_time_to_throw",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_pass_att", "pass_att", "attempts"),
-    },
-    "ng_rec_avg_separation": {
-        "value_keys": ("ng_rec_avg_separation",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rec_targets", "targets"),
-    },
-    "ng_rec_avg_yac": {
-        "value_keys": ("ng_rec_avg_yac",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rec_rec", "rec", "receptions"),
-    },
-    "ng_rec_avg_yac_above_expectation": {
-        "value_keys": ("ng_rec_avg_yac_above_expectation",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rec_rec", "rec", "receptions"),
-    },
-    "ng_rec_catch_pct": {
-        "value_keys": ("ng_rec_catch_pct",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rec_targets", "targets"),
-    },
-    "ng_rush_rush_yds_over_exp_per_att": {
-        "value_keys": ("ng_rush_rush_yds_over_exp_per_att",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rush_rush_att", "rush_att", "carries"),
-    },
-    "ng_rush_efficiency": {
-        "value_keys": ("ng_rush_efficiency",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("ng_rush_rush_att", "rush_att", "carries"),
-    },
-    "sc_offense_pct": {
-        "value_keys": ("sc_offense_pct",),
-        "reducer": "weighted_mean",
-        "weight_keys": ("sc_offense_snaps",),
-    },
-}
-_WEEKLY_ROLLUP_GROUP_KEYS = ["season", "position", "player_display_name"]
+_WEEKLY_AGGREGATE_GROUP_KEYS = ["season", "position", "player_display_name"]
 
 
-def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
+def filter_regular_and_position(source: pd.DataFrame, positions: Iterable[str]) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
     filtered = source
     for season_col in ("season_type", "game_type"):
         if season_col in filtered.columns:
             filtered = filtered.loc[filtered[season_col] == "REG"]
             break
-    return filtered.loc[filtered["position"].isin(constants.POSITIONS)]
+    return filtered.loc[filtered["position"].isin(positions)]
 
 def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.DataFrame:
     """Return only mapped columns present in source, renamed to target names."""
     present = [column for column in column_map if column in source.columns]
-    return source[present].rename(columns={column: column_map[column] for column in present})
+    return source[present].rename(columns=column_map)
 
 def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
     """Left-join source onto base using available join keys."""
     join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
+    if not join_keys:
+        return base
     return base.merge(source.drop_duplicates(subset=join_keys), on=join_keys, how="left")
 
 def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
     """Map PFR seasonal short names to base full names for merge compatibility."""
     col = "player_display_name"
-    full_names = {_normalize_name(n): n for n in base_df[col].dropna().unique()}
-    name_map = {n: match for n in pfr_df[col].dropna().unique() if (match := full_names.get(_normalize_name(n)))}
+
+    full_names: Dict[str, str] = {}
+    ambiguous: set[str] = set()
+    for name in base_df[col].dropna().unique():
+        normalized = _normalize_name(name)
+        if normalized in full_names and full_names[normalized] != name:
+            ambiguous.add(normalized)
+            continue
+        full_names[normalized] = name
+    for normalized in ambiguous:
+        full_names.pop(normalized, None)
+
+    name_map: Dict[str, str] = {}
+    for name in pfr_df[col].dropna().unique():
+        match = full_names.get(_normalize_name(name))
+        if match:
+            name_map[name] = match
+
     aligned = pfr_df.copy()
     aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
     return aligned
 
-def _normalize_name(name: str) -> str:
+def _normalize_name(name: str, suffix_re: re.Pattern[str] = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")) -> str:
     """Reduce a player name to a normalized form for fuzzy matching."""
-    n = _NAME_SUFFIX_RE.sub("", name.strip())
+    n = suffix_re.sub("", name.strip())
     return n.replace("'", "").replace(".", "").lower()
 
 def add_derived_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Add derived stats (Yds/Rec, Yds/Rush) from available base columns."""
-    derived = {}
+    derived: Dict[str, pd.Series] = {}
     if {"receiving_yards", "receptions"}.issubset(df.columns):
         derived["Yds/Rec"] = _safe_rate(df, "receiving_yards", "receptions")
     if {"rushing_yards", "carries"}.issubset(df.columns):
         derived["Yds/Rush"] = _safe_rate(df, "rushing_yards", "carries")
-    return pd.concat([df, pd.DataFrame(derived, index=df.index)], axis=1) if derived else df
+    if not derived:
+        return df
+    return pd.concat([df, pd.DataFrame(derived, index=df.index)], axis=1)
 
 def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
     return (df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1))
 
-def resolve_metric_sources(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
+def combine_aliases(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
     """Fill each unified stat column with the first non-null value from prioritized source columns."""
     interpreted = df.copy()
     for out_col, sources in metric_sources.items():
@@ -117,71 +83,71 @@ def resolve_metric_sources(df: pd.DataFrame, metric_sources: Mapping[str, List[s
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
     return interpreted
 
-def _first_present_column(df: pd.DataFrame, candidates: Iterable[str]) -> str | None:
-    for candidate in candidates:
-        if candidate in df.columns:
-            return candidate
-    return None
+def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, sum_aggregate_metrics: dict[str, tuple[str, ...]], weighted_aggregate_metrics: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]) -> pd.DataFrame:
+    """Merge weekly-derived season aggregates into seasonal rows, filling only missing values."""
+    weekly_aggregates = aggregate_weekly_metrics_by_season(weekly_df, sum_aggregate_metrics, weighted_aggregate_metrics)
+    if weekly_aggregates.empty:
+        return seasonal_df
 
-def _build_grouped_rollup(weekly_df: pd.DataFrame, value_col: str, reducer: str, weight_col: str | None) -> pd.Series:
+    weekly_col_map = {metric: f"weekly_aggregate_{metric}" for metric in weekly_aggregates.columns if metric not in _WEEKLY_AGGREGATE_GROUP_KEYS}
+    renamed = weekly_aggregates.rename(columns=weekly_col_map)
+    merged = seasonal_df.merge(renamed, on=_WEEKLY_AGGREGATE_GROUP_KEYS, how="left")
+
+    for metric, aggregate_col in weekly_col_map.items():
+        aggregate_values = pd.to_numeric(merged[aggregate_col], errors="coerce")
+        if metric in merged.columns:
+            base_values = pd.to_numeric(merged[metric], errors="coerce")
+            merged[metric] = base_values.fillna(aggregate_values)
+        else:
+            merged[metric] = aggregate_values
+
+    return merged.drop(columns=list(weekly_col_map.values()), errors="ignore")
+
+def aggregate_weekly_metrics_by_season(weekly_df: pd.DataFrame, sum_aggregate_metrics: dict[str, tuple[str, ...]], weighted_aggregate_metrics: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]) -> pd.DataFrame:
+    """Aggregate selected weekly metrics into season-level player stats."""
+    if weekly_df.empty:
+        return pd.DataFrame(columns=[*_WEEKLY_AGGREGATE_GROUP_KEYS])
+
+    columns = weekly_df.columns
+    aggregates: List[pd.Series] = []
+    for stat_key, value_keys in sum_aggregate_metrics.items():
+        value_col = next((candidate for candidate in value_keys if candidate in columns), None)
+        if not value_col:
+            continue
+        aggregates.append(_aggregate_group_stat(weekly_df, value_col, "sum", None).rename(stat_key))
+
+    for stat_key, metric_keys in weighted_aggregate_metrics.items():
+        value_keys, weight_keys = metric_keys
+        value_col = next((candidate for candidate in value_keys if candidate in columns), None)
+        if not value_col:
+            continue
+
+        weight_col = next((candidate for candidate in weight_keys if candidate in columns), None)
+
+        aggregates.append(_aggregate_group_stat(weekly_df, value_col, "weighted_mean", weight_col).rename(stat_key))
+
+    if not aggregates:
+        return pd.DataFrame(columns=[*_WEEKLY_AGGREGATE_GROUP_KEYS])
+
+    return pd.concat(aggregates, axis=1).reset_index()
+
+def _aggregate_group_stat(weekly_df: pd.DataFrame, value_col: str, reducer: str, weight_col: str | None) -> pd.Series:
+    group_fields = [weekly_df[key] for key in _WEEKLY_AGGREGATE_GROUP_KEYS]
     value = pd.to_numeric(weekly_df[value_col], errors="coerce")
-    grouped_value = value.groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS])
+    grouped_value = value.groupby(group_fields)
 
     if reducer == "sum":
         return grouped_value.sum(min_count=1)
 
     if reducer == "weighted_mean" and weight_col:
         weight = pd.to_numeric(weekly_df[weight_col], errors="coerce")
-        valid_weights = weight.where(weight > 0)
-        weighted_sum = (value * valid_weights).groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS]).sum(min_count=1)
-        weight_sum = valid_weights.groupby([weekly_df[key] for key in _WEEKLY_ROLLUP_GROUP_KEYS]).sum(min_count=1)
-        weighted = weighted_sum.div(weight_sum.where(weight_sum > 0))
-        return weighted.where(weight_sum > 0, grouped_value.mean())
+        positive_weights = weight.where(weight > 0)
+        weighted_sum = (value * positive_weights).groupby(group_fields).sum(min_count=1)
+        weight_sum = positive_weights.groupby(group_fields).sum(min_count=1)
+        weighted_mean = weighted_sum.div(weight_sum)
+        return weighted_mean.where(weight_sum > 0, grouped_value.mean())
 
     return grouped_value.mean()
-
-def build_weekly_season_rollups(weekly_df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate selected weekly metrics into season-level player stats."""
-    if weekly_df.empty or any(key not in weekly_df.columns for key in _WEEKLY_ROLLUP_GROUP_KEYS):
-        return pd.DataFrame(columns=[*_WEEKLY_ROLLUP_GROUP_KEYS])
-
-    rollups: List[pd.Series] = []
-    for stat_key, spec in _WEEKLY_SEASON_ROLLUP_SPECS.items():
-        value_keys = cast(Iterable[str], spec.get("value_keys", ()))
-        value_col = _first_present_column(weekly_df, value_keys)
-        if not value_col:
-            continue
-        weight_keys = cast(Iterable[str], spec.get("weight_keys", ()))
-        weight_col = _first_present_column(weekly_df, weight_keys)
-        reducer = str(spec.get("reducer", "mean"))
-        rollup_series = _build_grouped_rollup(weekly_df, value_col, reducer, weight_col).rename(stat_key)
-        rollups.append(rollup_series)
-
-    if not rollups:
-        return pd.DataFrame(columns=[*_WEEKLY_ROLLUP_GROUP_KEYS])
-
-    return pd.concat(rollups, axis=1).reset_index()
-
-def merge_weekly_rollups_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame) -> pd.DataFrame:
-    """Merge weekly-derived season rollups into seasonal rows, filling only missing values."""
-    rollups = build_weekly_season_rollups(weekly_df)
-    if rollups.empty:
-        return seasonal_df
-
-    metric_cols = [column for column in rollups.columns if column not in _WEEKLY_ROLLUP_GROUP_KEYS]
-    renamed = rollups.rename(columns={column: f"weekly_rollup_{column}" for column in metric_cols})
-    merged = seasonal_df.merge(renamed, on=_WEEKLY_ROLLUP_GROUP_KEYS, how="left")
-
-    for metric in metric_cols:
-        rollup_col = f"weekly_rollup_{metric}"
-        rollup_numeric = pd.to_numeric(merged[rollup_col], errors="coerce")
-        if metric in merged.columns:
-            base_numeric = pd.to_numeric(merged[metric], errors="coerce")
-            merged[metric] = base_numeric.where(base_numeric.notna(), rollup_numeric)
-        else:
-            merged[metric] = rollup_numeric
-
-    return merged.drop(columns=[f"weekly_rollup_{metric}" for metric in metric_cols], errors="ignore")
 
 def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""
@@ -189,6 +155,7 @@ def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[s
     groups = [ranked[col] for col in group_cols if col in ranked.columns]
     if not groups:
         return ranked
+
     for metric in metrics:
         if metric not in ranked.columns:
             continue
@@ -196,15 +163,20 @@ def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[s
         ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
     return ranked
 
-def build_seasonal_data(seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.DataFrame]]:
+def build_seasonal_data(seasonal_df: pd.DataFrame, positions: Iterable[str]) -> Dict[int, Dict[str, pd.DataFrame]]:
     """Build season -> position -> DataFrame view for chart endpoints."""
+    allowed_positions = set(positions)
     drop_cols = ["season", "position", "player_id", "player_name", "position_group"]
     result: Dict[int, Dict[str, pd.DataFrame]] = {}
+
     for (season, position), group in seasonal_df.groupby(["season", "position"]):
-        if position not in constants.POSITIONS:
+        if position not in allowed_positions:
             continue
-        cleaned = _clean_numeric_stats(group.drop(columns=drop_cols, errors="ignore").drop_duplicates(subset=["player_display_name"]).set_index("player_display_name"))
+
+        dedupe_key = "player_id" if "player_id" in group.columns else "player_display_name"
+        cleaned = _clean_numeric_stats(group.drop_duplicates(subset=[dedupe_key]).drop(columns=drop_cols, errors="ignore").set_index("player_display_name"))
         result.setdefault(int(season), {})[position] = cleaned
+
     return result
 
 def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
@@ -218,7 +190,8 @@ def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_weekly_player_stats(weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
     """Build player -> weekly record list view for player modal."""
-    ordered = _clean_weekly_records(weekly_df.sort_values(["season", "week", "player_display_name"]))
+    ordered = weekly_df.sort_values(["season", "week", "player_display_name"])
+    ordered = _clean_weekly_records(ordered)
     return {player_name: group.drop(columns=["player_display_name"], errors="ignore").to_dict("records") for player_name, group in ordered.groupby("player_display_name", sort=False)}
 
 def _clean_weekly_records(df: pd.DataFrame) -> pd.DataFrame:
