@@ -26,7 +26,7 @@ import './Charts.css';
 
 const CHART_UI_STORAGE_KEY = 'chartsUi';
 
-export default function Charts({ onPlayerClick }) {
+export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
   const [chartUiState, setChartUiState] = useSessionStorageObject(CHART_UI_STORAGE_KEY, {});
   const initialPosition = chartUiState.position || 'Overall';
 
@@ -37,7 +37,7 @@ export default function Charts({ onPlayerClick }) {
   const [stat, setStat] = useState(chartUiState.stat || DEFAULT_STAT[initialPosition] || DEFAULT_STAT.Overall);
   const [topN, setTopN] = useState(chartUiState.topN || 20);
   const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
-  const effectivePosition = view === 'trend' ? 'Overall' : position;
+  const effectivePosition = position;
   const effectiveSeason = view === 'trend' ? null : season;
 
   // Server payload for selected position + season.
@@ -65,6 +65,7 @@ export default function Charts({ onPlayerClick }) {
     [rankedTrendPlayers]
   );
   const trendSeries = trendData?.points || [];
+  const chartSeason = effectiveSeason ?? chartData?.season ?? null;
 
   useEffect(() => {
     // Keep selected stat valid when position/season payload changes.
@@ -126,7 +127,7 @@ export default function Charts({ onPlayerClick }) {
             setStat={setStat}
             statOptions={statOptions}
             showStatControl={VIEWS_USING_STAT.has(view)}
-            showPositionControl={view !== 'trend'}
+            showPositionControl
             showSeasonControl={view !== 'trend'}
             trendPlayer={trendPlayer}
             setTrendPlayer={setTrendPlayer}
@@ -143,7 +144,12 @@ export default function Charts({ onPlayerClick }) {
         )}
 
         {view === 'consistency-upside' && (
-          <AverageVsUpsideChart data={consistencyData?.players || []} onPlayerClick={onPlayerClick} />
+          <AverageVsUpsideChart
+            data={consistencyData?.players || []}
+            season={chartSeason}
+            onPlayerClick={onPlayerClick}
+            onPlayerSeasonClick={onPlayerSeasonClick}
+          />
         )}
 
         {view === 'trend' && (
@@ -152,6 +158,7 @@ export default function Charts({ onPlayerClick }) {
             playerName={trendPlayer}
             statLabel={getStatLabel(stat)}
             onPlayerClick={onPlayerClick}
+            onPlayerSeasonClick={onPlayerSeasonClick}
           />
         )}
       </div>

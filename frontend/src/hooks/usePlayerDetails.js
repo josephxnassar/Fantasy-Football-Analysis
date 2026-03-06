@@ -25,7 +25,7 @@ export function usePlayerDetails() {
     };
   }, []);
 
-  const handlePlayerClick = useCallback(async (playerName) => {
+  const loadPlayerForModal = useCallback(async (playerName, season = null, errorMessage = 'Failed to load player details.') => {
     // New player request invalidates pending season-specific requests.
     const requestId = ++playerRequestIdRef.current;
     seasonRequestIdRef.current += 1;
@@ -35,7 +35,7 @@ export function usePlayerDetails() {
       setDetailsError(null);
       setCurrentPlayerName(playerName);
 
-      const response = await getPlayer(playerName);
+      const response = await getPlayer(playerName, season);
       if (requestId !== playerRequestIdRef.current) return;
 
       setPlayerDetails(response.data);
@@ -45,10 +45,10 @@ export function usePlayerDetails() {
 
       // API season list is sorted descending; first entry is most recent.
       const mostRecentSeason = seasons.length > 0 ? seasons[0] : null;
-      setCurrentSeason(mostRecentSeason);
+      setCurrentSeason(season ?? mostRecentSeason);
     } catch (err) {
       if (requestId === playerRequestIdRef.current) {
-        setDetailsError('Failed to load player details.');
+        setDetailsError(errorMessage);
         setPlayerDetails(null);
         setCurrentPlayerName(null);
         setCurrentSeason(null);
@@ -61,6 +61,24 @@ export function usePlayerDetails() {
       }
     }
   }, []);
+
+  const handlePlayerClick = useCallback(async (playerName) => {
+    await loadPlayerForModal(playerName);
+  }, [loadPlayerForModal]);
+
+  const handlePlayerSeasonClick = useCallback(async (playerName, season) => {
+    const normalizedSeason = Number(season);
+    if (!Number.isFinite(normalizedSeason)) {
+      await loadPlayerForModal(playerName);
+      return;
+    }
+
+    await loadPlayerForModal(
+      playerName,
+      normalizedSeason,
+      `Failed to load ${normalizedSeason} season data.`
+    );
+  }, [loadPlayerForModal]);
 
   const handleSeasonChange = useCallback(async (season) => {
     if (!currentPlayerName) return;
@@ -108,6 +126,7 @@ export function usePlayerDetails() {
     availableSeasons: playerAvailableSeasons,
     currentSeason,
     handlePlayerClick,
+    handlePlayerSeasonClick,
     handleSeasonChange,
     closeDetails,
   };

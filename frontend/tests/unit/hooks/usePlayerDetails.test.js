@@ -10,7 +10,7 @@ vi.mock('../../../src/api', () => ({
 
 describe('usePlayerDetails', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('loads player details across season changes', async () => {
@@ -36,7 +36,7 @@ describe('usePlayerDetails', () => {
       await result.current.handlePlayerClick('Patrick Mahomes');
     });
 
-    expect(getPlayer).toHaveBeenCalledWith('Patrick Mahomes');
+    expect(getPlayer).toHaveBeenCalledWith('Patrick Mahomes', null);
     expect(result.current.currentSeason).toBe(2025);
 
     await act(async () => {
@@ -44,6 +44,27 @@ describe('usePlayerDetails', () => {
     });
 
     expect(getPlayer).toHaveBeenNthCalledWith(2, 'Patrick Mahomes', 2024);
+    expect(result.current.playerDetails.stats['Pass Yds']).toBe(4000);
+    expect(result.current.detailsError).toBeNull();
+  });
+
+  it('opens a player directly at a selected season', async () => {
+    getPlayer.mockResolvedValueOnce({
+      data: {
+        name: 'Patrick Mahomes',
+        stats: { 'Pass Yds': 4000 },
+        available_seasons: [2025, 2024],
+      },
+    });
+
+    const { result } = renderHook(() => usePlayerDetails());
+
+    await act(async () => {
+      await result.current.handlePlayerSeasonClick('Patrick Mahomes', 2024);
+    });
+
+    expect(getPlayer).toHaveBeenCalledWith('Patrick Mahomes', 2024);
+    expect(result.current.currentSeason).toBe(2024);
     expect(result.current.playerDetails.stats['Pass Yds']).toBe(4000);
     expect(result.current.detailsError).toBeNull();
   });

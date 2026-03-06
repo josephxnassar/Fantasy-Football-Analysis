@@ -21,7 +21,7 @@ const TAB_COMPONENTS = {
   search: PlayerSearch,
 };
 
-function Statistics({ onPlayerClick }) {
+function Statistics({ onPlayerClick, onPlayerSeasonClick }) {
   const [activeSubTab, setActiveSubTab] = useState('charts');
   const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Rankings;
 
@@ -38,7 +38,7 @@ function Statistics({ onPlayerClick }) {
 
       <div className="statistics-content">
         <Suspense fallback={<LoadingMessage message="Loading statistics..." />}>
-          <ActiveSubTab onPlayerClick={onPlayerClick} />
+          <ActiveSubTab onPlayerClick={onPlayerClick} onPlayerSeasonClick={onPlayerSeasonClick} />
         </Suspense>
       </div>
     </div>
