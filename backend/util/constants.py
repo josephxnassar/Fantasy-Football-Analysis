@@ -462,10 +462,10 @@ SNAP_COUNTS_COLUMN_MAP = {
 }
 
 # Weekly-to-season aggregate config
-WEEKLY_SUM_AGGREGATE_METRICS = {
+WEEKLY_SUM_AGGREGATE_METRICS: dict[str, tuple[str, ...]] = {
     "exp_fp": ("exp_fp", "ffo_total_fp_exp"),
 }
-WEEKLY_WEIGHTED_AGGREGATE_METRICS = {
+WEEKLY_WEIGHTED_AGGREGATE_METRICS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "ng_pass_passer_rating": (("ng_pass_passer_rating",), ("ng_pass_att", "pass_att", "attempts")),
     "ng_pass_avg_time_to_throw": (("ng_pass_avg_time_to_throw",), ("ng_pass_att", "pass_att", "attempts")),
     "ng_rec_avg_separation": (("ng_rec_avg_separation",), ("ng_rec_targets", "targets")),
