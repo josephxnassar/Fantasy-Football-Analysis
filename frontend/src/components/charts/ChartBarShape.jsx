@@ -2,8 +2,8 @@ import { Rectangle } from 'recharts';
 
 export default function ChartBarShape(props) {
   const { index, payload, onBarClick, ...rectProps } = props;
-  // Slight rank-based lightness shift makes adjacent bars easier to scan.
-  const fill = `hsl(225, 73%, ${Math.max(40, 65 - index * 0.8)}%)`;
+  // Slight rank-based lightness shift keeps bars readable while matching the blue theme.
+  const fill = `hsl(212, 78%, ${Math.max(40, 65 - index * 0.8)}%)`;
 
   return (
     <Rectangle

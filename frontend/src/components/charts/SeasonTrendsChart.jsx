@@ -7,6 +7,7 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
   }
 
   const hasPointClickAction = Boolean(onPlayerSeasonClick || onPlayerClick);
+  const trendColor = 'var(--color-primary)';
   const handleTrendPointClick = (payload) => {
     const clickedSeason = Number(payload?.season);
     if (onPlayerSeasonClick && Number.isFinite(clickedSeason)) {
@@ -25,8 +26,8 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
         cx={cx}
         cy={cy}
         r={3}
-        fill="#4f6ee4"
-        stroke="#4f6ee4"
+        fill={trendColor}
+        stroke={trendColor}
         cursor={hasPointClickAction ? 'pointer' : 'default'}
         onClick={() => handleTrendPointClick(payload)}
       />
@@ -41,8 +42,8 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
         cx={cx}
         cy={cy}
         r={5}
-        fill="#4f6ee4"
-        stroke="#4f6ee4"
+        fill={trendColor}
+        stroke={trendColor}
         cursor={hasPointClickAction ? 'pointer' : 'default'}
         onClick={() => handleTrendPointClick(payload)}
       />
@@ -75,7 +76,7 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
             dataKey="value"
             name={playerName}
             connectNulls
-            stroke="#4f6ee4"
+            stroke={trendColor}
             strokeWidth={2.8}
             dot={renderDot}
             activeDot={renderActiveDot}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { getTeamDepthChart } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
+import { getTeamColor } from '../utils/teamColors';
 import { ErrorMessage, ModalOverlay, SubTabNav } from './common';
 import PlayerHeader from './player-details/PlayerHeader';
 import PlayerOverviewTab from './player-details/PlayerOverviewTab';
@@ -31,6 +32,13 @@ export default function PlayerDetailsModal({
     getTeamDepthChart,
     'Failed to load depth chart'
   );
+  const playerTeamColor = getTeamColor(playerDetails?.team);
+  const playerModalStyle = {
+    '--player-team-color': playerTeamColor,
+    '--player-team-tint': `${playerTeamColor}10`,
+    '--player-team-border': `${playerTeamColor}38`,
+    '--player-team-chip': `${playerTeamColor}14`,
+  };
   const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
   const showStatsActions = modalTab === 'statistics' && (availableSeasons.length > 1 || hasWeeklyData);
 
@@ -38,7 +46,7 @@ export default function PlayerDetailsModal({
 
   return (
     <ModalOverlay className="modal-overlay--player-details" onClose={onClose}>
-      <div className="modal-content">
+      <div className="modal-content player-details-modal-content" style={playerModalStyle}>
         {loading ? (
           <div className="loading">Loading player details...</div>
         ) : (

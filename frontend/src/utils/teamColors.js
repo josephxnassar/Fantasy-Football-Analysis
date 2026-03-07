@@ -1,6 +1,6 @@
 /* Team accent colors for team-driven UI surfaces (modals, team nav cards, links). */
 
-const DEFAULT_TEAM_COLOR = '#667eea';
+const DEFAULT_TEAM_COLOR = '#2563eb';
 
 export const TEAM_COLORS = {
   ARI: '#97233F',

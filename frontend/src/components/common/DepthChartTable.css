@@ -43,7 +43,7 @@
 }
 
 .depth-chart-table tbody tr:hover {
-  background: rgba(102, 126, 234, 0.06);
+  background: rgba(37, 99, 235, 0.06);
 }
 
 .depth-chart-table tbody tr:last-child td {
@@ -58,7 +58,7 @@
   font-size: 13px;
   white-space: nowrap;
   border-right: 2px solid var(--color-border);
-  background: rgba(102, 126, 234, 0.04);
+  background: rgba(37, 99, 235, 0.04);
 }
 
 .player-cell {
@@ -103,7 +103,7 @@
 }
 
 .player-cell.highlight {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(14, 165, 233, 0.12) 100%);
   font-weight: 700;
   color: var(--color-primary);
 }

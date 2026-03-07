@@ -1,9 +1,11 @@
 import { Suspense, lazy, useState } from 'react';
 import './App.css';
+import AppHeaderPreview from './components/AppHeaderPreview';
 import { ErrorBoundary, LoadingMessage } from './components/common';
 import LandingPage from './components/LandingPage';
 import PlayerDetailsModal from './components/PlayerDetailsModal';
 import { usePlayerDetails } from './hooks/usePlayerDetails';
+import { APP_FUNCTIONAL_DESCRIPTION, HEADER_PROOF_POINTS, NAV_TABS } from './utils/appContent';
 
 const Statistics = lazy(() => import('./components/Statistics'));
 const Schedules = lazy(() => import('./components/Schedules'));
@@ -15,11 +17,6 @@ const TAB_COMPONENTS = {
   schedules: Schedules,
   'depth-charts': DepthCharts,
 };
-const NAV_TABS = [
-  { id: 'statistics', label: 'Statistics' },
-  { id: 'schedules', label: 'Schedules' },
-  { id: 'depth-charts', label: 'Depth Charts' },
-];
 
 function App() {
   const [activeTab, setActiveTab] = useState(null);
@@ -35,6 +32,7 @@ function App() {
     closeDetails,
   } = usePlayerDetails();
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] || Statistics;
+  const activeTabLabel = NAV_TABS.find((tab) => tab.id === activeTab)?.label || 'Statistics';
   const showPlayerModal = playerDetails || loadingDetails || detailsError;
   const playerModal = showPlayerModal ? (
     <PlayerDetailsModal
@@ -61,23 +59,38 @@ function App() {
   return (
     <div className="App">
       <header className="app-header">
-        <button
-          className="app-home-button"
-          onClick={goHome}
-          title="Home"
-        >
-          🏠
-        </button>
-        <h1
-          className="app-header-title"
-          onClick={goHome}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && goHome()}
-        >
-          Fantasy Football Analysis
-        </h1>
-        <p>Your one-stop hub for smarter fantasy decisions</p>
+        <div className="app-header-inner">
+          <div className="app-header-copy">
+            <button
+              className="app-home-button"
+              onClick={goHome}
+              title="Home"
+            >
+              Home
+            </button>
+
+            <h1
+              className="app-header-title"
+              onClick={goHome}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && goHome()}
+            >
+              Fantasy Football Analysis
+            </h1>
+            <p className="app-header-tagline">
+              {APP_FUNCTIONAL_DESCRIPTION}
+            </p>
+
+            <ul className="app-header-proof-list">
+              {HEADER_PROOF_POINTS.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          </div>
+
+          <AppHeaderPreview activeTab={activeTab} activeTabLabel={activeTabLabel} />
+        </div>
       </header>
 
       <nav className="app-nav">

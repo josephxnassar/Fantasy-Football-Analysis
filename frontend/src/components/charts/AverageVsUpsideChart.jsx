@@ -52,7 +52,8 @@ export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPl
           />
           <Scatter
             data={data}
-            fill="#3c90d4"
+            fill="var(--color-primary)"
+            stroke="var(--color-primary-dark)"
             onClick={(point) => {
               const playerName = point?.payload?.name || point?.name;
               if (!playerName) return;

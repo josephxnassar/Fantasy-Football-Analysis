@@ -26,7 +26,7 @@
   width: min(100%, 1040px);
   margin: 0 auto;
   background:
-    radial-gradient(circle at top right, rgba(102, 126, 234, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 28%),
     linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
 }
 
@@ -299,14 +299,14 @@
 
 .ranking-player-button:hover {
   color: var(--color-primary);
-  background: rgba(102, 126, 234, 0.12);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .ranking-player-button:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   color: var(--color-primary);
-  background: rgba(102, 126, 234, 0.12);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .score-positive {
