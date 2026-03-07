@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from backend.statistics.statistics import Statistics
+from backend.statistics.statistics import RosterData, Statistics
 from backend.statistics.util import stats_helpers
 from backend.util import constants
 
@@ -99,7 +99,16 @@ def test_build_all_players_includes_expected_fields(statistics_source: Statistic
     teams = {"A": "KC", "B": "CIN"}
     rookies = {"B": True}
 
-    players = statistics_source._build_all_players(positions, eligible, ages, headshots, teams, rookies)
+    players = statistics_source._build_all_players(
+        RosterData(
+            positions=positions,
+            ages=ages,
+            eligible=eligible,
+            headshots=headshots,
+            teams=teams,
+            rookies=rookies,
+        )
+    )
 
     by_name = {player["name"]: player for player in players}
     assert set(by_name) == {"A", "B"}
@@ -109,23 +118,36 @@ def test_build_all_players_includes_expected_fields(statistics_source: Statistic
     assert by_name["A"]["team"] == "KC"
 
 def test_collect_stats_player_names_and_filter_all_players(statistics_source: Statistics) -> None:
-    seasonal_data = {
-        2024: {
-            "RB": pd.DataFrame({"rush_yds": [100.0]}, index=pd.Index(["Kenneth Walker III"], name="player_display_name"))
+    seasonal_df = pd.DataFrame(
+        {
+            "season": [2024],
+            "position": ["RB"],
+            "player_display_name": ["Kenneth Walker III"],
+            "rush_yds": [100.0],
         }
-    }
-    weekly_stats = {"Kenneth Walker III": [{"week": 1, "rush_yds": 64.0}]}
+    )
+    weekly_df = pd.DataFrame(
+        {
+            "season": [2024],
+            "week": [1],
+            "position": ["RB"],
+            "player_display_name": ["Kenneth Walker III"],
+            "rush_yds": [64.0],
+        }
+    )
 
-    names = statistics_source._collect_stats_player_names(seasonal_data, weekly_stats)
+    names = statistics_source._collect_stats_player_names(seasonal_df, weekly_df)
     assert names == {"Kenneth Walker III"}
 
     players = statistics_source._build_all_players(
-        player_positions={"Kenneth Walker": "RB", "Kenneth Walker III": "RB"},
-        eligible_players={"Kenneth Walker", "Kenneth Walker III"},
-        player_ages={"Kenneth Walker": 23, "Kenneth Walker III": 24},
-        player_headshots={},
-        player_teams={},
-        player_rookies={},
+        RosterData(
+            positions={"Kenneth Walker": "RB", "Kenneth Walker III": "RB"},
+            ages={"Kenneth Walker": 23, "Kenneth Walker III": 24},
+            eligible={"Kenneth Walker", "Kenneth Walker III"},
+            headshots={},
+            teams={},
+            rookies={},
+        ),
         valid_player_names=names,
     )
     assert [player["name"] for player in players] == ["Kenneth Walker III"]

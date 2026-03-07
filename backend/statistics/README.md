@@ -49,11 +49,12 @@ Configured seasons:
 3. Merge all weekly sources onto base weekly player stats.
 4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
 5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows, and compute positional ranks.
-6. Build final cache views:
+6. Collect represented player names from shaped DataFrames (`_collect_stats_player_names`).
+7. Build final cache views in parallel (`_build_statistics_data`):
 - Seasonal (`_build_seasonal_player_stats`): season -> position -> DataFrame.
 - Weekly (`_build_weekly_player_stats`): player -> list of weekly records.
-- Both views are cleaned for JSON safety (`NaN/inf` handling) during build.
-7. Collect represented player names (`_collect_stats_player_names`) and build filtered player metadata (`_build_all_players`).
+- Filtered player metadata (`_build_all_players`): `all_players`.
+- Seasonal and weekly views are cleaned for JSON safety (`NaN/inf` handling) during build.
 
 ## Output Cache Shape
 
