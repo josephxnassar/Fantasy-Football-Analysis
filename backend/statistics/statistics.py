@@ -28,7 +28,7 @@ class RosterData(NamedTuple):
 
 class Statistics(base_source.BaseSource):
     """Processes player statistics and builds stat caches."""
-    
+
     def __init__(self, seasons: List[int]) -> None:
         """Initialize with seasons"""
         super().__init__(seasons)
@@ -260,43 +260,99 @@ class Statistics(base_source.BaseSource):
                 results[futures[future]] = future.result()
         return results
 
-    @timed("Statistics._merge_and_partition_data")
-    def _merge_and_partition_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]]]:
-        """Build cache views from pre-loaded statistics sources."""
-        try:
-            weekly_df = sources["player_weekly"]
-            seasonal_df = sources["player_seasonal"]
+    @timed("Statistics._merge_statistics_data")
+    def _merge_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Merge source tables into base weekly and seasonal dataframes."""
+        weekly_df = sources["player_weekly"]
+        seasonal_df = sources["player_seasonal"]
 
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
-            weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
 
-            for pfr_key, join_keys in [("pfr_pass_season", ["season", "player_display_name", "team"]),
-                                        ("pfr_rush_season", ["season", "player_display_name", "team", "position"]),
-                                        ("pfr_rec_season", ["season", "player_display_name", "team", "position"])]:
-                aligned = stats_helpers.align_pfr_seasonal_names(sources[pfr_key], seasonal_df)
-                seasonal_df = stats_helpers.merge_source(seasonal_df, aligned, join_keys)
+        seasonal_df = stats_helpers.merge_aligned_pfr_seasonal_sources(seasonal_df, sources, [("pfr_pass_season", ["season", "player_display_name", "team"]),
+                                                                                              ("pfr_rush_season", ["season", "player_display_name", "team", "position"]),
+                                                                                              ("pfr_rec_season", ["season", "player_display_name", "team", "position"])])
 
-            weekly_df = stats_helpers.add_derived_stats(weekly_df)
-            seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
-            weekly_df = stats_helpers.combine_aliases(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
-            seasonal_df = stats_helpers.combine_aliases(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
-            seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, constants.WEEKLY_SUM_AGGREGATE_METRICS, constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS)
-            weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
-            seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
+        return weekly_df, seasonal_df
 
-            seasonal_data = stats_helpers.build_seasonal_data(seasonal_df, constants.POSITIONS)
-            weekly_player_stats = stats_helpers.build_weekly_player_stats(weekly_df)
+    @timed("Statistics._shape_statistics_data")
+    def _shape_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Shape merged dataframes with derived metrics, aliases, aggregates, and ranks."""
+        weekly_df = stats_helpers.add_derived_stats(weekly_df)
+        seasonal_df = stats_helpers.add_derived_stats(seasonal_df)
 
-            return seasonal_data, weekly_player_stats
-        except Exception as e:
-            logger.error("Failed to partition statistics data: %s", e)
-            raise DataProcessingError(f"Failed to partition statistics data: {e}", source="Statistics") from e
+        weekly_df = stats_helpers.combine_aliases(weekly_df, constants.INTERPRETED_METRIC_SOURCES)
+        seasonal_df = stats_helpers.combine_aliases(seasonal_df, constants.INTERPRETED_METRIC_SOURCES)
+
+        seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, constants.WEEKLY_SUM_AGGREGATE_METRICS, constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS)
+
+        weekly_df = stats_helpers.add_group_ranks(weekly_df, constants.INTERPRETED_RANK_METRICS, ["season", "position", "week"])
+        seasonal_df = stats_helpers.add_group_ranks(seasonal_df, constants.INTERPRETED_RANK_METRICS, ["season", "position"])
+
+        return weekly_df, seasonal_df
+
+    @timed("Statistics._build_seasonal_player_stats")
+    def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.DataFrame]]:
+        """Build season -> position -> DataFrame view for chart endpoints."""
+        allowed_positions = set(constants.POSITIONS)
+        drop_cols = ["season", "position", "player_id", "player_name", "position_group"]
+        return {
+            int(season): by_position
+            for season, season_group in seasonal_df.groupby("season")
+            if (
+                by_position := {
+                    position: stats_helpers.clean_numeric_stats(
+                        group.drop_duplicates(
+                            subset=["player_id" if "player_id" in group.columns else "player_display_name"]
+                        )
+                        .drop(columns=drop_cols, errors="ignore")
+                        .set_index("player_display_name")
+                    )
+                    for position, group in season_group.groupby("position")
+                    if position in allowed_positions
+                }
+            )
+        }
+
+    @timed("Statistics._build_weekly_player_stats")
+    def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
+        """Build player -> weekly record list view for player modal."""
+        ordered = weekly_df.sort_values(["season", "week", "player_display_name"])
+        ordered = stats_helpers.clean_weekly_records(ordered)
+        return {
+            player_name: group.drop(columns=["player_display_name"], errors="ignore").to_dict("records")
+            for player_name, group in ordered.groupby("player_display_name", sort=False)
+        }
+
+    @timed("Statistics._collect_stats_player_names")
+    def _collect_stats_player_names(self, seasonal_player_stats: Dict[int, Dict[str, pd.DataFrame]], weekly_player_stats: Dict[str, List[Dict]]) -> set[str]:
+        """Collect all player names represented in seasonal or weekly stats views."""
+        names = set(weekly_player_stats.keys())
+        for season_map in seasonal_player_stats.values():
+            for df in season_map.values():
+                names.update(str(name) for name in df.index)
+        return names
+
+    @timed("Statistics._build_all_players")
+    def _build_all_players(self, player_positions: Dict[str, str], eligible_players: set[str], player_ages: Dict[str, int], player_headshots: Dict[str, str], player_teams: Dict[str, str], player_rookies: Dict[str, bool], valid_player_names: set[str] | None = None) -> List[Dict]:
+        """Build pre-assembled player list with player metadata for API consumption."""
+        return [
+            {
+                "name": player_name,
+                "position": player_positions.get(player_name),
+                "age": player_ages.get(player_name),
+                "headshot_url": player_headshots.get(player_name),
+                "team": player_teams.get(player_name),
+                "is_rookie": player_rookies.get(player_name, False),
+                "is_eligible": player_name in eligible_players,
+            } for player_name in player_positions if valid_player_names is None or player_name in valid_player_names
+        ]
 
     @timed("Statistics.run")
     def run(self) -> None:
@@ -312,15 +368,23 @@ class Statistics(base_source.BaseSource):
         sources = cast(Dict[str, pd.DataFrame], results["sources"])
 
         roster_data = self._extract_all_roster_data(rosters)
-        seasonal_data, weekly_stats = self._merge_and_partition_data(sources)
 
-        stats_player_names = stats_helpers.collect_stats_player_names(seasonal_data, weekly_stats)
-        all_players = stats_helpers.build_all_players(roster_data.positions, roster_data.eligible, roster_data.ages, roster_data.headshots, roster_data.teams, roster_data.rookies, valid_player_names=stats_player_names)
+        try:
+            weekly_df, seasonal_df = self._merge_statistics_data(sources)
+            weekly_df, seasonal_df = self._shape_statistics_data(weekly_df, seasonal_df)
+            seasonal_player_stats = self._build_seasonal_player_stats(seasonal_df)
+            weekly_player_stats = self._build_weekly_player_stats(weekly_df)
+        except Exception as e:
+            logger.error("Failed to partition statistics data: %s", e)
+            raise DataProcessingError(f"Failed to partition statistics data: {e}", source="Statistics") from e
+
+        stats_player_names = self._collect_stats_player_names(seasonal_player_stats, weekly_player_stats)
+        all_players = self._build_all_players(roster_data.positions, roster_data.eligible, roster_data.ages, roster_data.headshots, roster_data.teams, roster_data.rookies, valid_player_names=stats_player_names)
 
         self.set_cache(
             {
                 constants.STATS["ALL_PLAYERS"]: all_players,
-                constants.STATS["BY_YEAR"]: seasonal_data,
-                constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_stats,
+                constants.STATS["BY_YEAR"]: seasonal_player_stats,
+                constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_player_stats,
             }
         )

@@ -1,6 +1,6 @@
 # Statistics Module
 
-Last verified: 2026-03-03
+Last verified: 2026-03-07
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
 
@@ -48,12 +48,12 @@ Configured seasons:
 2. Normalize each source to regular season + fantasy positions (`QB/RB/WR/TE`) and keep mapped columns.
 3. Merge all weekly sources onto base weekly player stats.
 4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
-5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), resolve unified stat keys from source priorities, roll selected weekly-only metrics up into seasonal player rows, and compute positional ranks.
+5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows, and compute positional ranks.
 6. Build final cache views:
-- Seasonal (`build_seasonal_data`): season -> position -> DataFrame.
-- Weekly (`build_weekly_player_stats`): player -> list of weekly records.
+- Seasonal (`_build_seasonal_player_stats`): season -> position -> DataFrame.
+- Weekly (`_build_weekly_player_stats`): player -> list of weekly records.
 - Both views are cleaned for JSON safety (`NaN/inf` handling) during build.
-7. Build player metadata from rosters (`build_all_players`) filtered to only players that exist in stats outputs.
+7. Collect represented player names (`_collect_stats_player_names`) and build filtered player metadata (`_build_all_players`).
 
 ## Output Cache Shape
 
@@ -67,7 +67,8 @@ Notes:
 
 ## Related Files
 
-- Helpers: [`util/stats_helpers.py`](util/stats_helpers.py)
+- Orchestration + cache-shape builders: [`statistics.py`](statistics.py)
+- Reusable dataframe helpers: [`util/stats_helpers.py`](util/stats_helpers.py)
 - Constants/config: [`../util/constants.py`](../util/constants.py)
 
 ## Rebuild Command

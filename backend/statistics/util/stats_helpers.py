@@ -32,10 +32,27 @@ def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List
 def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
     """Map PFR seasonal short names to base full names for merge compatibility."""
     col = "player_display_name"
+    full_names = _build_unambiguous_name_lookup(base_df[col])
+    if not full_names:
+        return pfr_df.copy()
 
+    name_map: Dict[str, str] = {}
+    for name in pfr_df[col].dropna().unique():
+        match = full_names.get(_normalize_name(name))
+        if match:
+            name_map[name] = match
+    if not name_map:
+        return pfr_df.copy()
+
+    aligned = pfr_df.copy()
+    aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
+    return aligned
+
+def _build_unambiguous_name_lookup(base_names: pd.Series) -> Dict[str, str]:
+    """Build normalized name lookup and remove ambiguous matches."""
     full_names: Dict[str, str] = {}
     ambiguous: set[str] = set()
-    for name in base_df[col].dropna().unique():
+    for name in base_names.dropna().unique():
         normalized = _normalize_name(name)
         if normalized in full_names and full_names[normalized] != name:
             ambiguous.add(normalized)
@@ -43,16 +60,15 @@ def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.
         full_names[normalized] = name
     for normalized in ambiguous:
         full_names.pop(normalized, None)
+    return full_names
 
-    name_map: Dict[str, str] = {}
-    for name in pfr_df[col].dropna().unique():
-        match = full_names.get(_normalize_name(name))
-        if match:
-            name_map[name] = match
-
-    aligned = pfr_df.copy()
-    aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
-    return aligned
+def merge_aligned_pfr_seasonal_sources(seasonal_df: pd.DataFrame, sources: Mapping[str, pd.DataFrame], join_specs: List[tuple[str, List[str]]]) -> pd.DataFrame:
+    """Align seasonal PFR names and merge each source into the seasonal dataframe."""
+    merged = seasonal_df
+    for source_key, join_keys in join_specs:
+        aligned = align_pfr_seasonal_names(sources[source_key], merged)
+        merged = merge_source(merged, aligned, join_keys)
+    return merged
 
 def _normalize_name(name: str, suffix_re: re.Pattern[str] = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")) -> str:
     """Reduce a player name to a normalized form for fuzzy matching."""
@@ -89,10 +105,18 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
     if weekly_aggregates.empty:
         return seasonal_df
 
-    weekly_col_map = {metric: f"weekly_aggregate_{metric}" for metric in weekly_aggregates.columns if metric not in _WEEKLY_AGGREGATE_GROUP_KEYS}
+    weekly_col_map = _build_weekly_aggregate_column_map(weekly_aggregates.columns)
     renamed = weekly_aggregates.rename(columns=weekly_col_map)
     merged = seasonal_df.merge(renamed, on=_WEEKLY_AGGREGATE_GROUP_KEYS, how="left")
+    _fill_seasonal_from_weekly_aggregates(merged, weekly_col_map)
+    return merged.drop(columns=list(weekly_col_map.values()), errors="ignore")
 
+def _build_weekly_aggregate_column_map(columns: Iterable[str]) -> Dict[str, str]:
+    """Map aggregate metric names to temporary merge-safe column names."""
+    return {metric: f"weekly_aggregate_{metric}" for metric in columns if metric not in _WEEKLY_AGGREGATE_GROUP_KEYS}
+
+def _fill_seasonal_from_weekly_aggregates(merged: pd.DataFrame, weekly_col_map: Mapping[str, str]) -> None:
+    """Fill seasonal metrics with weekly aggregates only where seasonal values are missing."""
     for metric, aggregate_col in weekly_col_map.items():
         aggregate_values = pd.to_numeric(merged[aggregate_col], errors="coerce")
         if metric in merged.columns:
@@ -101,35 +125,44 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
         else:
             merged[metric] = aggregate_values
 
-    return merged.drop(columns=list(weekly_col_map.values()), errors="ignore")
-
 def aggregate_weekly_metrics_by_season(weekly_df: pd.DataFrame, sum_aggregate_metrics: dict[str, tuple[str, ...]], weighted_aggregate_metrics: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]) -> pd.DataFrame:
     """Aggregate selected weekly metrics into season-level player stats."""
     if weekly_df.empty:
-        return pd.DataFrame(columns=[*_WEEKLY_AGGREGATE_GROUP_KEYS])
+        return pd.DataFrame(columns=list(_WEEKLY_AGGREGATE_GROUP_KEYS))
 
-    columns = weekly_df.columns
+    columns = set(weekly_df.columns)
     aggregates: List[pd.Series] = []
+    _append_sum_aggregates(aggregates, weekly_df, sum_aggregate_metrics, columns)
+    _append_weighted_aggregates(aggregates, weekly_df, weighted_aggregate_metrics, columns)
+
+    if not aggregates:
+        return pd.DataFrame(columns=list(_WEEKLY_AGGREGATE_GROUP_KEYS))
+
+    return pd.concat(aggregates, axis=1).reset_index()
+
+def _append_sum_aggregates(aggregates: List[pd.Series], weekly_df: pd.DataFrame, sum_aggregate_metrics: Mapping[str, tuple[str, ...]], columns: set[str]) -> None:
+    """Append sum-based aggregate series into aggregates list."""
     for stat_key, value_keys in sum_aggregate_metrics.items():
-        value_col = next((candidate for candidate in value_keys if candidate in columns), None)
+        value_col = _first_present_column(value_keys, columns)
         if not value_col:
             continue
         aggregates.append(_aggregate_group_stat(weekly_df, value_col, "sum", None).rename(stat_key))
 
-    for stat_key, metric_keys in weighted_aggregate_metrics.items():
-        value_keys, weight_keys = metric_keys
-        value_col = next((candidate for candidate in value_keys if candidate in columns), None)
+def _append_weighted_aggregates(aggregates: List[pd.Series], weekly_df: pd.DataFrame, weighted_aggregate_metrics: Mapping[str, tuple[tuple[str, ...], tuple[str, ...]]], columns: set[str]) -> None:
+    """Append weighted-mean aggregate series into aggregates list."""
+    for stat_key, (value_keys, weight_keys) in weighted_aggregate_metrics.items():
+        value_col = _first_present_column(value_keys, columns)
         if not value_col:
             continue
-
-        weight_col = next((candidate for candidate in weight_keys if candidate in columns), None)
-
+        weight_col = _first_present_column(weight_keys, columns)
         aggregates.append(_aggregate_group_stat(weekly_df, value_col, "weighted_mean", weight_col).rename(stat_key))
 
-    if not aggregates:
-        return pd.DataFrame(columns=[*_WEEKLY_AGGREGATE_GROUP_KEYS])
-
-    return pd.concat(aggregates, axis=1).reset_index()
+def _first_present_column(candidates: Iterable[str], columns: set[str]) -> str | None:
+    """Return the first candidate column that exists in columns."""
+    for candidate in candidates:
+        if candidate in columns:
+            return candidate
+    return None
 
 def _aggregate_group_stat(weekly_df: pd.DataFrame, value_col: str, reducer: str, weight_col: str | None) -> pd.Series:
     group_fields = [weekly_df[key] for key in _WEEKLY_AGGREGATE_GROUP_KEYS]
@@ -163,23 +196,7 @@ def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[s
         ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
     return ranked
 
-def build_seasonal_data(seasonal_df: pd.DataFrame, positions: Iterable[str]) -> Dict[int, Dict[str, pd.DataFrame]]:
-    """Build season -> position -> DataFrame view for chart endpoints."""
-    allowed_positions = set(positions)
-    drop_cols = ["season", "position", "player_id", "player_name", "position_group"]
-    result: Dict[int, Dict[str, pd.DataFrame]] = {}
-
-    for (season, position), group in seasonal_df.groupby(["season", "position"]):
-        if position not in allowed_positions:
-            continue
-
-        dedupe_key = "player_id" if "player_id" in group.columns else "player_display_name"
-        cleaned = _clean_numeric_stats(group.drop_duplicates(subset=[dedupe_key]).drop(columns=drop_cols, errors="ignore").set_index("player_display_name"))
-        result.setdefault(int(season), {})[position] = cleaned
-
-    return result
-
-def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
+def clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Replace non-finite numeric values with 0 for JSON-safe chart payloads."""
     cleaned = df.copy()
     numeric_cols = cleaned.select_dtypes(include="number").columns
@@ -188,35 +205,7 @@ def _clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
     cleaned.loc[:, text_cols] = cleaned.loc[:, text_cols].where(pd.notna(cleaned.loc[:, text_cols]), None)
     return cleaned
 
-def build_weekly_player_stats(weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
-    """Build player -> weekly record list view for player modal."""
-    ordered = weekly_df.sort_values(["season", "week", "player_display_name"])
-    ordered = _clean_weekly_records(ordered)
-    return {player_name: group.drop(columns=["player_display_name"], errors="ignore").to_dict("records") for player_name, group in ordered.groupby("player_display_name", sort=False)}
-
-def _clean_weekly_records(df: pd.DataFrame) -> pd.DataFrame:
+def clean_weekly_records(df: pd.DataFrame) -> pd.DataFrame:
     """Replace non-finite/NaN values with None for JSON-safe weekly record lists."""
     cleaned = df.replace([float("inf"), -float("inf")], pd.NA)
     return cleaned.astype(object).where(pd.notna(cleaned), None)
-
-def collect_stats_player_names(seasonal_data: Dict[int, Dict[str, pd.DataFrame]], weekly_stats: Dict[str, List[Dict]]) -> set[str]:
-    """Collect all player names represented in seasonal or weekly stats views."""
-    names = set(weekly_stats.keys())
-    for season_map in seasonal_data.values():
-        for df in season_map.values():
-            names.update(str(name) for name in df.index)
-    return names
-
-def build_all_players(player_positions: Dict[str, str], eligible_players: set[str], player_ages: Dict[str, int], player_headshots: Dict[str, str], player_teams: Dict[str, str], player_rookies: Dict[str, bool], valid_player_names: set[str] | None = None) -> List[Dict]:
-    """Build pre-assembled player list with player metadata for API consumption."""
-    return [
-        {
-            "name": player_name,
-            "position": player_positions.get(player_name),
-            "age": player_ages.get(player_name),
-            "headshot_url": player_headshots.get(player_name),
-            "team": player_teams.get(player_name),
-            "is_rookie": player_rookies.get(player_name, False),
-            "is_eligible": player_name in eligible_players,
-        } for player_name in player_positions if valid_player_names is None or player_name in valid_player_names
-    ]
