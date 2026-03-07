@@ -42,13 +42,13 @@ export default function AppHeaderPreview({ activeTab, activeTabLabel }) {
           </div>
           <div className="app-preview-depth-row">
             <span className="pos">RB</span>
-            <span>Lead</span>
-            <span>Rot.</span>
+            <span>Starter</span>
+            <span>Backup</span>
           </div>
           <div className="app-preview-depth-row">
             <span className="pos">TE</span>
-            <span>TE1</span>
-            <span>TE2</span>
+            <span>Starter</span>
+            <span>Backup</span>
           </div>
         </div>
       ) : null}
@@ -62,18 +62,48 @@ export default function AppHeaderPreview({ activeTab, activeTabLabel }) {
               <p className="meta">Team • Position • Season</p>
             </div>
           </div>
-          <div className="app-preview-stat-list">
-            <div className="app-preview-stat-row good">
-              <span>Targets</span>
-              <strong>11</strong>
+
+          <div className="app-preview-category-grid">
+            <div className="app-preview-category">
+              <p className="app-preview-category-title">Fantasy</p>
+              <div className="app-preview-stat-list app-preview-stat-list--compact">
+                <div className="app-preview-stat-row good">
+                  <span>PPR Pts</span>
+                  <strong>--</strong>
+                </div>
+                <div className="app-preview-stat-row medium">
+                  <span>Expected</span>
+                  <strong>--</strong>
+                </div>
+              </div>
             </div>
-            <div className="app-preview-stat-row medium">
-              <span>Snap %</span>
-              <strong>86%</strong>
+
+            <div className="app-preview-category">
+              <p className="app-preview-category-title">Usage</p>
+              <div className="app-preview-stat-list app-preview-stat-list--compact">
+                <div className="app-preview-stat-row medium">
+                  <span>Snap %</span>
+                  <strong>--</strong>
+                </div>
+                <div className="app-preview-stat-row good">
+                  <span>Targets</span>
+                  <strong>--</strong>
+                </div>
+              </div>
             </div>
-            <div className="app-preview-stat-row poor">
-              <span>Drop %</span>
-              <strong>6.2%</strong>
+
+            <div className="app-preview-category">
+              <p className="app-preview-category-title">Receiving</p>
+              <div className="app-preview-stat-list app-preview-stat-list--compact">
+                <div className="app-preview-stat-row good">
+                  <span>Rec Yds</span>
+                  <strong>--</strong>
+                </div>
+                <div className="app-preview-stat-row poor">
+                  <span>Drop %</span>
+                  <strong>--</strong>
+                </div>
+              </div>
             </div>
           </div>
         </div>
