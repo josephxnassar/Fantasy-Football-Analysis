@@ -101,14 +101,14 @@
 .team-card:focus-visible {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--color-primary);
+  border-color: var(--team-color, var(--color-primary));
   outline: none;
 }
 
 .team-abbr {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--team-color, var(--color-primary));
   margin-bottom: var(--spacing-xs);
 }
 
@@ -120,6 +120,6 @@
 
 .team-action {
   font-size: 13px;
-  color: var(--color-info);
+  color: var(--team-color, var(--color-info));
   font-weight: 500;
 }

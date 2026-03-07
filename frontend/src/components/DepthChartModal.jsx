@@ -1,10 +1,17 @@
 import { getTeamDepthChart } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
+import { getTeamColor } from '../utils/teamColors';
 import { DepthChartTable, ModalOverlay } from './common';
 import './DepthChartModal.css';
 
-export default function DepthChartModal({ team, onClose }) {
+export default function DepthChartModal({ team, onClose, onPlayerClick }) {
   const { data: depthChart, loading, error } = useTeamModalData(team, getTeamDepthChart, 'Failed to load depth chart');
+  const teamHeaderColor = { color: getTeamColor(depthChart?.team || team) };
+  const handlePlayerClick = (playerName) => {
+    if (!playerName) return;
+    onClose?.();
+    onPlayerClick?.(playerName);
+  };
 
   if (!team) return null;
 
@@ -20,12 +27,15 @@ export default function DepthChartModal({ team, onClose }) {
         {depthChart && !loading && (
           <>
             <div className="depth-chart-header">
-              <h2 className="depth-chart-title">{depthChart.team}</h2>
+              <h2 className="depth-chart-title" style={teamHeaderColor}>{depthChart.team}</h2>
               <p className="depth-chart-full-name">{depthChart.team_name}</p>
             </div>
 
             <div className="depth-chart-table-wrapper">
-              <DepthChartTable entries={depthChart.depth_chart} />
+              <DepthChartTable
+                entries={depthChart.depth_chart}
+                onPlayerClick={onPlayerClick ? handlePlayerClick : undefined}
+              />
             </div>
           </>
         )}

@@ -2,7 +2,7 @@
 
 import './DepthChartTable.css';
 
-function DepthChartTable({ entries, variant = 'full', highlightName = null }) {
+function DepthChartTable({ entries, variant = 'full', highlightName = null, onPlayerClick }) {
   const tableClass = variant === 'mini' ? 'depth-chart-mini-table' : 'depth-chart-table';
 
   // Build consistent cell class list for state styling (starter/empty/highlight).
@@ -12,6 +12,20 @@ function DepthChartTable({ entries, variant = 'full', highlightName = null }) {
     if (!name) classes.push('empty');
     if (highlightName && name === highlightName) classes.push('highlight');
     return classes.join(' ');
+  };
+  const renderPlayerName = (name) => {
+    if (!name) return '—';
+    if (!onPlayerClick) return name;
+
+    return (
+      <button
+        type="button"
+        className="depth-chart-player-link"
+        onClick={() => onPlayerClick(name)}
+      >
+        {name}
+      </button>
+    );
   };
 
   return (
@@ -29,10 +43,10 @@ function DepthChartTable({ entries, variant = 'full', highlightName = null }) {
         {entries.map((entry, idx) => (
           <tr key={`${entry.position}-${idx}`}>
             <td className="position-cell">{entry.position}</td>
-            <td className={cellClass(entry.starter, 'starter')}>{entry.starter || '—'}</td>
-            <td className={cellClass(entry.second)}>{entry.second || '—'}</td>
-            <td className={cellClass(entry.third)}>{entry.third || '—'}</td>
-            <td className={cellClass(entry.fourth)}>{entry.fourth || '—'}</td>
+            <td className={cellClass(entry.starter, 'starter')}>{renderPlayerName(entry.starter)}</td>
+            <td className={cellClass(entry.second)}>{renderPlayerName(entry.second)}</td>
+            <td className={cellClass(entry.third)}>{renderPlayerName(entry.third)}</td>
+            <td className={cellClass(entry.fourth)}>{renderPlayerName(entry.fourth)}</td>
           </tr>
         ))}
       </tbody>

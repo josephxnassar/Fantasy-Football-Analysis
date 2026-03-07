@@ -112,10 +112,20 @@
   cursor: pointer;
 }
 
+.schedule-game.tinted-game {
+  background: var(--game-highlight);
+  border-color: var(--game-border);
+}
+
 .schedule-game.interactive:hover {
   background: var(--color-bg-white);
   border-color: var(--color-primary);
   box-shadow: var(--shadow-sm);
+}
+
+.schedule-game.tinted-game.interactive:hover {
+  background: var(--game-highlight);
+  border-color: var(--game-border);
 }
 
 .schedule-game.interactive:focus-visible {
@@ -126,6 +136,11 @@
 .schedule-game.expanded {
   background: var(--color-bg-white);
   border-color: var(--color-primary);
+}
+
+.schedule-game.tinted-game.expanded {
+  background: var(--game-highlight);
+  border-color: var(--game-border);
 }
 
 .schedule-game.bye {
@@ -142,17 +157,20 @@
 }
 
 .game-opponent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.game-opponent.home {
-  color: var(--color-success-deep);
+.game-prefix.home {
+  color: var(--color-text-muted);
 }
 
-.game-opponent.away {
-  color: var(--color-primary);
+.game-prefix.away {
+  font-weight: 700;
 }
 
 .game-opponent.bye-text {

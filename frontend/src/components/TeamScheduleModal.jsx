@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../api';
 import { useTeamModalData } from '../hooks/useTeamModalData';
+import { getTeamColor } from '../utils/teamColors';
 import { ModalOverlay } from './common';
 import './TeamScheduleModal.css';
 
@@ -24,6 +25,8 @@ export default function TeamScheduleModal({ team, onClose }) {
   );
 
   const { data: schedule, loading, error } = useTeamModalData(team, fetchSchedule, 'Failed to load schedule');
+  const scheduleTeamColor = getTeamColor(schedule?.team || team);
+  const teamHeaderColor = { color: scheduleTeamColor };
 
   const handleSeasonChange = (event) => {
     setSelectedSeason(Number(event.target.value));
@@ -56,7 +59,7 @@ export default function TeamScheduleModal({ team, onClose }) {
         {schedule && !loading && (
           <>
             <div className="schedule-header">
-              <h2 className="team-title">{schedule.team}</h2>
+              <h2 className="team-title" style={teamHeaderColor}>{schedule.team}</h2>
               <p className="team-full-name">{schedule.team_name}</p>
               {schedule.available_seasons?.length > 1 && (
                 <div className="schedule-season-selector">
@@ -80,47 +83,76 @@ export default function TeamScheduleModal({ team, onClose }) {
             </div>
             
             <div className="schedule-grid">
-              {schedule.schedule.map((game) => (
-                <button
-                  type="button"
-                  key={game.week} 
-                  className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${expandedWeek === game.week ? 'expanded' : ''}`}
-                  onClick={() => toggleGameDetails(game.week, game.opponent === 'BYE')}
-                >
-                  <span className="game-week">Week {game.week}</span>
-                  <span className={`game-opponent ${game.opponent === 'BYE' ? 'bye-text' : ''} ${game.home_away === 'AWAY' ? 'away' : game.home_away === 'HOME' ? 'home' : ''}`}>
-                    {game.opponent === 'BYE' ? 'BYE' : `${game.home_away === 'AWAY' ? '@' : 'vs'} ${game.opponent}`}
-                  </span>
-                  {game.opponent !== 'BYE' && getResultLabel(game) && (
-                    <span className={`game-result-pill ${getResultLabel(game) === 'W' ? 'win' : getResultLabel(game) === 'L' ? 'loss' : 'tie'}`}>
-                      {getResultLabel(game)}
-                    </span>
-                  )}
+              {schedule.schedule.map((game) => {
+                const isGame = game.opponent !== 'BYE';
+                const isHomeGame = isGame && game.home_away === 'HOME';
+                const isAwayGame = isGame && game.home_away === 'AWAY';
+                const opponentColor = isGame ? getTeamColor(game.opponent) : null;
+                const tileTintColor = isHomeGame ? scheduleTeamColor : isAwayGame ? opponentColor : null;
+                const gameTileStyle = tileTintColor
+                  ? {
+                      '--game-highlight': `${tileTintColor}12`,
+                      '--game-border': `${tileTintColor}36`,
+                    }
+                  : undefined;
 
-                  {expandedWeek === game.week && game.opponent !== 'BYE' && (
-                    <div className="game-details">
-                      {game.team_score !== null && game.opponent_score !== null ? (
-                        <>
-                          <div className="game-scoreline">
-                            <span className={game.winner === schedule.team ? 'winner' : ''}>
-                              {schedule.team} {game.team_score}
-                            </span>
-                            <span className="game-score-separator">-</span>
-                            <span className={game.winner === game.opponent ? 'winner' : ''}>
-                              {game.opponent} {game.opponent_score}
-                            </span>
-                          </div>
-                          <div className="game-winner-line">
-                            Winner: {game.winner === 'TIE' ? 'Tie' : game.winner}
-                          </div>
-                        </>
+                return (
+                  <button
+                    type="button"
+                    key={game.week}
+                    className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${tileTintColor ? 'tinted-game' : ''} ${expandedWeek === game.week ? 'expanded' : ''}`}
+                    style={gameTileStyle}
+                    onClick={() => toggleGameDetails(game.week, game.opponent === 'BYE')}
+                  >
+                    <span className="game-week">Week {game.week}</span>
+                    <span className={`game-opponent ${game.opponent === 'BYE' ? 'bye-text' : ''}`}>
+                      {game.opponent === 'BYE' ? (
+                        'BYE'
                       ) : (
-                        <div className="game-winner-line">Score unavailable.</div>
+                        <>
+                          <span
+                            className={`game-prefix ${game.home_away === 'AWAY' ? 'away' : 'home'}`}
+                            style={game.home_away === 'AWAY' ? { color: opponentColor } : undefined}
+                          >
+                            {game.home_away === 'AWAY' ? '@' : 'vs'}
+                          </span>
+                          <span className="game-opponent-code" style={{ color: opponentColor }}>
+                            {game.opponent}
+                          </span>
+                        </>
                       )}
-                    </div>
-                  )}
-                </button>
-              ))}
+                    </span>
+                    {game.opponent !== 'BYE' && getResultLabel(game) && (
+                      <span className={`game-result-pill ${getResultLabel(game) === 'W' ? 'win' : getResultLabel(game) === 'L' ? 'loss' : 'tie'}`}>
+                        {getResultLabel(game)}
+                      </span>
+                    )}
+
+                    {expandedWeek === game.week && game.opponent !== 'BYE' && (
+                      <div className="game-details">
+                        {game.team_score !== null && game.opponent_score !== null ? (
+                          <>
+                            <div className="game-scoreline">
+                              <span className={game.winner === schedule.team ? 'winner' : ''}>
+                                {schedule.team} {game.team_score}
+                              </span>
+                              <span className="game-score-separator">-</span>
+                              <span className={game.winner === game.opponent ? 'winner' : ''}>
+                                {game.opponent} {game.opponent_score}
+                              </span>
+                            </div>
+                            <div className="game-winner-line">
+                              Winner: {game.winner === 'TIE' ? 'Tie' : game.winner}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="game-winner-line">Score unavailable.</div>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </>
         )}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getTeamColorVars } from '../utils/teamColors';
 import './DivisionBrowser.css';
 
 function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →', defaultConference = 'AFC', defaultDivision = 'North' }) {
@@ -64,6 +65,7 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
             type="button"
             key={team}
             className="team-card"
+            style={getTeamColorVars(team)}
             onClick={() => onTeamSelect(team)}
           >
             <div className="team-abbr">{team}</div>

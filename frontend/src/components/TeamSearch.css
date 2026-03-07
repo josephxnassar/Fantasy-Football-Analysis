@@ -76,7 +76,7 @@
 .team-item:hover,
 .team-item:focus-visible {
   background: var(--color-bg-light);
-  border-color: var(--color-primary);
+  border-color: var(--team-color, var(--color-primary));
   transform: translateX(4px);
   outline: none;
 }
@@ -84,7 +84,7 @@
 .team-item-abbr {
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--team-color, var(--color-primary));
   min-width: 40px;
 }
 
@@ -96,7 +96,7 @@
 
 .team-item-arrow {
   font-size: 16px;
-  color: var(--color-info);
+  color: var(--team-color, var(--color-info));
   opacity: 0;
   transition: opacity var(--transition-fast);
 }

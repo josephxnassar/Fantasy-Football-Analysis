@@ -68,6 +68,28 @@
   border-right: 1px solid var(--color-border-light);
 }
 
+.depth-chart-player-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--color-primary-dark);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.depth-chart-player-link:hover {
+  color: var(--color-primary);
+}
+
+.depth-chart-player-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .player-cell:last-child {
   border-right: none;
 }
