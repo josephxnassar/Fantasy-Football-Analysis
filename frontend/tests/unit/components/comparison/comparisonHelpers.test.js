@@ -6,12 +6,12 @@ import {
   getWinningSlotIdsForStat,
   getWinningSlotIdsForWeeks,
 } from '../../../../src/components/comparison/comparisonHelpers';
-import { PRODUCTION_GROUPS } from '../../../../src/utils/statMeta';
+import { PRODUCTION_GROUPS_NO_RANKS } from '../../../../src/utils/statMeta';
 
 describe('buildComparisonRows', () => {
   it('builds category and stat rows in profile order', () => {
     const rows = buildComparisonRows('Overall');
-    const expectedStatCount = Object.values(PRODUCTION_GROUPS.Overall).reduce(
+    const expectedStatCount = Object.values(PRODUCTION_GROUPS_NO_RANKS.Overall).reduce(
       (total, stats) => total + stats.length,
       0
     );
@@ -23,8 +23,8 @@ describe('buildComparisonRows', () => {
     });
     expect(rows[1]).toEqual({
       type: 'stat',
-      id: `stat:${PRODUCTION_GROUPS.Overall.Fantasy[0]}`,
-      statKey: PRODUCTION_GROUPS.Overall.Fantasy[0],
+      id: `stat:${PRODUCTION_GROUPS_NO_RANKS.Overall.Fantasy[0]}`,
+      statKey: PRODUCTION_GROUPS_NO_RANKS.Overall.Fantasy[0],
       category: 'Fantasy',
     });
     expect(rows.filter((row) => row.type === 'stat')).toHaveLength(expectedStatCount);

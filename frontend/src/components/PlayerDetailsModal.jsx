@@ -46,7 +46,7 @@ export default function PlayerDetailsModal({
 
   return (
     <ModalOverlay className="modal-overlay--player-details" onClose={onClose}>
-      <div className="modal-content player-details-modal-content" style={playerModalStyle}>
+      <div className="player-details-modal-content" style={playerModalStyle}>
         {loading ? (
           <div className="loading">Loading player details...</div>
         ) : (

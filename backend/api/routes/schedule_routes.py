@@ -1,6 +1,6 @@
 """Schedule API routes — team schedules"""
 import math
-from typing import Optional
+from typing import Optional, SupportsInt
 
 from fastapi import APIRouter, Request
 
@@ -16,16 +16,22 @@ def _to_optional_int(value: object) -> Optional[int]:
     """Convert scalar schedule values into nullable ints."""
     if value is None:
         return None
-    if isinstance(value, float) and math.isnan(value):
-        return None
     if isinstance(value, str):
         value = value.strip()
         if not value or value.upper() == "BYE":
             return None
-    try:
-        return int(value)
-    except (TypeError, ValueError):
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    if isinstance(value, float) and math.isnan(value):
         return None
+    if isinstance(value, SupportsInt):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+    return None
 
 
 @router.get("/{team}", response_model=TeamScheduleResponse)

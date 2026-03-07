@@ -1,4 +1,4 @@
-.modal-content {
+.player-details-modal-content {
   background: var(--color-bg-white);
   padding: 1rem 1.1rem 1.05rem;
   border-radius: 8px;
@@ -7,11 +7,7 @@
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-}
-
-.player-details-modal-content {
   border: 1px solid var(--player-team-border, var(--color-border-light));
-  background-color: var(--color-bg-white);
   background-image: linear-gradient(
     180deg,
     var(--player-team-tint, transparent) 0%,
