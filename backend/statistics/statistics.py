@@ -1,7 +1,7 @@
 """Player statistics processing and cache generation."""
 
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from typing import Dict, List, NamedTuple, Tuple, cast
 
 import nflreadpy as nfl
@@ -318,14 +318,13 @@ class Statistics(base_source.BaseSource):
     @timed("Statistics._build_statistics_data")
     def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_names: set[str]) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]], List[Dict]]:
         """Build seasonal stats, weekly stats, and all players in parallel."""
-        builders = {
-            "seasonal_player_stats": (self._build_seasonal_player_stats, (seasonal_df,)),
-            "weekly_player_stats": (self._build_weekly_player_stats, (weekly_df,)),
-            "all_players": (self._build_all_players, (roster_data, stats_player_names)),
-        }
         results: Dict[str, object] = {}
         with ThreadPoolExecutor(max_workers=3) as executor:
-            futures = {executor.submit(fn, *args): name for name, (fn, args) in builders.items()}
+            futures: Dict[Future[object], str] = {
+                executor.submit(self._build_seasonal_player_stats, seasonal_df): "seasonal_player_stats",
+                executor.submit(self._build_weekly_player_stats, weekly_df): "weekly_player_stats",
+                executor.submit(self._build_all_players, roster_data, stats_player_names): "all_players",
+            }
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
 
