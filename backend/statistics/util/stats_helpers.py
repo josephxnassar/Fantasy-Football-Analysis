@@ -32,7 +32,7 @@ def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List
 def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
     """Map PFR seasonal short names to base full names for merge compatibility."""
     col = "player_display_name"
-    full_names = _build_unambiguous_name_lookup(base_df[col])
+    full_names = _build_unique_normalized_name_lookup(base_df[col])
     if not full_names:
         return pfr_df.copy()
 
@@ -48,7 +48,7 @@ def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.
     aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
     return aligned
 
-def _build_unambiguous_name_lookup(base_names: pd.Series) -> Dict[str, str]:
+def _build_unique_normalized_name_lookup(base_names: pd.Series) -> Dict[str, str]:
     """Build normalized name lookup and remove ambiguous matches."""
     full_names: Dict[str, str] = {}
     ambiguous: set[str] = set()
@@ -61,14 +61,6 @@ def _build_unambiguous_name_lookup(base_names: pd.Series) -> Dict[str, str]:
     for normalized in ambiguous:
         full_names.pop(normalized, None)
     return full_names
-
-def merge_aligned_pfr_seasonal_sources(seasonal_df: pd.DataFrame, sources: Mapping[str, pd.DataFrame], join_specs: List[tuple[str, List[str]]]) -> pd.DataFrame:
-    """Align seasonal PFR names and merge each source into the seasonal dataframe."""
-    merged = seasonal_df
-    for source_key, join_keys in join_specs:
-        aligned = align_pfr_seasonal_names(sources[source_key], merged)
-        merged = merge_source(merged, aligned, join_keys)
-    return merged
 
 def _normalize_name(name: str, suffix_re: re.Pattern[str] = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")) -> str:
     """Reduce a player name to a normalized form for fuzzy matching."""
@@ -99,88 +91,51 @@ def combine_aliases(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
     return interpreted
 
-def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, sum_aggregate_metrics: dict[str, tuple[str, ...]], weighted_aggregate_metrics: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]) -> pd.DataFrame:
+def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, sum_aggregate_metrics: Iterable[str], averaged_aggregate_metrics: Iterable[str]) -> pd.DataFrame:
     """Merge weekly-derived season aggregates into seasonal rows, filling only missing values."""
-    weekly_aggregates = aggregate_weekly_metrics_by_season(weekly_df, sum_aggregate_metrics, weighted_aggregate_metrics)
-    if weekly_aggregates.empty:
+    if seasonal_df.empty or weekly_df.empty:
         return seasonal_df
 
-    weekly_col_map = _build_weekly_aggregate_column_map(weekly_aggregates.columns)
-    renamed = weekly_aggregates.rename(columns=weekly_col_map)
-    merged = seasonal_df.merge(renamed, on=_WEEKLY_AGGREGATE_GROUP_KEYS, how="left")
-    _fill_seasonal_from_weekly_aggregates(merged, weekly_col_map)
-    return merged.drop(columns=list(weekly_col_map.values()), errors="ignore")
+    group_keys = [key for key in _WEEKLY_AGGREGATE_GROUP_KEYS if key in seasonal_df.columns and key in weekly_df.columns]
 
-def _build_weekly_aggregate_column_map(columns: Iterable[str]) -> Dict[str, str]:
-    """Map aggregate metric names to temporary merge-safe column names."""
-    return {metric: f"weekly_aggregate_{metric}" for metric in columns if metric not in _WEEKLY_AGGREGATE_GROUP_KEYS}
+    if not group_keys:
+        return seasonal_df
 
-def _fill_seasonal_from_weekly_aggregates(merged: pd.DataFrame, weekly_col_map: Mapping[str, str]) -> None:
-    """Fill seasonal metrics with weekly aggregates only where seasonal values are missing."""
-    for metric, aggregate_col in weekly_col_map.items():
-        aggregate_values = pd.to_numeric(merged[aggregate_col], errors="coerce")
-        if metric in merged.columns:
-            base_values = pd.to_numeric(merged[metric], errors="coerce")
-            merged[metric] = base_values.fillna(aggregate_values)
+    aggregates = weekly_df[group_keys].drop_duplicates().copy()
+    
+    summed_metric_sources = {metric_name: (metric_name,) for metric_name in sum_aggregate_metrics}
+    aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, summed_metric_sources, "sum")
+
+    averaged_metric_sources = {metric_name: (metric_name,) for metric_name in averaged_aggregate_metrics}
+    aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, averaged_metric_sources, "mean")
+
+    metric_cols = [col for col in aggregates.columns if col not in group_keys]
+    if not metric_cols:
+        return seasonal_df
+
+    return _merge_aggregates_and_fill_missing(seasonal_df, aggregates, group_keys, metric_cols)
+
+def _append_aggregated_metrics(aggregates_df: pd.DataFrame, weekly_df: pd.DataFrame, group_keys: list[str], metric_sources: Mapping[str, tuple[str, ...]], reducer: str) -> pd.DataFrame:
+    """Append grouped reductions for configured source metrics."""
+    for out_col, source_candidates in metric_sources.items():
+        source_col = next((col for col in source_candidates if col in weekly_df.columns), None)
+        if source_col is None:
+            continue
+        grouped = (weekly_df[group_keys + [source_col]].assign(**{source_col: lambda frame: pd.to_numeric(frame[source_col], errors="coerce")}).groupby(group_keys, dropna=False, sort=False)[source_col])
+        reduced = grouped.sum(min_count=1) if reducer == "sum" else grouped.mean()
+        aggregates_df = aggregates_df.merge(reduced.rename(out_col).reset_index(), on=group_keys, how="left")
+    return aggregates_df
+
+def _merge_aggregates_and_fill_missing(seasonal_df: pd.DataFrame, aggregates_df: pd.DataFrame, group_keys: list[str], metric_cols: list[str]) -> pd.DataFrame:
+    """Merge aggregate metrics and backfill only missing seasonal values."""
+    weekly_cols = {col: f"__weekly_agg__{col}" for col in metric_cols}
+    merged = seasonal_df.merge(aggregates_df.rename(columns=weekly_cols), on=group_keys, how="left")
+    for metric_col, weekly_col in weekly_cols.items():
+        if metric_col in merged.columns:
+            merged[metric_col] = merged[metric_col].where(merged[metric_col].notna(), merged[weekly_col])
         else:
-            merged[metric] = aggregate_values
-
-def aggregate_weekly_metrics_by_season(weekly_df: pd.DataFrame, sum_aggregate_metrics: dict[str, tuple[str, ...]], weighted_aggregate_metrics: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]) -> pd.DataFrame:
-    """Aggregate selected weekly metrics into season-level player stats."""
-    if weekly_df.empty:
-        return pd.DataFrame(columns=list(_WEEKLY_AGGREGATE_GROUP_KEYS))
-
-    columns = set(weekly_df.columns)
-    aggregates: List[pd.Series] = []
-    _append_sum_aggregates(aggregates, weekly_df, sum_aggregate_metrics, columns)
-    _append_weighted_aggregates(aggregates, weekly_df, weighted_aggregate_metrics, columns)
-
-    if not aggregates:
-        return pd.DataFrame(columns=list(_WEEKLY_AGGREGATE_GROUP_KEYS))
-
-    return pd.concat(aggregates, axis=1).reset_index()
-
-def _append_sum_aggregates(aggregates: List[pd.Series], weekly_df: pd.DataFrame, sum_aggregate_metrics: Mapping[str, tuple[str, ...]], columns: set[str]) -> None:
-    """Append sum-based aggregate series into aggregates list."""
-    for stat_key, value_keys in sum_aggregate_metrics.items():
-        value_col = _first_present_column(value_keys, columns)
-        if not value_col:
-            continue
-        aggregates.append(_aggregate_group_stat(weekly_df, value_col, "sum", None).rename(stat_key))
-
-def _append_weighted_aggregates(aggregates: List[pd.Series], weekly_df: pd.DataFrame, weighted_aggregate_metrics: Mapping[str, tuple[tuple[str, ...], tuple[str, ...]]], columns: set[str]) -> None:
-    """Append weighted-mean aggregate series into aggregates list."""
-    for stat_key, (value_keys, weight_keys) in weighted_aggregate_metrics.items():
-        value_col = _first_present_column(value_keys, columns)
-        if not value_col:
-            continue
-        weight_col = _first_present_column(weight_keys, columns)
-        aggregates.append(_aggregate_group_stat(weekly_df, value_col, "weighted_mean", weight_col).rename(stat_key))
-
-def _first_present_column(candidates: Iterable[str], columns: set[str]) -> str | None:
-    """Return the first candidate column that exists in columns."""
-    for candidate in candidates:
-        if candidate in columns:
-            return candidate
-    return None
-
-def _aggregate_group_stat(weekly_df: pd.DataFrame, value_col: str, reducer: str, weight_col: str | None) -> pd.Series:
-    group_fields = [weekly_df[key] for key in _WEEKLY_AGGREGATE_GROUP_KEYS]
-    value = pd.to_numeric(weekly_df[value_col], errors="coerce")
-    grouped_value = value.groupby(group_fields)
-
-    if reducer == "sum":
-        return grouped_value.sum(min_count=1)
-
-    if reducer == "weighted_mean" and weight_col:
-        weight = pd.to_numeric(weekly_df[weight_col], errors="coerce")
-        positive_weights = weight.where(weight > 0)
-        weighted_sum = (value * positive_weights).groupby(group_fields).sum(min_count=1)
-        weight_sum = positive_weights.groupby(group_fields).sum(min_count=1)
-        weighted_mean = weighted_sum.div(weight_sum)
-        return weighted_mean.where(weight_sum > 0, grouped_value.mean())
-
-    return grouped_value.mean()
+            merged[metric_col] = merged[weekly_col]
+    return merged.drop(columns=list(weekly_cols.values()))
 
 def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""

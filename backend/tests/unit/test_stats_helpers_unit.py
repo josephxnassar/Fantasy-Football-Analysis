@@ -8,6 +8,16 @@ from backend.util import constants
 pytestmark = pytest.mark.unit
 
 
+class _NflReadPyResult:
+    """Simple nflreadpy-like wrapper exposing to_pandas()."""
+
+    def __init__(self, df: pd.DataFrame) -> None:
+        self._df = df
+
+    def to_pandas(self) -> pd.DataFrame:
+        return self._df
+
+
 @pytest.fixture
 def statistics_source() -> Statistics:
     return Statistics([2025])
@@ -27,7 +37,60 @@ def test_add_derived_stats_handles_zero_division() -> None:
     assert result.loc[0, "Yds/Rush"] == 4.0
     assert result.loc[1, "Yds/Rush"] == 0.0
 
-def test_aggregate_weekly_metrics_by_season_aggregates_with_expected_reducers() -> None:
+def test_filter_regular_and_position_filters_regular_fantasy_positions() -> None:
+    source = pd.DataFrame({
+        "game_type": ["REG", "REG", "PRE"],
+        "position": ["WR", "K", "WR"],
+        "team": ["LA", "WAS", "LA"],
+    })
+
+    filtered = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
+
+    assert filtered.shape[0] == 1
+    assert filtered.iloc[0]["position"] == "WR"
+
+def test_load_nextgen_receiving_stats_normalizes_team_abbreviations(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
+    source_df = pd.DataFrame(
+        {
+            "season": [2025],
+            "week": [1],
+            "player_display_name": ["Puka Nacua"],
+            "player_position": ["WR"],
+            "team_abbr": ["LA"],
+            "avg_separation": [2.8],
+        }
+    )
+
+    monkeypatch.setattr(
+        "backend.statistics.statistics.nfl.load_nextgen_stats",
+        lambda **_: _NflReadPyResult(source_df),
+    )
+
+    loaded = statistics_source._load_nextgen_receiving_stats()
+
+    assert loaded.iloc[0]["team"] == "LAR"
+
+def test_load_pfr_adv_rec_season_normalizes_team_abbreviations(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
+    source_df = pd.DataFrame(
+        {
+            "season": [2025],
+            "player": ["Puka Nacua"],
+            "tm": ["LA"],
+            "pos": ["WR"],
+            "adot": [9.3],
+        }
+    )
+
+    monkeypatch.setattr(
+        "backend.statistics.statistics.nfl.load_pfr_advstats",
+        lambda **_: _NflReadPyResult(source_df),
+    )
+
+    loaded = statistics_source._load_pfr_adv_rec_season()
+
+    assert loaded.iloc[0]["team"] == "LAR"
+
+def test_merge_weekly_aggregates_into_seasonal_applies_sum_and_mean_reducers() -> None:
     weekly_df = pd.DataFrame({
         "season": [2025, 2025, 2025, 2024],
         "position": ["QB", "QB", "WR", "QB"],
@@ -42,18 +105,23 @@ def test_aggregate_weekly_metrics_by_season_aggregates_with_expected_reducers() 
         "sc_offense_snaps": [60, 40, 65, 70],
     })
 
-    weekly_aggregates = stats_helpers.aggregate_weekly_metrics_by_season(
+    seasonal_df = weekly_df[["season", "position", "player_display_name"]].drop_duplicates().copy()
+    for col in ("exp_fp", "ng_pass_passer_rating", "ng_pass_avg_time_to_throw", "sc_offense_pct", "ng_rec_avg_separation"):
+        seasonal_df[col] = float("nan")
+
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
+        seasonal_df,
         weekly_df,
         constants.WEEKLY_SUM_AGGREGATE_METRICS,
-        constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS,
+        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
     )
-    qb_2025 = weekly_aggregates[(weekly_aggregates["season"] == 2025) & (weekly_aggregates["player_display_name"] == "Patrick Mahomes")].iloc[0]
-    wr_2025 = weekly_aggregates[(weekly_aggregates["season"] == 2025) & (weekly_aggregates["player_display_name"] == "JaMarr Chase")].iloc[0]
+    qb_2025 = merged[(merged["season"] == 2025) & (merged["player_display_name"] == "Patrick Mahomes")].iloc[0]
+    wr_2025 = merged[(merged["season"] == 2025) & (merged["player_display_name"] == "JaMarr Chase")].iloc[0]
 
     assert qb_2025["exp_fp"] == pytest.approx(35.0)
-    assert qb_2025["ng_pass_passer_rating"] == pytest.approx(92.0)
-    assert qb_2025["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
-    assert qb_2025["sc_offense_pct"] == pytest.approx(0.82)
+    assert qb_2025["ng_pass_passer_rating"] == pytest.approx(90.0)
+    assert qb_2025["ng_pass_avg_time_to_throw"] == pytest.approx(2.6)
+    assert qb_2025["sc_offense_pct"] == pytest.approx(0.8)
     assert wr_2025["ng_rec_avg_separation"] == pytest.approx(2.6)
 
 def test_merge_weekly_aggregates_into_seasonal_fills_missing_values_only() -> None:
@@ -82,14 +150,14 @@ def test_merge_weekly_aggregates_into_seasonal_fills_missing_values_only() -> No
         seasonal_df,
         weekly_df,
         constants.WEEKLY_SUM_AGGREGATE_METRICS,
-        constants.WEEKLY_WEIGHTED_AGGREGATE_METRICS,
+        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
     )
     row = merged.iloc[0]
 
     assert row["exp_fp"] == pytest.approx(35.0)
     assert row["ng_pass_passer_rating"] == pytest.approx(97.4)
-    assert row["ng_pass_avg_time_to_throw"] == pytest.approx(2.56)
-    assert row["sc_offense_pct"] == pytest.approx(0.82)
+    assert row["ng_pass_avg_time_to_throw"] == pytest.approx(2.6)
+    assert row["sc_offense_pct"] == pytest.approx(0.8)
 
 def test_build_all_players_includes_expected_fields(statistics_source: Statistics) -> None:
     positions = {"A": "QB", "B": "WR"}

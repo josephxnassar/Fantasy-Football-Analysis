@@ -45,10 +45,10 @@ Configured seasons:
 ## Processing Pipeline
 
 1. Load all stat sources in parallel (`_load_statistics_sources`) and rosters in parallel with source loading (`run`).
-2. Normalize each source to regular season + fantasy positions (`QB/RB/WR/TE`) and keep mapped columns.
+2. Normalize team abbreviations in each source loader (for example `LA -> LAR`, `WAS -> WSH`) before downstream joins, then apply regular-season + fantasy-position filtering where applicable (`QB/RB/WR/TE`) and keep mapped columns.
 3. Merge all weekly sources onto base weekly player stats.
 4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
-5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows, and compute positional ranks.
+5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows (`WEEKLY_SUM_AGGREGATE_METRICS` via sum, `WEEKLY_AVERAGED_AGGREGATE_METRICS` via plain mean), and compute positional ranks.
 6. Collect represented player names from shaped DataFrames (`_collect_stats_player_names`).
 7. Build final cache views in parallel (`_build_statistics_data`):
 - Seasonal (`_build_seasonal_player_stats`): season -> position -> DataFrame.
