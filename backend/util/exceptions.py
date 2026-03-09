@@ -5,7 +5,6 @@ Hierarchy:
     FantasyFootballError (base)
     ├── DataLoadError           — external data source failures (nflreadpy, web)
     ├── DataProcessingError     — data transformation or computation failures
-    ├── ScrapingError           — ESPN web scraping failures
     ├── CacheNotLoadedError     — cache missing or empty
     └── PlayerNotFoundError     — player lookup failed across all data sources
 """
@@ -26,12 +25,6 @@ class DataLoadError(FantasyFootballError):
 class DataProcessingError(FantasyFootballError):
     """Failed during data transformation, aggregation, or computation"""
     pass
-
-
-class ScrapingError(FantasyFootballError):
-    """Failed to scrape or parse web data (ESPN depth charts)"""
-    pass
-
 
 class CacheNotLoadedError(FantasyFootballError):
     """Required cache data is not loaded or is empty"""

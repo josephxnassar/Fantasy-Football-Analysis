@@ -23,6 +23,7 @@ backend/tests/.pytest_work/
 .venv/
 backend/database/data/*
 !backend/database/data/.gitkeep
+backend/depth_chart/espn.py
 *.xlsm
 
 # Frontend / Node
@@ -35,6 +36,3 @@ dist/
 
 # AI project intelligence
 claude.md
-
-# Local-only compliance-retained file (do not track)
-backend/depth_chart/espn.py

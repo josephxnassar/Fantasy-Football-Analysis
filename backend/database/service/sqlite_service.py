@@ -1,4 +1,4 @@
-"""SQLite cache service for Statistics, Schedules, and ESPN depth charts."""
+"""SQLite cache service for Statistics, Schedules, and depth charts."""
 
 from __future__ import annotations
 
