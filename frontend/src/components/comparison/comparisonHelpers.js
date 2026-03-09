@@ -29,7 +29,7 @@ function getWinningSlotIdsFromEntries(entries, lowerIsBetter) {
 
   const values = entries.map((entry) => entry.value);
   const allEqual = values.every((value) => value === values[0]);
-  if (allEqual) return new Set();
+  if (allEqual) return new Set(entries.map((entry) => entry.id));
 
   const targetValue = lowerIsBetter
     ? Math.min(...values)

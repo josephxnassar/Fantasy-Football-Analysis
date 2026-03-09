@@ -80,13 +80,13 @@ describe('buildComparisonRows', () => {
     expect(getWinningSlotIdsForStat('ng_pass_avg_time_to_throw', slots)).toEqual(new Set([2]));
   });
 
-  it('does not mark winners for complete ties', () => {
+  it('marks all tied players as winners on complete ties', () => {
     const slots = [
       { id: 1, stats: { fp_ppr: 200 } },
       { id: 2, stats: { fp_ppr: 200 } },
     ];
 
-    expect(getWinningSlotIdsForStat('fp_ppr', slots)).toEqual(new Set());
+    expect(getWinningSlotIdsForStat('fp_ppr', slots)).toEqual(new Set([1, 2]));
   });
 
   it('picks highest weeks played as winner and tallies wins', () => {
