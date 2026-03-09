@@ -33,7 +33,7 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 ## Architecture At A Glance
 
 ```text
-nflreadpy + ESPN
+nflreadpy
       |
       v
 backend data modules
@@ -236,7 +236,7 @@ backend/
   api/            FastAPI app, routes, models, API helpers
   statistics/     nflreadpy ingestion + stat cache generation
   schedules/      schedule normalization + bye-week filling
-  depth_chart/    ESPN depth chart scraper
+  depth_chart/    nflreadpy depth chart loader
   database/       SQLite DAO/service cache persistence
   config/         env loading and logging config
 frontend/

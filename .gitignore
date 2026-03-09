@@ -35,3 +35,6 @@ dist/
 
 # AI project intelligence
 claude.md
+
+# Local-only compliance-retained file (do not track)
+backend/depth_chart/espn.py

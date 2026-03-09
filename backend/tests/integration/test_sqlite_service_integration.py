@@ -148,13 +148,3 @@ def test_load_table_safe_returns_none_for_missing_table() -> None:
         assert service._load_table_safe("Statistics_missing_table") is None
     finally:
         service.close()
-
-
-def test_app_depth_chart_source_validation(monkeypatch) -> None:
-    app = App()
-    try:
-        monkeypatch.setattr("backend.app.DEPTH_CHART_SOURCE", "invalid")
-        with pytest.raises(ValueError, match="DEPTH_CHART_SOURCE"):
-            app._get_depth_chart_source()
-    finally:
-        app.db.close()

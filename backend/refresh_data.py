@@ -14,7 +14,7 @@ if __name__ == "__main__":
     app = App()
     
     print(">> Downloading fresh data from all sources...")
-    print("   - ESPN Depth Charts (web scraping)")
+    print("   - Depth Charts ")
     print("   - NFL Schedules ")
     print("   - Player Statistics ")
     print()

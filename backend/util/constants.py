@@ -9,7 +9,7 @@ CURRENT_SEASON = max(SEASONS)
 # Top-level cache names (used by App.caches)
 CACHE = {
     "STATISTICS": "Statistics",
-    "DEPTH_CHART": "ESPNDepthChart",
+    "DEPTH_CHART": "DepthChart",
     "SCHEDULES": "Schedules",
 }
 

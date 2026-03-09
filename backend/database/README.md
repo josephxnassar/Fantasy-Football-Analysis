@@ -4,7 +4,7 @@ Last verified: 2026-03-03
 
 [![SQLite](https://img.shields.io/badge/SQLite-persistence-003B57?logo=sqlite&logoColor=white)](service/sqlite_service.py)
 
-SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
+SQLite cache persistence for `Statistics`, `Schedules`, and `DepthChart`.
 
 ## Table of Contents
 
@@ -30,7 +30,7 @@ SQLite cache persistence for `Statistics`, `Schedules`, and `ESPNDepthChart`.
 |---|---|
 | `Statistics` | `all_players`, per-season/per-position tables, weekly stats |
 | `Schedules` | One table per `season + team` |
-| `ESPNDepthChart` | One table per team |
+| `DepthChart` | One table per team |
 
 Statistics weekly rows are flattened with an internal key column (`__player_key`) so cache grouping is stable on reload.
 
@@ -54,7 +54,7 @@ Statistics weekly rows are flattened with an internal key column (`__player_key`
 - `Statistics_player_weekly_stats` exists
 - at least one `Statistics_<season>_<position>` table exists
 - at least one `Schedules_*` table exists
-- at least one `ESPNDepthChart_*` table exists
+- at least one `DepthChart_*` table exists
 
 If false, required cache families are missing and startup should trigger a cache rebuild via `App.initialize()`.
 

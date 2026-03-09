@@ -3,9 +3,7 @@
 import logging
 from typing import Any, Dict
 
-from backend.config.settings import DEPTH_CHART_SOURCE
 from backend.database.service.sqlite_service import SQLService
-from backend.depth_chart.espn import ESPNDepthChart
 from backend.depth_chart.nrp import NRPDepthChart
 from backend.schedules.schedules import Schedules
 from backend.statistics.statistics import Statistics
@@ -31,20 +29,9 @@ class App:
             self.run()
             self.save()
 
-    def _get_depth_chart_source(self):
-        source = DEPTH_CHART_SOURCE
-        if source == "nrp":
-            return NRPDepthChart()
-        if source == "espn":
-            return ESPNDepthChart()
-        raise ValueError(
-            "Invalid DEPTH_CHART_SOURCE configured. "
-            "Expected one of: espn, nrp."
-        )
-    
     def run(self) -> None:
         """Fetch fresh data from all sources"""
-        instances = [(constants.CACHE["DEPTH_CHART"], self._get_depth_chart_source()),
+        instances = [(constants.CACHE["DEPTH_CHART"], NRPDepthChart()),
                      (constants.CACHE["SCHEDULES"], Schedules(constants.SEASONS)),
                      (constants.CACHE["STATISTICS"], Statistics(constants.SEASONS))]
 

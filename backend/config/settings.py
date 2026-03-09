@@ -24,13 +24,6 @@ CORS_ALLOW_CREDENTIALS: bool = (os.getenv("CORS_ALLOW_CREDENTIALS", "false").str
 
 # Database
 DB_PATH: str = os.getenv("DB_PATH", "backend/database/data/nfl_cache.db")
-DEPTH_CHART_SOURCE: str = os.getenv("DEPTH_CHART_SOURCE", "espn").strip().lower()
-_VALID_DEPTH_CHART_SOURCES = {"espn", "nrp"}
-if DEPTH_CHART_SOURCE not in _VALID_DEPTH_CHART_SOURCES:
-    raise ValueError(
-        "Invalid DEPTH_CHART_SOURCE. Expected one of: "
-        f"{', '.join(sorted(_VALID_DEPTH_CHART_SOURCES))}; got '{DEPTH_CHART_SOURCE}'."
-    )
 
 # Logging
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "DEBUG").upper()
