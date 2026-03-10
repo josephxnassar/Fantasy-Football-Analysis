@@ -81,15 +81,14 @@ export default function PlayerComparisonTable({
             {selectedPlayers.map((slot) => {
               const displayValue = slot.loading ? '...' : (slot.weeksPlayed ?? '—');
               const isWinner = weeksWinners.has(slot.id) && displayValue !== '—';
+              const valueClassName = [
+                'direct-comparison-value-chip',
+                displayValue === '—' ? 'direct-comparison-value-chip--missing' : '',
+                isWinner ? 'direct-comparison-value-chip--winner' : '',
+              ].filter(Boolean).join(' ');
               return (
-                <td
-                  key={`${slot.id}-weeks-played`}
-                  className={[
-                    displayValue === '—' ? 'direct-comparison-value-missing' : '',
-                    isWinner ? 'direct-comparison-value-winner' : '',
-                  ].filter(Boolean).join(' ')}
-                >
-                  {displayValue}
+                <td key={`${slot.id}-weeks-played`}>
+                  <span className={valueClassName}>{displayValue}</span>
                 </td>
               );
             })}
@@ -123,15 +122,14 @@ export default function PlayerComparisonTable({
                   const displayValue = slot.loading ? '...' : formatComparisonValue(row.statKey, rawValue);
                   const winners = statWinnersByKey[row.statKey] || new Set();
                   const isWinner = winners.has(slot.id) && displayValue !== '—';
+                  const valueClassName = [
+                    'direct-comparison-value-chip',
+                    displayValue === '—' ? 'direct-comparison-value-chip--missing' : '',
+                    isWinner ? 'direct-comparison-value-chip--winner' : '',
+                  ].filter(Boolean).join(' ');
                   return (
-                    <td
-                      key={`${slot.id}-${row.statKey}`}
-                      className={[
-                        displayValue === '—' ? 'direct-comparison-value-missing' : '',
-                        isWinner ? 'direct-comparison-value-winner' : '',
-                      ].filter(Boolean).join(' ')}
-                    >
-                      {displayValue}
+                    <td key={`${slot.id}-${row.statKey}`}>
+                      <span className={valueClassName}>{displayValue}</span>
                     </td>
                   );
                 })}

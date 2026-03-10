@@ -22,6 +22,7 @@ export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick })
     handlePositionProfileChange,
     handlePlayerSelect,
     handleSeasonChange,
+    handleRemovePlayer,
   } = usePlayerComparisonState();
 
   return (
@@ -65,7 +66,18 @@ export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick })
               <div className="direct-comparison-slot-grid">
                 {comparisonSlots.map((slot) => (
                   <article key={slot.id} className="direct-comparison-slot-card">
-                    <h3>Slot {slot.id}</h3>
+                    <div className="direct-comparison-slot-header">
+                      <h3>Slot {slot.id}</h3>
+                      {slot.playerName && (
+                        <button
+                          type="button"
+                          className="direct-comparison-slot-remove"
+                          onClick={() => handleRemovePlayer(slot.id)}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
 
                     <div className="direct-comparison-slot-field">
                       <label htmlFor={`comparison-player-${slot.id}`}>Player</label>
