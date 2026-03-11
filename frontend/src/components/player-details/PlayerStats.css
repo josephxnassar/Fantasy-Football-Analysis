@@ -41,9 +41,9 @@
 
 .aggregate-stats-grid {
   display: grid;
-  grid-template-columns: repeat(var(--stat-category-count), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--stat-category-count), 11.6rem);
   gap: 0.45rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .stat-category {
@@ -98,10 +98,10 @@
 }
 
 .stat-label {
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   color: var(--color-text-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.18px;
+  text-transform: none;
+  letter-spacing: 0;
   font-weight: 700;
   line-height: 1.1;
   display: flex;
@@ -119,7 +119,7 @@
 }
 
 .stat-value {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   line-height: 1.1;
   color: var(--color-text-strong);

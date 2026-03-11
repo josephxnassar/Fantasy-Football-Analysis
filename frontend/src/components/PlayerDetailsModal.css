@@ -2,8 +2,8 @@
   background: var(--color-bg-white);
   padding: 1rem 1.1rem 1.05rem;
   border-radius: 8px;
-  max-width: 1220px;
-  width: 95%;
+  width: fit-content;
+  max-width: min(99vw, 1400px);
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -124,7 +124,10 @@
 }
 
 .player-details-close-button {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  z-index: 2;
   width: 2.1rem;
   height: 2.1rem;
   padding: 0;
@@ -158,6 +161,10 @@
 }
 
 @media (max-width: 900px) {
+  .player-details-modal-content {
+    width: 95%;
+  }
+
   .player-dashboard-header {
     align-items: flex-start;
   }

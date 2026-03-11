@@ -111,8 +111,6 @@ export const PRODUCTION_GROUPS = {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl', 'ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
     'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct', 'ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r'],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
-    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
     Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'targets_rank', 'rec_yds_rank', 'rec_td_rank'],
   },
@@ -154,8 +152,6 @@ export const PRODUCTION_GROUPS_NO_RANKS = {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
     Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl', 'ng_rec_avg_separation', 'pfr_rec_adot', 'ng_rec_catch_pct'],
     'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'racr', 'pfr_rec_drop_pct', 'ng_rec_avg_yac', 'ng_rec_avg_yac_above_expectation', 'pfr_rec_yac_r'],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
-    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa'],
     Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
   },
   Overall: {
