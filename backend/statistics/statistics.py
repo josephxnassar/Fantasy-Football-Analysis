@@ -213,7 +213,13 @@ class Statistics(base_source.BaseSource):
             name = getattr(row, "full_name", None)
             if not isinstance(name, str) or not name:
                 continue
-            season = getattr(row, "season", None)
+            season_raw = getattr(row, "season", None)
+            season_int: int | None = None
+            if pd.notna(season_raw):
+                try:
+                    season_int = int(cast(int | float | str, season_raw))
+                except (TypeError, ValueError):
+                    season_int = None
             position = getattr(row, "position", None)
             if not isinstance(position, str) or position not in constants.POSITIONS:
                 continue
@@ -223,11 +229,11 @@ class Statistics(base_source.BaseSource):
                 age = (today - birth_ts).days // 365
                 if age > 0:
                     player_ages[name] = int(age)
-            if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
+            if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot and season_int is not None:
                 prev = headshot_tracker.get(name)
-                if not prev or season > prev[0]:
-                    headshot_tracker[name] = (season, headshot)
-            if season == current_season:
+                if not prev or season_int > prev[0]:
+                    headshot_tracker[name] = (season_int, headshot)
+            if season_int == current_season:
                 if getattr(row, "status", None) != "RET":
                     eligible_players.add(name)
                 if isinstance(team := getattr(row, "team", None), str) and team:
