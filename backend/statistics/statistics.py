@@ -37,22 +37,18 @@ class Statistics(base_source.BaseSource):
     def _load_rosters(self) -> pd.DataFrame:
         """Load roster data from nflreadpy"""
         try:
-            return nfl.load_rosters(seasons=self.seasons).to_pandas()
+            source = nfl.load_rosters(seasons=self.seasons).to_pandas()
+            return stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
         except Exception as e:
             logger.error("Failed to load rosters: %s", e)
             raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e
-
-    def _pfr_seasons(self, min_year: int = 2018) -> List[int]:
-        """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
-        return [s for s in self.seasons if s >= min_year]
 
     @timed("Statistics._load_player_weekly_stats")
     def _load_player_weekly_stats(self) -> pd.DataFrame:
         """Load and normalize weekly regular-season player stats."""
         try:
             source = nfl.load_player_stats(summary_level="week", seasons=self.seasons).to_pandas()
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.PLAYER_WEEKLY_COLUMN_MAP)
         except Exception as e:
@@ -63,10 +59,8 @@ class Statistics(base_source.BaseSource):
     def _load_player_seasonal_stats(self) -> pd.DataFrame:
         """Load and normalize seasonal regular-season player stats."""
         try:
-            source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas()
-            source = source.rename(columns={"recent_team": "team"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas().rename(columns={"recent_team": "team"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.PLAYER_SEASONAL_COLUMN_MAP)
         except Exception as e:
@@ -78,11 +72,10 @@ class Statistics(base_source.BaseSource):
         """Load weekly fantasy opportunity stats from nflreadpy."""
         try:
             source = nfl.load_ff_opportunity(stat_type="weekly", seasons=self.seasons).to_pandas().rename(columns={"full_name": "player_display_name", "posteam": "team"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source["season"] = pd.to_numeric(source["season"], errors="coerce")
             source["week"] = pd.to_numeric(source["week"], errors="coerce")
             source = source.dropna(subset=["season", "week"]).astype({"season": "int32", "week": "int32"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.FF_OPP_WEEKLY_COLUMN_MAP)
         except Exception as e:
@@ -94,8 +87,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen passing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_PASS_COLUMN_MAP)
         except Exception as e:
@@ -107,8 +99,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen receiving stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_REC_COLUMN_MAP)
         except Exception as e:
@@ -120,8 +111,7 @@ class Statistics(base_source.BaseSource):
         """Load Next Gen rushing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             return stats_helpers.select_columns(source, constants.NEXTGEN_RUSH_COLUMN_MAP)
         except Exception as e:
@@ -132,9 +122,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_pass_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced passing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_PASS_WEEKLY_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced pass stats: %s", e)
@@ -144,9 +133,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_rush_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced rushing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_RUSH_WEEKLY_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced rush stats: %s", e)
@@ -156,9 +144,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_rec_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced receiving stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=self._pfr_seasons()).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_REC_WEEKLY_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced receiving stats: %s", e)
@@ -168,9 +155,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_pass_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced passing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_PASS_SEASON_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced pass stats: %s", e)
@@ -180,9 +166,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_rush_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced rushing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_RUSH_SEASON_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced rush stats: %s", e)
@@ -192,9 +177,8 @@ class Statistics(base_source.BaseSource):
     def _load_pfr_adv_rec_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced receiving stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=self._pfr_seasons()).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             return stats_helpers.select_columns(source, constants.PFR_REC_SEASON_COLUMN_MAP)
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced receiving stats: %s", e)
@@ -204,9 +188,8 @@ class Statistics(base_source.BaseSource):
     def _load_snap_counts(self) -> pd.DataFrame:
         """Load and normalize weekly regular-season snap counts."""
         try:
-            source = nfl.load_snap_counts(seasons=self._pfr_seasons(2012)).to_pandas().rename(columns={"player": "player_display_name"})
-            if "team" in source.columns:
-                source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            source = nfl.load_snap_counts(seasons=stats_helpers.pfr_seasons(self.seasons, 2012)).to_pandas().rename(columns={"player": "player_display_name"})
+            source = stats_helpers.team_normalization(source, constants.TEAM_ABBR_NORMALIZATION)
             source = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
             source = stats_helpers.select_columns(source, constants.SNAP_COUNTS_COLUMN_MAP)
             return source.drop_duplicates(subset=["season", "week", "player_display_name", "position"])
@@ -222,6 +205,7 @@ class Statistics(base_source.BaseSource):
         player_positions: Dict[str, str] = {}
         player_ages: Dict[str, int] = {}
         eligible_players: set[str] = set()
+        headshot_tracker: Dict[str, tuple[int, str]] = {}
         player_headshots: Dict[str, str] = {}
         player_teams: Dict[str, str] = {}
         rookies: Dict[str, bool] = {}
@@ -229,13 +213,7 @@ class Statistics(base_source.BaseSource):
             name = getattr(row, "full_name", None)
             if not isinstance(name, str) or not name:
                 continue
-            season_raw = getattr(row, "season", None)
-            season_int: int | None = None
-            if pd.notna(season_raw):
-                try:
-                    season_int = int(cast(int | float | str, season_raw))
-                except (TypeError, ValueError):
-                    season_int = None
+            season = getattr(row, "season", None)
             position = getattr(row, "position", None)
             if not isinstance(position, str) or position not in constants.POSITIONS:
                 continue
@@ -245,15 +223,18 @@ class Statistics(base_source.BaseSource):
                 age = (today - birth_ts).days // 365
                 if age > 0:
                     player_ages[name] = int(age)
-            if season_int == current_season:
+            if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
+                prev = headshot_tracker.get(name)
+                if not prev or season > prev[0]:
+                    headshot_tracker[name] = (season, headshot)
+            if season == current_season:
                 if getattr(row, "status", None) != "RET":
                     eligible_players.add(name)
-                if isinstance(headshot := getattr(row, "headshot_url", None), str) and headshot:
-                    player_headshots[name] = headshot
                 if isinstance(team := getattr(row, "team", None), str) and team:
-                    player_teams[name] = constants.TEAM_ABBR_NORMALIZATION.get(team, team)
+                    player_teams[name] = team
                 if (entry_year := getattr(row, "entry_year", None)) == current_season and pd.notna(entry_year):
                     rookies[name] = True
+        player_headshots = {name: headshot for name, (_, headshot) in headshot_tracker.items()}
         logger.info("Positions: %s | Ages: %s | Eligible: %s | Headshots: %s | Player-Teams: %s | Rookies: %s", len(player_positions), len(player_ages), len(eligible_players), len(player_headshots), len(player_teams), sum(1 for v in rookies.values() if v))
         return RosterData(player_positions, player_ages, eligible_players, player_headshots, player_teams, rookies)
 
@@ -305,9 +286,14 @@ class Statistics(base_source.BaseSource):
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_pass_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rush_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["pfr_rec_weekly"], ["season", "week", "game_id", "player_display_name", "team"])
+        weekly_join_specs: List[Tuple[str, List[str]]] = [
+            ("pfr_pass_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
+            ("pfr_rush_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
+            ("pfr_rec_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
+        ]
+        for source_key, join_keys in weekly_join_specs:
+            aligned = stats_helpers.align_pfr_seasonal_names(sources[source_key], weekly_df)
+            weekly_df = stats_helpers.merge_source(weekly_df, aligned, join_keys)
         return weekly_df
 
     @timed("Statistics._merge_seasonal_statistics_data")

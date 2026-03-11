@@ -7,6 +7,14 @@ import pandas as pd
 
 _WEEKLY_AGGREGATE_GROUP_KEYS = ["season", "position", "player_display_name"]
 
+def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
+    """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
+    return [s for s in seasons if s >= min_year]
+
+def team_normalization(source: pd.DataFrame, normalization_map: Mapping[str, str]) -> pd.DataFrame:
+    if "team" in source.columns:
+        source["team"] = source["team"].replace(normalization_map)
+    return source
 
 def filter_regular_and_position(source: pd.DataFrame, positions: Iterable[str]) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
@@ -15,6 +23,8 @@ def filter_regular_and_position(source: pd.DataFrame, positions: Iterable[str]) 
         if season_col in filtered.columns:
             filtered = filtered.loc[filtered[season_col] == "REG"]
             break
+    if "position" not in filtered.columns:
+        return filtered.iloc[0:0].copy()
     return filtered.loc[filtered["position"].isin(positions)]
 
 def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.DataFrame:
@@ -32,15 +42,21 @@ def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List
 def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
     """Map PFR seasonal short names to base full names for merge compatibility."""
     col = "player_display_name"
+    if col not in pfr_df.columns or col not in base_df.columns:
+        return pfr_df.copy()
+    
     full_names = _build_unique_normalized_name_lookup(base_df[col])
     if not full_names:
         return pfr_df.copy()
 
     name_map: Dict[str, str] = {}
     for name in pfr_df[col].dropna().unique():
+        if not isinstance(name, str):
+            continue
         match = full_names.get(_normalize_name(name))
         if match:
             name_map[name] = match
+
     if not name_map:
         return pfr_df.copy()
 
@@ -53,6 +69,8 @@ def _build_unique_normalized_name_lookup(base_names: pd.Series) -> Dict[str, str
     full_names: Dict[str, str] = {}
     ambiguous: set[str] = set()
     for name in base_names.dropna().unique():
+        if not isinstance(name, str):
+            continue
         normalized = _normalize_name(name)
         if normalized in full_names and full_names[normalized] != name:
             ambiguous.add(normalized)
@@ -117,6 +135,9 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
 
 def _append_aggregated_metrics(aggregates_df: pd.DataFrame, weekly_df: pd.DataFrame, group_keys: list[str], metric_sources: Mapping[str, tuple[str, ...]], reducer: str) -> pd.DataFrame:
     """Append grouped reductions for configured source metrics."""
+    if not group_keys:
+        return aggregates_df
+    
     for out_col, source_candidates in metric_sources.items():
         source_col = next((col for col in source_candidates if col in weekly_df.columns), None)
         if source_col is None:
@@ -140,6 +161,7 @@ def _merge_aggregates_and_fill_missing(seasonal_df: pd.DataFrame, aggregates_df:
 def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""
     ranked = df.copy()
+
     groups = [ranked[col] for col in group_cols if col in ranked.columns]
     if not groups:
         return ranked

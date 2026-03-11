@@ -49,6 +49,13 @@ def test_filter_regular_and_position_filters_regular_fantasy_positions() -> None
     assert filtered.shape[0] == 1
     assert filtered.iloc[0]["position"] == "WR"
 
+def test_filter_regular_and_position_handles_missing_position_column() -> None:
+    source = pd.DataFrame({"game_type": ["REG"], "team": ["LA"]})
+
+    filtered = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
+
+    assert filtered.empty
+
 def test_load_nextgen_receiving_stats_normalizes_team_abbreviations(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
     source_df = pd.DataFrame(
         {
@@ -159,6 +166,19 @@ def test_merge_weekly_aggregates_into_seasonal_fills_missing_values_only() -> No
     assert row["ng_pass_avg_time_to_throw"] == pytest.approx(2.6)
     assert row["sc_offense_pct"] == pytest.approx(0.8)
 
+def test_merge_weekly_aggregates_into_seasonal_returns_seasonal_when_group_keys_missing() -> None:
+    seasonal_df = pd.DataFrame({"season": [2025], "player_display_name": ["Patrick Mahomes"]})
+    weekly_df = pd.DataFrame({"week": [1], "player_name": ["Patrick Mahomes"], "exp_fp": [20.0]})
+
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
+        seasonal_df,
+        weekly_df,
+        constants.WEEKLY_SUM_AGGREGATE_METRICS,
+        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
+    )
+
+    assert merged.equals(seasonal_df)
+
 def test_build_all_players_includes_expected_fields(statistics_source: Statistics) -> None:
     positions = {"A": "QB", "B": "WR"}
     eligible = {"A"}
@@ -249,6 +269,41 @@ def test_build_weekly_player_stats_replaces_nan_values_for_json_safety(statistic
     assert record["receiving_epa"] is None
     assert record["target_share"] == 0.2
 
+def test_merge_weekly_statistics_data_aligns_pfr_names_before_merge(statistics_source: Statistics) -> None:
+    sources = {
+        "player_weekly": pd.DataFrame(
+            {
+                "season": [2025],
+                "week": [1],
+                "game_id": ["2025_01_NE_BUF"],
+                "player_display_name": ["Joe Milton III"],
+                "position": ["QB"],
+                "team": ["NE"],
+            }
+        ),
+        "snap_counts": pd.DataFrame(),
+        "ff_opp_weekly": pd.DataFrame(),
+        "nextgen_pass_weekly": pd.DataFrame(),
+        "nextgen_rec_weekly": pd.DataFrame(),
+        "nextgen_rush_weekly": pd.DataFrame(),
+        "pfr_pass_weekly": pd.DataFrame(
+            {
+                "season": [2025],
+                "week": [1],
+                "game_id": ["2025_01_NE_BUF"],
+                "player_display_name": ["Joe Milton"],
+                "team": ["NE"],
+                "pfr_pass_bad_throws": [2.0],
+            }
+        ),
+        "pfr_rush_weekly": pd.DataFrame(columns=["season", "week", "game_id", "player_display_name", "team"]),
+        "pfr_rec_weekly": pd.DataFrame(columns=["season", "week", "game_id", "player_display_name", "team"]),
+    }
+
+    merged = statistics_source._merge_weekly_statistics_data(sources)
+
+    assert merged.loc[0, "pfr_pass_bad_throws"] == 2.0
+
 # --- align_pfr_seasonal_names ---
 
 def test_align_pfr_seasonal_names_maps_short_to_full_names() -> None:
@@ -275,6 +330,14 @@ def test_align_pfr_seasonal_names_passes_through_unmatched() -> None:
     aligned = stats_helpers.align_pfr_seasonal_names(pfr_df, base_df)
 
     assert list(aligned["player_display_name"]) == ["Unknown Player", "Patrick Mahomes"]
+
+def test_align_pfr_seasonal_names_handles_missing_name_column() -> None:
+    base_df = pd.DataFrame({"player_display_name": ["Patrick Mahomes"]})
+    pfr_df = pd.DataFrame({"stat": [5]})
+
+    aligned = stats_helpers.align_pfr_seasonal_names(pfr_df, base_df)
+
+    assert aligned.equals(pfr_df)
 
 # --- combine_aliases ---
 
@@ -335,6 +398,13 @@ def test_add_group_ranks_skips_missing_metrics() -> None:
 
     assert "fp_ppr_rank" in result.columns
     assert "nonexistent_rank" not in result.columns
+
+def test_add_group_ranks_returns_unmodified_when_group_columns_missing() -> None:
+    df = pd.DataFrame({"fp_ppr": [300.0, 280.0]})
+
+    result = stats_helpers.add_group_ranks(df, ["fp_ppr"], ["season", "position"])
+
+    assert result.equals(df)
 
 
 def test_add_group_ranks_includes_touchdown_rank_metrics() -> None:
