@@ -288,7 +288,7 @@ class Statistics(base_source.BaseSource):
         """Merge weekly source tables into base weekly dataframe."""
         weekly_df = sources["player_weekly"]
         weekly_df = stats_helpers.merge_source(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "game_id", "player_id", "player_display_name", "position", "team"])
+        weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "player_id", "player_display_name", "position", "team"])
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
         weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
