@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-03-04
+Last verified: 2026-03-11
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)

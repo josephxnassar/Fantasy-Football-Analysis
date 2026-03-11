@@ -1,6 +1,6 @@
 # Frontend
 
-Last verified: 2026-03-04
+Last verified: 2026-03-11
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](vite.config.js)
@@ -46,6 +46,7 @@ npm run build
 The app opens on a **Landing Page** ([`src/components/LandingPage.jsx`](src/components/LandingPage.jsx)) with quick search, feature cards, at-a-glance stats, and data source attribution. A home button (🏠) in the header returns to the landing page.
 
 [`src/App.jsx`](src/App.jsx) owns a single shared player-details modal that is reused by landing-page search, statistics search, and charts. The modal's team depth chart loads on demand only when the **Depth Chart** tab is opened.
+The modal stat grouping suppresses `pfr_pass_on_tgt_pct` when the value is `0` to avoid showing placeholder values for seasons where that metric is missing in source data.
 
 Top-level tabs in [`src/App.jsx`](src/App.jsx):
 - `Statistics`

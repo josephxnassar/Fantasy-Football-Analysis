@@ -1,6 +1,6 @@
 # Statistics Module
 
-Last verified: 2026-03-07
+Last verified: 2026-03-11
 
 [![nflreadpy](https://img.shields.io/badge/Input-nflreadpy-1F6FEB)](statistics.py)
 
@@ -46,7 +46,10 @@ Configured seasons:
 
 1. Load all stat sources in parallel (`_load_statistics_sources`) and rosters in parallel with source loading (`run`).
 2. Normalize team abbreviations in each source loader (for example `LA -> LAR`, `WAS -> WSH`) before downstream joins, then apply regular-season + fantasy-position filtering where applicable (`QB/RB/WR/TE`) and keep mapped columns.
-3. Merge all weekly sources onto base weekly player stats.
+3. Merge weekly sources onto base weekly player stats via a shared join-spec loop.
+- Sources with abbreviated PFR-style names (`snap_counts`, `pfr_*_weekly`) are aligned with `align_pfr_seasonal_names` before merge.
+- `ff_opp_weekly` merges without `game_id` (`season/week/player_id/player_display_name/position/team`) because source coverage does not reliably include it.
+- `pfr_*_weekly` keeps `game_id` in join candidates when available (`season/week/game_id/player_display_name/team`).
 4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
 5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows (`WEEKLY_SUM_AGGREGATE_METRICS` via sum, `WEEKLY_AVERAGED_AGGREGATE_METRICS` via plain mean), and compute positional ranks.
 6. Collect represented player names from shaped DataFrames (`_collect_stats_player_names`).
