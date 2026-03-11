@@ -287,19 +287,19 @@ class Statistics(base_source.BaseSource):
     def _merge_weekly_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Merge weekly source tables into base weekly dataframe."""
         weekly_df = sources["player_weekly"]
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["snap_counts"], ["season", "week", "game_id", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["ff_opp_weekly"], ["season", "week", "player_id", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_pass_weekly"], ["season", "week", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rec_weekly"], ["season", "week", "player_display_name", "position", "team"])
-        weekly_df = stats_helpers.merge_source(weekly_df, sources["nextgen_rush_weekly"], ["season", "week", "player_display_name", "position", "team"])
-        weekly_join_specs: List[Tuple[str, List[str]]] = [
-            ("pfr_pass_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
-            ("pfr_rush_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
-            ("pfr_rec_weekly", ["season", "week", "game_id", "player_display_name", "team"]),
+        weekly_join_specs: List[Tuple[str, List[str], bool]] = [
+            ("snap_counts", ["season", "week", "player_display_name", "position", "team"], True),
+            ("ff_opp_weekly", ["season", "week", "player_id", "player_display_name", "position", "team"], False),
+            ("nextgen_pass_weekly", ["season", "week", "player_display_name", "position", "team"], False),
+            ("nextgen_rec_weekly", ["season", "week", "player_display_name", "position", "team"], False),
+            ("nextgen_rush_weekly", ["season", "week", "player_display_name", "position", "team"], False),
+            ("pfr_pass_weekly", ["season", "week", "game_id", "player_display_name", "team"], True),
+            ("pfr_rush_weekly", ["season", "week", "game_id", "player_display_name", "team"], True),
+            ("pfr_rec_weekly", ["season", "week", "game_id", "player_display_name", "team"], True),
         ]
-        for source_key, join_keys in weekly_join_specs:
-            aligned = stats_helpers.align_pfr_seasonal_names(sources[source_key], weekly_df)
-            weekly_df = stats_helpers.merge_source(weekly_df, aligned, join_keys)
+        for source_key, join_keys, align_names in weekly_join_specs:
+            source_df = stats_helpers.align_pfr_seasonal_names(sources[source_key], weekly_df) if align_names else sources[source_key]
+            weekly_df = stats_helpers.merge_source(weekly_df, source_df, join_keys)
         return weekly_df
 
     @timed("Statistics._merge_seasonal_statistics_data")

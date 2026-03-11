@@ -1,7 +1,7 @@
 """Application constants and configuration"""
 
 # Available seasons
-SEASONS = list(range(2016, 2026))
+SEASONS = list(range(2018, 2026))
 
 # Last season in list
 CURRENT_SEASON = max(SEASONS)

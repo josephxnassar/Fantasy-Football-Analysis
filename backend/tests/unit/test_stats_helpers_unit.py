@@ -304,6 +304,81 @@ def test_merge_weekly_statistics_data_aligns_pfr_names_before_merge(statistics_s
 
     assert merged.loc[0, "pfr_pass_bad_throws"] == 2.0
 
+def test_merge_weekly_statistics_data_merges_ff_opp_when_base_game_id_is_null(statistics_source: Statistics) -> None:
+    sources = {
+        "player_weekly": pd.DataFrame(
+            {
+                "season": [2024],
+                "week": [1],
+                "game_id": [pd.NA],
+                "player_id": ["00-0031234"],
+                "player_display_name": ["DJ Moore"],
+                "position": ["WR"],
+                "team": ["CHI"],
+            }
+        ),
+        "snap_counts": pd.DataFrame(),
+        "ff_opp_weekly": pd.DataFrame(
+            {
+                "season": [2024],
+                "week": [1],
+                "game_id": ["2024_01_CHI_TEN"],
+                "player_id": ["00-0031234"],
+                "player_display_name": ["DJ Moore"],
+                "position": ["WR"],
+                "team": ["CHI"],
+                "ffo_total_fp_exp": [18.25],
+            }
+        ),
+        "nextgen_pass_weekly": pd.DataFrame(),
+        "nextgen_rec_weekly": pd.DataFrame(),
+        "nextgen_rush_weekly": pd.DataFrame(),
+        "pfr_pass_weekly": pd.DataFrame(),
+        "pfr_rush_weekly": pd.DataFrame(),
+        "pfr_rec_weekly": pd.DataFrame(),
+    }
+
+    merged = statistics_source._merge_weekly_statistics_data(sources)
+
+    assert merged.loc[0, "ffo_total_fp_exp"] == pytest.approx(18.25)
+
+def test_merge_weekly_statistics_data_merges_snap_counts_when_base_game_id_is_null_and_name_differs(statistics_source: Statistics) -> None:
+    sources = {
+        "player_weekly": pd.DataFrame(
+            {
+                "season": [2024],
+                "week": [1],
+                "game_id": [pd.NA],
+                "player_id": ["00-0031234"],
+                "player_display_name": ["Joe Milton III"],
+                "position": ["QB"],
+                "team": ["NE"],
+            }
+        ),
+        "snap_counts": pd.DataFrame(
+            {
+                "season": [2024],
+                "week": [1],
+                "game_id": ["2024_01_NE_CIN"],
+                "player_display_name": ["Joe Milton"],
+                "position": ["QB"],
+                "team": ["NE"],
+                "sc_offense_pct": [0.82],
+            }
+        ),
+        "ff_opp_weekly": pd.DataFrame(),
+        "nextgen_pass_weekly": pd.DataFrame(),
+        "nextgen_rec_weekly": pd.DataFrame(),
+        "nextgen_rush_weekly": pd.DataFrame(),
+        "pfr_pass_weekly": pd.DataFrame(),
+        "pfr_rush_weekly": pd.DataFrame(),
+        "pfr_rec_weekly": pd.DataFrame(),
+    }
+
+    merged = statistics_source._merge_weekly_statistics_data(sources)
+
+    assert merged.loc[0, "sc_offense_pct"] == pytest.approx(0.82)
+
 # --- align_pfr_seasonal_names ---
 
 def test_align_pfr_seasonal_names_maps_short_to_full_names() -> None:
