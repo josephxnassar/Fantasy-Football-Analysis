@@ -39,6 +39,9 @@ export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
     const orderedStats = {};
     statKeys.forEach((statKey) => {
       const value = normalized[statKey];
+      if (statKey === 'pfr_pass_on_tgt_pct' && Number(value) === 0) {
+        return;
+      }
       if (isVisibleStatValue(value, options)) {
         orderedStats[statKey] = value;
       }
