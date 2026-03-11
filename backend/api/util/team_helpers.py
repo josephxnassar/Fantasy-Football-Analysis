@@ -20,9 +20,9 @@ def get_team_cache(caches: Dict[str, Any], cache_name: str, team: str, label: st
 def validate_team(team: str) -> str:
     """Validate and normalize a team abbreviation."""
     team = team.upper()
-    if team not in constants.TEAMS:
+    if team not in constants.TEAM_METADATA:
         raise HTTPException(status_code=400,
-                            detail=f"Invalid team. Must be one of: {', '.join(sorted(constants.TEAMS))}")
+                            detail=f"Invalid team. Must be one of: {', '.join(sorted(constants.TEAM_METADATA))}")
     return team
 
 def get_team_schedule_entry(schedule_cache: Dict[Any, Dict[str, Any]], team: str, season: Optional[int]) -> Tuple[int, List[int], Any]:

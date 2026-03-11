@@ -24,7 +24,7 @@ def get_team_depth_chart(request: Request, team: str) -> TeamDepthChartResponse:
     team, df = get_team_cache(caches, constants.CACHE["DEPTH_CHART"], team, label="Depth chart")
 
     return TeamDepthChartResponse(team=team,
-                                  team_name=constants.TEAM_NAMES.get(team, team),
+                                  team_name=constants.TEAM_METADATA.get(team, {}).get("name", team),
                                   depth_chart= [DepthChartEntry(position=position,
                                                                 starter=_normalize_depth_value(row.get('starter')),
                                                                 second=_normalize_depth_value(row.get('2nd')),

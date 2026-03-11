@@ -50,7 +50,7 @@ def get_player(request: Request, player_name: str, season: Optional[int] = None)
     player_team = meta.get("team")
     if isinstance(player_team, str):
         player_team = constants.TEAM_ABBR_NORMALIZATION.get(player_team, player_team)
-    if player_team not in constants.TEAMS:
+    if player_team not in constants.TEAM_METADATA:
         player_team = find_player_team(resolved_name, depth_charts)
 
     return PlayerResponse(name=resolved_name,

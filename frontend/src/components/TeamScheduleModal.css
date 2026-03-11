@@ -96,6 +96,7 @@
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-md);
+  position: relative;
   appearance: none;
   background: var(--color-bg-light);
   border-radius: var(--radius-md);
@@ -108,24 +109,25 @@
   cursor: default;
 }
 
-.schedule-game.interactive {
-  cursor: pointer;
+.schedule-game.home-game::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 14px solid var(--home-corner-color, var(--color-primary));
+  border-left: 14px solid transparent;
 }
 
-.schedule-game.tinted-game {
-  background: var(--game-highlight);
-  border-color: var(--game-border);
+.schedule-game.interactive {
+  cursor: pointer;
 }
 
 .schedule-game.interactive:hover {
   background: var(--color-bg-white);
   border-color: var(--color-primary);
   box-shadow: var(--shadow-sm);
-}
-
-.schedule-game.tinted-game.interactive:hover {
-  background: var(--game-highlight);
-  border-color: var(--game-border);
 }
 
 .schedule-game.interactive:focus-visible {
@@ -136,11 +138,6 @@
 .schedule-game.expanded {
   background: var(--color-bg-white);
   border-color: var(--color-primary);
-}
-
-.schedule-game.tinted-game.expanded {
-  background: var(--game-highlight);
-  border-color: var(--game-border);
 }
 
 .schedule-game.bye {

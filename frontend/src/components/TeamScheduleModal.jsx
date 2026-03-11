@@ -86,21 +86,16 @@ export default function TeamScheduleModal({ team, onClose }) {
               {schedule.schedule.map((game) => {
                 const isGame = game.opponent !== 'BYE';
                 const isHomeGame = isGame && game.home_away === 'HOME';
-                const isAwayGame = isGame && game.home_away === 'AWAY';
                 const opponentColor = isGame ? getTeamColor(game.opponent) : null;
-                const tileTintColor = isHomeGame ? scheduleTeamColor : isAwayGame ? opponentColor : null;
-                const gameTileStyle = tileTintColor
-                  ? {
-                      '--game-highlight': `${tileTintColor}12`,
-                      '--game-border': `${tileTintColor}36`,
-                    }
+                const gameTileStyle = isHomeGame
+                  ? { '--home-corner-color': scheduleTeamColor }
                   : undefined;
 
                 return (
                   <button
                     type="button"
                     key={game.week}
-                    className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${tileTintColor ? 'tinted-game' : ''} ${expandedWeek === game.week ? 'expanded' : ''}`}
+                    className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${isHomeGame ? 'home-game' : ''} ${expandedWeek === game.week ? 'expanded' : ''}`}
                     style={gameTileStyle}
                     onClick={() => toggleGameDetails(game.week, game.opponent === 'BYE')}
                   >

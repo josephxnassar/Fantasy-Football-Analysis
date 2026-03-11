@@ -28,7 +28,7 @@ class NRPDepthChart(BaseSource):
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
             depth["pos_rank"] = pd.to_numeric(depth["pos_rank"], errors="coerce")
             depth["pos_slot"] = pd.to_numeric(depth["pos_slot"], errors="coerce")
-            return depth.loc[depth["team"].isin(constants.TEAMS) & depth["pos_abb"].isin(constants.POSITIONS)]
+            return depth.loc[depth["team"].isin(constants.TEAM_METADATA) & depth["pos_abb"].isin(constants.POSITIONS)]
         except Exception as e:
             logger.error("Failed to load depth charts from nflreadpy: %s", e)
             raise DataLoadError(f"Failed to load depth charts from nflreadpy: {e}", source="NRPDepthChart") from e
@@ -79,7 +79,7 @@ class NRPDepthChart(BaseSource):
         latest_rows = self._latest_team_rows(depth_rows)
         rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
 
-        for team in constants.TEAMS:
+        for team in constants.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
                 logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)

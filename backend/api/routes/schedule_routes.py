@@ -77,7 +77,7 @@ def get_team_schedule(request: Request, team: str, season: Optional[int] = None)
         )
 
     return TeamScheduleResponse(team=team,
-                                team_name=constants.TEAM_NAMES.get(team, team),
+                                team_name=constants.TEAM_METADATA.get(team, {}).get("name", team),
                                 season=target_season,
                                 available_seasons=available_seasons,
                                 schedule=schedule,

@@ -23,11 +23,41 @@ STATS = {
 # Important fantasy skill positions
 POSITIONS = ['QB', 'RB', 'WR', 'TE']
 
-# Team abbreviations
-TEAMS = ["ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE", 
-         "DAL", "DEN", "DET", "GB" , "HOU", "IND", "JAX", "KC" , 
-         "LV" , "LAC", "LAR", "MIA", "MIN", "NE" , "NO" , "NYG", 
-         "NYJ", "PHI", "PIT", "SF" , "SEA", "TB" , "TEN", "WSH"]
+# Canonical team metadata (single source of truth for team lists/names/divisions).
+TEAM_METADATA = {
+    "ARI": {"name": "Arizona Cardinals", "conference": "NFC", "division": "West"},
+    "ATL": {"name": "Atlanta Falcons", "conference": "NFC", "division": "South"},
+    "BAL": {"name": "Baltimore Ravens", "conference": "AFC", "division": "North"},
+    "BUF": {"name": "Buffalo Bills", "conference": "AFC", "division": "East"},
+    "CAR": {"name": "Carolina Panthers", "conference": "NFC", "division": "South"},
+    "CHI": {"name": "Chicago Bears", "conference": "NFC", "division": "North"},
+    "CIN": {"name": "Cincinnati Bengals", "conference": "AFC", "division": "North"},
+    "CLE": {"name": "Cleveland Browns", "conference": "AFC", "division": "North"},
+    "DAL": {"name": "Dallas Cowboys", "conference": "NFC", "division": "East"},
+    "DEN": {"name": "Denver Broncos", "conference": "AFC", "division": "West"},
+    "DET": {"name": "Detroit Lions", "conference": "NFC", "division": "North"},
+    "GB": {"name": "Green Bay Packers", "conference": "NFC", "division": "North"},
+    "HOU": {"name": "Houston Texans", "conference": "AFC", "division": "South"},
+    "IND": {"name": "Indianapolis Colts", "conference": "AFC", "division": "South"},
+    "JAX": {"name": "Jacksonville Jaguars", "conference": "AFC", "division": "South"},
+    "KC": {"name": "Kansas City Chiefs", "conference": "AFC", "division": "West"},
+    "LV": {"name": "Las Vegas Raiders", "conference": "AFC", "division": "West"},
+    "LAC": {"name": "Los Angeles Chargers", "conference": "AFC", "division": "West"},
+    "LAR": {"name": "Los Angeles Rams", "conference": "NFC", "division": "West"},
+    "MIA": {"name": "Miami Dolphins", "conference": "AFC", "division": "East"},
+    "MIN": {"name": "Minnesota Vikings", "conference": "NFC", "division": "North"},
+    "NE": {"name": "New England Patriots", "conference": "AFC", "division": "East"},
+    "NO": {"name": "New Orleans Saints", "conference": "NFC", "division": "South"},
+    "NYG": {"name": "New York Giants", "conference": "NFC", "division": "East"},
+    "NYJ": {"name": "New York Jets", "conference": "AFC", "division": "East"},
+    "PHI": {"name": "Philadelphia Eagles", "conference": "NFC", "division": "East"},
+    "PIT": {"name": "Pittsburgh Steelers", "conference": "AFC", "division": "North"},
+    "SF": {"name": "San Francisco 49ers", "conference": "NFC", "division": "West"},
+    "SEA": {"name": "Seattle Seahawks", "conference": "NFC", "division": "West"},
+    "TB": {"name": "Tampa Bay Buccaneers", "conference": "NFC", "division": "South"},
+    "TEN": {"name": "Tennessee Titans", "conference": "AFC", "division": "South"},
+    "WSH": {"name": "Washington Commanders", "conference": "NFC", "division": "East"},
+}
 
 # Normalize historical/alternate abbreviations to canonical team codes.
 TEAM_ABBR_NORMALIZATION = {
@@ -37,37 +67,6 @@ TEAM_ABBR_NORMALIZATION = {
     "OAK": "LV",
     "SD": "LAC",
     "JAC": "JAX",
-}
-
-# NFL Division Structure
-NFL_DIVISIONS = {
-    "AFC": {
-        "North": ["BAL", "CIN", "CLE", "PIT"],
-        "South": ["HOU", "IND", "JAX", "TEN"],
-        "East": ["BUF", "MIA", "NE", "NYJ"],
-        "West": ["DEN", "KC", "LV", "LAC"]
-    },
-    "NFC": {
-        "North": ["CHI", "DET", "GB", "MIN"],
-        "South": ["ATL", "CAR", "NO", "TB"],
-        "East": ["DAL", "NYG", "PHI", "WSH"],
-        "West": ["ARI", "LAR", "SF", "SEA"]
-    }
-}
-
-# Team display names
-TEAM_NAMES = {
-    "ARI": "Arizona Cardinals", "ATL": "Atlanta Falcons", "BAL": "Baltimore Ravens",
-    "BUF": "Buffalo Bills", "CAR": "Carolina Panthers", "CHI": "Chicago Bears",
-    "CIN": "Cincinnati Bengals", "CLE": "Cleveland Browns", "DAL": "Dallas Cowboys",
-    "DEN": "Denver Broncos", "DET": "Detroit Lions", "GB": "Green Bay Packers",
-    "HOU": "Houston Texans", "IND": "Indianapolis Colts", "JAX": "Jacksonville Jaguars",
-    "KC": "Kansas City Chiefs", "LAC": "Los Angeles Chargers", "LAR": "Los Angeles Rams",
-    "LV": "Las Vegas Raiders", "MIA": "Miami Dolphins", "MIN": "Minnesota Vikings",
-    "NE": "New England Patriots", "NO": "New Orleans Saints", "NYG": "New York Giants",
-    "NYJ": "New York Jets", "PHI": "Philadelphia Eagles", "PIT": "Pittsburgh Steelers",
-    "SF": "San Francisco 49ers", "SEA": "Seattle Seahawks", "TB": "Tampa Bay Buccaneers",
-    "TEN": "Tennessee Titans", "WSH": "Washington Commanders"
 }
 
 PLAYER_WEEKLY_COLUMN_MAP = {

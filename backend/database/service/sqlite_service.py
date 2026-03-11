@@ -149,7 +149,7 @@ class SQLService:
 
         for season in seasons:
             season_map: Dict[str, pd.DataFrame] = {}
-            for team in constants.TEAMS:
+            for team in constants.TEAM_METADATA:
                 df = self._load_table_safe(f"{prefix}_{season}_{team}")
                 if df is None or df.empty:
                     continue
@@ -171,7 +171,7 @@ class SQLService:
         prefix = constants.CACHE["DEPTH_CHART"]
         charts: Dict[str, pd.DataFrame] = {}
 
-        for team in constants.TEAMS:
+        for team in constants.TEAM_METADATA:
             df = self._load_table_safe(f"{prefix}_{team}")
             if df is None or df.empty:
                 continue
