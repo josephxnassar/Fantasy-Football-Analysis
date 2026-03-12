@@ -91,7 +91,7 @@ Run from repository root:
 ```bash
 uv run ruff check backend
 uv run mypy
-uv run pytest -q
+uv run pytest -q backend/tests
 ```
 
 ## Configuration
@@ -108,9 +108,7 @@ Variables:
 - `LOG_LEVEL`
 - `LOG_CONSOLE_LEVEL`
 - `LOG_DIR`
-- `LOG_ROTATION_WHEN`
-- `LOG_ROTATION_INTERVAL`
-- `LOG_BACKUP_COUNT`
+- `ERROR_RUN_LOGS_KEEP`
 - `TIMING_ENABLED`
 - `TIMING_RUN_LOGS_KEEP`
 
@@ -118,9 +116,11 @@ Depth chart source:
 - Depth charts are loaded from seasonal `nflreadpy` data (`backend/depth_chart/nrp.py`).
 
 Timing logs:
-- Standard file logs are separated into subfolders under `LOG_DIR`: `errors/errors.log`, `timing/`.
-- With `TIMING_ENABLED=true`, each process run writes to `logs/timing/timing-<timestamp>-pid<pid>.log`.
-- `TIMING_RUN_LOGS_KEEP` controls how many of those run files are retained.
+- File logs are separated into subfolders under `LOG_DIR`: `errors/` and `timing/`.
+- Each process run writes error logs to `logs/errors/errors-<timestamp>-pid<pid>.log`.
+- With `TIMING_ENABLED=true`, each process run writes timing logs to `logs/timing/timing-<timestamp>-pid<pid>.log`.
+- `ERROR_RUN_LOGS_KEEP` controls how many per-run error logs are retained.
+- `TIMING_RUN_LOGS_KEEP` controls how many per-run timing logs are retained.
 
 ## Detailed Docs
 

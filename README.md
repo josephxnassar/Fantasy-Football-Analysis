@@ -154,7 +154,7 @@ Backend quality checks:
 ```bash
 uv run ruff check backend
 uv run mypy
-uv run pytest -q
+uv run pytest -q backend/tests
 ```
 
 Frontend quality checks:
@@ -197,7 +197,7 @@ Checks:
 - Backend lint/type/tests on Python `3.10` and `3.11`:
   - `uv run ruff check backend`
   - `uv run mypy`
-  - `uv run pytest -q`
+  - `uv run pytest -q backend/tests`
 - Frontend lint/tests/build:
   - `npm run lint`
   - `npm run test:run`
