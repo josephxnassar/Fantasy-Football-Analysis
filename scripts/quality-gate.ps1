@@ -37,7 +37,7 @@ Write-Host "Running full quality gate from $repoRoot" -ForegroundColor Yellow
 
 Invoke-QualityStep "Backend lint (ruff)" { uv run ruff check backend }
 Invoke-QualityStep "Backend type check (mypy)" { uv run mypy }
-Invoke-QualityStep "Backend tests (pytest)" { uv run pytest -q }
+Invoke-QualityStep "Backend tests (pytest)" { uv run pytest -q backend/tests }
 Invoke-QualityStep "Frontend lint" { npm --prefix frontend run lint }
 Invoke-QualityStep "Frontend tests" { npm --prefix frontend run test:run }
 

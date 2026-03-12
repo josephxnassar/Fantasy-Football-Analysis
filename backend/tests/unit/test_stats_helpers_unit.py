@@ -5,8 +5,6 @@ from backend.statistics.statistics import RosterData, Statistics
 from backend.statistics.util import stats_helpers
 from backend.util import constants
 
-pytestmark = pytest.mark.unit
-
 
 class _NflReadPyResult:
     """Simple nflreadpy-like wrapper exposing to_pandas()."""

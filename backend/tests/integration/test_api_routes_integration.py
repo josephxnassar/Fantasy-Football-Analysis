@@ -5,7 +5,6 @@ import pytest
 
 from backend.util import constants
 
-pytestmark = pytest.mark.integration
 
 def test_search_endpoint_omits_legacy_rating_fields(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:

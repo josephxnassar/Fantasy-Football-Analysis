@@ -47,7 +47,7 @@ jobs:
         run: uv run mypy
 
       - name: Run backend tests
-        run: uv run pytest -q
+        run: uv run pytest -q backend/tests
 
   frontend-build:
     name: Frontend Build

@@ -8,7 +8,6 @@ from backend.database.DAO.sqlite_dao import SQLiteCacheManager
 from backend.database.service.sqlite_service import SQLService
 from backend.util import constants
 
-pytestmark = pytest.mark.integration
 
 def test_sqlite_service_round_trip_for_all_cache_families(tmp_path, stats_cache, schedules_cache, depth_chart_cache) -> None:
     db_path = tmp_path / "integration_cache.db"

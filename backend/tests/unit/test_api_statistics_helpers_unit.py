@@ -13,7 +13,6 @@ from backend.api.util.api_statistics_helpers import (
     resolve_chart_season,
 )
 
-pytestmark = pytest.mark.unit
 
 def test_get_player_profile_uses_most_recent_season(stats_cache) -> None:
     stats, position, seasons, player_meta = get_player_profile(stats_cache, "Patrick Mahomes")

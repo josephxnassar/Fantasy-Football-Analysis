@@ -8,7 +8,6 @@ from backend.api.util.team_helpers import (
 )
 from backend.util import constants
 
-pytestmark = pytest.mark.unit
 
 def test_validate_team_normalizes_case() -> None:
     assert validate_team("kc") == "KC"

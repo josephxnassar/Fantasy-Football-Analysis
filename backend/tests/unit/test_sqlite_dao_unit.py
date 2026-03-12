@@ -3,7 +3,6 @@ import pytest
 
 from backend.database.DAO.sqlite_dao import SQLiteCacheManager
 
-pytestmark = pytest.mark.unit
 
 def test_sqlite_dao_rejects_unsafe_table_names() -> None:
     manager = SQLiteCacheManager(":memory:")
