@@ -176,7 +176,7 @@ Backend variables (loaded by [`backend/config/settings.py`](backend/config/setti
 |---|---|---|
 | `API_HOST` | `0.0.0.0` | API bind host |
 | `API_PORT` | `8000` | API bind port |
-| `CORS_ORIGINS` | `*` | Allowed origins |
+| `CORS_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Allowed origins |
 | `CORS_ALLOW_CREDENTIALS` | `false` | Enable credentialed CORS only when origins are explicit |
 | `DB_PATH` | `backend/database/data/nfl_cache.db` | SQLite location |
 | `LOG_LEVEL` | `DEBUG` | Root logging level |
@@ -217,6 +217,12 @@ Optional (all repos on your machine):
 
 ```bash
 git config --global commit.template "C:/path/to/.gitmessage.txt"
+```
+
+Line-ending recovery (only if you see noisy full-file diffs after `.gitattributes` changes):
+
+```bash
+git add --renormalize .
 ```
 
 ## Documentation Map
