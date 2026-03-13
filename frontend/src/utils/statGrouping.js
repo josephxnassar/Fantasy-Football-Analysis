@@ -1,4 +1,4 @@
-/* Groups/normalizes stats based on statMeta */
+// Groups and normalizes backend stats using the shared metadata maps.
 
 import { STAT_META } from './statMeta';
 
@@ -39,7 +39,7 @@ export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
     const orderedStats = {};
     statKeys.forEach((statKey) => {
       const value = normalized[statKey];
-      // Stat in 2018 DNE
+      // Skip seasons where a stat did not exist yet.
       if (statKey === 'pfr_pass_on_tgt_pct' && Number(value) === 0) {
         return;
       }

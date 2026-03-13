@@ -1,4 +1,4 @@
-/* Stat Information + formatting */
+// Shared stat labels, descriptions, and formatting helpers.
 
 import { STAT_META } from './statMeta';
 import { groupStatsByCategoryMap, hasDisplayValue } from './statGrouping';

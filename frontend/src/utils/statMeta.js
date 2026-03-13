@@ -1,4 +1,4 @@
-/* Stat metadata and groupings  */
+// Stat metadata drives labels, descriptions, and formatting across the UI.
 
 export const STAT_META = {
   // Fantasy summary.
@@ -79,7 +79,7 @@ export const STAT_META = {
   pfr_rec_brk_tkl: { label: 'Broken Tackles', description: 'Receiving broken tackles — tacklers evaded after the catch.', format: 'int' },
 };
 
-// ── Production tab: all important fantasy stats grouped by topic ──
+// Production tab stat groups.
 export const PRODUCTION_GROUPS = {
   QB: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
@@ -123,7 +123,7 @@ export const PRODUCTION_GROUPS = {
   },
 };
 
-// ── Leaderboard/comparison stat groups: production metrics without rank fields ──
+// Leaderboard and comparison groups omit rank-only fields.
 export const PRODUCTION_GROUPS_NO_RANKS = {
   QB: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],

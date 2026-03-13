@@ -1,4 +1,4 @@
-/* Stat color-coding helpers - returns CSS class from stat thresholds. */
+// Stat color helpers that map values to CSS classes.
 
 import { isLowerBetterStat } from './statDirection';
 

@@ -1,4 +1,4 @@
-/* API client for Fantasy Football backend */
+// API client for the Fantasy Football backend.
 
 import axios from 'axios';
 

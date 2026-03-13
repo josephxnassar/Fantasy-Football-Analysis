@@ -1,4 +1,4 @@
-/* Min thresholds for certain stats */
+// Minimum thresholds used before color-scoring certain stats.
 
 export const STAT_THRESHOLDS = {
   'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },

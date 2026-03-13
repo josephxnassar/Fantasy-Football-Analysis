@@ -1,7 +1,4 @@
-/**
- * Create a deferred promise for controlling async test timing.
- * @returns {{ promise: Promise, resolve: Function }}
- */
+// Test helper for resolving promises on demand.
 export function deferred() {
   let resolve;
   const promise = new Promise((res) => {

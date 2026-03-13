@@ -1,4 +1,4 @@
-/* Weighted rankings tab with category + stat-level controls. */
+// Weighted rankings tab with category and stat-level controls.
 
 import { useEffect, useMemo, useState } from 'react';
 

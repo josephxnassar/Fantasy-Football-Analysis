@@ -1,4 +1,4 @@
-/* Ranking-specific category groups, separate from production display groups. */
+// Ranking-specific stat groups, separate from production display groups.
 
 export const RANKING_GROUPS = {
   Overall: {

@@ -1,4 +1,4 @@
-/* Shared product copy used by the app shell and landing hero. */
+// Shared product copy used by the app shell and landing hero.
 
 export const APP_FUNCTIONAL_DESCRIPTION =
   'Search player stats and weekly splits, compare rankings, and browse team schedules and depth charts.';

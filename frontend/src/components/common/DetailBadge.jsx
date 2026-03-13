@@ -1,4 +1,4 @@
-/* Reusable badge for displaying player details (team, position, age) */
+// Reusable badge for player details like team, position, and age.
 
 import './DetailBadge.css';
 

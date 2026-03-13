@@ -1,4 +1,4 @@
-/* Shared hook for team-based modal data loading. */
+// Shared hook for team-based modal data loading.
 
 import { useEffect, useState } from 'react';
 

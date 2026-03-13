@@ -1,4 +1,4 @@
-/* Hook for loading consistency/upside chart payloads by position and season. */
+// Hook for loading consistency and upside chart payloads.
 
 import { useEffect, useState } from 'react';
 

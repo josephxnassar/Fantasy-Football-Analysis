@@ -1,14 +1,9 @@
-/* Shared modal overlay — closes on backdrop click, passes through children. */
+// Shared modal overlay with backdrop-close behavior.
 
 import './ModalOverlay.css';
 
-/**
- * @param {Object} props
- * @param {Function} props.onClose    — called when the backdrop (not content) is clicked
- * @param {string}  [props.className] — Optional modifier class for the overlay div
- * @param {React.ReactNode} props.children
- */
 export default function ModalOverlay({ onClose, className = '', children }) {
+  // Only backdrop clicks close the modal; content clicks are ignored.
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };

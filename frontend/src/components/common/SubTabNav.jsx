@@ -1,4 +1,4 @@
-/* Reusable sub-navigation component for tab switching within content sections. */
+// Reusable sub-navigation for switching tabs within a feature.
 
 import './SubTabNav.css';
 

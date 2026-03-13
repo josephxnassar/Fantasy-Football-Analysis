@@ -1,4 +1,4 @@
-/* Summary stat tiles showing app data coverage */
+// Summary stat tiles showing app data coverage.
 
 import { ErrorMessage, LoadingMessage } from '../common';
 import { useAppInfo } from './useAppInfo';

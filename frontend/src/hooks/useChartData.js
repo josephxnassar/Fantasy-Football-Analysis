@@ -1,4 +1,4 @@
-/* Hook for loading chart payloads by position/season. */
+// Hook for loading chart payloads by position and season.
 
 import { useEffect, useState } from 'react';
 import { getChartData } from '../api';

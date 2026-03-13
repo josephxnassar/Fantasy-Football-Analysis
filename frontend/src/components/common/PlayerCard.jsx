@@ -1,4 +1,4 @@
-/* Reusable player card component for search results */
+// Reusable player card for search and picker results.
 
 import './PlayerCard.css';
 import RookieBadge from './RookieBadge';

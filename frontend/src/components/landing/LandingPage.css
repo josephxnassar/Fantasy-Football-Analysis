@@ -1,5 +1,4 @@
-/* Landing page — shared layout for the section-based info hub.
-   Section-specific styles live in components/landing/*.css */
+/* Landing page shared layout; section-specific styles live in components/landing/*.css. */
 
 .landing {
   min-height: 100vh;

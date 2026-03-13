@@ -54,6 +54,7 @@ Invoke-QualityStep "Backend type check (mypy)" { uv run mypy }
 Invoke-QualityStep "Backend tests (pytest)" { uv run pytest -q backend/tests }
 Invoke-QualityStep "Frontend lint" { Invoke-InFrontend { npm run lint } }
 Invoke-QualityStep "Frontend tests" { Invoke-InFrontend { npm run test:run } }
+Invoke-QualityStep "Frontend audit" { Invoke-InFrontend { npm audit } }
 
 if (-not $SkipBuild) {
     Invoke-QualityStep "Frontend build" { Invoke-InFrontend { npm run build } }

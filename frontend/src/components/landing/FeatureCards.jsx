@@ -1,4 +1,4 @@
-/* Navigation cards for the three main app sections */
+// Navigation cards for the three main app sections.
 
 import './FeatureCards.css';
 

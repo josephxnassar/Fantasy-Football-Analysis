@@ -1,4 +1,4 @@
-/* Team accent colors for team-driven UI surfaces (modals, team nav cards, links). */
+// Team accent colors for team-driven UI surfaces.
 
 const DEFAULT_TEAM_COLOR = '#2563eb';
 

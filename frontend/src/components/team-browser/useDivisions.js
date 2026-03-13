@@ -1,4 +1,4 @@
-/* Hook for loading and caching divisions data. Prevents duplicate API calls when multiple components need division data. */
+// Hook for loading and caching divisions data across consumers.
 
 import { useState, useEffect, useMemo } from 'react';
 import { getDivisions } from '../../api';

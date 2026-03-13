@@ -1,4 +1,4 @@
-/* Static section previews shown in the main app header. */
+// Static section previews shown in the main app header.
 
 export default function AppHeaderPreview({ activeTab, activeTabLabel }) {
   return (

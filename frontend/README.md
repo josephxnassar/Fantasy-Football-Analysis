@@ -3,7 +3,7 @@
 Last verified: 2026-03-13
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](vite.config.js)
+[![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](vite.config.js)
 [![Axios](https://img.shields.io/badge/Axios-HTTP-5A29E4)](src/api.js)
 [![Recharts](https://img.shields.io/badge/Recharts-Charts-22C55E)](src/components/charts/Charts.jsx)
 
@@ -32,6 +32,7 @@ Default URL: `http://localhost:3000`
 ```bash
 npm run lint
 npm run test:run
+npm audit
 npm run build
 ```
 

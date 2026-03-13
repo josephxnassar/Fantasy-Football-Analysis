@@ -1,4 +1,4 @@
-/* Hook for loading single-player season trend points. */
+// Hook for loading single-player season trend points.
 
 import { useEffect, useState } from 'react';
 

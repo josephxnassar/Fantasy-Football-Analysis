@@ -1,4 +1,4 @@
-/* Hook for JSON object persistence in sessionStorage. */
+// Hook for JSON object persistence in sessionStorage.
 
 import { useEffect, useState } from 'react';
 

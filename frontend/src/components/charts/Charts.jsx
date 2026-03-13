@@ -1,4 +1,4 @@
-/* Multi-view charts tab for leaderboards, trends, and profile scatter plots. */
+// Multi-view charts tab for leaderboards, trends, and profile scatter plots.
 
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 

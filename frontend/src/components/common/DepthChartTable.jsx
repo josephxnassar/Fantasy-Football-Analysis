@@ -1,4 +1,4 @@
-/* Shared depth chart table component used by both DepthChartModal and PlayerDetailsModal. Renders a POS / Starter / 2nd / 3rd / 4th table with optional player highlighting. */
+// Shared depth chart table for the full modal and the player-details modal.
 
 import './DepthChartTable.css';
 

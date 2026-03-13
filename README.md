@@ -5,7 +5,7 @@ Last verified: 2026-03-13
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](frontend/package.json)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](frontend/vite.config.js)
+[![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](frontend/vite.config.js)
 [![SQLite](https://img.shields.io/badge/SQLite-Cache-003B57?logo=sqlite&logoColor=white)](backend/database/service/sqlite_service.py)
 
 Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend for:
@@ -163,6 +163,7 @@ Frontend quality checks:
 cd frontend
 npm run lint
 npm run test:run
+npm audit
 npm run build
 ```
 

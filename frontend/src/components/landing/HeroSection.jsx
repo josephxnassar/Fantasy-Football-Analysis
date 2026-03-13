@@ -1,4 +1,4 @@
-/* Hero banner at the top of the landing page */
+// Hero banner at the top of the landing page.
 
 import './HeroSection.css';
 import { APP_FUNCTIONAL_DESCRIPTION, HEADER_PROOF_POINTS } from '../../appContent';

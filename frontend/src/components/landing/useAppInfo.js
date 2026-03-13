@@ -1,4 +1,4 @@
-/* Hook for loading application overview metadata from /api/app-info */
+// Hook for loading application overview metadata from /api/app-info.
 
 import { useState, useEffect } from 'react';
 import { getAppInfo } from '../../api';

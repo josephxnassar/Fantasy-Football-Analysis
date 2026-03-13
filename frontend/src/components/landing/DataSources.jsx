@@ -1,4 +1,4 @@
-/* Attribution links for the data sources powering the app */
+// Attribution links for the data sources powering the app.
 
 import './DataSources.css';
 

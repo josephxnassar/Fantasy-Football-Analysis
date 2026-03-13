@@ -1,4 +1,4 @@
-/* Comparison table view for selected player-season slots. */
+// Comparison table for the selected player-season slots.
 
 import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../utils/statDefinitions';
 import { EmptyStateMessage, StatTooltip } from '../common';

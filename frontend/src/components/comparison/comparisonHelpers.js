@@ -1,4 +1,4 @@
-/* Helpers for ordering direct-comparison rows from production stat metadata. */
+// Helpers for ordering comparison rows from the shared production metadata.
 
 import { PRODUCTION_GROUPS_NO_RANKS } from '../../utils/statMeta';
 import { isLowerBetterStat } from '../../utils/statDirection';

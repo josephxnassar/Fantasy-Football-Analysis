@@ -1,4 +1,4 @@
-/* Hook for player-comparison state, data loading, and winner calculations. */
+// Hook for player-comparison state, loading, and winner calculations.
 
 import { useMemo, useRef, useState } from 'react';
 

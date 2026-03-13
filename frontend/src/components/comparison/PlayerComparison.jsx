@@ -1,4 +1,4 @@
-/* Side-by-side player and season comparison using production stat metadata. */
+// Side-by-side player and season comparison view.
 
 import { ErrorMessage, LoadingMessage } from '../common';
 import { POSITION_OPTIONS } from '../statistics/statisticsOptions';
