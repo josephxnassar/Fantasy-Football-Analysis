@@ -4,7 +4,7 @@ import {
   CHART_VIEW_OPTIONS,
   VIEW_META,
   VIEWS_USING_STAT,
-} from '../../../../src/components/charts/chartsConfig';
+} from '../../../src/components/charts/chartsConfig';
 
 describe('chartsConfig', () => {
   it('uses expected chart view labels', () => {

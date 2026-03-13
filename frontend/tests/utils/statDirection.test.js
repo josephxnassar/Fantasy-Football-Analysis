@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isLowerBetterStat } from '../../../src/utils/statDirection';
+import { isLowerBetterStat } from '../../src/utils/statDirection';
 
 describe('isLowerBetterStat', () => {
   it('treats time-to-throw as lower-is-better', () => {

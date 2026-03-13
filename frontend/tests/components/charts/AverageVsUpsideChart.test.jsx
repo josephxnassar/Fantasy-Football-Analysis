@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import AverageVsUpsideChart from '../../../../src/components/charts/AverageVsUpsideChart';
+import AverageVsUpsideChart from '../../../src/components/charts/AverageVsUpsideChart';
 
 vi.mock('recharts', () => {
   const Passthrough = ({ children }) => <div>{children}</div>;

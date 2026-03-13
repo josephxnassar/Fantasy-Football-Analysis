@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { groupStatsByCategoryMap } from '../../../src/utils/statGrouping';
-import { PRODUCTION_GROUPS } from '../../../src/utils/statMeta';
+import { groupStatsByCategoryMap } from '../../src/utils/statGrouping';
+import { PRODUCTION_GROUPS } from '../../src/utils/statMeta';
 
 describe('groupStatsByCategoryMap', () => {
   it('groups QB stats into correct categories', () => {

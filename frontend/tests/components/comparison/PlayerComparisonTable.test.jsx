@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import PlayerComparisonTable from '../../../../src/components/comparison/PlayerComparisonTable';
+import PlayerComparisonTable from '../../../src/components/comparison/PlayerComparisonTable';
 
 function renderTable(overrides = {}) {
   const props = {

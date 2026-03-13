@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getStatColorClass } from '../../../src/utils/statColorHelpers';
+import { getStatColorClass } from '../../src/utils/statColorHelpers';
 
 describe('getStatColorClass', () => {
   describe('invalid inputs', () => {

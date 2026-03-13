@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPresetProfile } from '../../../../src/components/rankings/rankingPresets';
+import { buildPresetProfile } from '../../../src/components/rankings/rankingPresets';
 
 describe('rankingPresets', () => {
   const groups = [

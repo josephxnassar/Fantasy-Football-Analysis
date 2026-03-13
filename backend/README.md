@@ -1,6 +1,6 @@
 # Backend
 
-Last verified: 2026-03-11
+Last verified: 2026-03-13
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-runtime-009688?logo=fastapi&logoColor=white)](api/api.py)
 [![SQLite](https://img.shields.io/badge/SQLite-cache-003B57?logo=sqlite&logoColor=white)](database/service/sqlite_service.py)
@@ -14,8 +14,9 @@ Last verified: 2026-03-11
 4. [Cache Families](#cache-families)
 5. [Run Commands](#run-commands)
 6. [Quality Checks](#quality-checks)
-7. [Configuration](#configuration)
-8. [Detailed Docs](#detailed-docs)
+7. [Test Layout](#test-layout)
+8. [Configuration](#configuration)
+9. [Detailed Docs](#detailed-docs)
 
 ## Responsibilities
 
@@ -93,6 +94,14 @@ uv run ruff check backend
 uv run mypy
 uv run pytest -q backend/tests
 ```
+
+## Test Layout
+
+Backend tests stay intentionally simple under [`tests/`](tests):
+- [`tests/conftest.py`](tests/conftest.py) is the single shared pytest setup file.
+- [`tests/unit/`](tests/unit) covers helpers, DAO behavior, and statistics shaping.
+- [`tests/integration/`](tests/integration) covers API routes, app initialization, and SQLite service behavior.
+- [`tests/e2e/`](tests/e2e) covers higher-level user flows.
 
 ## Configuration
 

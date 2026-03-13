@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-03-11
+Last verified: 2026-03-13
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
@@ -246,8 +246,10 @@ backend/
   database/       SQLite DAO/service cache persistence
   config/         env loading and logging config
 frontend/
-  src/            React components, hooks, utils
+  src/            React app code organized by feature plus shared hooks/utils
+  tests/          Vitest tests grouped into components, hooks, and utils
   public/         static assets
+backend/tests/    Pytest tests grouped into unit, integration, and e2e
 scripts/dev-startup.ps1    Windows bootstrap/start script
 scripts/quality-gate.ps1   Full local lint/type/test/build gate
 scripts/clean.ps1          Local cache/build cleanup script

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildBarData,
-} from '../../../../src/components/charts/chartsHelpers';
+} from '../../../src/components/charts/chartsHelpers';
 
 describe('buildBarData', () => {
   it('filters route-running metrics by minimum target volume', () => {

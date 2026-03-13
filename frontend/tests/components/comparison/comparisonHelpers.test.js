@@ -5,8 +5,8 @@ import {
   buildComparisonWins,
   getWinningSlotIdsForStat,
   getWinningSlotIdsForWeeks,
-} from '../../../../src/components/comparison/comparisonHelpers';
-import { PRODUCTION_GROUPS_NO_RANKS } from '../../../../src/utils/statMeta';
+} from '../../../src/components/comparison/comparisonHelpers';
+import { PRODUCTION_GROUPS_NO_RANKS } from '../../../src/utils/statMeta';
 
 describe('buildComparisonRows', () => {
   it('builds category and stat rows in profile order', () => {

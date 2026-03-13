@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../setup';
-import { __resetChartDataCache, useChartData } from '../../../src/hooks/useChartData';
-import { getChartData } from '../../../src/api';
+import { deferred } from '../deferred';
+import { __resetChartDataCache, useChartData } from '../../src/hooks/useChartData';
+import { getChartData } from '../../src/api';
 
-vi.mock('../../../src/api', () => ({
+vi.mock('../../src/api', () => ({
   getChartData: vi.fn(),
 }));
 

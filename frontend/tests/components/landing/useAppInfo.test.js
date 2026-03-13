@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../setup';
+import { deferred } from '../../deferred';
 import { getAppInfo } from '../../../src/api';
 
 vi.mock('../../../src/api', () => ({

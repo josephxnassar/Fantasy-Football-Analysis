@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { RANKING_GROUPS } from '../../../../src/components/rankings/rankingGroups';
-import { buildRankings, getRankableGroups } from '../../../../src/components/rankings/rankingsHelpers';
+import { RANKING_GROUPS } from '../../../src/components/rankings/rankingGroups';
+import { buildRankings, getRankableGroups } from '../../../src/components/rankings/rankingsHelpers';
 
 describe('rankingsHelpers', () => {
   it('filters unavailable stats from rankable groups', () => {

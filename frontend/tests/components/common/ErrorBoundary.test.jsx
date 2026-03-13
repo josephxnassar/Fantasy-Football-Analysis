@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
-import ErrorBoundary from '../../../../src/components/common/ErrorBoundary';
+import ErrorBoundary from '../../../src/components/common/ErrorBoundary';
 
 function MaybeCrash({ shouldCrash }) {
   if (shouldCrash) {
