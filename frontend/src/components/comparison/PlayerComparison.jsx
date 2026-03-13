@@ -1,9 +1,9 @@
 /* Side-by-side player and season comparison using production stat metadata. */
 
-import { POSITION_OPTIONS } from '../utils/leaderboardOptions';
-import { MAX_COMPARE_PLAYERS, usePlayerComparisonState } from './comparison/usePlayerComparisonState';
-import { ErrorMessage, LoadingMessage } from './common';
-import PlayerComparisonTable from './comparison/PlayerComparisonTable';
+import { ErrorMessage, LoadingMessage } from '../common';
+import { POSITION_OPTIONS } from '../statistics/statisticsOptions';
+import PlayerComparisonTable from './PlayerComparisonTable';
+import { MAX_COMPARE_PLAYERS, usePlayerComparisonState } from './usePlayerComparisonState';
 import './PlayerComparison.css';
 
 export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick }) {

@@ -1,5 +1,8 @@
-import PlayerSearch from './PlayerSearch';
-import { HeroSection, FeatureCards, AtAGlance, DataSources } from './landing';
+import PlayerSearch from '../player-search/PlayerSearch';
+import AtAGlance from './AtAGlance';
+import DataSources from './DataSources';
+import FeatureCards from './FeatureCards';
+import HeroSection from './HeroSection';
 import './LandingPage.css';
 
 export default function LandingPage({ onNavigate, onPlayerClick }) {

@@ -1,7 +1,7 @@
 /* Hook for loading application overview metadata from /api/app-info */
 
 import { useState, useEffect } from 'react';
-import { getAppInfo } from '../api';
+import { getAppInfo } from '../../api';
 
 let cachedAppInfo = null;
 let appInfoRequestPromise = null;

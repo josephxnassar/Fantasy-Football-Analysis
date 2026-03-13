@@ -28,7 +28,7 @@ describe('useAppInfo', () => {
 
   it('loads app info and exposes the payload', async () => {
     getAppInfo.mockResolvedValueOnce(mockResponse);
-    const { useAppInfo } = await import('../../../src/hooks/useAppInfo');
+    const { useAppInfo } = await import('../../../src/components/landing/useAppInfo');
 
     const { result } = renderHook(() => useAppInfo());
 
@@ -43,7 +43,7 @@ describe('useAppInfo', () => {
 
   it('reuses cached app info on later mounts without another API call', async () => {
     getAppInfo.mockResolvedValueOnce(mockResponse);
-    const { useAppInfo } = await import('../../../src/hooks/useAppInfo');
+    const { useAppInfo } = await import('../../../src/components/landing/useAppInfo');
 
     const { result, unmount } = renderHook(() => useAppInfo());
     await waitFor(() => {
@@ -63,7 +63,7 @@ describe('useAppInfo', () => {
   it('shares a single in-flight request across concurrent mounts', async () => {
     const pendingRequest = deferred();
     getAppInfo.mockImplementationOnce(() => pendingRequest.promise);
-    const { useAppInfo } = await import('../../../src/hooks/useAppInfo');
+    const { useAppInfo } = await import('../../../src/components/landing/useAppInfo');
 
     const first = renderHook(() => useAppInfo());
     const second = renderHook(() => useAppInfo());
@@ -89,7 +89,7 @@ describe('useAppInfo', () => {
   it('exposes an error state when the request fails', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     getAppInfo.mockRejectedValueOnce(new Error('App info failed'));
-    const { useAppInfo } = await import('../../../src/hooks/useAppInfo');
+    const { useAppInfo } = await import('../../../src/components/landing/useAppInfo');
 
     const { result } = renderHook(() => useAppInfo());
 

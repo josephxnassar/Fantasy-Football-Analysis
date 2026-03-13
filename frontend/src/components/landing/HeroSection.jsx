@@ -1,7 +1,7 @@
 /* Hero banner at the top of the landing page */
 
 import './HeroSection.css';
-import { APP_FUNCTIONAL_DESCRIPTION, HEADER_PROOF_POINTS } from '../../utils/appContent';
+import { APP_FUNCTIONAL_DESCRIPTION, HEADER_PROOF_POINTS } from '../../appContent';
 
 export default function HeroSection() {
   return (

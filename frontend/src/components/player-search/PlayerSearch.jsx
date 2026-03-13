@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { searchPlayers } from '../api';
-import { ErrorMessage, EmptyStateMessage, PlayerCard } from './common';
+import { searchPlayers } from '../../api';
+import { ErrorMessage, EmptyStateMessage, PlayerCard } from '../common';
 import './PlayerSearch.css';
 
 export default function PlayerSearch({

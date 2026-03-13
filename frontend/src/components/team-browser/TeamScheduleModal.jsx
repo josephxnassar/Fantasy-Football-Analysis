@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
-import { getTeamSchedule } from '../api';
-import { useTeamModalData } from '../hooks/useTeamModalData';
-import { getTeamColor } from '../utils/teamColors';
-import { ModalOverlay } from './common';
+import { getTeamSchedule } from '../../api';
+import { useTeamModalData } from '../../hooks/useTeamModalData';
+import { getTeamColor } from '../../utils/teamColors';
+import { ModalOverlay } from '../common';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {

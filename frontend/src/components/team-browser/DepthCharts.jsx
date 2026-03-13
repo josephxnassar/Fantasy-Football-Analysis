@@ -1,5 +1,5 @@
-import TeamBrowser from './TeamBrowser';
 import DepthChartModal from './DepthChartModal';
+import TeamBrowser from './TeamBrowser';
 
 function DepthCharts({ onPlayerClick }) {
   return (

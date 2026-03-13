@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { getPlayerTrendData } from '../api';
+import { getPlayerTrendData } from '../../api';
 
 const seasonChartCache = new Map();
 const seasonChartInFlight = new Map();

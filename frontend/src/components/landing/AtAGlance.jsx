@@ -1,7 +1,7 @@
 /* Summary stat tiles showing app data coverage */
 
 import { ErrorMessage, LoadingMessage } from '../common';
-import { useAppInfo } from '../../hooks/useAppInfo';
+import { useAppInfo } from './useAppInfo';
 import './AtAGlance.css';
 
 export default function AtAGlance() {

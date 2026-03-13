@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RANKING_GROUPS } from '../../../../src/utils/rankingMeta';
+import { RANKING_GROUPS } from '../../../../src/components/rankings/rankingGroups';
 import { buildRankings, getRankableGroups } from '../../../../src/components/rankings/rankingsHelpers';
 
 describe('rankingsHelpers', () => {

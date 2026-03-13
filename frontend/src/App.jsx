@@ -1,15 +1,15 @@
 import { Suspense, lazy, useState } from 'react';
-import './App.css';
-import AppHeaderPreview from './components/AppHeaderPreview';
+import './components/app/AppShell.css';
+import AppHeader from './components/app/AppHeader';
+import TabErrorFallback from './components/app/TabErrorFallback';
 import { ErrorBoundary, LoadingMessage } from './components/common';
-import LandingPage from './components/LandingPage';
-import PlayerDetailsModal from './components/PlayerDetailsModal';
-import { usePlayerDetails } from './hooks/usePlayerDetails';
-import { APP_FUNCTIONAL_DESCRIPTION, HEADER_PROOF_POINTS, NAV_TABS } from './utils/appContent';
+import LandingPage from './components/landing/LandingPage';
+import PlayerDetailsModal from './components/player-details/PlayerDetailsModal';
+import { usePlayerDetails } from './components/player-details/usePlayerDetails';
 
-const Statistics = lazy(() => import('./components/Statistics'));
-const Schedules = lazy(() => import('./components/Schedules'));
-const DepthCharts = lazy(() => import('./components/DepthCharts'));
+const Statistics = lazy(() => import('./components/statistics/Statistics'));
+const Schedules = lazy(() => import('./components/team-browser/Schedules'));
+const DepthCharts = lazy(() => import('./components/team-browser/DepthCharts'));
 
 const DEFAULT_TAB = 'statistics';
 const TAB_COMPONENTS = {
@@ -17,6 +17,11 @@ const TAB_COMPONENTS = {
   schedules: Schedules,
   'depth-charts': DepthCharts,
 };
+const NAV_TABS = [
+  { id: 'statistics', label: 'Statistics' },
+  { id: 'schedules', label: 'Schedules' },
+  { id: 'depth-charts', label: 'Depth Charts' },
+];
 
 function App() {
   const [activeTab, setActiveTab] = useState(null);
@@ -33,8 +38,7 @@ function App() {
   } = usePlayerDetails();
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] || Statistics;
   const activeTabLabel = NAV_TABS.find((tab) => tab.id === activeTab)?.label || 'Statistics';
-  const showPlayerModal = playerDetails || loadingDetails || detailsError;
-  const playerModal = showPlayerModal ? (
+  const playerModal = (
     <PlayerDetailsModal
       playerDetails={playerDetails}
       loading={loadingDetails}
@@ -44,7 +48,7 @@ function App() {
       currentSeason={currentSeason}
       onSeasonChange={handleSeasonChange}
     />
-  ) : null;
+  );
   const goHome = () => setActiveTab(null);
 
   if (!activeTab) {
@@ -58,40 +62,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="app-header">
-        <div className="app-header-inner">
-          <div className="app-header-copy">
-            <button
-              className="app-home-button"
-              onClick={goHome}
-              title="Home"
-            >
-              Home
-            </button>
-
-            <h1
-              className="app-header-title"
-              onClick={goHome}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && goHome()}
-            >
-              Fantasy Football Analysis
-            </h1>
-            <p className="app-header-tagline">
-              {APP_FUNCTIONAL_DESCRIPTION}
-            </p>
-
-            <ul className="app-header-proof-list">
-              {HEADER_PROOF_POINTS.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
-
-          <AppHeaderPreview activeTab={activeTab} activeTabLabel={activeTabLabel} />
-        </div>
-      </header>
+      <AppHeader activeTab={activeTab} activeTabLabel={activeTabLabel} onHome={goHome} />
 
       <nav className="app-nav">
         <div className="nav-container">
@@ -112,27 +83,13 @@ function App() {
           resetKey={activeTab}
           onReset={() => setActiveTab(DEFAULT_TAB)}
           fallbackRender={({ resetErrorBoundary }) => (
-            <div className="tab-error-fallback">
-              <h2>This section crashed.</h2>
-              <p>Try opening another tab or reset this section.</p>
-              <div className="tab-error-actions">
-                <button
-                  className="tab-error-btn secondary"
-                  onClick={() => {
-                    setActiveTab(DEFAULT_TAB);
-                    resetErrorBoundary();
-                  }}
-                >
-                  Go To Statistics
-                </button>
-                <button
-                  className="tab-error-btn primary"
-                  onClick={resetErrorBoundary}
-                >
-                  Retry Tab
-                </button>
-              </div>
-            </div>
+            <TabErrorFallback
+              onGoToDefault={() => {
+                setActiveTab(DEFAULT_TAB);
+                resetErrorBoundary();
+              }}
+              onRetry={resetErrorBoundary}
+            />
           )}
         >
           <Suspense fallback={<LoadingMessage message="Loading section..." />}>

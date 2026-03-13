@@ -1,30 +1,35 @@
 /* Multi-view charts tab for leaderboards, trends, and profile scatter plots. */
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 
-import { useChartData } from '../hooks/useChartData';
-import { useConsistencyData } from '../hooks/useConsistencyData';
-import { useSessionStorageObject } from '../hooks/useSessionStorageObject';
-import { useSeasonChartData } from '../hooks/useSeasonChartData';
-import { getStatLabel } from '../utils/statDefinitions';
-import { PRODUCTION_GROUPS_NO_RANKS } from '../utils/statMeta';
-import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
-import ChartControls from './charts/ChartControls';
-import AverageVsUpsideChart from './charts/AverageVsUpsideChart';
-import LeaderboardChart from './charts/LeaderboardChart';
-import SeasonTrendsChart from './charts/SeasonTrendsChart';
+import { useChartData } from '../../hooks/useChartData';
+import { useSessionStorageObject } from '../../hooks/useSessionStorageObject';
+import { getStatLabel } from '../../utils/statDefinitions';
+import { PRODUCTION_GROUPS_NO_RANKS } from '../../utils/statMeta';
+import { ErrorMessage, LoadingMessage, StatTooltip } from '../common';
+import ChartControls from './ChartControls';
 import {
   DEFAULT_STAT,
   VIEW_META,
   VIEWS_USING_STAT,
-} from './charts/chartsConfig';
+} from './chartsConfig';
 import {
   buildBarData,
   getStatOptions,
-} from './charts/chartsHelpers';
+} from './chartsHelpers';
+import { useConsistencyData } from './useConsistencyData';
+import { useSeasonChartData } from './useSeasonChartData';
 import './Charts.css';
 
 const CHART_UI_STORAGE_KEY = 'chartsUi';
+const LeaderboardChart = lazy(() => import('./LeaderboardChart'));
+const AverageVsUpsideChart = lazy(() => import('./AverageVsUpsideChart'));
+const SeasonTrendsChart = lazy(() => import('./SeasonTrendsChart'));
+const VIEW_LOADING_MESSAGES = {
+  leaderboard: 'Loading leaderboard chart...',
+  'consistency-upside': 'Loading Average vs Upside chart...',
+  trend: 'Loading season trends chart...',
+};
 
 export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
   const [chartUiState, setChartUiState] = useSessionStorageObject(CHART_UI_STORAGE_KEY, {});
@@ -139,35 +144,37 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
           />
         </div>
 
-        {view === 'leaderboard' && (
-          <LeaderboardChart
-            data={barData}
-            stat={stat}
-            season={chartSeason}
-            onPlayerClick={onPlayerClick}
-            onPlayerSeasonClick={onPlayerSeasonClick}
-          />
-        )}
+        <Suspense fallback={<LoadingMessage message={VIEW_LOADING_MESSAGES[view] || 'Loading chart view...'} />}>
+          {view === 'leaderboard' && (
+            <LeaderboardChart
+              data={barData}
+              stat={stat}
+              season={chartSeason}
+              onPlayerClick={onPlayerClick}
+              onPlayerSeasonClick={onPlayerSeasonClick}
+            />
+          )}
 
-        {view === 'consistency-upside' && (
-          <AverageVsUpsideChart
-            data={consistencyData?.players || []}
-            season={chartSeason}
-            onPlayerClick={onPlayerClick}
-            onPlayerSeasonClick={onPlayerSeasonClick}
-          />
-        )}
+          {view === 'consistency-upside' && (
+            <AverageVsUpsideChart
+              data={consistencyData?.players || []}
+              season={chartSeason}
+              onPlayerClick={onPlayerClick}
+              onPlayerSeasonClick={onPlayerSeasonClick}
+            />
+          )}
 
-        {view === 'trend' && (
-          <SeasonTrendsChart
-            data={trendSeries}
-            playerName={trendPlayer}
-            stat={stat}
-            statLabel={getStatLabel(stat)}
-            onPlayerClick={onPlayerClick}
-            onPlayerSeasonClick={onPlayerSeasonClick}
-          />
-        )}
+          {view === 'trend' && (
+            <SeasonTrendsChart
+              data={trendSeries}
+              playerName={trendPlayer}
+              stat={stat}
+              statLabel={getStatLabel(stat)}
+              onPlayerClick={onPlayerClick}
+              onPlayerSeasonClick={onPlayerSeasonClick}
+            />
+          )}
+        </Suspense>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { getConsistencyData } from '../api';
+import { getConsistencyData } from '../../api';
 
 const consistencyCache = new Map();
 const consistencyInFlight = new Map();

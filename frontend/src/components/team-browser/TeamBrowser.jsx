@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import DivisionBrowser from './DivisionBrowser';
 import TeamSearch from './TeamSearch';
-import { SubTabNav } from './common';
-import { useDivisions } from '../hooks/useDivisions';
+import { SubTabNav } from '../common';
+import { useDivisions } from './useDivisions';
 import './TeamBrowser.css';
 
 const TABS = [

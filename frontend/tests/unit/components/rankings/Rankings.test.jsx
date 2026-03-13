@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import Rankings from '../../../../src/components/Rankings';
+import Rankings from '../../../../src/components/rankings/Rankings';
 import { useChartData } from '../../../../src/hooks/useChartData';
 import { useSessionStorageObject } from '../../../../src/hooks/useSessionStorageObject';
 

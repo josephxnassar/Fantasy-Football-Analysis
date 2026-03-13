@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import PlayerDetailsModal from '../../../src/components/PlayerDetailsModal';
+import PlayerDetailsModal from '../../../src/components/player-details/PlayerDetailsModal';
 import { useTeamModalData } from '../../../src/hooks/useTeamModalData';
 
 vi.mock('../../../src/hooks/useTeamModalData', () => ({

@@ -1,7 +1,7 @@
-import { getTeamDepthChart } from '../api';
-import { useTeamModalData } from '../hooks/useTeamModalData';
-import { getTeamColor } from '../utils/teamColors';
-import { DepthChartTable, ModalOverlay } from './common';
+import { getTeamDepthChart } from '../../api';
+import { useTeamModalData } from '../../hooks/useTeamModalData';
+import { getTeamColor } from '../../utils/teamColors';
+import { DepthChartTable, ModalOverlay } from '../common';
 import './DepthChartModal.css';
 
 export default function DepthChartModal({ team, onClose, onPlayerClick }) {

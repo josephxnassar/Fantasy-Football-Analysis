@@ -1,16 +1,16 @@
 /* Player details modal with stats and season selection */
 
 import { useState } from 'react';
-import { getTeamDepthChart } from '../api';
-import { useTeamModalData } from '../hooks/useTeamModalData';
-import { getTeamColor } from '../utils/teamColors';
-import { ErrorMessage, ModalOverlay, SubTabNav } from './common';
-import PlayerHeader from './player-details/PlayerHeader';
-import PlayerOverviewTab from './player-details/PlayerOverviewTab';
-import PlayerDepthChartTab from './player-details/PlayerDepthChartTab';
-import StatsSeasonSelector from './player-details/StatsSeasonSelector';
-import StatsViewModeToggle from './player-details/StatsViewModeToggle';
-import './player-details/PlayerStats.css';
+import { getTeamDepthChart } from '../../api';
+import { useTeamModalData } from '../../hooks/useTeamModalData';
+import { getTeamColor } from '../../utils/teamColors';
+import { ErrorMessage, ModalOverlay, SubTabNav } from '../common';
+import PlayerDepthChartTab from './PlayerDepthChartTab';
+import PlayerHeader from './PlayerHeader';
+import PlayerOverviewTab from './PlayerOverviewTab';
+import StatsSeasonSelector from './StatsSeasonSelector';
+import StatsViewModeToggle from './StatsViewModeToggle';
+import './PlayerStats.css';
 import './PlayerDetailsModal.css';
 
 export default function PlayerDetailsModal({ 

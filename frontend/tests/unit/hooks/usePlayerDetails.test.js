@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { usePlayerDetails } from '../../../src/hooks/usePlayerDetails';
+import { usePlayerDetails } from '../../../src/components/player-details/usePlayerDetails';
 import { getPlayer } from '../../../src/api';
 
 vi.mock('../../../src/api', () => ({

@@ -24,7 +24,7 @@ describe('useDivisions', () => {
 
   it('loads divisions and exposes team data', async () => {
     getDivisions.mockResolvedValueOnce(mockResponse);
-    const { useDivisions } = await import('../../../src/hooks/useDivisions');
+    const { useDivisions } = await import('../../../src/components/team-browser/useDivisions');
 
     const { result } = renderHook(() => useDivisions());
 
@@ -41,7 +41,7 @@ describe('useDivisions', () => {
 
   it('reuses cached data on second mount without calling API again', async () => {
     getDivisions.mockResolvedValueOnce(mockResponse);
-    const { useDivisions } = await import('../../../src/hooks/useDivisions');
+    const { useDivisions } = await import('../../../src/components/team-browser/useDivisions');
 
     const { result, unmount } = renderHook(() => useDivisions());
     await waitFor(() => {
@@ -61,7 +61,7 @@ describe('useDivisions', () => {
   it('exposes error state when fetch fails', async () => {
     getDivisions.mockRejectedValueOnce(new Error('Network error'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { useDivisions } = await import('../../../src/hooks/useDivisions');
+    const { useDivisions } = await import('../../../src/components/team-browser/useDivisions');
 
     const { result } = renderHook(() => useDivisions());
 

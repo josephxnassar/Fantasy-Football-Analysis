@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getTeamColorVars } from '../utils/teamColors';
+import { getTeamColorVars } from '../../utils/teamColors';
 import './TeamSearch.css';
 
 function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {

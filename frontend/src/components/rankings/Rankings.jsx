@@ -2,20 +2,20 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { useChartData } from '../hooks/useChartData';
-import { useSessionStorageObject } from '../hooks/useSessionStorageObject';
-import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../utils/leaderboardOptions';
-import { RANKING_GROUPS } from '../utils/rankingMeta';
-import { getStatLabel } from '../utils/statDefinitions';
-import { ErrorMessage, LoadingMessage, StatTooltip } from './common';
+import { useChartData } from '../../hooks/useChartData';
+import { useSessionStorageObject } from '../../hooks/useSessionStorageObject';
+import { getStatLabel } from '../../utils/statDefinitions';
+import { ErrorMessage, LoadingMessage, StatTooltip } from '../common';
+import { TOP_N_OPTIONS, POSITION_OPTIONS } from '../statistics/statisticsOptions';
+import { RANKING_GROUPS } from './rankingGroups';
 import {
   buildRankings,
   DEFAULT_CATEGORY_WEIGHT,
   DEFAULT_STAT_WEIGHT,
   getRankableGroups,
-} from './rankings/rankingsHelpers';
-import { buildPresetProfile, RANKING_PRESETS } from './rankings/rankingPresets';
-import WeightScale from './rankings/WeightScale';
+} from './rankingsHelpers';
+import { buildPresetProfile, RANKING_PRESETS } from './rankingPresets';
+import WeightScale from './WeightScale';
 import './Rankings.css';
 
 const STORAGE_KEY = 'rankingsWeights';

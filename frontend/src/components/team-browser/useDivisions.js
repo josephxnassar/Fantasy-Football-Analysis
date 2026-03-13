@@ -1,7 +1,7 @@
 /* Hook for loading and caching divisions data. Prevents duplicate API calls when multiple components need division data. */
 
 import { useState, useEffect, useMemo } from 'react';
-import { getDivisions } from '../api';
+import { getDivisions } from '../../api';
 
 let cachedDivisionPayload = null;
 let divisionsRequestPromise = null;

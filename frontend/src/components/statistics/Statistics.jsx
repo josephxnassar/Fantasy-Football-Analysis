@@ -1,11 +1,11 @@
 import { Suspense, lazy, useState } from 'react';
-import { LoadingMessage, SubTabNav } from './common';
+import { LoadingMessage, SubTabNav } from '../common';
 import './Statistics.css';
 
-const PlayerSearch = lazy(() => import('./PlayerSearch'));
-const Charts = lazy(() => import('./Charts'));
-const Rankings = lazy(() => import('./Rankings'));
-const PlayerComparison = lazy(() => import('./PlayerComparison'));
+const PlayerSearch = lazy(() => import('../player-search/PlayerSearch'));
+const Charts = lazy(() => import('../charts/Charts'));
+const Rankings = lazy(() => import('../rankings/Rankings'));
+const PlayerComparison = lazy(() => import('../comparison/PlayerComparison'));
 
 const TABS = [
   { id: 'charts', label: 'Charts' },

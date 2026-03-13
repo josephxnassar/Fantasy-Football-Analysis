@@ -1,7 +1,7 @@
 /* Hook for managing player details modal state */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getPlayer } from '../api';
+import { getPlayer } from '../../api';
 
 export function usePlayerDetails() {
   // Full player payload used by PlayerDetailsModal.

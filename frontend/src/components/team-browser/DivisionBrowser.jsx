@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTeamColorVars } from '../utils/teamColors';
+import { getTeamColorVars } from '../../utils/teamColors';
 import './DivisionBrowser.css';
 
 function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →', defaultConference = 'AFC', defaultDivision = 'North' }) {

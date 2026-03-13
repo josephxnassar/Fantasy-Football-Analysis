@@ -6,7 +6,7 @@ import { getPlayerTrendData } from '../../../src/api';
 import {
   __resetSeasonChartDataCache,
   useSeasonChartData,
-} from '../../../src/hooks/useSeasonChartData';
+} from '../../../src/components/charts/useSeasonChartData';
 
 vi.mock('../../../src/api', () => ({
   getPlayerTrendData: vi.fn(),

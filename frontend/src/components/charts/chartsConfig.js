@@ -1,7 +1,3 @@
-import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../../utils/leaderboardOptions';
-
-export { POSITION_OPTIONS, TOP_N_OPTIONS };
-
 export const CHART_VIEW_OPTIONS = [
   { value: 'leaderboard', label: 'Leaderboard' },
   { value: 'consistency-upside', label: 'Average vs Upside' },

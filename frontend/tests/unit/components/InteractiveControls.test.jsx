@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import DivisionBrowser from '../../../src/components/DivisionBrowser';
-import TeamSearch from '../../../src/components/TeamSearch';
+import DivisionBrowser from '../../../src/components/team-browser/DivisionBrowser';
+import TeamSearch from '../../../src/components/team-browser/TeamSearch';
 import PlayerCard from '../../../src/components/common/PlayerCard';
 
 describe('interactive frontend controls', () => {
