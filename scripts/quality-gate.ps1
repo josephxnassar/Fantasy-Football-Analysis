@@ -33,16 +33,30 @@ function Invoke-QualityStep {
     Write-Host "PASSED: $Name" -ForegroundColor Green
 }
 
+function Invoke-InFrontend {
+    param(
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$Action
+    )
+
+    Push-Location (Join-Path $repoRoot "frontend")
+    try {
+        & $Action
+    } finally {
+        Pop-Location
+    }
+}
+
 Write-Host "Running full quality gate from $repoRoot" -ForegroundColor Yellow
 
 Invoke-QualityStep "Backend lint (ruff)" { uv run ruff check backend }
 Invoke-QualityStep "Backend type check (mypy)" { uv run mypy }
 Invoke-QualityStep "Backend tests (pytest)" { uv run pytest -q backend/tests }
-Invoke-QualityStep "Frontend lint" { npm --prefix frontend run lint }
-Invoke-QualityStep "Frontend tests" { npm --prefix frontend run test:run }
+Invoke-QualityStep "Frontend lint" { Invoke-InFrontend { npm run lint } }
+Invoke-QualityStep "Frontend tests" { Invoke-InFrontend { npm run test:run } }
 
 if (-not $SkipBuild) {
-    Invoke-QualityStep "Frontend build" { npm --prefix frontend run build }
+    Invoke-QualityStep "Frontend build" { Invoke-InFrontend { npm run build } }
 } else {
     Write-Host ""
     Write-Host "Skipping frontend build (--SkipBuild)." -ForegroundColor Yellow

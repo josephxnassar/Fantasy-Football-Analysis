@@ -2,12 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './StatTooltip.css';
 
-/**
- * Rich tooltip popover for stat explanations.
- * Triggered by clicking an info icon next to a stat label.
- * Rendered via portal with fixed positioning so ancestor
- * overflow rules never clip the popover.
- */
 export default function StatTooltip({ label, description, iconSize = 12 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -44,8 +38,7 @@ export default function StatTooltip({ label, description, iconSize = 12 }) {
     if (left < 8) left = 8;
     if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
 
-    // If it would overflow the bottom, flip above.
-    // Estimate popover height (will be corrected on next frame).
+    // If it would overflow the bottom, flip above. Estimate popover height (will be corrected on next frame).
     const estH = 120;
     if (top + estH > window.innerHeight - 8) {
       top = trigger.top - estH - gap;
