@@ -2,17 +2,13 @@ import js from '@eslint/js';
 import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
 
 const vitestGlobals = {
   describe: 'readonly',
   it: 'readonly',
-  test: 'readonly',
   expect: 'readonly',
   beforeEach: 'readonly',
   afterEach: 'readonly',
-  beforeAll: 'readonly',
-  afterAll: 'readonly',
   vi: 'readonly',
 };
 
@@ -33,13 +29,11 @@ export default [
       },
       globals: {
         ...globals.browser,
-        ...globals.node,
       },
     },
     plugins: {
       react,
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
     },
     settings: {
       react: {
@@ -52,8 +46,15 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react/prop-types': 'off',
       'react/no-unescaped-entities': 'off',
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    files: ['vite.config.js', 'eslint.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
   {
@@ -61,7 +62,6 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node,
         ...vitestGlobals,
       },
     },
