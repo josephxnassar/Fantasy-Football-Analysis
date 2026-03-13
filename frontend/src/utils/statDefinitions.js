@@ -1,4 +1,4 @@
-/* Stat label/format API plus re-exported grouping helpers. */
+/* Stat Information + formatting */
 
 import { STAT_META } from './statMeta';
 import { groupStatsByCategoryMap, hasDisplayValue } from './statGrouping';

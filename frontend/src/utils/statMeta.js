@@ -1,4 +1,4 @@
-/* Canonical stat metadata and position group definitions. */
+/* Stat metadata and groupings  */
 
 export const STAT_META = {
   // Fantasy summary.

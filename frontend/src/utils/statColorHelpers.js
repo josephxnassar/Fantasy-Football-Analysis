@@ -93,12 +93,6 @@ function isRankMetric(statName) {
   return toKey(statName).endsWith('_rank');
 }
 
-/**
- * Get color class for a stat value.
- * @param {string} statName - Stat key.
- * @param {number} value - Stat value.
- * @returns {string} CSS class.
- */
 export function getStatColorClass(statName, value) {
   if (value === null || value === undefined || Number.isNaN(value)) return '';
   const numeric = typeof value === 'number' ? value : Number(value);

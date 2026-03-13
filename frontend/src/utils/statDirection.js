@@ -1,4 +1,4 @@
-/* Shared stat-direction helpers for comparisons and ranking logic. */
+/* Red/Yellow/Green stats where lower is better */
 
 const LOWER_IS_BETTER_TOKENS = [
   'interception',
