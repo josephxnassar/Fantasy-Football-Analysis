@@ -17,8 +17,9 @@ def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
     return [s for s in seasons if s >= min_year]
 
 def team_normalization(source: pd.DataFrame) -> pd.DataFrame:
-    if "team" in source.columns:
-        source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+    for team_col in ("team", "recent_team", "posteam", "team_abbr", "tm"):
+        if team_col in source.columns:
+            source[team_col] = source[team_col].replace(constants.TEAM_ABBR_NORMALIZATION)
     return source
 
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
@@ -28,9 +29,10 @@ def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
         if season_col in filtered.columns:
             filtered = filtered.loc[filtered[season_col] == "REG"]
             break
-    if "position" not in filtered.columns:
+    position_col = next((candidate for candidate in ("position", "player_position", "pos") if candidate in filtered.columns), None)
+    if not position_col:
         return filtered.iloc[0:0].copy()
-    return filtered.loc[filtered["position"].isin(constants.POSITIONS)]
+    return filtered.loc[filtered[position_col].isin(constants.POSITIONS)]
 
 def select_columns(source: pd.DataFrame, column_map: Mapping[str, str], required_columns: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
     """Return only mapped columns present in source, renamed to target names."""

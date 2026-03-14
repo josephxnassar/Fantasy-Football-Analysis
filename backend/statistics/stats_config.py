@@ -74,7 +74,7 @@ PLAYER_SEASONAL_COLUMN_MAP = {
     "player_display_name": "player_display_name",
     "position": "position",
     "position_group": "position_group",
-    "team": "team",
+    "recent_team": "team",
     "completions": "completions",
     "attempts": "attempts",
     "passing_yards": "passing_yards",
@@ -129,16 +129,16 @@ PLAYER_SEASONAL_COLUMN_MAP = {
     "fantasy_points": "fantasy_points",
     "fantasy_points_ppr": "fantasy_points_ppr",
 }
-PLAYER_SEASONAL_REQUIRED_COLUMNS = ["season", "player_id", "player_display_name", "position", "team"]
+PLAYER_SEASONAL_REQUIRED_COLUMNS = ["season", "player_id", "player_display_name", "position", "recent_team"]
 
 FF_OPP_WEEKLY_COLUMN_MAP = {
     "season": "season",
     "week": "week",
     "game_id": "game_id",
     "player_id": "player_id",
-    "player_display_name": "player_display_name",
+    "full_name": "player_display_name",
     "position": "position",
-    "team": "team",
+    "posteam": "team",
     "pass_attempt": "ffo_pass_att",
     "rec_attempt": "ffo_rec_att",
     "rush_attempt": "ffo_rush_att",
@@ -216,14 +216,14 @@ FF_OPP_WEEKLY_COLUMN_MAP = {
     "total_first_down_diff": "ffo_total_fd_diff",
     "total_fantasy_points_diff": "ffo_total_fp_diff",
 }
-FF_OPP_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "player_id", "player_display_name", "position", "team"]
+FF_OPP_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "player_id", "full_name", "position", "posteam"]
 
 NEXTGEN_PASS_COLUMN_MAP = {
     "season": "season",
     "week": "week",
     "player_display_name": "player_display_name",
-    "position": "position",
-    "team": "team",
+    "player_position": "position",
+    "team_abbr": "team",
     "player_gsis_id": "ng_pass_player_gsis_id",
     "avg_time_to_throw": "ng_pass_avg_time_to_throw",
     "avg_completed_air_yards": "ng_pass_avg_completed_air_yds",
@@ -244,14 +244,14 @@ NEXTGEN_PASS_COLUMN_MAP = {
     "avg_air_distance": "ng_pass_avg_air_distance",
     "max_air_distance": "ng_pass_max_air_distance",
 }
-NEXTGEN_PASS_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "position", "team"]
+NEXTGEN_PASS_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "player_position", "team_abbr"]
 
 NEXTGEN_REC_COLUMN_MAP = {
     "season": "season",
     "week": "week",
     "player_display_name": "player_display_name",
-    "position": "position",
-    "team": "team",
+    "player_position": "position",
+    "team_abbr": "team",
     "player_gsis_id": "ng_rec_player_gsis_id",
     "avg_cushion": "ng_rec_avg_cushion",
     "avg_separation": "ng_rec_avg_separation",
@@ -266,14 +266,14 @@ NEXTGEN_REC_COLUMN_MAP = {
     "avg_expected_yac": "ng_rec_avg_exp_yac",
     "avg_yac_above_expectation": "ng_rec_avg_yac_above_expectation",
 }
-NEXTGEN_REC_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "position", "team"]
+NEXTGEN_REC_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "player_position", "team_abbr"]
 
 NEXTGEN_RUSH_COLUMN_MAP = {
     "season": "season",
     "week": "week",
     "player_display_name": "player_display_name",
-    "position": "position",
-    "team": "team",
+    "player_position": "position",
+    "team_abbr": "team",
     "player_gsis_id": "ng_rush_player_gsis_id",
     "efficiency": "ng_rush_efficiency",
     "percent_attempts_gte_eight_defenders": "ng_rush_pct_att_gte_eight_defenders",
@@ -287,7 +287,7 @@ NEXTGEN_RUSH_COLUMN_MAP = {
     "rush_yards_over_expected_per_att": "ng_rush_rush_yds_over_exp_per_att",
     "rush_pct_over_expected": "ng_rush_rush_pct_over_exp",
 }
-NEXTGEN_RUSH_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "position", "team"]
+NEXTGEN_RUSH_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "player_position", "team_abbr"]
 
 PFR_PASS_WEEKLY_COLUMN_MAP = {
     "season": "season",
@@ -297,7 +297,7 @@ PFR_PASS_WEEKLY_COLUMN_MAP = {
     "pfr_game_id": "pfr_pass_pfr_game_id",
     "team": "team",
     "opponent": "pfr_pass_opponent",
-    "player_display_name": "player_display_name",
+    "pfr_player_name": "player_display_name",
     "pfr_player_id": "pfr_pass_pfr_player_id",
     "passing_drops": "pfr_pass_drops",
     "passing_drop_pct": "pfr_pass_drop_pct",
@@ -315,7 +315,7 @@ PFR_PASS_WEEKLY_COLUMN_MAP = {
     "def_times_hurried": "pfr_pass_def_times_hurried",
     "def_times_hitqb": "pfr_pass_def_times_hitqb",
 }
-PFR_PASS_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "player_display_name", "team"]
+PFR_PASS_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "pfr_player_name", "team"]
 
 PFR_RUSH_WEEKLY_COLUMN_MAP = {
     "season": "season",
@@ -325,7 +325,7 @@ PFR_RUSH_WEEKLY_COLUMN_MAP = {
     "pfr_game_id": "pfr_rush_pfr_game_id",
     "team": "team",
     "opponent": "pfr_rush_opponent",
-    "player_display_name": "player_display_name",
+    "pfr_player_name": "player_display_name",
     "pfr_player_id": "pfr_rush_pfr_player_id",
     "carries": "pfr_rush_att",
     "rushing_yards_before_contact": "pfr_rush_ybc",
@@ -335,7 +335,7 @@ PFR_RUSH_WEEKLY_COLUMN_MAP = {
     "rushing_broken_tackles": "pfr_rush_brk_tkl",
     "receiving_broken_tackles": "pfr_rush_receiving_broken_tackles",
 }
-PFR_RUSH_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "player_display_name", "team"]
+PFR_RUSH_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "pfr_player_name", "team"]
 
 PFR_REC_WEEKLY_COLUMN_MAP = {
     "season": "season",
@@ -345,7 +345,7 @@ PFR_REC_WEEKLY_COLUMN_MAP = {
     "pfr_game_id": "pfr_rec_pfr_game_id",
     "team": "team",
     "opponent": "pfr_rec_opponent",
-    "player_display_name": "player_display_name",
+    "pfr_player_name": "player_display_name",
     "pfr_player_id": "pfr_rec_pfr_player_id",
     "rushing_broken_tackles": "pfr_rec_rushing_broken_tackles",
     "receiving_broken_tackles": "pfr_rec_brk_tkl",
@@ -356,11 +356,11 @@ PFR_REC_WEEKLY_COLUMN_MAP = {
     "receiving_int": "pfr_rec_int",
     "receiving_rat": "pfr_rec_rat",
 }
-PFR_REC_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "player_display_name", "team"]
+PFR_REC_WEEKLY_REQUIRED_COLUMNS = ["season", "week", "game_id", "pfr_player_name", "team"]
 
 PFR_PASS_SEASON_COLUMN_MAP = {
     "season": "season",
-    "player_display_name": "player_display_name",
+    "player": "player_display_name",
     "team": "team",
     "pfr_id": "pfr_pass_pfr_id",
     "pass_attempts": "pfr_pass_pass_att",
@@ -397,14 +397,14 @@ PFR_PASS_SEASON_COLUMN_MAP = {
     "scrambles": "pfr_pass_scrambles",
     "scramble_yards_per_attempt": "pfr_pass_scramble_yds_per_att",
 }
-PFR_PASS_SEASON_REQUIRED_COLUMNS = ["season", "player_display_name", "team"]
+PFR_PASS_SEASON_REQUIRED_COLUMNS = ["season", "player", "team"]
 
 PFR_RUSH_SEASON_COLUMN_MAP = {
     "season": "season",
-    "player_display_name": "player_display_name",
+    "player": "player_display_name",
     "pfr_id": "pfr_rush_pfr_id",
-    "team": "team",
-    "position": "position",
+    "tm": "team",
+    "pos": "position",
     "att": "pfr_rush_att",
     "yds": "pfr_rush_yds",
     "td": "pfr_rush_td",
@@ -416,14 +416,14 @@ PFR_RUSH_SEASON_COLUMN_MAP = {
     "brk_tkl": "pfr_rush_brk_tkl",
     "att_br": "pfr_rush_att_br",
 }
-PFR_RUSH_SEASON_REQUIRED_COLUMNS = ["season", "player_display_name", "position"]
+PFR_RUSH_SEASON_REQUIRED_COLUMNS = ["season", "player", "pos"]
 
 PFR_REC_SEASON_COLUMN_MAP = {
     "season": "season",
-    "player_display_name": "player_display_name",
+    "player": "player_display_name",
     "pfr_id": "pfr_rec_pfr_id",
-    "team": "team",
-    "position": "position",
+    "tm": "team",
+    "pos": "position",
     "tgt": "pfr_rec_tgt",
     "rec": "pfr_rec_rec",
     "yds": "pfr_rec_yds",
@@ -441,7 +441,7 @@ PFR_REC_SEASON_COLUMN_MAP = {
     "int": "pfr_rec_int",
     "rat": "pfr_rec_rat",
 }
-PFR_REC_SEASON_REQUIRED_COLUMNS = ["season", "player_display_name", "position"]
+PFR_REC_SEASON_REQUIRED_COLUMNS = ["season", "player", "pos"]
 
 SNAP_COUNTS_COLUMN_MAP = {
     "game_id": "game_id",
@@ -449,7 +449,7 @@ SNAP_COUNTS_COLUMN_MAP = {
     "season": "season",
     "game_type": "sc_game_type",
     "week": "week",
-    "player_display_name": "player_display_name",
+    "player": "player_display_name",
     "pfr_player_id": "sc_pfr_player_id",
     "position": "position",
     "team": "team",
@@ -461,7 +461,7 @@ SNAP_COUNTS_COLUMN_MAP = {
     "st_snaps": "sc_st_snaps",
     "st_pct": "sc_st_pct",
 }
-SNAP_COUNTS_REQUIRED_COLUMNS = ["season", "week", "player_display_name", "position", "team"]
+SNAP_COUNTS_REQUIRED_COLUMNS = ["season", "week", "player", "position", "team"]
 
 WEEKLY_SUM_AGGREGATE_METRICS = ["exp_fp"]
 WEEKLY_AVERAGED_AGGREGATE_METRICS = [

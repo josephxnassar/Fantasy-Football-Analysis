@@ -47,7 +47,7 @@ class StatisticsSourceLoader:
     def load_player_seasonal_stats(self) -> pd.DataFrame:
         """Load and normalize seasonal regular-season player stats."""
         try:
-            source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas().rename(columns={"recent_team": "team"})
+            source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, stats_config.PLAYER_SEASONAL_COLUMN_MAP, stats_config.PLAYER_SEASONAL_REQUIRED_COLUMNS, "player_seasonal")
@@ -59,7 +59,7 @@ class StatisticsSourceLoader:
     def load_ff_opportunity_weekly(self) -> pd.DataFrame:
         """Load weekly fantasy opportunity stats from nflreadpy."""
         try:
-            source = nfl.load_ff_opportunity(stat_type="weekly", seasons=self.seasons).to_pandas().rename(columns={"full_name": "player_display_name", "posteam": "team"})
+            source = nfl.load_ff_opportunity(stat_type="weekly", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source["season"] = pd.to_numeric(source["season"], errors="coerce")
             source["week"] = pd.to_numeric(source["week"], errors="coerce")
@@ -74,7 +74,7 @@ class StatisticsSourceLoader:
     def load_nextgen_passing_stats(self) -> pd.DataFrame:
         """Load Next Gen passing stats from nflreadpy."""
         try:
-            source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
+            source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, stats_config.NEXTGEN_PASS_COLUMN_MAP, stats_config.NEXTGEN_PASS_REQUIRED_COLUMNS, "nextgen_pass_weekly")
@@ -86,7 +86,7 @@ class StatisticsSourceLoader:
     def load_nextgen_receiving_stats(self) -> pd.DataFrame:
         """Load Next Gen receiving stats from nflreadpy."""
         try:
-            source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
+            source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, stats_config.NEXTGEN_REC_COLUMN_MAP, stats_config.NEXTGEN_REC_REQUIRED_COLUMNS, "nextgen_rec_weekly")
@@ -98,7 +98,7 @@ class StatisticsSourceLoader:
     def load_nextgen_rushing_stats(self) -> pd.DataFrame:
         """Load Next Gen rushing stats from nflreadpy."""
         try:
-            source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
+            source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
             return stats_helpers.select_columns(source, stats_config.NEXTGEN_RUSH_COLUMN_MAP, stats_config.NEXTGEN_RUSH_REQUIRED_COLUMNS, "nextgen_rush_weekly")
@@ -110,7 +110,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_pass_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced passing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_PASS_WEEKLY_COLUMN_MAP, stats_config.PFR_PASS_WEEKLY_REQUIRED_COLUMNS, "pfr_pass_weekly")
         except Exception as e:
@@ -121,7 +121,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_rush_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced rushing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_RUSH_WEEKLY_COLUMN_MAP, stats_config.PFR_RUSH_WEEKLY_REQUIRED_COLUMNS, "pfr_rush_weekly")
         except Exception as e:
@@ -132,7 +132,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_rec_weekly(self) -> pd.DataFrame:
         """Load weekly PFR advanced receiving stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_REC_WEEKLY_COLUMN_MAP, stats_config.PFR_REC_WEEKLY_REQUIRED_COLUMNS, "pfr_rec_weekly")
         except Exception as e:
@@ -143,7 +143,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_pass_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced passing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name"})
+            source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_PASS_SEASON_COLUMN_MAP, stats_config.PFR_PASS_SEASON_REQUIRED_COLUMNS, "pfr_pass_season")
         except Exception as e:
@@ -154,7 +154,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_rush_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced rushing stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_RUSH_SEASON_COLUMN_MAP, stats_config.PFR_RUSH_SEASON_REQUIRED_COLUMNS, "pfr_rush_season")
         except Exception as e:
@@ -165,7 +165,7 @@ class StatisticsSourceLoader:
     def load_pfr_adv_rec_season(self) -> pd.DataFrame:
         """Load seasonal PFR advanced receiving stats from nflreadpy."""
         try:
-            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
+            source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             return stats_helpers.select_columns(source, stats_config.PFR_REC_SEASON_COLUMN_MAP, stats_config.PFR_REC_SEASON_REQUIRED_COLUMNS, "pfr_rec_season")
         except Exception as e:
@@ -176,7 +176,7 @@ class StatisticsSourceLoader:
     def load_snap_counts(self) -> pd.DataFrame:
         """Load and normalize weekly regular-season snap counts."""
         try:
-            source = nfl.load_snap_counts(seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name"})
+            source = nfl.load_snap_counts(seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
             source = stats_helpers.select_columns(source, stats_config.SNAP_COUNTS_COLUMN_MAP, stats_config.SNAP_COUNTS_REQUIRED_COLUMNS, "snap_counts")

@@ -42,6 +42,32 @@ def test_load_nextgen_receiving_stats_normalizes_team_abbreviations(monkeypatch:
     assert loaded.iloc[0]["team"] == "LAR"
 
 
+def test_load_player_seasonal_stats_maps_recent_team_to_team(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
+    source_df = pd.DataFrame(
+        {
+            "season": [2025],
+            "player_id": ["00-0037834"],
+            "player_name": ["P.Nacua"],
+            "player_display_name": ["Puka Nacua"],
+            "position": ["WR"],
+            "position_group": ["WR"],
+            "recent_team": ["LA"],
+            "season_type": ["REG"],
+            "fantasy_points_ppr": [121.2],
+        }
+    )
+
+    monkeypatch.setattr(
+        "backend.statistics.loaders.nfl.load_player_stats",
+        lambda **_: _NflReadPyResult(source_df),
+    )
+
+    loaded = statistics_source._source_loader.load_player_seasonal_stats()
+
+    assert loaded.iloc[0]["team"] == "LAR"
+    assert "recent_team" not in loaded.columns
+
+
 def test_load_pfr_adv_rec_season_normalizes_team_abbreviations(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
     source_df = pd.DataFrame(
         {
