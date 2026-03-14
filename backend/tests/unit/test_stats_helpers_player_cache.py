@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from backend.statistics.statistics import RosterData, Statistics
+from backend.util.exceptions import DataLoadError
 
 
 class _NflReadPyResult:
@@ -60,6 +61,28 @@ def test_load_pfr_adv_rec_season_normalizes_team_abbreviations(monkeypatch: pyte
     loaded = statistics_source._source_loader.load_pfr_adv_rec_season()
 
     assert loaded.iloc[0]["team"] == "LAR"
+
+
+def test_load_player_weekly_stats_requires_structural_columns(monkeypatch: pytest.MonkeyPatch, statistics_source: Statistics) -> None:
+    source_df = pd.DataFrame(
+        {
+            "season": [2025],
+            "week": [1],
+            "game_id": ["2025_01_LAR_DET"],
+            "player_id": ["00-0037834"],
+            "player_display_name": ["Puka Nacua"],
+            "position": ["WR"],
+            "season_type": ["REG"],
+        }
+    )
+
+    monkeypatch.setattr(
+        "backend.statistics.loaders.nfl.load_player_stats",
+        lambda **_: _NflReadPyResult(source_df),
+    )
+
+    with pytest.raises(DataLoadError, match="player_weekly missing required columns: team"):
+        statistics_source._source_loader.load_player_weekly_stats()
 
 
 def test_build_all_players_includes_expected_fields(statistics_source: Statistics) -> None:

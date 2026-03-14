@@ -47,6 +47,38 @@ def test_filter_regular_and_position_handles_missing_position_column() -> None:
     assert filtered.empty
 
 
+def test_select_columns_raises_for_missing_required_columns() -> None:
+    source = pd.DataFrame({"season": [2025], "player_display_name": ["Puka Nacua"]})
+
+    with pytest.raises(ValueError, match="test_source missing required columns: team, week"):
+        stats_helpers.select_columns(
+            source,
+            {"season": "season", "week": "week", "team": "team"},
+            ["season", "week", "team"],
+            "test_source",
+        )
+
+
+def test_select_columns_warns_for_missing_optional_columns(caplog: pytest.LogCaptureFixture) -> None:
+    source = pd.DataFrame({"season": [2025], "week": [1], "player_display_name": ["Puka Nacua"]})
+
+    with caplog.at_level("WARNING"):
+        selected = stats_helpers.select_columns(
+            source,
+            {
+                "season": "season",
+                "week": "week",
+                "player_display_name": "player_display_name",
+                "team": "team",
+            },
+            ["season", "week", "player_display_name"],
+            "test_source",
+        )
+
+    assert list(selected.columns) == ["season", "week", "player_display_name"]
+    assert "test_source missing optional columns: team" in caplog.text
+
+
 def test_merge_weekly_aggregates_into_seasonal_applies_sum_and_mean_reducers() -> None:
     weekly_df = pd.DataFrame(
         {

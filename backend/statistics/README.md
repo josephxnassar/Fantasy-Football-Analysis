@@ -42,11 +42,13 @@ Season guards used in loaders:
 
 Configured seasons:
 - [`backend/util/constants.py`](../util/constants.py) -> `SEASONS`
+- [`backend/statistics/stats_config.py`](stats_config.py) -> source column maps, required columns, and stats-specific aggregation config
 
 ## Processing Pipeline
 
 1. Load all stat sources in parallel through [`loaders.py`](loaders.py) and rosters in parallel with source loading (`run`).
 2. Normalize team abbreviations in each source loader (for example `LA -> LAR`, `WAS -> WSH`) before downstream joins, then apply regular-season + fantasy-position filtering where applicable (`QB/RB/WR/TE`) and keep mapped columns.
+- Loaders fail fast when required structural source columns are missing and only warn when optional mapped stat columns disappear.
 3. Merge weekly sources onto base weekly player stats via a shared join-spec loop.
 - Sources with abbreviated PFR-style names (`snap_counts`, `pfr_*_weekly`) are aligned with `align_pfr_seasonal_names` before merge.
 - `ff_opp_weekly` merges without `game_id` (`season/week/player_id/player_display_name/position/team`) because source coverage does not reliably include it.
@@ -75,7 +77,8 @@ Notes:
 - Orchestration + cache-shape builders: [`statistics.py`](statistics.py)
 - nflreadpy loaders: [`loaders.py`](loaders.py)
 - Reusable dataframe helpers: [`util/stats_helpers.py`](util/stats_helpers.py)
-- Constants/config: [`../util/constants.py`](../util/constants.py)
+- Shared app constants: [`../util/constants.py`](../util/constants.py)
+- Stats source/config constants: [`stats_config.py`](stats_config.py)
 
 ## Rebuild Command
 

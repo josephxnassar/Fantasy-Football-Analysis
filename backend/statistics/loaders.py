@@ -7,8 +7,8 @@ from typing import Callable
 import nflreadpy as nfl
 import pandas as pd
 
+from backend.statistics import stats_config
 from backend.statistics.util import stats_helpers
-from backend.util import constants
 from backend.util.exceptions import DataLoadError
 from backend.util.timing import timed
 
@@ -38,7 +38,7 @@ class StatisticsSourceLoader:
             source = nfl.load_player_stats(summary_level="week", seasons=self.seasons).to_pandas()
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.PLAYER_WEEKLY_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PLAYER_WEEKLY_COLUMN_MAP, stats_config.PLAYER_WEEKLY_REQUIRED_COLUMNS, "player_weekly")
         except Exception as e:
             logger.error("Failed to load player weekly stats: %s", e)
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
@@ -50,7 +50,7 @@ class StatisticsSourceLoader:
             source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas().rename(columns={"recent_team": "team"})
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.PLAYER_SEASONAL_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PLAYER_SEASONAL_COLUMN_MAP, stats_config.PLAYER_SEASONAL_REQUIRED_COLUMNS, "player_seasonal")
         except Exception as e:
             logger.error("Failed to load player seasonal stats: %s", e)
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
@@ -65,7 +65,7 @@ class StatisticsSourceLoader:
             source["week"] = pd.to_numeric(source["week"], errors="coerce")
             source = source.dropna(subset=["season", "week"]).astype({"season": "int32", "week": "int32"})
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.FF_OPP_WEEKLY_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.FF_OPP_WEEKLY_COLUMN_MAP, stats_config.FF_OPP_WEEKLY_REQUIRED_COLUMNS, "ff_opp_weekly")
         except Exception as e:
             logger.error("Failed to load weekly fantasy opportunity stats: %s", e)
             raise DataLoadError(f"Failed to load weekly fantasy opportunity stats: {e}", source="Statistics") from e
@@ -77,7 +77,7 @@ class StatisticsSourceLoader:
             source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.NEXTGEN_PASS_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.NEXTGEN_PASS_COLUMN_MAP, stats_config.NEXTGEN_PASS_REQUIRED_COLUMNS, "nextgen_pass_weekly")
         except Exception as e:
             logger.error("Failed to load Next Gen passing stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen passing stats: {e}", source="Statistics") from e
@@ -89,7 +89,7 @@ class StatisticsSourceLoader:
             source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.NEXTGEN_REC_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.NEXTGEN_REC_COLUMN_MAP, stats_config.NEXTGEN_REC_REQUIRED_COLUMNS, "nextgen_rec_weekly")
         except Exception as e:
             logger.error("Failed to load Next Gen receiving stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen receiving stats: {e}", source="Statistics") from e
@@ -101,7 +101,7 @@ class StatisticsSourceLoader:
             source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas().rename(columns={"player_position": "position", "team_abbr": "team"})
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            return stats_helpers.select_columns(source, constants.NEXTGEN_RUSH_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.NEXTGEN_RUSH_COLUMN_MAP, stats_config.NEXTGEN_RUSH_REQUIRED_COLUMNS, "nextgen_rush_weekly")
         except Exception as e:
             logger.error("Failed to load Next Gen rushing stats: %s", e)
             raise DataLoadError(f"Failed to load Next Gen rushing stats: {e}", source="Statistics") from e
@@ -112,7 +112,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_PASS_WEEKLY_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_PASS_WEEKLY_COLUMN_MAP, stats_config.PFR_PASS_WEEKLY_REQUIRED_COLUMNS, "pfr_pass_weekly")
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced pass stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced pass stats: {e}", source="Statistics") from e
@@ -123,7 +123,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_RUSH_WEEKLY_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_RUSH_WEEKLY_COLUMN_MAP, stats_config.PFR_RUSH_WEEKLY_REQUIRED_COLUMNS, "pfr_rush_weekly")
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced rush stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced rush stats: {e}", source="Statistics") from e
@@ -134,7 +134,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"pfr_player_name": "player_display_name"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_REC_WEEKLY_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_REC_WEEKLY_COLUMN_MAP, stats_config.PFR_REC_WEEKLY_REQUIRED_COLUMNS, "pfr_rec_weekly")
         except Exception as e:
             logger.error("Failed to load weekly PFR advanced receiving stats: %s", e)
             raise DataLoadError(f"Failed to load weekly PFR advanced receiving stats: {e}", source="Statistics") from e
@@ -145,7 +145,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_PASS_SEASON_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_PASS_SEASON_COLUMN_MAP, stats_config.PFR_PASS_SEASON_REQUIRED_COLUMNS, "pfr_pass_season")
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced pass stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced pass stats: {e}", source="Statistics") from e
@@ -156,7 +156,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_RUSH_SEASON_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_RUSH_SEASON_COLUMN_MAP, stats_config.PFR_RUSH_SEASON_REQUIRED_COLUMNS, "pfr_rush_season")
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced rush stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced rush stats: {e}", source="Statistics") from e
@@ -167,7 +167,7 @@ class StatisticsSourceLoader:
         try:
             source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name", "tm": "team", "pos": "position"})
             source = stats_helpers.team_normalization(source)
-            return stats_helpers.select_columns(source, constants.PFR_REC_SEASON_COLUMN_MAP)
+            return stats_helpers.select_columns(source, stats_config.PFR_REC_SEASON_COLUMN_MAP, stats_config.PFR_REC_SEASON_REQUIRED_COLUMNS, "pfr_rec_season")
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced receiving stats: %s", e)
             raise DataLoadError(f"Failed to load seasonal PFR advanced receiving stats: {e}", source="Statistics") from e
@@ -179,7 +179,7 @@ class StatisticsSourceLoader:
             source = nfl.load_snap_counts(seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas().rename(columns={"player": "player_display_name"})
             source = stats_helpers.team_normalization(source)
             source = stats_helpers.filter_regular_and_position(source)
-            source = stats_helpers.select_columns(source, constants.SNAP_COUNTS_COLUMN_MAP)
+            source = stats_helpers.select_columns(source, stats_config.SNAP_COUNTS_COLUMN_MAP, stats_config.SNAP_COUNTS_REQUIRED_COLUMNS, "snap_counts")
             return source.drop_duplicates(subset=["season", "week", "player_display_name", "position"])
         except Exception as e:
             logger.error("Failed to load snap counts: %s", e)

@@ -1,11 +1,15 @@
 """Helper functions for statistics transformations and cache shaping."""
 
+import logging
 import re
 from typing import Dict, List, Mapping
 
 import pandas as pd
 
+from backend.statistics import stats_config
 from backend.util import constants
+
+logger = logging.getLogger(__name__)
 
 
 def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
@@ -28,9 +32,19 @@ def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
         return filtered.iloc[0:0].copy()
     return filtered.loc[filtered["position"].isin(constants.POSITIONS)]
 
-def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.DataFrame:
+def select_columns(source: pd.DataFrame, column_map: Mapping[str, str], required_columns: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
     """Return only mapped columns present in source, renamed to target names."""
+    required = required_columns or []
+    missing_required = [column for column in required if column not in source.columns]
+    if missing_required:
+        missing = ", ".join(sorted(missing_required))
+        raise ValueError(f"{source_name or 'source'} missing required columns: {missing}")
+
     present = [column for column in column_map if column in source.columns]
+    if source_name:
+        missing_optional = [column for column in column_map if column not in source.columns and column not in required]
+        if missing_optional:
+            logger.warning("%s missing optional columns: %s", source_name, ", ".join(sorted(missing_optional)))
     return source[present].rename(columns=column_map)
 
 def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
@@ -104,7 +118,7 @@ def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
 def combine_aliases(df: pd.DataFrame) -> pd.DataFrame:
     """Fill each unified stat column with the first non-null value from prioritized source columns."""
     interpreted = df.copy()
-    for out_col, sources in constants.INTERPRETED_METRIC_SOURCES.items():
+    for out_col, sources in stats_config.INTERPRETED_METRIC_SOURCES.items():
         cols = [col for col in sources if col in interpreted.columns]
         if cols:
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
@@ -122,10 +136,10 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
 
     aggregates = weekly_df[group_keys].drop_duplicates().copy()
     
-    summed_metric_sources = {metric_name: (metric_name,) for metric_name in constants.WEEKLY_SUM_AGGREGATE_METRICS}
+    summed_metric_sources = {metric_name: (metric_name,) for metric_name in stats_config.WEEKLY_SUM_AGGREGATE_METRICS}
     aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, summed_metric_sources, "sum")
 
-    averaged_metric_sources = {metric_name: (metric_name,) for metric_name in constants.WEEKLY_AVERAGED_AGGREGATE_METRICS}
+    averaged_metric_sources = {metric_name: (metric_name,) for metric_name in stats_config.WEEKLY_AVERAGED_AGGREGATE_METRICS}
     aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, averaged_metric_sources, "mean")
 
     metric_cols = [col for col in aggregates.columns if col not in group_keys]
@@ -167,7 +181,7 @@ def add_group_ranks(df: pd.DataFrame, group_cols: List[str]) -> pd.DataFrame:
     if not groups:
         return ranked
 
-    for metric in constants.INTERPRETED_RANK_METRICS:
+    for metric in stats_config.INTERPRETED_RANK_METRICS:
         if metric not in ranked.columns:
             continue
         numeric = pd.to_numeric(ranked[metric], errors="coerce")
