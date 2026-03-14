@@ -50,7 +50,7 @@ Test setup and layout:
 
 ## UI Navigation Model
 
-The app opens on a **Landing Page** ([`src/components/landing/LandingPage.jsx`](src/components/landing/LandingPage.jsx)) with quick search, feature cards, at-a-glance stats, and data source attribution. A home button (🏠) in the header returns to the landing page.
+The app opens on a **Landing Page** ([`src/components/landing/LandingPage.jsx`](src/components/landing/LandingPage.jsx)) with quick search, feature cards, at-a-glance stats, and data source attribution. A Home button in the header returns to the landing page.
 
 [`src/App.jsx`](src/App.jsx) owns a single shared player-details modal that is reused by landing-page search, statistics search, and charts. The modal flow lives in [`src/components/player-details/`](src/components/player-details), and the modal's team depth chart loads on demand only when the **Depth Chart** tab is opened.
 The modal stat grouping suppresses `pfr_pass_on_tgt_pct` when the value is `0` to avoid showing placeholder values for seasons where that metric is missing in source data.

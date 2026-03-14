@@ -6,6 +6,30 @@ import pytest
 from backend.util import constants
 
 
+def test_root_status_endpoint_returns_expected_payload(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "online",
+        "message": "Fantasy Football Analysis API",
+        "version": "0.1.0",
+    }
+
+
+def test_divisions_endpoint_returns_conference_structure(client_factory, app_caches) -> None:
+    with client_factory(app_caches) as client:
+        response = client.get("/api/teams/divisions")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert set(payload["divisions"]) == {"AFC", "NFC"}
+    assert payload["team_names"]["KC"] == "Kansas City Chiefs"
+    assert "KC" in payload["divisions"]["AFC"]["West"]
+    assert "GB" in payload["divisions"]["NFC"]["North"]
+
+
 def test_search_endpoint_omits_legacy_rating_fields(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:
         response = client.get("/api/search", params={"q": "maho"})
@@ -53,6 +77,32 @@ def test_schedule_and_depth_chart_endpoints_return_team_data(client_factory, app
     assert schedule["schedule"][0]["winner"] == "KC"
     assert depth["team"] == "KC"
     assert any(row["position"] == "QB" and row["starter"] == "Patrick Mahomes" for row in depth["depth_chart"])
+
+
+def test_schedule_endpoint_handles_tie_and_score_coercion(client_factory, app_caches) -> None:
+    custom_caches = deepcopy(app_caches)
+    custom_caches[constants.CACHE["SCHEDULES"]][2025]["KC"] = (
+        pd.DataFrame(
+            [
+                {"week": 1, "opponent": "BAL", "home_away": "HOME", "team_score": "21", "opponent_score": "21"},
+                {"week": 2, "opponent": "CIN", "home_away": "AWAY", "team_score": "N/A", "opponent_score": "17"},
+            ]
+        ).set_index("week")
+    )
+
+    with client_factory(custom_caches) as client:
+        response = client.get("/api/schedules/KC", params={"season": 2025})
+
+    assert response.status_code == 200
+    schedule_rows = {row["week"]: row for row in response.json()["schedule"]}
+
+    assert schedule_rows[1]["team_score"] == 21
+    assert schedule_rows[1]["opponent_score"] == 21
+    assert schedule_rows[1]["winner"] == "TIE"
+
+    assert schedule_rows[2]["team_score"] is None
+    assert schedule_rows[2]["opponent_score"] == 17
+    assert schedule_rows[2]["winner"] is None
 
 def test_chart_data_endpoint_returns_overall_and_stat_columns(client_factory, app_caches) -> None:
     with client_factory(app_caches) as client:

@@ -38,7 +38,7 @@ Behavior:
 - Existing DB cache -> load into memory
 - Missing DB cache -> fetch fresh source data, persist cache, and load into memory
 
-Routes rely on these caches and surface `503` when required caches are unavailable.
+Cache-backed routes rely on these caches and surface `503` when required caches are unavailable.
 
 Statistics route behavior:
 - `/api/player/{player_name}` matches the provided player name directly against stats cache player names.

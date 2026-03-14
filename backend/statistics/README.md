@@ -38,7 +38,7 @@ Loaded from `nflreadpy`:
 
 Season guards used in loaders:
 - PFR advanced: `>= 2018`
-- Snap counts: `>= 2012`
+- Snap counts: `>= 2018`
 
 Configured seasons:
 - [`backend/util/constants.py`](../util/constants.py) -> `SEASONS`
@@ -50,10 +50,10 @@ Configured seasons:
 2. Normalize team abbreviations in each source loader (for example `LA -> LAR`, `WAS -> WSH`) before downstream joins, then apply regular-season + fantasy-position filtering where applicable (`QB/RB/WR/TE`) and keep mapped columns.
 - Loaders fail fast when required structural source columns are missing and only warn when optional mapped stat columns disappear.
 3. Merge weekly sources onto base weekly player stats via a shared join-spec loop.
-- Sources with abbreviated PFR-style names (`snap_counts`, `pfr_*_weekly`) are aligned with `align_pfr_seasonal_names` before merge.
 - `ff_opp_weekly` merges without `game_id` (`season/week/player_id/player_display_name/position/team`) because source coverage does not reliably include it.
 - `pfr_*_weekly` keeps `game_id` in join candidates when available (`season/week/game_id/player_display_name/team`).
-4. Normalize PFR seasonal player names (`align_pfr_seasonal_names`) then merge onto base seasonal player stats.
+4. Merge seasonal sources onto base seasonal player stats, applying PFR name normalization (`align_pfr_seasonal_names`) where needed.
+- Seasonal PFR rush/rec merges intentionally drop `team` from join keys so traded-player total rows (`2TM`/`3TM`) can still merge.
 5. Add derived metrics (`Yds/Rec`, `Yds/Rush`), combine stat aliases into canonical keys, roll selected weekly-only metrics up into seasonal player rows (`WEEKLY_SUM_AGGREGATE_METRICS` via sum, `WEEKLY_AVERAGED_AGGREGATE_METRICS` via plain mean), and compute positional ranks.
 6. Collect represented player names from shaped DataFrames (`_collect_stats_player_names`).
 7. Build final cache views in parallel (`_build_statistics_data`):
