@@ -6,11 +6,10 @@ from backend.database.service.sqlite_service import SQLService
 from backend.util import constants
 
 
-def test_sqlite_service_round_trip_for_all_cache_families(tmp_path, stats_cache, schedules_cache, depth_chart_cache) -> None:
-    db_path = tmp_path / "integration_cache.db"
+def test_sqlite_service_round_trip_for_all_cache_families(stats_cache, schedules_cache, depth_chart_cache) -> None:
     service = SQLService()
     service.db.close()
-    service.db = SQLiteCacheManager(str(db_path))
+    service.db = SQLiteCacheManager(":memory:")
 
     try:
         assert service.has_cached_data() is False
@@ -40,11 +39,10 @@ def test_sqlite_service_round_trip_for_all_cache_families(tmp_path, stats_cache,
         service.close()
 
 
-def test_has_cached_data_requires_core_statistics_tables(tmp_path) -> None:
-    db_path = tmp_path / "cache_gate.db"
+def test_has_cached_data_requires_core_statistics_tables() -> None:
     service = SQLService()
     service.db.close()
-    service.db = SQLiteCacheManager(str(db_path))
+    service.db = SQLiteCacheManager(":memory:")
 
     stats_prefix = constants.CACHE["STATISTICS"]
     schedules_prefix = constants.CACHE["SCHEDULES"]
