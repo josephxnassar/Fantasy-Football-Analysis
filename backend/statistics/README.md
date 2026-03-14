@@ -18,6 +18,7 @@ Generates statistics caches consumed by the API (`all_players`, `by_year`, `play
 ## Primary Entry
 
 - Main class: [`statistics.py`](statistics.py)
+- Loaders: [`loaders.py`](loaders.py)
 - Core method: `Statistics.run()`
 
 ## Data Inputs
@@ -44,7 +45,7 @@ Configured seasons:
 
 ## Processing Pipeline
 
-1. Load all stat sources in parallel (`_load_statistics_sources`) and rosters in parallel with source loading (`run`).
+1. Load all stat sources in parallel through [`loaders.py`](loaders.py) and rosters in parallel with source loading (`run`).
 2. Normalize team abbreviations in each source loader (for example `LA -> LAR`, `WAS -> WSH`) before downstream joins, then apply regular-season + fantasy-position filtering where applicable (`QB/RB/WR/TE`) and keep mapped columns.
 3. Merge weekly sources onto base weekly player stats via a shared join-spec loop.
 - Sources with abbreviated PFR-style names (`snap_counts`, `pfr_*_weekly`) are aligned with `align_pfr_seasonal_names` before merge.
@@ -72,6 +73,7 @@ Notes:
 ## Related Files
 
 - Orchestration + cache-shape builders: [`statistics.py`](statistics.py)
+- nflreadpy loaders: [`loaders.py`](loaders.py)
 - Reusable dataframe helpers: [`util/stats_helpers.py`](util/stats_helpers.py)
 - Constants/config: [`../util/constants.py`](../util/constants.py)
 

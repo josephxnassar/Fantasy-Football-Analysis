@@ -32,11 +32,11 @@ def test_load_nextgen_receiving_stats_normalizes_team_abbreviations(monkeypatch:
     )
 
     monkeypatch.setattr(
-        "backend.statistics.statistics.nfl.load_nextgen_stats",
+        "backend.statistics.loaders.nfl.load_nextgen_stats",
         lambda **_: _NflReadPyResult(source_df),
     )
 
-    loaded = statistics_source._load_nextgen_receiving_stats()
+    loaded = statistics_source._source_loader.load_nextgen_receiving_stats()
 
     assert loaded.iloc[0]["team"] == "LAR"
 
@@ -53,11 +53,11 @@ def test_load_pfr_adv_rec_season_normalizes_team_abbreviations(monkeypatch: pyte
     )
 
     monkeypatch.setattr(
-        "backend.statistics.statistics.nfl.load_pfr_advstats",
+        "backend.statistics.loaders.nfl.load_pfr_advstats",
         lambda **_: _NflReadPyResult(source_df),
     )
 
-    loaded = statistics_source._load_pfr_adv_rec_season()
+    loaded = statistics_source._source_loader.load_pfr_adv_rec_season()
 
     assert loaded.iloc[0]["team"] == "LAR"
 

@@ -1,22 +1,23 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import re
-from typing import Dict, Iterable, List, Mapping
+from typing import Dict, List, Mapping
 
 import pandas as pd
 
-_WEEKLY_AGGREGATE_GROUP_KEYS = ["season", "position", "player_display_name"]
+from backend.util import constants
+
 
 def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
     """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
     return [s for s in seasons if s >= min_year]
 
-def team_normalization(source: pd.DataFrame, normalization_map: Mapping[str, str]) -> pd.DataFrame:
+def team_normalization(source: pd.DataFrame) -> pd.DataFrame:
     if "team" in source.columns:
-        source["team"] = source["team"].replace(normalization_map)
+        source["team"] = source["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
     return source
 
-def filter_regular_and_position(source: pd.DataFrame, positions: Iterable[str]) -> pd.DataFrame:
+def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
     filtered = source
     for season_col in ("season_type", "game_type"):
@@ -25,7 +26,7 @@ def filter_regular_and_position(source: pd.DataFrame, positions: Iterable[str]) 
             break
     if "position" not in filtered.columns:
         return filtered.iloc[0:0].copy()
-    return filtered.loc[filtered["position"].isin(positions)]
+    return filtered.loc[filtered["position"].isin(constants.POSITIONS)]
 
 def select_columns(source: pd.DataFrame, column_map: Mapping[str, str]) -> pd.DataFrame:
     """Return only mapped columns present in source, renamed to target names."""
@@ -100,31 +101,31 @@ def _safe_rate(df: pd.DataFrame, numerator: str, denominator: str) -> pd.Series:
     """Compute a rounded per-unit rate while handling divide-by-zero/NaN."""
     return (df[numerator].div(df[denominator]).replace([float("inf"), -float("inf")], 0).fillna(0).round(1))
 
-def combine_aliases(df: pd.DataFrame, metric_sources: Mapping[str, List[str]]) -> pd.DataFrame:
+def combine_aliases(df: pd.DataFrame) -> pd.DataFrame:
     """Fill each unified stat column with the first non-null value from prioritized source columns."""
     interpreted = df.copy()
-    for out_col, sources in metric_sources.items():
+    for out_col, sources in constants.INTERPRETED_METRIC_SOURCES.items():
         cols = [col for col in sources if col in interpreted.columns]
         if cols:
             interpreted[out_col] = interpreted[cols].bfill(axis=1).iloc[:, 0]
     return interpreted
 
-def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, sum_aggregate_metrics: Iterable[str], averaged_aggregate_metrics: Iterable[str]) -> pd.DataFrame:
+def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame) -> pd.DataFrame:
     """Merge weekly-derived season aggregates into seasonal rows, filling only missing values."""
     if seasonal_df.empty or weekly_df.empty:
         return seasonal_df
 
-    group_keys = [key for key in _WEEKLY_AGGREGATE_GROUP_KEYS if key in seasonal_df.columns and key in weekly_df.columns]
+    group_keys = [key for key in ["season", "position", "player_display_name"] if key in seasonal_df.columns and key in weekly_df.columns]
 
     if not group_keys:
         return seasonal_df
 
     aggregates = weekly_df[group_keys].drop_duplicates().copy()
     
-    summed_metric_sources = {metric_name: (metric_name,) for metric_name in sum_aggregate_metrics}
+    summed_metric_sources = {metric_name: (metric_name,) for metric_name in constants.WEEKLY_SUM_AGGREGATE_METRICS}
     aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, summed_metric_sources, "sum")
 
-    averaged_metric_sources = {metric_name: (metric_name,) for metric_name in averaged_aggregate_metrics}
+    averaged_metric_sources = {metric_name: (metric_name,) for metric_name in constants.WEEKLY_AVERAGED_AGGREGATE_METRICS}
     aggregates = _append_aggregated_metrics(aggregates, weekly_df, group_keys, averaged_metric_sources, "mean")
 
     metric_cols = [col for col in aggregates.columns if col not in group_keys]
@@ -158,7 +159,7 @@ def _merge_aggregates_and_fill_missing(seasonal_df: pd.DataFrame, aggregates_df:
             merged[metric_col] = merged[weekly_col]
     return merged.drop(columns=list(weekly_cols.values()))
 
-def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[str]) -> pd.DataFrame:
+def add_group_ranks(df: pd.DataFrame, group_cols: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""
     ranked = df.copy()
 
@@ -166,7 +167,7 @@ def add_group_ranks(df: pd.DataFrame, metrics: Iterable[str], group_cols: List[s
     if not groups:
         return ranked
 
-    for metric in metrics:
+    for metric in constants.INTERPRETED_RANK_METRICS:
         if metric not in ranked.columns:
             continue
         numeric = pd.to_numeric(ranked[metric], errors="coerce")

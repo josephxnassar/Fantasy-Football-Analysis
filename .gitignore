@@ -20,6 +20,7 @@ backend/tests/.pytest_work/
 .pytest_tmp/
 .ruff_cache/
 .mypy_cache/
+.uv-cache/
 .venv/
 backend/database/data/*
 !backend/database/data/.gitkeep

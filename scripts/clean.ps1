@@ -36,6 +36,7 @@ $explicitTargets = @(
     ".pytest_tmp",
     ".ruff_cache",
     ".mypy_cache",
+    ".uv-cache",
     ".eslintcache",
     "frontend/.vite",
     "frontend/dist",

@@ -2,7 +2,6 @@ import pandas as pd
 import pytest
 
 from backend.statistics.util import stats_helpers
-from backend.util import constants
 
 
 def test_add_derived_stats_handles_zero_division() -> None:
@@ -34,7 +33,7 @@ def test_filter_regular_and_position_filters_regular_fantasy_positions() -> None
         }
     )
 
-    filtered = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
+    filtered = stats_helpers.filter_regular_and_position(source)
 
     assert filtered.shape[0] == 1
     assert filtered.iloc[0]["position"] == "WR"
@@ -43,7 +42,7 @@ def test_filter_regular_and_position_filters_regular_fantasy_positions() -> None
 def test_filter_regular_and_position_handles_missing_position_column() -> None:
     source = pd.DataFrame({"game_type": ["REG"], "team": ["LA"]})
 
-    filtered = stats_helpers.filter_regular_and_position(source, constants.POSITIONS)
+    filtered = stats_helpers.filter_regular_and_position(source)
 
     assert filtered.empty
 
@@ -80,12 +79,7 @@ def test_merge_weekly_aggregates_into_seasonal_applies_sum_and_mean_reducers() -
     ):
         seasonal_df[col] = float("nan")
 
-    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
-        seasonal_df,
-        weekly_df,
-        constants.WEEKLY_SUM_AGGREGATE_METRICS,
-        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
-    )
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df)
     qb_2025 = merged[
         (merged["season"] == 2025) & (merged["player_display_name"] == "Patrick Mahomes")
     ].iloc[0]
@@ -126,12 +120,7 @@ def test_merge_weekly_aggregates_into_seasonal_fills_missing_values_only() -> No
         }
     )
 
-    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
-        seasonal_df,
-        weekly_df,
-        constants.WEEKLY_SUM_AGGREGATE_METRICS,
-        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
-    )
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df)
     row = merged.iloc[0]
 
     assert row["exp_fp"] == pytest.approx(35.0)
@@ -144,42 +133,34 @@ def test_merge_weekly_aggregates_into_seasonal_returns_seasonal_when_group_keys_
     seasonal_df = pd.DataFrame({"season": [2025], "player_display_name": ["Patrick Mahomes"]})
     weekly_df = pd.DataFrame({"week": [1], "player_name": ["Patrick Mahomes"], "exp_fp": [20.0]})
 
-    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(
-        seasonal_df,
-        weekly_df,
-        constants.WEEKLY_SUM_AGGREGATE_METRICS,
-        constants.WEEKLY_AVERAGED_AGGREGATE_METRICS,
-    )
+    merged = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df)
 
     assert merged.equals(seasonal_df)
 
 
 def test_combine_aliases_uses_first_non_null() -> None:
-    df = pd.DataFrame({"primary": [100.0, float("nan")], "fallback": [90.0, 80.0]})
-    metric_sources = {"out_col": ["primary", "fallback"]}
+    df = pd.DataFrame({"fantasy_points_ppr": [100.0, float("nan")], "ffo_total_fp": [90.0, 80.0]})
 
-    result = stats_helpers.combine_aliases(df, metric_sources)
+    result = stats_helpers.combine_aliases(df)
 
-    assert result.loc[0, "out_col"] == 100.0
-    assert result.loc[1, "out_col"] == 80.0
+    assert result.loc[0, "fp_ppr"] == 100.0
+    assert result.loc[1, "fp_ppr"] == 80.0
 
 
 def test_combine_aliases_skips_missing_source_columns() -> None:
-    df = pd.DataFrame({"col_a": [10.0]})
-    metric_sources = {"out": ["missing_col", "col_a"]}
+    df = pd.DataFrame({"ng_pass_att": [10.0]})
 
-    result = stats_helpers.combine_aliases(df, metric_sources)
+    result = stats_helpers.combine_aliases(df)
 
-    assert result.loc[0, "out"] == 10.0
+    assert result.loc[0, "pass_att"] == 10.0
 
 
 def test_combine_aliases_all_null_stays_nan() -> None:
-    df = pd.DataFrame({"src": [float("nan")]})
-    metric_sources = {"out": ["src"]}
+    df = pd.DataFrame({"ffo_total_fp_exp": [float("nan")]})
 
-    result = stats_helpers.combine_aliases(df, metric_sources)
+    result = stats_helpers.combine_aliases(df)
 
-    assert pd.isna(result.loc[0, "out"])
+    assert pd.isna(result.loc[0, "exp_fp"])
 
 
 def test_add_group_ranks_ranks_within_groups() -> None:
@@ -191,7 +172,7 @@ def test_add_group_ranks_ranks_within_groups() -> None:
         }
     )
 
-    result = stats_helpers.add_group_ranks(df, ["fp_ppr"], ["season", "position"])
+    result = stats_helpers.add_group_ranks(df, ["season", "position"])
 
     ranks = result["fp_ppr_rank"].tolist()
     assert ranks == [2, 3, 1]
@@ -206,24 +187,24 @@ def test_add_group_ranks_handles_ties() -> None:
         }
     )
 
-    result = stats_helpers.add_group_ranks(df, ["rec_yds"], ["season", "position"])
+    result = stats_helpers.add_group_ranks(df, ["season", "position"])
 
     assert result["rec_yds_rank"].tolist() == [1, 1]
 
 
-def test_add_group_ranks_skips_missing_metrics() -> None:
+def test_add_group_ranks_skips_missing_default_metrics() -> None:
     df = pd.DataFrame({"season": [2025], "position": ["QB"], "fp_ppr": [300.0]})
 
-    result = stats_helpers.add_group_ranks(df, ["fp_ppr", "nonexistent"], ["season", "position"])
+    result = stats_helpers.add_group_ranks(df, ["season", "position"])
 
     assert "fp_ppr_rank" in result.columns
-    assert "nonexistent_rank" not in result.columns
+    assert "pass_att_rank" not in result.columns
 
 
 def test_add_group_ranks_returns_unmodified_when_group_columns_missing() -> None:
     df = pd.DataFrame({"fp_ppr": [300.0, 280.0]})
 
-    result = stats_helpers.add_group_ranks(df, ["fp_ppr"], ["season", "position"])
+    result = stats_helpers.add_group_ranks(df, ["season", "position"])
 
     assert result.equals(df)
 
@@ -247,9 +228,7 @@ def test_add_group_ranks_includes_touchdown_rank_metrics() -> None:
         }
     )
 
-    result = stats_helpers.add_group_ranks(
-        df, constants.INTERPRETED_RANK_METRICS, ["season", "position"]
-    )
+    result = stats_helpers.add_group_ranks(df, ["season", "position"])
 
     assert "pass_td_rank" in result.columns
     assert "rush_td_rank" in result.columns
