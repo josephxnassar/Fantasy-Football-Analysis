@@ -2,15 +2,15 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import PlayerCard from '../../../src/components/common/PlayerCard';
+import SelectablePlayerCard from '../../../src/components/common/SelectablePlayerCard';
 
-describe('PlayerCard', () => {
+describe('SelectablePlayerCard', () => {
   it('renders as a keyboard-accessible button', async () => {
     const user = userEvent.setup();
     const onPlayerClick = vi.fn();
 
     render(
-      <PlayerCard
+      <SelectablePlayerCard
         player={{ name: 'Christian McCaffrey', team: 'SF', position: 'RB', age: 29 }}
         onPlayerClick={onPlayerClick}
       />

@@ -1,31 +1,27 @@
-// Shared depth chart table for the full modal and the player-details modal.
+// Generates depth chart tables (mini: like in player modals, full: like in Depth Charts)
 
 import './DepthChartTable.css';
 
 function DepthChartTable({ entries, variant = 'full', highlightName = null, onPlayerClick }) {
   const tableClass = variant === 'mini' ? 'depth-chart-mini-table' : 'depth-chart-table';
 
-  // Build consistent cell class list for state styling (starter/empty/highlight).
   const cellClass = (name, extra = '') => {
     const classes = ['player-cell'];
-    if (extra) classes.push(extra);
-    if (!name) classes.push('empty');
-    if (highlightName && name === highlightName) classes.push('highlight');
+    if (extra)
+      classes.push(extra);
+    if (!name)
+      classes.push('empty');
+    if (highlightName && name === highlightName)
+      classes.push('highlight');
     return classes.join(' ');
   };
   const renderPlayerName = (name) => {
-    if (!name) return '—';
-    if (!onPlayerClick) return name;
-
-    return (
-      <button
-        type="button"
-        className="depth-chart-player-link"
-        onClick={() => onPlayerClick(name)}
-      >
-        {name}
-      </button>
-    );
+    if (!name) 
+      return '—';
+    if (!onPlayerClick) 
+      return name;
+    else 
+      return (<button type="button" className="depth-chart-player-link" onClick={() => onPlayerClick(name)}>{name}</button>);
   };
 
   return (

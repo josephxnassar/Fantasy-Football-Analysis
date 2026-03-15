@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { searchPlayers } from '../../api';
-import { ErrorMessage, EmptyStateMessage, PlayerCard } from '../common';
+import { ErrorMessage, EmptyStateMessage, SelectablePlayerCard } from '../common';
 import './PlayerSearch.css';
 
 export default function PlayerSearch({
@@ -68,7 +68,7 @@ export default function PlayerSearch({
             <h3 className="results-count">Found {searchResults.count} players</h3>
             {searchResults.count > 0 ? (
               <div className="results-grid">
-                {displayResults.map((player) => <PlayerCard key={player.name} player={player} onPlayerClick={onPlayerClick} />)}
+                {displayResults.map((player) => <SelectablePlayerCard key={player.name} player={player} onPlayerClick={onPlayerClick} />)}
               </div>
             ) : (
               <EmptyStateMessage message={`No players found matching "${searchQuery}"`} />

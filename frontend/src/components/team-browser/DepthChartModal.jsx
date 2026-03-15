@@ -1,7 +1,7 @@
 import { getTeamDepthChart } from '../../api';
 import { useTeamModalData } from '../../hooks/useTeamModalData';
 import { getTeamColor } from '../../utils/teamColors';
-import { DepthChartTable, ModalOverlay } from '../common';
+import { DepthChartTable, ModalBackdrop } from '../common';
 import './DepthChartModal.css';
 
 export default function DepthChartModal({ team, onClose, onPlayerClick }) {
@@ -16,7 +16,7 @@ export default function DepthChartModal({ team, onClose, onPlayerClick }) {
   if (!team) return null;
 
   return (
-    <ModalOverlay onClose={onClose}>
+    <ModalBackdrop onClose={onClose}>
       <div className="depth-chart-modal-content">
         <button className="depth-chart-close-button" onClick={onClose}>×</button>
 
@@ -40,6 +40,6 @@ export default function DepthChartModal({ team, onClose, onPlayerClick }) {
           </>
         )}
       </div>
-    </ModalOverlay>
+    </ModalBackdrop>
   );
 }

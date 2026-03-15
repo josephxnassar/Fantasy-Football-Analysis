@@ -51,12 +51,6 @@
   font-weight: 800;
   line-height: 1.04;
   letter-spacing: -0.02em;
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-}
-
-.app-header-title:hover {
-  opacity: 0.85;
 }
 
 .app-header-tagline {

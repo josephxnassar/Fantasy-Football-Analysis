@@ -1,4 +1,4 @@
-// Static section previews shown in the main app header.
+// Specific tab previews that are used in AppHeader
 
 export default function AppHeaderPreview({ activeTab, activeTabLabel }) {
   return (

@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../../api';
 import { useTeamModalData } from '../../hooks/useTeamModalData';
 import { getTeamColor } from '../../utils/teamColors';
-import { ModalOverlay } from '../common';
+import { ModalBackdrop } from '../common';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
@@ -48,7 +48,7 @@ export default function TeamScheduleModal({ team, onClose }) {
   if (!team) return null;
 
   return (
-    <ModalOverlay onClose={onClose}>
+    <ModalBackdrop onClose={onClose}>
       <div className="schedule-modal-content">
         <button className="schedule-close-button" onClick={onClose}>×</button>
         
@@ -152,6 +152,6 @@ export default function TeamScheduleModal({ team, onClose }) {
           </>
         )}
       </div>
-    </ModalOverlay>
+    </ModalBackdrop>
   );
 }

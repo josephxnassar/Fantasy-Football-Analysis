@@ -1,4 +1,4 @@
-// Reusable badge for player details like team, position, and age.
+// Creates class for age/team/pos
 
 import './DetailBadge.css';
 

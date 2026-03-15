@@ -38,7 +38,7 @@ Loaded from `nflreadpy`:
 
 Season guards used in loaders:
 - PFR advanced: `>= 2018`
-- Snap counts: `>= 2018`
+- Snap counts: `>= 2012`
 
 Configured seasons:
 - [`backend/util/constants.py`](../util/constants.py) -> `SEASONS`

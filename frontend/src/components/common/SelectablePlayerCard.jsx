@@ -1,16 +1,12 @@
 // Reusable player card for search and picker results.
 
-import './PlayerCard.css';
+import './SelectablePlayerCard.css';
 import RookieBadge from './RookieBadge';
 import DetailBadge from './DetailBadge';
 
-export default function PlayerCard({ player, onPlayerClick }) {
+export default function SelectablePlayerCard({ player, onPlayerClick }) {
   return (
-    <button
-      type="button"
-      className="player-card"
-      onClick={() => onPlayerClick(player.name, player)}
-    >
+    <button type="button" className="player-card" onClick={() => onPlayerClick(player.name, player)}>
       <div className="player-card-left">
         <div className="player-name-search">
           <span>{player.name}</span>

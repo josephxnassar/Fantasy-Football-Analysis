@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { getTeamDepthChart } from '../../api';
 import { useTeamModalData } from '../../hooks/useTeamModalData';
 import { getTeamColor } from '../../utils/teamColors';
-import { ErrorMessage, ModalOverlay, SubTabNav } from '../common';
+import { ErrorMessage, ModalBackdrop, SubTabNav } from '../common';
 import PlayerDepthChartTab from './PlayerDepthChartTab';
 import PlayerHeader from './PlayerHeader';
 import PlayerOverviewTab from './PlayerOverviewTab';
@@ -45,7 +45,7 @@ export default function PlayerDetailsModal({
   if (!playerDetails && !loading && !error) return null;
 
   return (
-    <ModalOverlay className="modal-overlay--player-details" onClose={onClose}>
+    <ModalBackdrop className="modal-overlay--player-details" onClose={onClose}>
       <div className="player-details-modal-content" style={playerModalStyle}>
         {loading ? (
           <div className="loading">Loading player details...</div>
@@ -118,6 +118,6 @@ export default function PlayerDetailsModal({
           </>
         )}
       </div>
-    </ModalOverlay>
+    </ModalBackdrop>
   );
 }
