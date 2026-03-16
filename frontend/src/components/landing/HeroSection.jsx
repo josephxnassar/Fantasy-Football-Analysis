@@ -9,15 +9,8 @@ export default function HeroSection() {
       <div className="landing-hero-inner">
         <div className="landing-hero-copy">
           <h1 className="landing-title">Fantasy Football Analysis</h1>
-          <p className="landing-tagline">
-            {APP_FUNCTIONAL_DESCRIPTION}
-          </p>
-
-          <ul className="landing-proof-list">
-            {HEADER_PROOF_POINTS.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
-          </ul>
+          <p className="landing-tagline">{APP_FUNCTIONAL_DESCRIPTION}</p>
+          <ul className="landing-proof-list">{HEADER_PROOF_POINTS.map((point) => (<li key={point}>{point}</li>))}</ul>
         </div>
 
         <aside className="landing-hero-visual" aria-hidden="true">

@@ -15,11 +15,9 @@ export function useAppInfo() {
     let cancelled = false;
 
     if (cachedAppInfo) {
-      if (!cancelled) {
-        setData(cachedAppInfo);
-        setError(null);
-        setLoading(false);
-      }
+      setData(cachedAppInfo);
+      setError(null);
+      setLoading(false);
       return () => {
         cancelled = true;
       };
@@ -51,6 +49,7 @@ export function useAppInfo() {
         appInfoRequestPromise = null;
       }
     };
+    
     fetchInfo();
     return () => { cancelled = true; };
   }, []);

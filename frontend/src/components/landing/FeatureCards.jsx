@@ -32,11 +32,7 @@ export default function FeatureCards({ onNavigate }) {
       <h2 className="section-heading">Explore</h2>
       <div className="landing-features">
         {FEATURES.map((feature) => (
-          <button
-            key={feature.id}
-            className="feature-card"
-            onClick={() => onNavigate(feature.id)}
-          >
+          <button key={feature.id} className="feature-card" onClick={() => onNavigate(feature.id)}>
             <span className="feature-icon">{feature.icon}</span>
             <h3 className="feature-title">{feature.title}</h3>
             <p className="feature-description">{feature.description}</p>
