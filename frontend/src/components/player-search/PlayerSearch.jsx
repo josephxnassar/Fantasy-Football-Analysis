@@ -3,13 +3,7 @@ import { searchPlayers } from '../../api';
 import { ErrorMessage, EmptyStateMessage, SelectablePlayerCard } from '../common';
 import './PlayerSearch.css';
 
-export default function PlayerSearch({
-  onPlayerClick,
-  className,
-  heading = 'Search Players',
-  maxResults,
-  variant = 'default',
-}) {
+export default function PlayerSearch({onPlayerClick, className, heading = 'Search Players', maxResults, variant = 'default'}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,31 +32,17 @@ export default function PlayerSearch({
   const results = searchResults?.results ?? [];
   const displayResults = maxResults ? results.slice(0, maxResults) : results;
 
-  const containerClassName = [
-    'player-search-container',
-    `player-search--${variant}`,
-    className,
-  ].filter(Boolean).join(' ');
+  const containerClassName = ['player-search-container', `player-search--${variant}`, className].filter(Boolean).join(' ');
 
   return (
     <div className={containerClassName}>
       <div className="search-section">
         <h2 className="search-heading">{heading}</h2>
         <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            placeholder="Search by player name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="player-search-input"
-          />
-          <button type="submit" className="search-button" disabled={loading}>
-            {loading ? 'Searching...' : 'Search'}
-          </button>
+          <input type="text" placeholder="Search by player name..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="player-search-input"/>
+          <button type="submit" className="search-button" disabled={loading}>{loading ? 'Searching...' : 'Search'}</button>
         </form>
-
         {error && <ErrorMessage message={error} />}
-
         {searchResults && (
           <div className="results-section">
             <h3 className="results-count">Found {searchResults.count} players</h3>
@@ -70,9 +50,7 @@ export default function PlayerSearch({
               <div className="results-grid">
                 {displayResults.map((player) => <SelectablePlayerCard key={player.name} player={player} onPlayerClick={onPlayerClick} />)}
               </div>
-            ) : (
-              <EmptyStateMessage message={`No players found matching "${searchQuery}"`} />
-            )}
+            ) : (<EmptyStateMessage message={`No players found matching "${searchQuery}"`} />)}
           </div>
         )}
       </div>

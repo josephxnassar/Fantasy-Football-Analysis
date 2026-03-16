@@ -4,13 +4,7 @@ export default function PlayerHeader({ playerDetails }) {
   // Compact identity block for the dashboard header.
   return (
     <div className="player-header">
-      <img
-        src={playerDetails?.headshot_url || '/vacant-player.svg'}
-        alt={playerDetails?.headshot_url ? playerDetails.name : 'No headshot available'}
-        className="player-headshot"
-        // Fallback keeps broken image URLs from collapsing the layout.
-        onError={(e) => { e.target.src = '/vacant-player.svg'; }}
-      />
+      <img src={playerDetails?.headshot_url || '/vacant-player.svg'} alt={playerDetails?.headshot_url ? playerDetails.name : 'No headshot available'} className="player-headshot" onError={(e) => { e.target.src = '/vacant-player.svg'; }}/>
 
       <div className="player-summary">
         <div className="player-name-row">
