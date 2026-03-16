@@ -13,14 +13,10 @@ function getCacheKey(position, playerName, stat) {
 
 async function fetchPlayerTrendPayload(playerName, position, stat, key) {
   if (!seasonChartInFlight.has(key)) {
-    const request = getPlayerTrendData(playerName, position, stat)
-      .then((response) => {
+    const request = getPlayerTrendData(playerName, position, stat).then((response) => {
         seasonChartCache.set(key, response.data);
         return response.data;
-      })
-      .finally(() => {
-        seasonChartInFlight.delete(key);
-      });
+      }).finally(() => {seasonChartInFlight.delete(key)});
     seasonChartInFlight.set(key, request);
   }
 

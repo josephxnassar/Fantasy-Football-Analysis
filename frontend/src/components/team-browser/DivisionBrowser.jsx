@@ -22,52 +22,30 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
     }
   }, [divisionNames, expandedDivision]);
 
-  if (loading) {
+  if (loading)
     return <div className="loading">Loading divisions...</div>;
-  }
 
-  if (error) {
+  if (error)
     return <div className="error">{error}</div>;
-  }
 
   return (
     <div className="division-browser">
       <div className="conference-selector">
         {conferences.map((conf) => (
-          <button
-            key={conf}
-            className={`conference-button ${expandedConference === conf ? 'active' : ''} ${conf.toLowerCase()}`}
-            onClick={() => {
-              setExpandedConference(conf);
-              setExpandedDivision(Object.keys(divisions?.[conf] || {})[0] || 'North');
-            }}
-          >
-            {conf}
-          </button>
+          <button key={conf} className={`conference-button ${expandedConference === conf ? 'active' : ''} ${conf.toLowerCase()}`} onClick={() => {
+            setExpandedConference(conf);
+            setExpandedDivision(Object.keys(divisions?.[conf] || {})[0] || 'North');
+          }}>{conf}</button>
         ))}
       </div>
 
       <div className="division-selector">
-        {divisionNames.map((div) => (
-          <button
-            key={div}
-            className={`division-button ${expandedDivision === div ? 'active' : ''}`}
-            onClick={() => setExpandedDivision(div)}
-          >
-            {div}
-          </button>
-        ))}
+        {divisionNames.map((div) => (<button key={div} className={`division-button ${expandedDivision === div ? 'active' : ''}`} onClick={() => setExpandedDivision(div)}>{div}</button>))}
       </div>
 
       <div className="team-grid">
         {teams.map((team) => (
-          <button
-            type="button"
-            key={team}
-            className="team-card"
-            style={getTeamColorVars(team)}
-            onClick={() => onTeamSelect(team)}
-          >
+          <button type="button" key={team} className="team-card" style={getTeamColorVars(team)} onClick={() => onTeamSelect(team)}>
             <div className="team-abbr">{team}</div>
             <div className="team-name">{teamNames[team] || team}</div>
             <div className="team-action">{actionLabel}</div>

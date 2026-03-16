@@ -8,21 +8,15 @@ function isMissingStatValue(value) {
 }
 
 function formatComparisonValue(statKey, value) {
-  if (isMissingStatValue(value)) return '—';
+  if (isMissingStatValue(value))
+    return '—';
   return formatStatForDisplay(statKey, value);
 }
 
-export default function PlayerComparisonTable({
-  selectedPlayers,
-  comparisonRows,
-  statWinnersByKey,
-  weeksWinners,
-  winCountsBySlot,
-  onPlayerClick,
-  onPlayerSeasonClick,
-}) {
+export default function PlayerComparisonTable({selectedPlayers, comparisonRows, statWinnersByKey, weeksWinners, winCountsBySlot, onPlayerClick, onPlayerSeasonClick}) {
   const handlePlayerHeaderClick = (slot) => {
-    if (!slot?.playerName) return;
+    if (!slot?.playerName)
+      return;
     const selectedSeason = Number(slot.season);
     if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
       onPlayerSeasonClick(slot.playerName, selectedSeason);
@@ -31,18 +25,15 @@ export default function PlayerComparisonTable({
     onPlayerClick?.(slot.playerName);
   };
 
-  if (selectedPlayers.length === 0) {
+  if (selectedPlayers.length === 0)
     return <EmptyStateMessage message="Select at least one player to compare." />;
-  }
 
   return (
     <div className="direct-comparison-table-wrapper">
       <table className="direct-comparison-table">
         <colgroup>
           <col className="direct-comparison-col-stat" />
-          {selectedPlayers.map((slot) => (
-            <col key={`col-${slot.id}`} className="direct-comparison-col-player" />
-          ))}
+          {selectedPlayers.map((slot) => (<col key={`col-${slot.id}`} className="direct-comparison-col-player" />))}
         </colgroup>
         <thead>
           <tr>
@@ -50,18 +41,9 @@ export default function PlayerComparisonTable({
             {selectedPlayers.map((slot) => (
               <th key={slot.id}>
                 <div className="direct-comparison-column-header">
-                  <button
-                    type="button"
-                    className="direct-comparison-player-link"
-                    title={slot.playerName}
-                    onClick={() => handlePlayerHeaderClick(slot)}
-                  >
-                    {slot.playerName}
-                  </button>
+                  <button type="button" className="direct-comparison-player-link" title={slot.playerName} onClick={() => handlePlayerHeaderClick(slot)}>{slot.playerName}</button>
                   <small>{slot.season ?? 'Latest'}</small>
-                  <small className="direct-comparison-wins-label">
-                    Wins: {winCountsBySlot[slot.id] || 0}
-                  </small>
+                  <small className="direct-comparison-wins-label">Wins: {winCountsBySlot[slot.id] || 0}</small>
                 </div>
               </th>
             ))}
@@ -72,20 +54,13 @@ export default function PlayerComparisonTable({
             <th scope="row" className="direct-comparison-stat-cell">
               <span className="direct-comparison-stat-label">
                 <span>Weeks Played</span>
-                <StatTooltip
-                  label="Weeks Played"
-                  description="Number of weekly game logs recorded for the selected season."
-                />
+                <StatTooltip label="Weeks Played" description="Number of weekly game logs recorded for the selected season."/>
               </span>
             </th>
             {selectedPlayers.map((slot) => {
               const displayValue = slot.loading ? '...' : (slot.weeksPlayed ?? '—');
               const isWinner = weeksWinners.has(slot.id) && displayValue !== '—';
-              const valueClassName = [
-                'direct-comparison-value-chip',
-                displayValue === '—' ? 'direct-comparison-value-chip--missing' : '',
-                isWinner ? 'direct-comparison-value-chip--winner' : '',
-              ].filter(Boolean).join(' ');
+              const valueClassName = ['direct-comparison-value-chip', displayValue === '—' ? 'direct-comparison-value-chip--missing' : '', isWinner ? 'direct-comparison-value-chip--winner' : ''].filter(Boolean).join(' ');
               return (
                 <td key={`${slot.id}-weeks-played`}>
                   <span className={valueClassName}>{displayValue}</span>
@@ -111,10 +86,7 @@ export default function PlayerComparisonTable({
                 <th scope="row" className="direct-comparison-stat-cell">
                   <span className="direct-comparison-stat-label">
                     <span>{statLabel}</span>
-                    <StatTooltip
-                      label={statLabel}
-                      description={statDescription}
-                    />
+                    <StatTooltip label={statLabel} description={statDescription}/>
                   </span>
                 </th>
                 {selectedPlayers.map((slot) => {
@@ -122,11 +94,7 @@ export default function PlayerComparisonTable({
                   const displayValue = slot.loading ? '...' : formatComparisonValue(row.statKey, rawValue);
                   const winners = statWinnersByKey[row.statKey] || new Set();
                   const isWinner = winners.has(slot.id) && displayValue !== '—';
-                  const valueClassName = [
-                    'direct-comparison-value-chip',
-                    displayValue === '—' ? 'direct-comparison-value-chip--missing' : '',
-                    isWinner ? 'direct-comparison-value-chip--winner' : '',
-                  ].filter(Boolean).join(' ');
+                  const valueClassName = ['direct-comparison-value-chip', displayValue === '—' ? 'direct-comparison-value-chip--missing' : '', isWinner ? 'direct-comparison-value-chip--winner' : ''].filter(Boolean).join(' ');
                   return (
                     <td key={`${slot.id}-${row.statKey}`}>
                       <span className={valueClassName}>{displayValue}</span>

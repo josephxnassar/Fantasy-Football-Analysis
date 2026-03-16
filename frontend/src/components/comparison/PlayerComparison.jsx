@@ -32,25 +32,17 @@ export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick })
           <div className="direct-comparison-copy">
             <p className="direct-comparison-kicker">Player Comparison</p>
             <h1>Player Comparison</h1>
-            <p className="direct-comparison-subtitle">
-              Pick a position pool, choose up to {MAX_COMPARE_PLAYERS} players, then select each player&apos;s season.
-            </p>
+            <p className="direct-comparison-subtitle">Pick a position pool, choose up to {MAX_COMPARE_PLAYERS} players, then select each player&apos;s season.</p>
           </div>
 
           <div className="direct-comparison-controls">
             <div className="direct-comparison-control-group">
               <label>Position:</label>
               <select value={positionProfile} onChange={(event) => handlePositionProfileChange(event.target.value)}>
-                {POSITION_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
+                {POSITION_OPTIONS.map((option) => (<option key={option} value={option}>{option}</option>))}
               </select>
             </div>
-            <p className="direct-comparison-selection-count">
-              {selectedPlayers.length} / {MAX_COMPARE_PLAYERS} selected
-            </p>
+            <p className="direct-comparison-selection-count">{selectedPlayers.length} / {MAX_COMPARE_PLAYERS} selected</p>
           </div>
         </div>
 
@@ -68,51 +60,21 @@ export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick })
                   <article key={slot.id} className="direct-comparison-slot-card">
                     <div className="direct-comparison-slot-header">
                       <h3>Slot {slot.id}</h3>
-                      {slot.playerName && (
-                        <button
-                          type="button"
-                          className="direct-comparison-slot-remove"
-                          onClick={() => handleRemovePlayer(slot.id)}
-                        >
-                          Remove
-                        </button>
-                      )}
+                      {slot.playerName && (<button type="button" className="direct-comparison-slot-remove" onClick={() => handleRemovePlayer(slot.id)}>Remove</button>)}
                     </div>
 
                     <div className="direct-comparison-slot-field">
                       <label htmlFor={`comparison-player-${slot.id}`}>Player</label>
-                      <select
-                        id={`comparison-player-${slot.id}`}
-                        value={slot.playerName}
-                        onChange={(event) => handlePlayerSelect(slot.id, event.target.value)}
-                        disabled={Boolean(playerOptionsError) || playerOptions.length === 0}
-                      >
+                      <select id={`comparison-player-${slot.id}`} value={slot.playerName} onChange={(event) => handlePlayerSelect(slot.id, event.target.value)} disabled={Boolean(playerOptionsError) || playerOptions.length === 0}>
                         <option value="">Select player</option>
-                        {playerOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
+                        {playerOptions.map((option) => (<option key={option} value={option}>{option}</option>))}
                       </select>
                     </div>
 
                     <div className="direct-comparison-slot-field">
                       <label htmlFor={`comparison-season-${slot.id}`}>Season</label>
-                      <select
-                        id={`comparison-season-${slot.id}`}
-                        value={slot.season ?? ''}
-                        onChange={(event) => handleSeasonChange(slot.id, event.target.value)}
-                        disabled={!slot.playerName || slot.loading || slot.availableSeasons.length === 0}
-                      >
-                        {!slot.playerName ? (
-                          <option value="">Select player first</option>
-                        ) : (
-                          slot.availableSeasons.map((seasonOption) => (
-                            <option key={seasonOption} value={seasonOption}>
-                              {seasonOption}
-                            </option>
-                          ))
-                        )}
+                      <select id={`comparison-season-${slot.id}`} value={slot.season ?? ''} onChange={(event) => handleSeasonChange(slot.id, event.target.value)} disabled={!slot.playerName || slot.loading || slot.availableSeasons.length === 0}>
+                        {!slot.playerName ? (<option value="">Select player first</option>) : (slot.availableSeasons.map((seasonOption) => (<option key={seasonOption} value={seasonOption}>{seasonOption}</option>)))}
                       </select>
                     </div>
 
@@ -130,15 +92,7 @@ export default function PlayerComparison({ onPlayerClick, onPlayerSeasonClick })
 
         <div className="direct-comparison-panel direct-comparison-panel--table">
           <h2>Comparison Table</h2>
-          <PlayerComparisonTable
-            selectedPlayers={selectedPlayers}
-            comparisonRows={comparisonRows}
-            statWinnersByKey={statWinnersByKey}
-            weeksWinners={weeksWinners}
-            winCountsBySlot={winCountsBySlot}
-            onPlayerClick={onPlayerClick}
-            onPlayerSeasonClick={onPlayerSeasonClick}
-          />
+          <PlayerComparisonTable selectedPlayers={selectedPlayers} comparisonRows={comparisonRows} statWinnersByKey={statWinnersByKey} weeksWinners={weeksWinners} winCountsBySlot={winCountsBySlot} onPlayerClick={onPlayerClick} onPlayerSeasonClick={onPlayerSeasonClick}/>
         </div>
       </div>
     </div>

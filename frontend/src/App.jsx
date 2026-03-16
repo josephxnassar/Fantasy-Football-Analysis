@@ -49,7 +49,7 @@ function App() {
         <ErrorBoundary
           resetKey={activeTab}
           onReset={() => setActiveTab(DEFAULT_TAB)}
-          fallbackRender={({ resetErrorBoundary }) => (<TabErrorFallback onGoToDefault={() => {setActiveTab(DEFAULT_TAB); resetErrorBoundary();}} onRetry={resetErrorBoundary}/>)}>
+          fallbackRender={({ resetErrorBoundary }) => (<TabErrorFallback onGoToDefault={() => {setActiveTab(DEFAULT_TAB); resetErrorBoundary()}} onRetry={resetErrorBoundary}/>)}>
           <Suspense fallback={<LoadingMessage message="Loading section..." />}>
             <ActiveTabComponent onPlayerClick={handlePlayerClick} onPlayerSeasonClick={handlePlayerSeasonClick}/>
           </Suspense>

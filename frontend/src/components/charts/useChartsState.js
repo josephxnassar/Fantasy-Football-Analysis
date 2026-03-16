@@ -47,16 +47,19 @@ export function useChartsStateValidation({
   trendPlayerOptions,
 }) {
   useEffect(() => {
-    if (!availableStatOptions.length) return;
+    if (!availableStatOptions.length)
+      return;
     if (!availableStatOptions.includes(stat)) {
       setStat(availableStatOptions[0]);
     }
   }, [availableStatOptions, stat, setStat]);
 
   useEffect(() => {
-    if (view !== 'trend') return;
+    if (view !== 'trend')
+      return;
     if (!trendPlayerOptions.length) {
-      if (trendPlayer) setTrendPlayer('');
+      if (trendPlayer)
+        setTrendPlayer('');
       return;
     }
     if (!trendPlayer || !trendPlayerOptions.includes(trendPlayer)) {
