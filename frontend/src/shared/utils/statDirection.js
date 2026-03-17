@@ -14,6 +14,8 @@ const LOWER_IS_BETTER_TOKENS = [
 ];
 
 export function isLowerBetterStat(statName) {
-  const key = String(statName || '').trim().toLowerCase();
+  const key = String(statName || '')
+    .trim()
+    .toLowerCase();
   return LOWER_IS_BETTER_TOKENS.some((token) => key.includes(token));
 }

@@ -16,7 +16,7 @@ describe('TeamSearch', () => {
         loading={false}
         error={null}
         onTeamSelect={onTeamSelect}
-      />
+      />,
     );
 
     const button = screen.getByRole('button', { name: /Kansas City Chiefs/i });

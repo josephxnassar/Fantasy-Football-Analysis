@@ -3,10 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../support/deferred';
 import { getPlayerTrendData } from '../../../../src/api';
-import {
-  __resetSeasonChartDataCache,
-  useSeasonChartData,
-} from '../../../../src/features/statistics/charts/useSeasonChartData';
+import { __resetSeasonChartDataCache, useSeasonChartData } from '../../../../src/features/statistics/charts/useSeasonChartData';
 
 vi.mock('../../../../src/api', () => ({
   getPlayerTrendData: vi.fn(),
@@ -54,14 +51,11 @@ describe('useSeasonChartData', () => {
   it('ignores stale responses when player changes mid-request', async () => {
     const firstRequest = deferred();
     const secondRequest = deferred();
-    getPlayerTrendData
-      .mockImplementationOnce(() => firstRequest.promise)
-      .mockImplementationOnce(() => secondRequest.promise);
+    getPlayerTrendData.mockImplementationOnce(() => firstRequest.promise).mockImplementationOnce(() => secondRequest.promise);
 
-    const { result, rerender } = renderHook(
-      ({ playerName }) => useSeasonChartData('QB', playerName, 'Pass Yds', true),
-      { initialProps: { playerName: 'Patrick Mahomes' } }
-    );
+    const { result, rerender } = renderHook(({ playerName }) => useSeasonChartData('QB', playerName, 'Pass Yds', true), {
+      initialProps: { playerName: 'Patrick Mahomes' },
+    });
 
     rerender({ playerName: 'Joe Burrow' });
 

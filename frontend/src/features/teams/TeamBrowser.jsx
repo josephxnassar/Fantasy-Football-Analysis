@@ -17,10 +17,21 @@ function TeamBrowser({ actionLabel, renderModal }) {
 
   return (
     <div className="team-browser-container">
-      <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab}/>
+      <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} />
 
       <div className="team-browser-content">
-        {activeSubTab === 'browse' ? (<DivisionBrowser divisions={divisions} teamNames={teamNames} loading={loading} error={error} onTeamSelect={setSelectedTeam} actionLabel={actionLabel}/>) : (<TeamSearch allTeams={allTeams} teamNames={teamNames} loading={loading} error={error} onTeamSelect={setSelectedTeam}/>)}
+        {activeSubTab === 'browse' ? (
+          <DivisionBrowser
+            divisions={divisions}
+            teamNames={teamNames}
+            loading={loading}
+            error={error}
+            onTeamSelect={setSelectedTeam}
+            actionLabel={actionLabel}
+          />
+        ) : (
+          <TeamSearch allTeams={allTeams} teamNames={teamNames} loading={loading} error={error} onTeamSelect={setSelectedTeam} />
+        )}
       </div>
 
       {selectedTeam && renderModal(selectedTeam, () => setSelectedTeam(null))}

@@ -11,7 +11,7 @@ export default function AtAGlance() {
     return (
       <section className="landing-section">
         <h2 className="section-heading">At a Glance</h2>
-        <LoadingMessage message="Loading app info..."/>
+        <LoadingMessage message="Loading app info..." />
       </section>
     );
   }
@@ -20,13 +20,12 @@ export default function AtAGlance() {
     return (
       <section className="landing-section">
         <h2 className="section-heading">At a Glance</h2>
-        <ErrorMessage message={error}/>
+        <ErrorMessage message={error} />
       </section>
     );
   }
 
-  if (!appInfo) 
-    return null;
+  if (!appInfo) return null;
 
   return (
     <section className="landing-section">
@@ -42,7 +41,9 @@ export default function AtAGlance() {
         </div>
         <div className="stat-tile">
           <span className="stat-tile-value">{appInfo.seasons.length}</span>
-          <span className="stat-tile-label">Seasons ({appInfo.seasons[0]}–{appInfo.current_season})</span>
+          <span className="stat-tile-label">
+            Seasons ({appInfo.seasons[0]}–{appInfo.current_season})
+          </span>
         </div>
         <div className="stat-tile">
           <span className="stat-tile-value">{appInfo.total_game_logs.toLocaleString()}</span>

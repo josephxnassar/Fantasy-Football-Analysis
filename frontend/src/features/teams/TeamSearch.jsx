@@ -10,21 +10,29 @@ function TeamSearch({ allTeams, teamNames, loading, error, onTeamSelect }) {
     return team.toLowerCase().includes(queryLower) || teamNameLower.includes(queryLower);
   });
 
-  if (loading)
-    return <div className="loading">Loading teams...</div>;
+  if (loading) return <div className="loading">Loading teams...</div>;
 
-  if (error)
-    return <div className="error">{error}</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="team-search">
       <div className="search-container">
-        <input type="text" className="team-search-input" placeholder="Search teams by name or abbreviation..." value={query} onChange={(e) => setQuery(e.target.value)}/>
-        {query && (<button className="clear-button" onClick={() => setQuery('')}>×</button>)}
+        <input
+          type="text"
+          className="team-search-input"
+          placeholder="Search teams by name or abbreviation..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {query && (
+          <button className="clear-button" onClick={() => setQuery('')}>
+            ×
+          </button>
+        )}
       </div>
 
       <div className="teams-list">
-        {filteredTeams.length === 0 && query && (<div className="empty-state">No teams found matching "{query}"</div>)}
+        {filteredTeams.length === 0 && query && <div className="empty-state">No teams found matching "{query}"</div>}
 
         {filteredTeams.map((team) => (
           <button type="button" key={team} className="team-item" style={getTeamColorVars(team)} onClick={() => onTeamSelect(team)}>

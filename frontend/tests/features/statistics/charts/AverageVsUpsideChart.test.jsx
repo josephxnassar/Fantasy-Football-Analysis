@@ -16,11 +16,7 @@ vi.mock('recharts', () => {
     Scatter: ({ data = [], onClick }) => (
       <div>
         {data.map((point, index) => (
-          <button
-            key={`${point.name}-${index}`}
-            type="button"
-            onClick={() => onClick?.({ payload: point })}
-          >
+          <button key={`${point.name}-${index}`} type="button" onClick={() => onClick?.({ payload: point })}>
             {point.name}
           </button>
         ))}
@@ -45,7 +41,7 @@ describe('AverageVsUpsideChart', () => {
         season={2025}
         onPlayerClick={onPlayerClick}
         onPlayerSeasonClick={onPlayerSeasonClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Josh Allen' }));
@@ -62,7 +58,7 @@ describe('AverageVsUpsideChart', () => {
         data={[{ name: 'Lamar Jackson', avg_fp_ppr: 23.1, ceiling_fp_ppr: 34.4, volatility_fp_ppr: 6.2, games: 16 }]}
         season={undefined}
         onPlayerClick={onPlayerClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Lamar Jackson' }));

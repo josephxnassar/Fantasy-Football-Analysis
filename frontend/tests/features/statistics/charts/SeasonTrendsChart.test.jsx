@@ -14,11 +14,7 @@ vi.mock('recharts', () => {
     YAxis: () => null,
     Tooltip: () => null,
     LineChart: ({ data = [], children }) => (
-      <div>
-        {Children.map(children, (child) =>
-          isValidElement(child) ? cloneElement(child, { __chartData: data }) : child
-        )}
-      </div>
+      <div>{Children.map(children, (child) => (isValidElement(child) ? cloneElement(child, { __chartData: data }) : child))}</div>
     ),
     Line: ({ __chartData = [], dot, activeDot }) => (
       <div>
@@ -56,14 +52,10 @@ vi.mock('recharts', () => {
 describe('SeasonTrendsChart', () => {
   it('shows empty-state message when player or data is missing', () => {
     const { rerender } = render(<SeasonTrendsChart data={[]} playerName="Josh Allen" statLabel="PPR Pts" />);
-    expect(
-      screen.getByText('No multi-season trend data available for this selection.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No multi-season trend data available for this selection.')).toBeInTheDocument();
 
     rerender(<SeasonTrendsChart data={[{ season: 2025, value: 320.4 }]} playerName="" statLabel="PPR Pts" />);
-    expect(
-      screen.getByText('No multi-season trend data available for this selection.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No multi-season trend data available for this selection.')).toBeInTheDocument();
   });
 
   it('opens player modal at clicked season when trend point is clicked', async () => {
@@ -78,7 +70,7 @@ describe('SeasonTrendsChart', () => {
         playerName="Josh Allen"
         statLabel="PPR Pts"
         onPlayerSeasonClick={onPlayerSeasonClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Dot 2024' }));
@@ -95,7 +87,7 @@ describe('SeasonTrendsChart', () => {
         playerName="Josh Allen"
         statLabel="PPR Pts"
         onPlayerClick={onPlayerClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Dot 2025' }));
@@ -112,7 +104,7 @@ describe('SeasonTrendsChart', () => {
         playerName="Josh Allen"
         statLabel="PPR Pts"
         onPlayerClick={onPlayerClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Josh Allen' }));

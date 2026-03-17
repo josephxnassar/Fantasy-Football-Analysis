@@ -57,7 +57,9 @@ const STAT_THRESHOLDS = {
 
 function toKey(statName) {
   // Normalize stat key for consistent lookup logic.
-  return String(statName || '').trim().toLowerCase();
+  return String(statName || '')
+    .trim()
+    .toLowerCase();
 }
 
 function compactKey(statName) {

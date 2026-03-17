@@ -17,20 +17,17 @@ const EMPTY_SLOT = {
 };
 
 function createInitialSlots() {
-  return Array.from({ length: MAX_COMPARE_PLAYERS }, (_, index) => ({id: index + 1, ...EMPTY_SLOT}));
+  return Array.from({ length: MAX_COMPARE_PLAYERS }, (_, index) => ({ id: index + 1, ...EMPTY_SLOT }));
 }
 
 function getWeeksPlayedForSeason(weeklyStats, season) {
-  if (!Array.isArray(weeklyStats) || season === null || season === undefined)
-    return null;
+  if (!Array.isArray(weeklyStats) || season === null || season === undefined) return null;
   return weeklyStats.filter((week) => Number(week?.season) === Number(season)).length;
 }
 
 function slotMatchesProfile(slot, profile) {
-  if (!slot?.playerName)
-    return false;
-  if (profile === 'Overall')
-    return true;
+  if (!slot?.playerName) return false;
+  if (profile === 'Overall') return true;
   return slot.position === profile;
 }
 
@@ -40,9 +37,7 @@ export function useComparisonSlots() {
   const requestIdsBySlotRef = useRef({});
 
   const updateSlot = (slotId, updater) => {
-    setComparisonSlots((previous) =>
-      previous.map((slot) => (slot.id === slotId ? updater(slot) : slot))
-    );
+    setComparisonSlots((previous) => previous.map((slot) => (slot.id === slotId ? updater(slot) : slot)));
   };
 
   const clearSlot = (slotId) => {
@@ -58,20 +53,29 @@ export function useComparisonSlots() {
 
     try {
       const response = await getPlayer(playerName, season);
-      if (requestIdsBySlotRef.current[slotId] !== requestId)
-        return;
+      if (requestIdsBySlotRef.current[slotId] !== requestId) return;
 
       const payload = response.data;
       const availableSeasons = payload.available_seasons || [];
-      const resolvedSeason = season ?? (availableSeasons[0] ?? null);
+      const resolvedSeason = season ?? availableSeasons[0] ?? null;
       const weeksPlayed = getWeeksPlayedForSeason(payload.weekly_stats || [], resolvedSeason);
 
-      updateSlot(slotId, (slot) => ({...slot, playerName: payload.name, team: payload.team, position: payload.position, season: resolvedSeason, weeksPlayed, availableSeasons, stats: payload.stats || {}, loading: false, error: null}));
+      updateSlot(slotId, (slot) => ({
+        ...slot,
+        playerName: payload.name,
+        team: payload.team,
+        position: payload.position,
+        season: resolvedSeason,
+        weeksPlayed,
+        availableSeasons,
+        stats: payload.stats || {},
+        loading: false,
+        error: null,
+      }));
     } catch (err) {
-      if (requestIdsBySlotRef.current[slotId] !== requestId)
-        return;
+      if (requestIdsBySlotRef.current[slotId] !== requestId) return;
       const message = err?.message || 'Failed to load player details.';
-      updateSlot(slotId, (slot) => ({...slot, loading: false, error: message}));
+      updateSlot(slotId, (slot) => ({ ...slot, loading: false, error: message }));
     }
   };
 
@@ -79,7 +83,7 @@ export function useComparisonSlots() {
     setSelectionError(null);
     requestIdsBySlotRef.current = {};
     setComparisonSlots((previous) =>
-      previous.map((slot) => (slotMatchesProfile(slot, nextPosition) ? slot : { id: slot.id, ...EMPTY_SLOT }))
+      previous.map((slot) => (slotMatchesProfile(slot, nextPosition) ? slot : { id: slot.id, ...EMPTY_SLOT })),
     );
   };
 
@@ -102,8 +106,7 @@ export function useComparisonSlots() {
   const handleSeasonChange = (slotId, nextSeasonValue) => {
     const slot = comparisonSlots.find((candidate) => candidate.id === slotId);
     const nextSeason = Number(nextSeasonValue);
-    if (!slot || !slot.playerName || Number.isNaN(nextSeason))
-      return;
+    if (!slot || !slot.playerName || Number.isNaN(nextSeason)) return;
     void loadPlayerDetails(slotId, slot.playerName, nextSeason);
   };
 

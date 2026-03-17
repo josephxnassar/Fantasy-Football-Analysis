@@ -40,14 +40,14 @@ describe('useTeamModalData', () => {
   it('ignores stale responses when the selected team changes', async () => {
     const firstRequest = deferred();
     const secondRequest = deferred();
-    const fetchFn = vi.fn()
+    const fetchFn = vi
+      .fn()
       .mockImplementationOnce(() => firstRequest.promise)
       .mockImplementationOnce(() => secondRequest.promise);
 
-    const { result, rerender } = renderHook(
-      ({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'),
-      { initialProps: { team: 'KC' } }
-    );
+    const { result, rerender } = renderHook(({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'), {
+      initialProps: { team: 'KC' },
+    });
 
     rerender({ team: 'BUF' });
 
@@ -90,14 +90,14 @@ describe('useTeamModalData', () => {
 
   it('clears stale data when a refetch fails', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const fetchFn = vi.fn()
+    const fetchFn = vi
+      .fn()
       .mockResolvedValueOnce({ data: { team: 'KC', opponents: ['BUF'] } })
       .mockRejectedValueOnce(new Error('Server error'));
 
-    const { result, rerender } = renderHook(
-      ({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'),
-      { initialProps: { team: 'KC' } }
-    );
+    const { result, rerender } = renderHook(({ team }) => useTeamModalData(team, fetchFn, 'Failed to load data.'), {
+      initialProps: { team: 'KC' },
+    });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);

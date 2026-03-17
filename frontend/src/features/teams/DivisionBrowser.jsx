@@ -2,7 +2,16 @@ import { useState, useEffect } from 'react';
 import { getTeamColorVars } from '../../shared/utils/teamColors';
 import './DivisionBrowser.css';
 
-function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, actionLabel = 'View Details →', defaultConference = 'AFC', defaultDivision = 'North' }) {
+function DivisionBrowser({
+  divisions,
+  teamNames,
+  loading,
+  error,
+  onTeamSelect,
+  actionLabel = 'View Details →',
+  defaultConference = 'AFC',
+  defaultDivision = 'North',
+}) {
   const [expandedConference, setExpandedConference] = useState(defaultConference);
   const [expandedDivision, setExpandedDivision] = useState(defaultDivision);
   const conferences = Object.keys(divisions || {});
@@ -22,25 +31,37 @@ function DivisionBrowser({ divisions, teamNames, loading, error, onTeamSelect, a
     }
   }, [divisionNames, expandedDivision]);
 
-  if (loading)
-    return <div className="loading">Loading divisions...</div>;
+  if (loading) return <div className="loading">Loading divisions...</div>;
 
-  if (error)
-    return <div className="error">{error}</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="division-browser">
       <div className="conference-selector">
         {conferences.map((conf) => (
-          <button key={conf} className={`conference-button ${expandedConference === conf ? 'active' : ''} ${conf.toLowerCase()}`} onClick={() => {
-            setExpandedConference(conf);
-            setExpandedDivision(Object.keys(divisions?.[conf] || {})[0] || 'North');
-          }}>{conf}</button>
+          <button
+            key={conf}
+            className={`conference-button ${expandedConference === conf ? 'active' : ''} ${conf.toLowerCase()}`}
+            onClick={() => {
+              setExpandedConference(conf);
+              setExpandedDivision(Object.keys(divisions?.[conf] || {})[0] || 'North');
+            }}
+          >
+            {conf}
+          </button>
         ))}
       </div>
 
       <div className="division-selector">
-        {divisionNames.map((div) => (<button key={div} className={`division-button ${expandedDivision === div ? 'active' : ''}`} onClick={() => setExpandedDivision(div)}>{div}</button>))}
+        {divisionNames.map((div) => (
+          <button
+            key={div}
+            className={`division-button ${expandedDivision === div ? 'active' : ''}`}
+            onClick={() => setExpandedDivision(div)}
+          >
+            {div}
+          </button>
+        ))}
       </div>
 
       <div className="team-grid">

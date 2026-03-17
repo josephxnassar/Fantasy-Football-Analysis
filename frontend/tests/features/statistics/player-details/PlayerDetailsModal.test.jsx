@@ -39,21 +39,13 @@ describe('PlayerDetailsModal', () => {
         availableSeasons={[2025]}
         currentSeason={2025}
         onSeasonChange={vi.fn()}
-      />
+      />,
     );
 
-    expect(useTeamModalData).toHaveBeenCalledWith(
-      null,
-      expect.any(Function),
-      'Failed to load depth chart'
-    );
+    expect(useTeamModalData).toHaveBeenCalledWith(null, expect.any(Function), 'Failed to load depth chart');
 
     await user.click(screen.getByRole('button', { name: 'Depth Chart' }));
 
-    expect(useTeamModalData).toHaveBeenLastCalledWith(
-      'KC',
-      expect.any(Function),
-      'Failed to load depth chart'
-    );
+    expect(useTeamModalData).toHaveBeenLastCalledWith('KC', expect.any(Function), 'Failed to load depth chart');
   });
 });

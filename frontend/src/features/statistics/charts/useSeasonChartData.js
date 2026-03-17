@@ -13,10 +13,14 @@ function getCacheKey(position, playerName, stat) {
 
 async function fetchPlayerTrendPayload(playerName, position, stat, key) {
   if (!seasonChartInFlight.has(key)) {
-    const request = getPlayerTrendData(playerName, position, stat).then((response) => {
+    const request = getPlayerTrendData(playerName, position, stat)
+      .then((response) => {
         seasonChartCache.set(key, response.data);
         return response.data;
-      }).finally(() => {seasonChartInFlight.delete(key)});
+      })
+      .finally(() => {
+        seasonChartInFlight.delete(key);
+      });
     seasonChartInFlight.set(key, request);
   }
 
@@ -60,11 +64,9 @@ export function useSeasonChartData(position, playerName, stat, enabled) {
           setError(null);
         }
       } catch (err) {
-        if (!cancelled) 
-          setError(err.message);
+        if (!cancelled) setError(err.message);
       } finally {
-        if (!cancelled) 
-          setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 

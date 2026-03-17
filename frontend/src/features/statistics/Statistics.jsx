@@ -28,12 +28,12 @@ function Statistics({ onPlayerClick, onPlayerSeasonClick }) {
   return (
     <div className="statistics-container">
       <div className="statistics-header">
-        <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} variant="statistics"/>
+        <SubTabNav tabs={TABS} activeTab={activeSubTab} onTabChange={setActiveSubTab} variant="statistics" />
       </div>
 
       <div className="statistics-content">
         <Suspense fallback={<LoadingMessage message="Loading statistics..." />}>
-          <ActiveSubTab onPlayerClick={onPlayerClick} onPlayerSeasonClick={onPlayerSeasonClick}/>
+          <ActiveSubTab onPlayerClick={onPlayerClick} onPlayerSeasonClick={onPlayerSeasonClick} />
         </Suspense>
       </div>
     </div>

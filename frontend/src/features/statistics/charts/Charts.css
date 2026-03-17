@@ -103,7 +103,10 @@
   min-width: 0;
   width: 100%;
   color: var(--color-text-primary);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .charts-controls select:hover {
@@ -220,7 +223,9 @@
   cursor: pointer;
   padding: 0;
   border-radius: 6px;
-  transition: color 0.16s ease, background-color 0.16s ease;
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease;
 }
 
 .charts-player-link:hover {

@@ -13,10 +13,14 @@ function getCacheKey(position, season, topN) {
 
 async function fetchConsistencyPayload(position, season, topN, key) {
   if (!consistencyInFlight.has(key)) {
-    const request = getConsistencyData(position, season, topN).then((response) => {
+    const request = getConsistencyData(position, season, topN)
+      .then((response) => {
         consistencyCache.set(key, response.data);
         return response.data;
-      }).finally(() => {consistencyInFlight.delete(key)});
+      })
+      .finally(() => {
+        consistencyInFlight.delete(key);
+      });
     consistencyInFlight.set(key, request);
   }
   return consistencyInFlight.get(key);

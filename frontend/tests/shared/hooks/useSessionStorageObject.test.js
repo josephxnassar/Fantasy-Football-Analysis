@@ -38,10 +38,7 @@ describe('useSessionStorageObject', () => {
     });
 
     await waitFor(() => {
-      expect(window.sessionStorage.getItem('chartsUi')).toBe(
-        JSON.stringify({ view: 'trend', topN: 15 })
-      );
+      expect(window.sessionStorage.getItem('chartsUi')).toBe(JSON.stringify({ view: 'trend', topN: 15 }));
     });
   });
 });
-

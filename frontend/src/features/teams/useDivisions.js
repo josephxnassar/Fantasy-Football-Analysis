@@ -29,10 +29,8 @@ export function useDivisions() {
 
     const fetchDivisions = async () => {
       try {
-        if (!cancelled)
-          setLoading(true);
-        if (!divisionsRequestPromise)
-          divisionsRequestPromise = getDivisions();
+        if (!cancelled) setLoading(true);
+        if (!divisionsRequestPromise) divisionsRequestPromise = getDivisions();
         const response = await divisionsRequestPromise;
         cachedDivisionPayload = response.data;
         if (!cancelled) {
@@ -41,12 +39,10 @@ export function useDivisions() {
           setError(null);
         }
       } catch (err) {
-        if (!cancelled)
-          setError('Failed to load division data');
+        if (!cancelled) setError('Failed to load division data');
         console.error(err);
       } finally {
-        if (!cancelled)
-          setLoading(false);
+        if (!cancelled) setLoading(false);
         divisionsRequestPromise = null;
       }
     };
@@ -58,7 +54,15 @@ export function useDivisions() {
     };
   }, []);
 
-  const allTeams = useMemo(() => (divisions ? Object.values(divisions).flatMap((conference) => Object.values(conference).flat()).sort() : []), [divisions]);
+  const allTeams = useMemo(
+    () =>
+      divisions
+        ? Object.values(divisions)
+            .flatMap((conference) => Object.values(conference).flat())
+            .sort()
+        : [],
+    [divisions],
+  );
 
   return { divisions, teamNames, allTeams, loading, error };
 }

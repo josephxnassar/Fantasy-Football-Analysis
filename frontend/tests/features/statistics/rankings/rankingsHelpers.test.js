@@ -5,15 +5,9 @@ import { buildRankings, getRankableGroups } from '../../../../src/features/stati
 
 describe('rankingsHelpers', () => {
   it('filters unavailable stats from rankable groups', () => {
-    const groups = getRankableGroups(
-      'RB',
-      ['fp_ppr', 'rush_yds', 'rush_att_rank'],
-      RANKING_GROUPS
-    );
+    const groups = getRankableGroups('RB', ['fp_ppr', 'rush_yds', 'rush_att_rank'], RANKING_GROUPS);
 
-    expect(groups).toEqual([
-      { category: 'Rushing Production', stats: ['rush_yds'] },
-    ]);
+    expect(groups).toEqual([{ category: 'Rushing Production', stats: ['rush_yds'] }]);
   });
 
   it('ranks players with sample-size thresholds applied', () => {
@@ -50,9 +44,7 @@ describe('rankingsHelpers', () => {
       },
     ];
 
-    const rankableGroups = [
-      { category: 'Route & Separation', stats: ['ng_rec_avg_separation'] },
-    ];
+    const rankableGroups = [{ category: 'Route & Separation', stats: ['ng_rec_avg_separation'] }];
 
     const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 2 }, {}, 10);
 
@@ -95,7 +87,7 @@ describe('rankingsHelpers', () => {
     const groups = getRankableGroups(
       'Overall',
       ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
-      RANKING_GROUPS
+      RANKING_GROUPS,
     );
 
     expect(groups).toEqual([

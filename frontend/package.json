@@ -8,6 +8,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest",
     "test:run": "vitest run"
   },
@@ -28,6 +30,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^15.15.0",
     "jsdom": "^28.1.0",
+    "prettier": "^3.8.1",
     "vite": "^6.4.1",
     "vitest": "^3.2.4"
   },

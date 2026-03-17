@@ -233,7 +233,7 @@
   .schedule-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .schedule-modal-content {
     padding: 1.5rem;
   }

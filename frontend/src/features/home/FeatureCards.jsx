@@ -15,14 +15,13 @@ const FEATURES = [
     icon: '📅',
     title: 'Team Schedules',
     description:
-      'Browse every NFL team\'s full-season schedule by conference and division. Switch seasons to compare past and upcoming matchups.',
+      "Browse every NFL team's full-season schedule by conference and division. Switch seasons to compare past and upcoming matchups.",
   },
   {
     id: 'depth-charts',
     icon: '📋',
     title: 'Depth Charts',
-    description:
-      'See current positional depth for every roster. Quickly spot starters, backups, and handcuff targets across the league.',
+    description: 'See current positional depth for every roster. Quickly spot starters, backups, and handcuff targets across the league.',
   },
 ];
 

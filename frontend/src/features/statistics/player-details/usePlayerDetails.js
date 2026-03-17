@@ -32,8 +32,7 @@ export function usePlayerDetails() {
       setCurrentPlayerName(playerName);
 
       const response = await getPlayer(playerName, season);
-      if (requestId !== playerRequestIdRef.current) 
-        return;
+      if (requestId !== playerRequestIdRef.current) return;
 
       setPlayerDetails(response.data);
 
@@ -58,44 +57,50 @@ export function usePlayerDetails() {
     }
   }, []);
 
-  const handlePlayerClick = useCallback(async (playerName) => {
-    await loadPlayerForModal(playerName);
-  }, [loadPlayerForModal]);
-
-  const handlePlayerSeasonClick = useCallback(async (playerName, season) => {
-    const normalizedSeason = Number(season);
-    if (!Number.isFinite(normalizedSeason)) {
+  const handlePlayerClick = useCallback(
+    async (playerName) => {
       await loadPlayerForModal(playerName);
-      return;
-    }
+    },
+    [loadPlayerForModal],
+  );
 
-    await loadPlayerForModal(playerName, normalizedSeason, `Failed to load ${normalizedSeason} season data.`);
-  }, [loadPlayerForModal]);
+  const handlePlayerSeasonClick = useCallback(
+    async (playerName, season) => {
+      const normalizedSeason = Number(season);
+      if (!Number.isFinite(normalizedSeason)) {
+        await loadPlayerForModal(playerName);
+        return;
+      }
 
-  const handleSeasonChange = useCallback(async (season) => {
-    if (!currentPlayerName) 
-      return;
+      await loadPlayerForModal(playerName, normalizedSeason, `Failed to load ${normalizedSeason} season data.`);
+    },
+    [loadPlayerForModal],
+  );
 
-    const requestId = ++seasonRequestIdRef.current;
+  const handleSeasonChange = useCallback(
+    async (season) => {
+      if (!currentPlayerName) return;
 
-    try {
-      setLoadingDetails(true);
-      setDetailsError(null);
+      const requestId = ++seasonRequestIdRef.current;
 
-      const response = await getPlayer(currentPlayerName, season);
-      if (requestId !== seasonRequestIdRef.current) return;
-      setPlayerDetails(response.data);
-      setCurrentSeason(season);
-      setPlayerAvailableSeasons(response.data.available_seasons || []);
-    } catch (err) {
-      if (requestId === seasonRequestIdRef.current)
-        setDetailsError(`Failed to load ${season} season data.`);
-      console.error(`Failed to load season data: ${err.message}`);
-    } finally {
-      if (requestId === seasonRequestIdRef.current)
-        setLoadingDetails(false);
-    }
-  }, [currentPlayerName]);
+      try {
+        setLoadingDetails(true);
+        setDetailsError(null);
+
+        const response = await getPlayer(currentPlayerName, season);
+        if (requestId !== seasonRequestIdRef.current) return;
+        setPlayerDetails(response.data);
+        setCurrentSeason(season);
+        setPlayerAvailableSeasons(response.data.available_seasons || []);
+      } catch (err) {
+        if (requestId === seasonRequestIdRef.current) setDetailsError(`Failed to load ${season} season data.`);
+        console.error(`Failed to load season data: ${err.message}`);
+      } finally {
+        if (requestId === seasonRequestIdRef.current) setLoadingDetails(false);
+      }
+    },
+    [currentPlayerName],
+  );
 
   const closeDetails = useCallback(() => {
     playerRequestIdRef.current += 1;

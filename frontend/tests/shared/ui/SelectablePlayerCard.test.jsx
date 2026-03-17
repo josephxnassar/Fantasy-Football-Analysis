@@ -10,10 +10,7 @@ describe('SelectablePlayerCard', () => {
     const onPlayerClick = vi.fn();
 
     render(
-      <SelectablePlayerCard
-        player={{ name: 'Christian McCaffrey', team: 'SF', position: 'RB', age: 29 }}
-        onPlayerClick={onPlayerClick}
-      />
+      <SelectablePlayerCard player={{ name: 'Christian McCaffrey', team: 'SF', position: 'RB', age: 29 }} onPlayerClick={onPlayerClick} />,
     );
 
     const button = screen.getByRole('button', { name: /Christian McCaffrey/i });
@@ -21,9 +18,6 @@ describe('SelectablePlayerCard', () => {
     expect(button).toHaveFocus();
     await user.keyboard('{Enter}');
 
-    expect(onPlayerClick).toHaveBeenCalledWith(
-      'Christian McCaffrey',
-      expect.objectContaining({ name: 'Christian McCaffrey' })
-    );
+    expect(onPlayerClick).toHaveBeenCalledWith('Christian McCaffrey', expect.objectContaining({ name: 'Christian McCaffrey' }));
   });
 });

@@ -1,4 +1,4 @@
-export default function RankingsResultsTable({rankedPlayers, selectedSeason, onPlayerClick, onPlayerSeasonClick}) {
+export default function RankingsResultsTable({ rankedPlayers, selectedSeason, onPlayerClick, onPlayerSeasonClick }) {
   const handlePlayerResultClick = (playerName) => {
     const seasonNumber = Number(selectedSeason);
     if (onPlayerSeasonClick && Number.isFinite(seasonNumber)) {
@@ -11,7 +11,9 @@ export default function RankingsResultsTable({rankedPlayers, selectedSeason, onP
   return (
     <div className="rankings-panel rankings-panel--results">
       <h2>Results</h2>
-      {rankedPlayers.length === 0 ? (<p className="rankings-empty">No players qualify for the current settings.</p>) : (
+      {rankedPlayers.length === 0 ? (
+        <p className="rankings-empty">No players qualify for the current settings.</p>
+      ) : (
         <div className="rankings-table-wrapper">
           <table className="rankings-table">
             <thead>
@@ -31,7 +33,9 @@ export default function RankingsResultsTable({rankedPlayers, selectedSeason, onP
                   <tr key={`${player.name}-${player.rank}`}>
                     <td>{player.rank}</td>
                     <td>
-                      <button type="button" className="ranking-player-button" onClick={() => handlePlayerResultClick(player.name)}>{player.name}</button>
+                      <button type="button" className="ranking-player-button" onClick={() => handlePlayerResultClick(player.name)}>
+                        {player.name}
+                      </button>
                     </td>
                     <td>{player.team || '-'}</td>
                     <td>{player.position || '-'}</td>

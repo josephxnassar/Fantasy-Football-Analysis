@@ -17,7 +17,7 @@ describe('DivisionBrowser', () => {
         error={null}
         onTeamSelect={onTeamSelect}
         actionLabel="View Schedule ->"
-      />
+      />,
     );
 
     const button = screen.getByRole('button', { name: /Baltimore Ravens/i });

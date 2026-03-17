@@ -26,8 +26,7 @@ export const STAT_THRESHOLDS = {
 
 export function meetsStatThreshold(player, stat) {
   const threshold = STAT_THRESHOLDS[stat];
-  if (!threshold) 
-    return true;
+  if (!threshold) return true;
   const volume = threshold.volumeStats.map((key) => player?.stats?.[key]).find((value) => typeof value === 'number');
   return typeof volume === 'number' && volume >= threshold.minVolume;
 }

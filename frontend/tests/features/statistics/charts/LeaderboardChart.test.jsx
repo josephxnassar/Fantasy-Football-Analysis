@@ -19,11 +19,7 @@ vi.mock('recharts', () => {
       </button>
     ),
     BarChart: ({ data = [], children }) => (
-      <div>
-        {Children.map(children, (child) =>
-          isValidElement(child) ? cloneElement(child, { __chartData: data }) : child
-        )}
-      </div>
+      <div>{Children.map(children, (child) => (isValidElement(child) ? cloneElement(child, { __chartData: data }) : child))}</div>
     ),
     YAxis: ({ __chartData = [], onClick }) => (
       <div>
@@ -38,9 +34,7 @@ vi.mock('recharts', () => {
       <div>
         {__chartData.map((payload, index) => (
           <div key={`${payload.name}-${index}`}>
-            {typeof shape === 'function'
-              ? shape({ payload, index, x: 0, y: 0, width: 10, height: 10 })
-              : null}
+            {typeof shape === 'function' ? shape({ payload, index, x: 0, y: 0, width: 10, height: 10 }) : null}
           </div>
         ))}
       </div>
@@ -67,7 +61,7 @@ describe('LeaderboardChart', () => {
         season={2025}
         onPlayerClick={onPlayerClick}
         onPlayerSeasonClick={onPlayerSeasonClick}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Josh Allen' }));
@@ -87,7 +81,7 @@ describe('LeaderboardChart', () => {
         ]}
         season={2025}
         onPlayerClick={onPlayerClick}
-      />
+      />,
     );
 
     await user.click(screen.getAllByRole('button', { name: 'Bar' })[0]);

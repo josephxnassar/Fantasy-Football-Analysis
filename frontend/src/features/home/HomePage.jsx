@@ -9,7 +9,7 @@ export default function HomePage({ onNavigate, onPlayerClick }) {
   return (
     <div className="landing">
       <HeroSection />
-      <PlayerSearch onPlayerClick={onPlayerClick} heading="Quick Player Search" maxResults={6} variant="landing"/>
+      <PlayerSearch onPlayerClick={onPlayerClick} heading="Quick Player Search" maxResults={6} variant="landing" />
       <FeatureCards onNavigate={onNavigate} />
       <AtAGlance />
       <DataSources />

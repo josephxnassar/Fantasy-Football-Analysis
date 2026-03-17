@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  buildBarData,
-} from '../../../../src/features/statistics/charts/chartsHelpers';
+import { buildBarData } from '../../../../src/features/statistics/charts/chartsHelpers';
 
 describe('buildBarData', () => {
   it('filters route-running metrics by minimum target volume', () => {
@@ -64,5 +62,4 @@ describe('buildBarData', () => {
       }),
     ]);
   });
-
 });

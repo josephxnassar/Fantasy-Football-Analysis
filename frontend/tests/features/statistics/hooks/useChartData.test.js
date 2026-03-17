@@ -47,14 +47,9 @@ describe('useChartData', () => {
   it('ignores stale responses when position changes mid-request', async () => {
     const firstRequest = deferred();
     const secondRequest = deferred();
-    getChartData
-      .mockImplementationOnce(() => firstRequest.promise)
-      .mockImplementationOnce(() => secondRequest.promise);
+    getChartData.mockImplementationOnce(() => firstRequest.promise).mockImplementationOnce(() => secondRequest.promise);
 
-    const { result, rerender } = renderHook(
-      ({ position }) => useChartData(position, 2024),
-      { initialProps: { position: 'QB' } }
-    );
+    const { result, rerender } = renderHook(({ position }) => useChartData(position, 2024), { initialProps: { position: 'QB' } });
 
     rerender({ position: 'RB' });
 

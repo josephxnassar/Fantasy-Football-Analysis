@@ -5,8 +5,7 @@ function hasSeasonCategories(groupedStats) {
 }
 
 export default function SeasonalStatsRow({ groupedStats, emptyText = 'No production data available' }) {
-  if (!hasSeasonCategories(groupedStats))
-    return <p className="player-details-no-data">{emptyText}</p>;
+  if (!hasSeasonCategories(groupedStats)) return <p className="player-details-no-data">{emptyText}</p>;
 
   return <StatsCategoryGrid groupedStats={groupedStats} />;
 }

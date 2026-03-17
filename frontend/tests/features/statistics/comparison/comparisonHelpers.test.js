@@ -11,10 +11,7 @@ import { PRODUCTION_GROUPS_NO_RANKS } from '../../../../src/shared/utils/statMet
 describe('buildComparisonRows', () => {
   it('builds category and stat rows in profile order', () => {
     const rows = buildComparisonRows('Overall');
-    const expectedStatCount = Object.values(PRODUCTION_GROUPS_NO_RANKS.Overall).reduce(
-      (total, stats) => total + stats.length,
-      0
-    );
+    const expectedStatCount = Object.values(PRODUCTION_GROUPS_NO_RANKS.Overall).reduce((total, stats) => total + stats.length, 0);
 
     expect(rows[0]).toEqual({
       type: 'category',

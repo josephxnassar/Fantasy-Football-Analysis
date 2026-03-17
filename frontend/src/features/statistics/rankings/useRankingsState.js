@@ -33,11 +33,11 @@ export function useRankingsState() {
   };
 
   const setCategoryWeight = (category, value) => {
-    updateProfile((profile) => ({...profile, categoryWeights: {...profile.categoryWeights, [category]: value}}));
+    updateProfile((profile) => ({ ...profile, categoryWeights: { ...profile.categoryWeights, [category]: value } }));
   };
 
   const setStatWeight = (stat, value) => {
-    updateProfile((profile) => ({...profile, statWeights: {...profile.statWeights, [stat]: value}}));
+    updateProfile((profile) => ({ ...profile, statWeights: { ...profile.statWeights, [stat]: value } }));
   };
 
   const resetPositionWeights = () => {
@@ -49,13 +49,12 @@ export function useRankingsState() {
   };
 
   const toggleCategoryDetails = (category) => {
-    setExpandedCategories((previous) => ({...previous, [category]: !previous[category]}));
+    setExpandedCategories((previous) => ({ ...previous, [category]: !previous[category] }));
   };
 
   const handlePresetChange = (presetId, rankableGroups) => {
     setSelectedPreset(presetId);
-    if (!rankableGroups.length)
-      return;
+    if (!rankableGroups.length) return;
     updateProfile(() => buildPresetProfile(presetId, rankableGroups));
   };
 

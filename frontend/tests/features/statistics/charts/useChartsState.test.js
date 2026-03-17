@@ -18,7 +18,7 @@ describe('useChartsState', () => {
         topN: 35,
         stat: 'target_share',
         trendPlayer: 'JaMarr Chase',
-      })
+      }),
     );
 
     const { result } = renderHook(() => useChartsState());
@@ -58,9 +58,8 @@ describe('useChartsState', () => {
           topN: 12,
           stat: 'pass_td',
           trendPlayer: 'Josh Allen',
-        })
+        }),
       );
     });
   });
 });
-

@@ -11,7 +11,11 @@ export default function HeroSection() {
         <div className="landing-hero-copy brand-hero-copy">
           <h1 className="landing-title brand-title">Fantasy Football Analysis</h1>
           <p className="landing-tagline brand-tagline">{APP_FUNCTIONAL_DESCRIPTION}</p>
-          <ul className="landing-proof-list brand-proof-list">{HEADER_PROOF_POINTS.map((point) => (<li key={point}>{point}</li>))}</ul>
+          <ul className="landing-proof-list brand-proof-list">
+            {HEADER_PROOF_POINTS.map((point) => (
+              <li key={point}>{point}</li>
+            ))}
+          </ul>
         </div>
 
         <aside className="landing-hero-visual" aria-hidden="true">
@@ -33,8 +37,12 @@ export default function HeroSection() {
               <circle className="hero-token-c" cx="246" cy="108" r="6" />
 
               <rect className="hero-mini-card" x="264" y="148" width="124" height="46" rx="8" />
-              <text className="hero-mini-label" x="276" y="167">Weekly + Season</text>
-              <text className="hero-mini-value" x="276" y="184">Split Ready</text>
+              <text className="hero-mini-label" x="276" y="167">
+                Weekly + Season
+              </text>
+              <text className="hero-mini-value" x="276" y="184">
+                Split Ready
+              </text>
             </svg>
 
             <div className="hero-visual-footer">

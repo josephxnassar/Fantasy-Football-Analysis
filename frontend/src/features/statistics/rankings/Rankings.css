@@ -294,7 +294,9 @@
   cursor: pointer;
   padding: 0;
   border-radius: 6px;
-  transition: color 0.16s ease, background-color 0.16s ease;
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease;
 }
 
 .ranking-player-button:hover {

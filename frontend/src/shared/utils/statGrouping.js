@@ -7,10 +7,8 @@ export function hasDisplayValue(value) {
 }
 
 function isVisibleStatValue(value, options = {}) {
-  if (!hasDisplayValue(value)) 
-    return false;
-  if (options.hideZero && typeof value === 'number' && value === 0) 
-    return false;
+  if (!hasDisplayValue(value)) return false;
+  if (options.hideZero && typeof value === 'number' && value === 0) return false;
   return true;
 }
 
@@ -19,11 +17,9 @@ export function normalizeStatsRecord(stats) {
   if (!stats || typeof stats !== 'object') return normalized;
 
   Object.entries(stats).forEach(([rawKey, value]) => {
-    if (!hasDisplayValue(value)) 
-      return;
+    if (!hasDisplayValue(value)) return;
     const key = rawKey.trim();
-    if (!Object.prototype.hasOwnProperty.call(STAT_META, key)) 
-      return;
+    if (!Object.prototype.hasOwnProperty.call(STAT_META, key)) return;
     normalized[key] = value;
   });
 
@@ -32,21 +28,17 @@ export function normalizeStatsRecord(stats) {
 
 export function groupStatsByCategoryMap(stats, categoryMap, options = {}) {
   const grouped = {};
-  if (!stats || typeof stats !== 'object') 
-    return grouped;
+  if (!stats || typeof stats !== 'object') return grouped;
   const normalized = normalizeStatsRecord(stats);
 
   Object.entries(categoryMap).forEach(([category, statKeys]) => {
     const orderedStats = {};
     statKeys.forEach((statKey) => {
       const value = normalized[statKey];
-      if (statKey === 'pfr_pass_on_tgt_pct' && Number(value) === 0)
-        return;
-      if (isVisibleStatValue(value, options))
-        orderedStats[statKey] = value;
+      if (statKey === 'pfr_pass_on_tgt_pct' && Number(value) === 0) return;
+      if (isVisibleStatValue(value, options)) orderedStats[statKey] = value;
     });
-    if (Object.keys(orderedStats).length > 0)
-      grouped[category] = orderedStats;
+    if (Object.keys(orderedStats).length > 0) grouped[category] = orderedStats;
   });
 
   return grouped;

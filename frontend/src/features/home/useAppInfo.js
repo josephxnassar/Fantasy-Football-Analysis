@@ -49,9 +49,11 @@ export function useAppInfo() {
         appInfoRequestPromise = null;
       }
     };
-    
+
     fetchInfo();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return { data, loading, error };

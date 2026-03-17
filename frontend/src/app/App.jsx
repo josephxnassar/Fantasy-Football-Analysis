@@ -26,30 +26,71 @@ const NAV_TABS = [
 
 function App() {
   const [activeTab, setActiveTab] = useState(null);
-  const {playerDetails, loadingDetails, detailsError, availableSeasons, currentSeason, handlePlayerClick, handlePlayerSeasonClick, handleSeasonChange, closeDetails} = usePlayerDetails();
+  const {
+    playerDetails,
+    loadingDetails,
+    detailsError,
+    availableSeasons,
+    currentSeason,
+    handlePlayerClick,
+    handlePlayerSeasonClick,
+    handleSeasonChange,
+    closeDetails,
+  } = usePlayerDetails();
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] || Statistics;
   const defaultTabLabel = NAV_TABS.find((tab) => tab.id === DEFAULT_TAB)?.label || 'Statistics';
   const activeTabLabel = NAV_TABS.find((tab) => tab.id === activeTab)?.label || defaultTabLabel;
-  const playerModal = (<PlayerDetailsModal playerDetails={playerDetails} loading={loadingDetails} error={detailsError} onClose={closeDetails} availableSeasons={availableSeasons} currentSeason={currentSeason} onSeasonChange={handleSeasonChange}/>);
+  const playerModal = (
+    <PlayerDetailsModal
+      playerDetails={playerDetails}
+      loading={loadingDetails}
+      error={detailsError}
+      onClose={closeDetails}
+      availableSeasons={availableSeasons}
+      currentSeason={currentSeason}
+      onSeasonChange={handleSeasonChange}
+    />
+  );
   const goHome = () => setActiveTab(null);
 
   if (!activeTab)
-    return <><HomePage onNavigate={setActiveTab} onPlayerClick={handlePlayerClick} />{playerModal}</>
+    return (
+      <>
+        <HomePage onNavigate={setActiveTab} onPlayerClick={handlePlayerClick} />
+        {playerModal}
+      </>
+    );
 
   return (
     <div className="App">
-      <AppHeader activeTab={activeTab} activeTabLabel={activeTabLabel} onHome={goHome}/>
+      <AppHeader activeTab={activeTab} activeTabLabel={activeTabLabel} onHome={goHome} />
 
       <nav className="app-nav">
         <div className="nav-container">
-          {NAV_TABS.map(({ id, label }) => (<button key={id} className={`nav-button ${activeTab === id ? 'active' : ''}`} onClick={() => setActiveTab(id)}>{label}</button>))}
+          {NAV_TABS.map(({ id, label }) => (
+            <button key={id} className={`nav-button ${activeTab === id ? 'active' : ''}`} onClick={() => setActiveTab(id)}>
+              {label}
+            </button>
+          ))}
         </div>
       </nav>
 
       <main>
-        <ErrorBoundary resetKey={activeTab} onReset={() => setActiveTab(DEFAULT_TAB)} fallbackRender={({ resetErrorBoundary }) => (<TabErrorFallback onGoToDefault={() => {setActiveTab(DEFAULT_TAB); resetErrorBoundary()}} onRetry={resetErrorBoundary}/>)}>
+        <ErrorBoundary
+          resetKey={activeTab}
+          onReset={() => setActiveTab(DEFAULT_TAB)}
+          fallbackRender={({ resetErrorBoundary }) => (
+            <TabErrorFallback
+              onGoToDefault={() => {
+                setActiveTab(DEFAULT_TAB);
+                resetErrorBoundary();
+              }}
+              onRetry={resetErrorBoundary}
+            />
+          )}
+        >
           <Suspense fallback={<LoadingMessage message="Loading section..." />}>
-            <ActiveTabComponent onPlayerClick={handlePlayerClick} onPlayerSeasonClick={handlePlayerSeasonClick}/>
+            <ActiveTabComponent onPlayerClick={handlePlayerClick} onPlayerSeasonClick={handlePlayerSeasonClick} />
           </Suspense>
         </ErrorBoundary>
       </main>

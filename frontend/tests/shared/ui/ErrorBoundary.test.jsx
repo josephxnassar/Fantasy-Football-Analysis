@@ -27,7 +27,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <MaybeCrash shouldCrash={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Healthy child')).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <MaybeCrash shouldCrash />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong.')).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe('ErrorBoundary', () => {
     const { rerender } = render(
       <ErrorBoundary resetKey="one">
         <MaybeCrash shouldCrash />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong.')).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary resetKey="two">
         <MaybeCrash shouldCrash={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Healthy child')).toBeInTheDocument();

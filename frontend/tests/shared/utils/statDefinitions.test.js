@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  formatStatForDisplay,
-  getStatDefinition,
-  getStatLabel,
-} from '../../../src/shared/utils/statDefinitions';
+import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../../src/shared/utils/statDefinitions';
 import { normalizeStatsRecord } from '../../../src/shared/utils/statGrouping';
 
 describe('statDefinitions', () => {

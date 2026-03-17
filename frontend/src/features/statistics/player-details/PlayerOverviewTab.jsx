@@ -15,7 +15,15 @@ export default function PlayerOverviewTab({ statsContext }) {
   return (
     <div className="stats-section">
       <h3>Production {currentSeason ? `(${currentSeason} Season)` : '(Most Recent Season)'}</h3>
-      {viewMode === 'aggregate' ? (<SeasonalStatsRow groupedStats={groupedSeasonStats} />) : (<WeeklyStatsRows statsContext={statsContext} groupWeeklyRecord={groupProductionStats} emptyWeeklyText="No weekly production data available"/>)}
+      {viewMode === 'aggregate' ? (
+        <SeasonalStatsRow groupedStats={groupedSeasonStats} />
+      ) : (
+        <WeeklyStatsRows
+          statsContext={statsContext}
+          groupWeeklyRecord={groupProductionStats}
+          emptyWeeklyText="No weekly production data available"
+        />
+      )}
     </div>
   );
 }

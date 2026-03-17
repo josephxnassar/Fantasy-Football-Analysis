@@ -13,23 +13,41 @@ import StatsViewModeToggle from './StatsViewModeToggle';
 import './PlayerStats.css';
 import './PlayerDetailsModal.css';
 
-export default function PlayerDetailsModal({playerDetails, loading, error, onClose, availableSeasons = [], onSeasonChange, currentSeason}) {
+export default function PlayerDetailsModal({
+  playerDetails,
+  loading,
+  error,
+  onClose,
+  availableSeasons = [],
+  onSeasonChange,
+  currentSeason,
+}) {
   const [modalTab, setModalTab] = useState('statistics');
   const [viewMode, setViewMode] = useState('aggregate');
 
-  const { data: teamDepthChart, loading: depthChartLoading, error: depthChartError } = useTeamModalData(modalTab === 'depth-chart' ? playerDetails?.team : null, getTeamDepthChart, 'Failed to load depth chart');
+  const {
+    data: teamDepthChart,
+    loading: depthChartLoading,
+    error: depthChartError,
+  } = useTeamModalData(modalTab === 'depth-chart' ? playerDetails?.team : null, getTeamDepthChart, 'Failed to load depth chart');
   const playerTeamColor = getTeamColor(playerDetails?.team);
-  const playerModalStyle = {'--player-team-color': playerTeamColor, '--player-team-tint': `${playerTeamColor}10`, '--player-team-border': `${playerTeamColor}38`, '--player-team-chip': `${playerTeamColor}14`};
+  const playerModalStyle = {
+    '--player-team-color': playerTeamColor,
+    '--player-team-tint': `${playerTeamColor}10`,
+    '--player-team-border': `${playerTeamColor}38`,
+    '--player-team-chip': `${playerTeamColor}14`,
+  };
   const hasWeeklyData = Array.isArray(playerDetails?.weekly_stats) && playerDetails.weekly_stats.length > 0;
   const showStatsActions = modalTab === 'statistics' && (availableSeasons.length > 1 || hasWeeklyData);
 
-  if (!playerDetails && !loading && !error) 
-    return null;
+  if (!playerDetails && !loading && !error) return null;
 
   return (
     <ModalBackdrop className="modal-overlay--player-details" onClose={onClose}>
       <div className="player-details-modal-content" style={playerModalStyle}>
-        {loading ? (<div className="loading">Loading player details...</div>) : (
+        {loading ? (
+          <div className="loading">Loading player details...</div>
+        ) : (
           <>
             {error && <ErrorMessage message={error} />}
             {playerDetails ? (
@@ -38,22 +56,43 @@ export default function PlayerDetailsModal({playerDetails, loading, error, onClo
                   <PlayerHeader playerDetails={playerDetails} />
 
                   <div className="player-dashboard-tabs">
-                    <SubTabNav tabs={[{ id: 'statistics', label: 'Statistics' }, { id: 'depth-chart', label: 'Depth Chart' }]} activeTab={modalTab} onTabChange={setModalTab} variant="compact"/>
+                    <SubTabNav
+                      tabs={[
+                        { id: 'statistics', label: 'Statistics' },
+                        { id: 'depth-chart', label: 'Depth Chart' },
+                      ]}
+                      activeTab={modalTab}
+                      onTabChange={setModalTab}
+                      variant="compact"
+                    />
                   </div>
 
                   {showStatsActions && (
                     <div className="player-dashboard-controls">
-                      <StatsSeasonSelector availableSeasons={availableSeasons} currentSeason={currentSeason} onSeasonChange={onSeasonChange}/>
-                      <StatsViewModeToggle viewMode={viewMode} setViewMode={setViewMode} hasWeeklyData={hasWeeklyData}/>
+                      <StatsSeasonSelector
+                        availableSeasons={availableSeasons}
+                        currentSeason={currentSeason}
+                        onSeasonChange={onSeasonChange}
+                      />
+                      <StatsViewModeToggle viewMode={viewMode} setViewMode={setViewMode} hasWeeklyData={hasWeeklyData} />
                     </div>
                   )}
 
-                  <button className="player-details-close-button" onClick={onClose} aria-label="Close player details">×</button>
+                  <button className="player-details-close-button" onClick={onClose} aria-label="Close player details">
+                    ×
+                  </button>
                 </div>
 
                 <div className="player-details-body">
-                  {modalTab === 'statistics' && (<PlayerOverviewTab statsContext={{ playerDetails, currentSeason, viewMode }}/>)}
-                  {modalTab === 'depth-chart' && (<PlayerDepthChartTab depthChartLoading={depthChartLoading} depthChartError={depthChartError} teamDepthChart={teamDepthChart} playerName={playerDetails?.name}/>)}
+                  {modalTab === 'statistics' && <PlayerOverviewTab statsContext={{ playerDetails, currentSeason, viewMode }} />}
+                  {modalTab === 'depth-chart' && (
+                    <PlayerDepthChartTab
+                      depthChartLoading={depthChartLoading}
+                      depthChartError={depthChartError}
+                      teamDepthChart={teamDepthChart}
+                      playerName={playerDetails?.name}
+                    />
+                  )}
                 </div>
               </div>
             ) : (

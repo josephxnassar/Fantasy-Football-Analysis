@@ -8,12 +8,7 @@
   overflow-y: auto;
   position: relative;
   border: 1px solid var(--player-team-border, var(--color-border-light));
-  background-image: linear-gradient(
-    180deg,
-    var(--player-team-tint, transparent) 0%,
-    var(--color-bg-white) 28%,
-    var(--color-bg-white) 100%
-  );
+  background-image: linear-gradient(180deg, var(--player-team-tint, transparent) 0%, var(--color-bg-white) 28%, var(--color-bg-white) 100%);
 }
 
 .player-dashboard {

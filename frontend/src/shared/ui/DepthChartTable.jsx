@@ -7,21 +7,20 @@ function DepthChartTable({ entries, variant = 'full', highlightName = null, onPl
 
   const cellClass = (name, extra = '') => {
     const classes = ['player-cell'];
-    if (extra)
-      classes.push(extra);
-    if (!name)
-      classes.push('empty');
-    if (highlightName && name === highlightName)
-      classes.push('highlight');
+    if (extra) classes.push(extra);
+    if (!name) classes.push('empty');
+    if (highlightName && name === highlightName) classes.push('highlight');
     return classes.join(' ');
   };
   const renderPlayerName = (name) => {
-    if (!name) 
-      return '—';
-    if (!onPlayerClick) 
-      return name;
-    else 
-      return (<button type="button" className="depth-chart-player-link" onClick={() => onPlayerClick(name)}>{name}</button>);
+    if (!name) return '—';
+    if (!onPlayerClick) return name;
+    else
+      return (
+        <button type="button" className="depth-chart-player-link" onClick={() => onPlayerClick(name)}>
+          {name}
+        </button>
+      );
   };
 
   return (

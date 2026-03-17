@@ -9,18 +9,15 @@ function hasWeeklyCategories(groupedStats) {
   return Object.values(groupedStats || {}).some((stats) => Object.keys(stats).length > 0);
 }
 
-export default function WeeklyStatsRows({statsContext, groupWeeklyRecord, emptyWeeklyText}) {
+export default function WeeklyStatsRows({ statsContext, groupWeeklyRecord, emptyWeeklyText }) {
   const { playerDetails, currentSeason } = statsContext;
-  if (!playerDetails?.position)
-    return <p className="player-details-no-data">{emptyWeeklyText}</p>;
+  if (!playerDetails?.position) return <p className="player-details-no-data">{emptyWeeklyText}</p>;
 
   const weeklyStats = playerDetails?.weekly_stats;
-  if (!Array.isArray(weeklyStats) || !weeklyStats.length)
-    return <p className="player-details-no-data">{emptyWeeklyText}</p>;
+  if (!Array.isArray(weeklyStats) || !weeklyStats.length) return <p className="player-details-no-data">{emptyWeeklyText}</p>;
 
   const seasonWeeks = weeklyStats.filter((week) => week.season === currentSeason).sort((a, b) => (a.week || 0) - (b.week || 0));
-  if (!seasonWeeks.length)
-    return <p className="player-details-no-data">No weekly data available for {currentSeason}</p>;
+  if (!seasonWeeks.length) return <p className="player-details-no-data">No weekly data available for {currentSeason}</p>;
 
   return (
     <div className="weekly-stats-container">
@@ -35,7 +32,11 @@ export default function WeeklyStatsRows({statsContext, groupWeeklyRecord, emptyW
               <h4 className="week-header">Week {week.week}</h4>
               {matchupLabel && <span className="week-matchup-badge">{matchupLabel}</span>}
             </div>
-            {hasWeeklyCategories(groupedStats) ? (<StatsCategoryGrid groupedStats={groupedStats} />) : (<p className="week-no-stats">No stats recorded</p>)}
+            {hasWeeklyCategories(groupedStats) ? (
+              <StatsCategoryGrid groupedStats={groupedStats} />
+            ) : (
+              <p className="week-no-stats">No stats recorded</p>
+            )}
           </div>
         );
       })}

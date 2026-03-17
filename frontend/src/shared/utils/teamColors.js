@@ -47,5 +47,5 @@ export function getTeamColor(team) {
 }
 
 export function getTeamColorVars(team) {
-  return {'--team-color': getTeamColor(team)};
+  return { '--team-color': getTeamColor(team) };
 }
