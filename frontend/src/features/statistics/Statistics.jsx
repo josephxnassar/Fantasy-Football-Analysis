@@ -23,7 +23,7 @@ const TAB_COMPONENTS = {
 
 function Statistics({ onPlayerClick, onPlayerSeasonClick }) {
   const [activeSubTab, setActiveSubTab] = useState('charts');
-  const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Rankings;
+  const ActiveSubTab = TAB_COMPONENTS[activeSubTab] || Charts;
 
   return (
     <div className="statistics-container">

@@ -1,6 +1,3 @@
-/* Shared depth chart table styles — used by both full modal and mini (player modal) variants */
-
-/* ── Full-size table ── */
 .depth-chart-table {
   width: 100%;
   border-collapse: separate;
@@ -50,7 +47,6 @@
   border-bottom: none;
 }
 
-/* ── Shared cell styles ── */
 .position-cell {
   padding: var(--spacing-sm) var(--spacing-md);
   font-weight: 700;
@@ -110,7 +106,6 @@
   color: var(--color-primary);
 }
 
-/* ── Mini table variant (player modal) ── */
 .depth-chart-mini-table {
   width: 100%;
   border-collapse: separate;
@@ -165,7 +160,6 @@
   font-size: 13px;
 }
 
-/* ── Responsive ── */
 @media (max-width: 600px) {
   .depth-chart-table,
   .depth-chart-mini-table {

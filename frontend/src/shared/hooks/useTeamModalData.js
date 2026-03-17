@@ -1,5 +1,3 @@
-// Shared hook for team-based modal data loading.
-
 import { useEffect, useState } from 'react';
 
 export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
@@ -20,7 +18,6 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
         return;
       }
 
-      // Generic team-data fetch path used by team modal components.
       try {
         if (!cancelled) {
           setLoading(true);

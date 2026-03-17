@@ -7,7 +7,7 @@ export default function RankingsWeightsPanel({
   rankableGroups,
   selectedPreset,
   handlePresetChange,
-  resetPositionWeights,
+  resetWeights,
   categoryWeights,
   expandedCategories,
   toggleCategoryDetails,
@@ -29,7 +29,7 @@ export default function RankingsWeightsPanel({
             ))}
           </select>
         </div>
-        <button type="button" className="reset-weights-button" onClick={resetPositionWeights}>
+        <button type="button" className="reset-weights-button" onClick={resetWeights}>
           Reset Weights
         </button>
       </div>

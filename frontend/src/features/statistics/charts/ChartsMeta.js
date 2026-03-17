@@ -18,11 +18,11 @@ export const VIEW_META = {
   },
   trend: {
     kicker: 'Season Trends',
-    description: 'Select one player and track the chosen stat across seasons to see long-term growth, decline, and stability.',
+    description:
+      'Select one player and track the chosen stat across seasons. The stat categories automatically adapt to the selected player’s position.',
   },
 };
 
-// Default chart stat when switching positions.
 export const DEFAULT_STAT = {
   QB: 'pass_yds',
   RB: 'rush_yds',

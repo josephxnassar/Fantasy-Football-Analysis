@@ -1,5 +1,7 @@
 import { ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
 
+import AverageVsUpsideTooltip from './AverageVsUpsideTooltip';
+
 export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPlayerSeasonClick }) {
   if (!data.length) return <p className="charts-no-data">No weekly data available for this season.</p>;
 
@@ -24,38 +26,7 @@ export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPl
             label={{ value: 'Weekly Ceiling PPR', angle: -90, position: 'insideLeft' }}
           />
           <ZAxis type="number" dataKey="games" range={[48, 260]} />
-          <Tooltip
-            cursor={false}
-            content={({ active, payload }) => {
-              if (!active || !payload?.length) return null;
-              const point = payload[0].payload;
-              return (
-                <div className="chart-tooltip">
-                  <div className="chart-tooltip-header">
-                    <div>
-                      <strong>{point.name}</strong>
-                      {point.position && <span className="chart-tooltip-team">{point.position}</span>}
-                      {point.team && <span className="chart-tooltip-team">{point.team}</span>}
-                    </div>
-                  </div>
-                  <div className="chart-tooltip-stats">
-                    <div>
-                      Weekly Avg PPR: <strong>{point.avg_fp_ppr.toFixed(2)}</strong>
-                    </div>
-                    <div>
-                      Weekly Ceiling PPR: <strong>{point.ceiling_fp_ppr.toFixed(2)}</strong>
-                    </div>
-                    <div>
-                      Volatility (Std Dev): <strong>{point.volatility_fp_ppr.toFixed(2)}</strong>
-                    </div>
-                    <div>
-                      Games: <strong>{point.games}</strong>
-                    </div>
-                  </div>
-                </div>
-              );
-            }}
-          />
+          <Tooltip cursor={false} content={<AverageVsUpsideTooltip />} />
           <Scatter
             data={data}
             fill="var(--color-primary)"

@@ -1,5 +1,3 @@
-// Stat metadata drives labels, descriptions, and formatting across the UI.
-
 export const STAT_META = {
   // Fantasy summary.
   fp_ppr: {
@@ -330,84 +328,11 @@ export const PRODUCTION_GROUPS = {
   },
 };
 
-// Leaderboard and comparison groups omit rank-only fields.
-export const PRODUCTION_GROUPS_NO_RANKS = {
-  QB: {
-    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
-    Passing: ['completions', 'pass_att', 'pass_yds', 'pass_td', 'passing_interceptions'],
-    'Passing Efficiency': ['passing_epa', 'passing_cpoe', 'ng_pass_passer_rating', 'pacr'],
-    'Accuracy & Pressure': ['pfr_pass_bad_throw_pct', 'pfr_pass_on_tgt_pct', 'pfr_pass_pressure_pct', 'ng_pass_avg_time_to_throw'],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td'],
-  },
-  RB: {
-    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_yac', 'pfr_rush_brk_tkl'],
-    'Rushing Efficiency': [
-      'Yds/Rush',
-      'rushing_epa',
-      'ng_rush_rush_yds_over_exp_per_att',
-      'ng_rush_efficiency',
-      'pfr_rush_yac_att',
-      'pfr_rush_ybc_att',
-    ],
-    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td', 'receiving_yards_after_catch', 'pfr_rec_brk_tkl'],
-    'Receiving Efficiency': ['Yds/Rec', 'receiving_epa', 'pfr_rec_drop_pct', 'pfr_rec_yac_r'],
-    Usage: ['target_share', 'wopr', 'sc_offense_pct'],
-  },
-  WR: {
-    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
-    Receiving: [
-      'targets',
-      'rec',
-      'rec_yds',
-      'rec_td',
-      'receiving_yards_after_catch',
-      'pfr_rec_brk_tkl',
-      'ng_rec_avg_separation',
-      'pfr_rec_adot',
-      'ng_rec_catch_pct',
-    ],
-    'Receiving Efficiency': [
-      'Yds/Rec',
-      'receiving_epa',
-      'racr',
-      'pfr_rec_drop_pct',
-      'ng_rec_avg_yac',
-      'ng_rec_avg_yac_above_expectation',
-      'pfr_rec_yac_r',
-    ],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td', 'pfr_rush_brk_tkl'],
-    'Rushing Efficiency': ['Yds/Rush', 'rushing_epa'],
-    Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
-  },
-  TE: {
-    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
-    Receiving: [
-      'targets',
-      'rec',
-      'rec_yds',
-      'rec_td',
-      'receiving_yards_after_catch',
-      'pfr_rec_brk_tkl',
-      'ng_rec_avg_separation',
-      'pfr_rec_adot',
-      'ng_rec_catch_pct',
-    ],
-    'Receiving Efficiency': [
-      'Yds/Rec',
-      'receiving_epa',
-      'racr',
-      'pfr_rec_drop_pct',
-      'ng_rec_avg_yac',
-      'ng_rec_avg_yac_above_expectation',
-      'pfr_rec_yac_r',
-    ],
-    Usage: ['target_share', 'air_yards_share', 'wopr', 'sc_offense_pct'],
-  },
-  Overall: {
-    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
-    Passing: ['completions', 'pass_att', 'pass_yds', 'pass_td', 'passing_interceptions'],
-    Rushing: ['rush_att', 'rush_yds', 'rush_td'],
-    Receiving: ['targets', 'rec', 'rec_yds', 'rec_td'],
-  },
+// Rankings use a separate weighting surface from production display groupings.
+export const OVERALL_RANKING_GROUPS = {
+  'Fantasy Output': ['fp_ppr', 'fp_std', 'exp_fp'],
+  'Positional Dominance': ['fp_ppr_rank', 'exp_fp_rank'],
+  'Volume Dominance': ['pass_att_rank', 'rush_att_rank', 'targets_rank'],
+  'Yardage Dominance': ['pass_yds_rank', 'rush_yds_rank', 'rec_yds_rank'],
+  'Touchdown Dominance': ['pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
 };

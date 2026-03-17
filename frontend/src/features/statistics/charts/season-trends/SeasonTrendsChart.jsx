@@ -1,5 +1,6 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { formatStatForDisplay } from '../../../shared/utils/statDefinitions';
+import { formatStatForDisplay } from '../../../../shared/utils/statDefinitions';
+import SeasonTrendsTooltip from './SeasonTrendsTooltip';
 
 export default function SeasonTrendsChart({ data, playerName, stat, statLabel, onPlayerClick, onPlayerSeasonClick }) {
   if (!playerName || !data.length) return <p className="charts-no-data">No multi-season trend data available for this selection.</p>;
@@ -64,11 +65,7 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
             tickFormatter={(value) => formatStatForDisplay(stat, value)}
             label={{ value: statLabel, angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip
-            cursor={false}
-            formatter={(value) => [formatStatForDisplay(stat, value), statLabel]}
-            labelFormatter={(season) => `${season} Season`}
-          />
+          <Tooltip cursor={false} content={<SeasonTrendsTooltip playerName={playerName} stat={stat} statLabel={statLabel} />} />
           <Line
             type="monotone"
             dataKey="value"

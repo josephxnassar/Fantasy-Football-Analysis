@@ -1,6 +1,6 @@
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { POSITION_OPTIONS } from '../statisticsOptions';
-import { CHART_VIEW_OPTIONS } from './chartsConfig';
+import { CHART_VIEW_OPTIONS } from './ChartsMeta';
 
 export default function ChartControls({
   view,

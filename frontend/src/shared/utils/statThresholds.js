@@ -1,5 +1,3 @@
-// Minimum thresholds used before color-scoring certain stats.
-
 export const STAT_THRESHOLDS = {
   'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
   'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },

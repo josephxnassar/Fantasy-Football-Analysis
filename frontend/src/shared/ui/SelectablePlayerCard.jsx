@@ -1,5 +1,3 @@
-// Reusable player card for search and picker results.
-
 import './SelectablePlayerCard.css';
 import RookieBadge from './RookieBadge';
 import DetailBadge from './DetailBadge';

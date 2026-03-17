@@ -1,5 +1,3 @@
-// Groups and normalizes backend stats using the shared metadata maps.
-
 import { STAT_META } from './statMeta';
 
 export function hasDisplayValue(value) {

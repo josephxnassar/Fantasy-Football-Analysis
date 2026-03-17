@@ -1,4 +1,3 @@
-/* Year Selector Styles */
 .year-selector {
   padding: 0.34rem 0.58rem;
   background: var(--color-bg-light);
@@ -32,7 +31,6 @@
   line-height: 1.1;
 }
 
-/* Stat Section */
 .stats-section h3 {
   margin: 0 0 0.7rem 0;
   color: var(--color-text-primary);
@@ -69,8 +67,6 @@
   letter-spacing: 0.22px;
   line-height: 1.1;
 }
-
-/* ── Compact table layout (shared by aggregate + weekly) ── */
 
 .stats-table {
   display: grid;
@@ -127,8 +123,6 @@
   text-align: right;
 }
 
-/* ── Color variants (applied to .stat-row) ── */
-
 .stat-row.stat-good {
   border-left-color: var(--color-success-strong);
   background: var(--color-surface-success);
@@ -160,8 +154,6 @@
 .stat-row.stat-no-data .stat-value {
   color: var(--color-text-muted);
 }
-
-/* ── View Mode Toggle ── */
 
 .view-mode-toggle {
   display: inline-flex;
@@ -198,7 +190,6 @@
   border-color: var(--color-info);
 }
 
-/* Weekly Stats */
 .weekly-stats-container {
   margin-top: 0.45rem;
   display: flex;

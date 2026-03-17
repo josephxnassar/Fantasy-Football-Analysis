@@ -1,5 +1,3 @@
-// Creates class for rookie, labeled R
-
 import './RookieBadge.css';
 
 export default function RookieBadge({ isRookie, size = 'medium' }) {

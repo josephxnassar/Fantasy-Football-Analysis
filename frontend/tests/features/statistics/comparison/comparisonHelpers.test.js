@@ -6,12 +6,18 @@ import {
   getWinningSlotIdsForStat,
   getWinningSlotIdsForWeeks,
 } from '../../../../src/features/statistics/comparison/comparisonHelpers';
-import { PRODUCTION_GROUPS_NO_RANKS } from '../../../../src/shared/utils/statMeta';
+import { PRODUCTION_GROUPS } from '../../../../src/shared/utils/statMeta';
+
+function withoutRankings(profile) {
+  const { Rankings: _rankings, ...groups } = PRODUCTION_GROUPS[profile] || PRODUCTION_GROUPS.Overall;
+  return groups;
+}
 
 describe('buildComparisonRows', () => {
   it('builds category and stat rows in profile order', () => {
-    const rows = buildComparisonRows('Overall');
-    const expectedStatCount = Object.values(PRODUCTION_GROUPS_NO_RANKS.Overall).reduce((total, stats) => total + stats.length, 0);
+    const overallGroups = withoutRankings('Overall');
+    const rows = buildComparisonRows('CrossPosition');
+    const expectedStatCount = 16;
 
     expect(rows[0]).toEqual({
       type: 'category',
@@ -20,15 +26,15 @@ describe('buildComparisonRows', () => {
     });
     expect(rows[1]).toEqual({
       type: 'stat',
-      id: `stat:${PRODUCTION_GROUPS_NO_RANKS.Overall.Fantasy[0]}`,
-      statKey: PRODUCTION_GROUPS_NO_RANKS.Overall.Fantasy[0],
+      id: `stat:${overallGroups.Fantasy[0]}`,
+      statKey: overallGroups.Fantasy[0],
       category: 'Fantasy',
     });
     expect(rows.filter((row) => row.type === 'stat')).toHaveLength(expectedStatCount);
   });
 
   it('falls back to Overall profile rows for unknown profile keys', () => {
-    expect(buildComparisonRows('UnknownProfile')).toEqual(buildComparisonRows('Overall'));
+    expect(buildComparisonRows('UnknownProfile')).toEqual(buildComparisonRows('CrossPosition'));
   });
 
   it('includes profile-specific categories and stats for WR', () => {
@@ -44,6 +50,22 @@ describe('buildComparisonRows', () => {
       id: 'stat:racr',
       statKey: 'racr',
       category: 'Receiving Efficiency',
+    });
+  });
+
+  it('includes cross-position categories for mixed QB comparisons', () => {
+    const rows = buildComparisonRows('CrossPosition');
+
+    expect(rows).toContainEqual({
+      type: 'category',
+      id: 'category:Volume',
+      label: 'Volume',
+    });
+    expect(rows).toContainEqual({
+      type: 'stat',
+      id: 'stat:receiving_epa',
+      statKey: 'receiving_epa',
+      category: 'Efficiency',
     });
   });
 

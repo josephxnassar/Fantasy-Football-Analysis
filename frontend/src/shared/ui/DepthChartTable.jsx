@@ -1,5 +1,3 @@
-// Generates depth chart tables (mini: like in player modals, full: like in Depth Charts)
-
 import './DepthChartTable.css';
 
 function DepthChartTable({ entries, variant = 'full', highlightName = null, onPlayerClick }) {

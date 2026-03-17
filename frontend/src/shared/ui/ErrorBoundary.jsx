@@ -1,5 +1,3 @@
-// Aims to stop UI crash from crashing whole app.
-
 import React from 'react';
 import './ErrorBoundary.css';
 

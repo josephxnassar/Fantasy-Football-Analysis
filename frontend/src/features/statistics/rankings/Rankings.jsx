@@ -1,10 +1,8 @@
-// Weighted rankings tab with category and stat-level controls.
-
 import { useMemo } from 'react';
 
-import { useChartData } from '../hooks/useChartData';
+import { OVERALL_RANKING_GROUPS } from '../../../shared/utils/statMeta';
 import { ErrorMessage, LoadingMessage } from '../../../shared/ui';
-import { RANKING_GROUPS } from './rankingGroups';
+import { useStatisticsData } from '../useStatisticsData';
 import RankingsHeader from './RankingsHeader';
 import { buildRankings, getRankableGroups } from './rankingsHelpers';
 import RankingsResultsTable from './RankingsResultsTable';
@@ -14,8 +12,6 @@ import './Rankings.css';
 
 export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
   const {
-    position,
-    setPosition,
     season,
     setSeason,
     selectedPreset,
@@ -24,20 +20,20 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
     statWeights,
     setCategoryWeight,
     setStatWeight,
-    resetPositionWeights,
+    resetWeights,
     toggleCategoryDetails,
     handlePresetChange,
   } = useRankingsState();
-  const { chartData, loading, error } = useChartData(position, season);
+  const { statisticsData, loading, error } = useStatisticsData('Overall', season);
   const rankableGroups = useMemo(
-    () => getRankableGroups(position, chartData?.stat_columns || [], RANKING_GROUPS),
-    [position, chartData?.stat_columns],
+    () => getRankableGroups(OVERALL_RANKING_GROUPS, statisticsData?.stat_columns || []),
+    [statisticsData?.stat_columns],
   );
   const rankedPlayers = useMemo(
-    () => buildRankings(chartData?.players || [], rankableGroups, categoryWeights, statWeights),
-    [chartData?.players, rankableGroups, categoryWeights, statWeights],
+    () => buildRankings(statisticsData?.players || [], rankableGroups, categoryWeights, statWeights),
+    [statisticsData?.players, rankableGroups, categoryWeights, statWeights],
   );
-  const selectedSeason = season ?? chartData?.season ?? null;
+  const selectedSeason = season ?? statisticsData?.season ?? null;
 
   if (loading) return <LoadingMessage message="Loading ranking data..." />;
   if (error) return <ErrorMessage message={error} />;
@@ -46,12 +42,10 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
     <div className="rankings-container">
       <div className="rankings-stage">
         <RankingsHeader
-          position={position}
-          setPosition={setPosition}
           season={season}
           setSeason={setSeason}
-          availableSeasons={chartData?.available_seasons}
-          currentSeason={chartData?.season}
+          availableSeasons={statisticsData?.available_seasons}
+          currentSeason={statisticsData?.season}
         />
 
         <div className="rankings-body">
@@ -59,7 +53,7 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
             rankableGroups={rankableGroups}
             selectedPreset={selectedPreset}
             handlePresetChange={handlePresetChange}
-            resetPositionWeights={resetPositionWeights}
+            resetWeights={resetWeights}
             categoryWeights={categoryWeights}
             expandedCategories={expandedCategories}
             toggleCategoryDetails={toggleCategoryDetails}

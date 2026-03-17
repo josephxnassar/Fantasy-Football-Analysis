@@ -1,30 +1,45 @@
-// Hook for comparison filters, player options, and winner calculations.
+import { useMemo } from 'react';
 
-import { useMemo, useState } from 'react';
-
-import { useChartData } from '../hooks/useChartData';
+import { useStatisticsData } from '../useStatisticsData';
 import { buildComparisonRows, buildComparisonWins, getWinningSlotIdsForStat, getWinningSlotIdsForWeeks } from './comparisonHelpers';
 import { useComparisonSlots } from './useComparisonSlots';
 
 export { MAX_COMPARE_PLAYERS } from './useComparisonSlots';
 
-export function usePlayerComparisonState() {
-  const [positionProfile, setPositionProfile] = useState('Overall');
-  const { comparisonSlots, selectionError, handlePlayerSelect, handleSeasonChange, handleRemovePlayer, resetForPositionProfile } =
-    useComparisonSlots();
-  const { chartData, loading: playerOptionsLoading, error: playerOptionsError } = useChartData(positionProfile, null);
+function getComparisonProfileLabel(profile, selectedPlayers) {
+  if (selectedPlayers.length === 0) return 'Select players';
+  if (selectedPlayers.some((slot) => slot.loading || (!slot.position && !slot.error))) return 'Detecting...';
+  return profile === 'CrossPosition' ? 'Cross-Position' : profile;
+}
 
-  const comparisonRows = buildComparisonRows(positionProfile);
+function isComparisonPosition(position) {
+  return position === 'QB' || position === 'RB' || position === 'WR' || position === 'TE';
+}
+
+function getComparisonProfile(selectedPlayers) {
+  const positions = [...new Set(selectedPlayers.map((slot) => slot.position).filter(isComparisonPosition))];
+  return positions.length === 1 ? positions[0] : 'CrossPosition';
+}
+
+export function usePlayerComparisonState() {
+  const { comparisonSlots, selectionError, handlePlayerSelect, handleSeasonChange, handleRemovePlayer } = useComparisonSlots();
+  const { statisticsData, loading: playerOptionsLoading, error: playerOptionsError } = useStatisticsData('Overall', null);
 
   const playerOptions = useMemo(() => {
-    const players = chartData?.players || [];
+    const players = statisticsData?.players || [];
     return players
       .map((player) => player.name)
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b));
-  }, [chartData?.players]);
+  }, [statisticsData?.players]);
 
   const selectedPlayers = comparisonSlots.filter((slot) => Boolean(slot.playerName));
+  const comparisonProfile = useMemo(
+    () => getComparisonProfile(selectedPlayers),
+    [selectedPlayers],
+  );
+  const comparisonProfileLabel = getComparisonProfileLabel(comparisonProfile, selectedPlayers);
+  const comparisonRows = useMemo(() => buildComparisonRows(comparisonProfile), [comparisonProfile]);
   const statWinnersByKey = useMemo(
     () =>
       Object.fromEntries(
@@ -37,24 +52,18 @@ export function usePlayerComparisonState() {
   const weeksWinners = useMemo(() => getWinningSlotIdsForWeeks(selectedPlayers), [selectedPlayers]);
   const winCountsBySlot = useMemo(() => buildComparisonWins(comparisonRows, selectedPlayers), [comparisonRows, selectedPlayers]);
 
-  const handlePositionProfileChange = (nextPosition) => {
-    setPositionProfile(nextPosition);
-    resetForPositionProfile(nextPosition);
-  };
-
   return {
-    positionProfile,
     comparisonSlots,
     selectionError,
     playerOptionsLoading,
     playerOptionsError,
     playerOptions,
     selectedPlayers,
+    comparisonProfileLabel,
     comparisonRows,
     statWinnersByKey,
     weeksWinners,
     winCountsBySlot,
-    handlePositionProfileChange,
     handlePlayerSelect,
     handleSeasonChange,
     handleRemovePlayer,

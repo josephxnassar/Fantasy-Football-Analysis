@@ -1,10 +1,10 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { StatTooltip } from '../../../shared/ui';
-import { formatStatForDisplay, getStatDefinition } from '../../../shared/utils/statDefinitions';
+import { StatTooltip } from '../../../../shared/ui';
+import { formatStatForDisplay, getStatDefinition } from '../../../../shared/utils/statDefinitions';
 import ChartBarShape from './ChartBarShape';
-import { getChartHeight } from './chartsHelpers';
-import ChartTooltip from './ChartTooltip';
+import { getChartHeight } from '../chartsHelpers';
+import LeaderboardTooltip from './LeaderboardTooltip';
 
 export default function LeaderboardChart({ data, stat, season, onPlayerClick, onPlayerSeasonClick }) {
   const statAxisLabel = data?.[0]?.statLabel || 'Selected Stat';
@@ -51,7 +51,7 @@ export default function LeaderboardChart({ data, stat, season, onPlayerClick, on
               if (e?.value) handlePlayerSelection(e.value);
             }}
           />
-          <Tooltip cursor={false} content={<ChartTooltip />} />
+          <Tooltip cursor={false} content={<LeaderboardTooltip />} />
           <Bar dataKey="value" shape={(shapeProps) => <ChartBarShape {...shapeProps} onBarClick={handlePlayerSelection} />} />
         </BarChart>
       </ResponsiveContainer>

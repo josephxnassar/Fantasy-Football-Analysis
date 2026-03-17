@@ -1,6 +1,6 @@
-import { formatStatForDisplay } from '../../../shared/utils/statDefinitions';
+import { formatStatForDisplay } from '../../../../shared/utils/statDefinitions';
 
-export default function ChartTooltip({ active, payload }) {
+export default function LeaderboardTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const displayValue = formatStatForDisplay(data.statKey, data.value);

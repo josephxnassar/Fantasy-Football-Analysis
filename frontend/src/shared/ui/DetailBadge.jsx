@@ -1,5 +1,3 @@
-// Creates class for age/team/pos
-
 import './DetailBadge.css';
 
 export default function DetailBadge({ children }) {

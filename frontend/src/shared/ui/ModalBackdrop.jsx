@@ -1,5 +1,3 @@
-// Backdrop clicks close the modal.
-
 import './ModalBackdrop.css';
 
 export default function ModalBackdrop({ onClose, className = '', children }) {

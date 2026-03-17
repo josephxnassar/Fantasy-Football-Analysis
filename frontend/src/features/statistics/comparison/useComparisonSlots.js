@@ -25,12 +25,6 @@ function getWeeksPlayedForSeason(weeklyStats, season) {
   return weeklyStats.filter((week) => Number(week?.season) === Number(season)).length;
 }
 
-function slotMatchesProfile(slot, profile) {
-  if (!slot?.playerName) return false;
-  if (profile === 'Overall') return true;
-  return slot.position === profile;
-}
-
 export function useComparisonSlots() {
   const [comparisonSlots, setComparisonSlots] = useState(createInitialSlots);
   const [selectionError, setSelectionError] = useState(null);
@@ -79,14 +73,6 @@ export function useComparisonSlots() {
     }
   };
 
-  const resetForPositionProfile = (nextPosition) => {
-    setSelectionError(null);
-    requestIdsBySlotRef.current = {};
-    setComparisonSlots((previous) =>
-      previous.map((slot) => (slotMatchesProfile(slot, nextPosition) ? slot : { id: slot.id, ...EMPTY_SLOT })),
-    );
-  };
-
   const handlePlayerSelect = (slotId, playerName) => {
     setSelectionError(null);
     if (!playerName) {
@@ -121,6 +107,5 @@ export function useComparisonSlots() {
     handlePlayerSelect,
     handleSeasonChange,
     handleRemovePlayer,
-    resetForPositionProfile,
   };
 }

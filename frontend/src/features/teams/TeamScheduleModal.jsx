@@ -3,6 +3,8 @@ import { getTeamSchedule } from '../../api';
 import { useTeamModalData } from '../../shared/hooks/useTeamModalData';
 import { getTeamColor } from '../../shared/utils/teamColors';
 import { ModalBackdrop } from '../../shared/ui';
+import TeamScheduleGameCard from './TeamScheduleGameCard';
+import TeamScheduleHeader from './TeamScheduleHeader';
 import './TeamScheduleModal.css';
 
 export default function TeamScheduleModal({ team, onClose }) {
@@ -37,13 +39,6 @@ export default function TeamScheduleModal({ team, onClose }) {
     setExpandedWeek((previousWeek) => (previousWeek === week ? null : week));
   };
 
-  const getResultLabel = (game) => {
-    if (!game?.winner) return null;
-    if (game.winner === 'TIE') return 'TIE';
-    if (game.winner === schedule.team) return 'W';
-    return 'L';
-  };
-
   if (!team) return null;
 
   return (
@@ -56,89 +51,23 @@ export default function TeamScheduleModal({ team, onClose }) {
         {error && <div className="error">{error}</div>}
         {schedule && !loading && (
           <>
-            <div className="schedule-header">
-              <h2 className="team-title" style={teamHeaderColor}>
-                {schedule.team}
-              </h2>
-              <p className="team-full-name">{schedule.team_name}</p>
-              {schedule.available_seasons?.length > 1 && (
-                <div className="schedule-season-selector">
-                  <label htmlFor="schedule-season">Season:</label>
-                  <select id="schedule-season" value={selectedSeason ?? schedule.season} onChange={handleSeasonChange}>
-                    {schedule.available_seasons.map((season) => (
-                      <option key={season} value={season}>
-                        {season}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              {schedule.bye_week && <div className="bye-week-badge">Bye Week: {schedule.bye_week}</div>}
-            </div>
+            <TeamScheduleHeader
+              schedule={schedule}
+              selectedSeason={selectedSeason}
+              onSeasonChange={handleSeasonChange}
+              teamHeaderColor={teamHeaderColor}
+            />
             <div className="schedule-grid">
-              {schedule.schedule.map((game) => {
-                const isGame = game.opponent !== 'BYE';
-                const isHomeGame = isGame && game.home_away === 'HOME';
-                const opponentColor = isGame ? getTeamColor(game.opponent) : null;
-                const gameTileStyle = isHomeGame ? { '--home-corner-color': scheduleTeamColor } : undefined;
-
-                return (
-                  <button
-                    type="button"
-                    key={game.week}
-                    className={`schedule-game ${game.opponent === 'BYE' ? 'bye' : 'interactive'} ${isHomeGame ? 'home-game' : ''} ${expandedWeek === game.week ? 'expanded' : ''}`}
-                    style={gameTileStyle}
-                    onClick={() => toggleGameDetails(game.week, game.opponent === 'BYE')}
-                  >
-                    <span className="game-week">Week {game.week}</span>
-                    <span className={`game-opponent ${game.opponent === 'BYE' ? 'bye-text' : ''}`}>
-                      {game.opponent === 'BYE' ? (
-                        'BYE'
-                      ) : (
-                        <>
-                          <span
-                            className={`game-prefix ${game.home_away === 'AWAY' ? 'away' : 'home'}`}
-                            style={game.home_away === 'AWAY' ? { color: opponentColor } : undefined}
-                          >
-                            {game.home_away === 'AWAY' ? '@' : 'vs'}
-                          </span>
-                          <span className="game-opponent-code" style={{ color: opponentColor }}>
-                            {game.opponent}
-                          </span>
-                        </>
-                      )}
-                    </span>
-                    {game.opponent !== 'BYE' && getResultLabel(game) && (
-                      <span
-                        className={`game-result-pill ${getResultLabel(game) === 'W' ? 'win' : getResultLabel(game) === 'L' ? 'loss' : 'tie'}`}
-                      >
-                        {getResultLabel(game)}
-                      </span>
-                    )}
-
-                    {expandedWeek === game.week && game.opponent !== 'BYE' && (
-                      <div className="game-details">
-                        {game.team_score !== null && game.opponent_score !== null ? (
-                          <>
-                            <div className="game-scoreline">
-                              <span className={game.winner === schedule.team ? 'winner' : ''}>
-                                {schedule.team} {game.team_score}
-                              </span>
-                              <span className="game-score-separator">-</span>
-                              <span className={game.winner === game.opponent ? 'winner' : ''}>
-                                {game.opponent} {game.opponent_score}
-                              </span>
-                            </div>
-                            <div className="game-winner-line">Winner: {game.winner === 'TIE' ? 'Tie' : game.winner}</div>
-                          </>
-                        ) : (
-                          <div className="game-winner-line">Score unavailable.</div>
-                        )}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
+              {schedule.schedule.map((game) => (
+                <TeamScheduleGameCard
+                  key={game.week}
+                  game={game}
+                  team={schedule.team}
+                  teamColor={scheduleTeamColor}
+                  expanded={expandedWeek === game.week}
+                  onToggle={toggleGameDetails}
+                />
+              ))}
             </div>
           </>
         )}

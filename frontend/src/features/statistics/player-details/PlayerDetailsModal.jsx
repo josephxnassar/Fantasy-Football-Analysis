@@ -1,5 +1,3 @@
-// Player details modal with stats and season selection.
-
 import { useState } from 'react';
 import { getTeamDepthChart } from '../../../api';
 import { useTeamModalData } from '../../../shared/hooks/useTeamModalData';

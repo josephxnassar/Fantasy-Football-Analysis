@@ -1,5 +1,3 @@
-// Hook for managing player-details modal state.
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPlayer } from '../../../api';
 

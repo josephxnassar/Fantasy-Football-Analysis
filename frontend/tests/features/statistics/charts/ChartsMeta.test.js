@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { CHART_VIEW_OPTIONS, VIEW_META, VIEWS_USING_STAT } from '../../../../src/features/statistics/charts/chartsConfig';
+import { CHART_VIEW_OPTIONS, VIEW_META, VIEWS_USING_STAT } from '../../../../src/features/statistics/charts/ChartsMeta';
 
-describe('chartsConfig', () => {
-  it('uses expected chart view labels', () => {
+describe('ChartsMeta', () => {
+  it('defines the supported chart views in display order', () => {
     expect(CHART_VIEW_OPTIONS).toEqual([
       { value: 'leaderboard', label: 'Leaderboard' },
       { value: 'consistency-upside', label: 'Average vs Upside' },
@@ -11,7 +11,7 @@ describe('chartsConfig', () => {
     ]);
   });
 
-  it('keeps view metadata aligned with chart views', () => {
+  it('provides metadata for every chart view', () => {
     const viewValues = CHART_VIEW_OPTIONS.map((option) => option.value);
     viewValues.forEach((value) => {
       expect(VIEW_META[value]).toBeDefined();
@@ -22,7 +22,7 @@ describe('chartsConfig', () => {
     expect(VIEW_META.trend.kicker).toBe('Season Trends');
   });
 
-  it('shows stat picker only for leaderboard and season trends', () => {
+  it('tracks which views expose the stat control', () => {
     expect(VIEWS_USING_STAT.has('leaderboard')).toBe(true);
     expect(VIEWS_USING_STAT.has('trend')).toBe(true);
     expect(VIEWS_USING_STAT.has('consistency-upside')).toBe(false);

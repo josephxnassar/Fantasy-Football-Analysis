@@ -18,10 +18,8 @@ function toNumber(value) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
-export function getRankableGroups(position, statColumns = [], rankingGroups) {
-  const groups = rankingGroups[position];
-  if (!groups) return [];
-  return Object.entries(groups)
+export function getRankableGroups(rankingGroups = {}, statColumns = []) {
+  return Object.entries(rankingGroups)
     .map(([category, stats]) => ({ category, stats: stats.filter((stat) => statColumns.includes(stat)) }))
     .filter(({ stats }) => stats.length > 0);
 }

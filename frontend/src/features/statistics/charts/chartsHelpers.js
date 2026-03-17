@@ -2,9 +2,7 @@ import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { meetsStatThreshold } from '../../../shared/utils/statThresholds';
 import { PLAYER_DISPLAY_LIMIT } from '../statisticsOptions';
 
-export function getStatOptions(position, statColumns = [], positionStatGroups) {
-  const groups = positionStatGroups[position];
-  if (!groups) return [];
+export function getStatOptions(groups = {}, statColumns = []) {
   return Object.entries(groups)
     .map(([category, stats]) => ({ category, stats: stats.filter((stat) => statColumns.includes(stat)) }))
     .filter(({ stats }) => stats.length > 0);

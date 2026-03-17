@@ -1,5 +1,3 @@
-// Hook for JSON object persistence in sessionStorage.
-
 import { useEffect, useState } from 'react';
 
 function safeLoad(key, fallback) {

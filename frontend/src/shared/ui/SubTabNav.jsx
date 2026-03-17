@@ -1,5 +1,3 @@
-// Reusable sub-navigation for switching tabs within a feature. Stats to Depth Charts inside the player modal. Charts to Rankings to Player Comparison to Player Search for statistics. Division Browsers to Team Search inside our team browsers.
-
 import './SubTabNav.css';
 
 function SubTabNav({ tabs, activeTab, onTabChange, variant = 'default', className }) {

@@ -1,5 +1,3 @@
-/* StatTooltip — info icon + popover for stat explanations. */
-
 .stat-tooltip-wrap {
   position: relative;
   display: inline-flex;

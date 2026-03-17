@@ -1,5 +1,3 @@
-// Team accent colors for team-driven UI surfaces.
-
 const DEFAULT_TEAM_COLOR = '#2563eb';
 
 export const TEAM_COLORS = {

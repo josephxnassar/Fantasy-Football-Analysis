@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Rankings from '../../../../src/features/statistics/rankings/Rankings';
-import { useChartData } from '../../../../src/features/statistics/hooks/useChartData';
+import { useStatisticsData } from '../../../../src/features/statistics/useStatisticsData';
 import { useSessionStorageObject } from '../../../../src/shared/hooks/useSessionStorageObject';
 
-vi.mock('../../../../src/features/statistics/hooks/useChartData', () => ({
-  useChartData: vi.fn(),
+vi.mock('../../../../src/features/statistics/useStatisticsData', () => ({
+  useStatisticsData: vi.fn(),
 }));
 
 vi.mock('../../../../src/shared/hooks/useSessionStorageObject', () => ({
@@ -39,8 +39,8 @@ const CHART_DATA_MOCK = {
 describe('Rankings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useChartData.mockReturnValue({
-      chartData: CHART_DATA_MOCK,
+    useStatisticsData.mockReturnValue({
+      statisticsData: CHART_DATA_MOCK,
       loading: false,
       error: null,
     });
@@ -53,6 +53,8 @@ describe('Rankings', () => {
     const onPlayerSeasonClick = vi.fn();
 
     render(<Rankings onPlayerClick={onPlayerClick} onPlayerSeasonClick={onPlayerSeasonClick} />);
+
+    expect(useStatisticsData).toHaveBeenCalledWith('Overall', null);
 
     await user.click(screen.getByRole('button', { name: 'Josh Allen' }));
 

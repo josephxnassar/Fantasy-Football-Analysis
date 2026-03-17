@@ -4,7 +4,6 @@
   padding: var(--spacing-lg);
 }
 
-/* Conference Selection */
 .conference-selector {
   display: flex;
   justify-content: center;
@@ -45,7 +44,6 @@
   box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
 }
 
-/* Division Selection */
 .division-selector {
   display: flex;
   justify-content: center;
@@ -77,7 +75,6 @@
   box-shadow: var(--shadow-primary);
 }
 
-/* Team Grid */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

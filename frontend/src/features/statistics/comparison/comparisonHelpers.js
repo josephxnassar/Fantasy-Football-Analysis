@@ -1,10 +1,27 @@
-// Helpers for ordering comparison rows from the shared production metadata.
-
-import { PRODUCTION_GROUPS_NO_RANKS } from '../../../shared/utils/statMeta';
+import { PRODUCTION_GROUPS } from '../../../shared/utils/statMeta';
 import { isLowerBetterStat } from '../../../shared/utils/statDirection';
 
-export function buildComparisonRows(positionProfile = 'Overall') {
-  const profileGroups = PRODUCTION_GROUPS_NO_RANKS[positionProfile] || PRODUCTION_GROUPS_NO_RANKS.Overall;
+function withoutRankings(profile) {
+  const { Rankings: _rankings, ...groups } = PRODUCTION_GROUPS[profile] || PRODUCTION_GROUPS.Overall;
+  return groups;
+}
+
+const COMPARISON_GROUPS = {
+  QB: withoutRankings('QB'),
+  RB: withoutRankings('RB'),
+  WR: withoutRankings('WR'),
+  TE: withoutRankings('TE'),
+  CrossPosition: {
+    Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
+    Volume: ['pass_att', 'rush_att', 'targets', 'sc_offense_pct'],
+    Yardage: ['pass_yds', 'rush_yds', 'rec_yds'],
+    Touchdowns: ['pass_td', 'rush_td', 'rec_td'],
+    Efficiency: ['passing_epa', 'rushing_epa', 'receiving_epa'],
+  },
+};
+
+export function buildComparisonRows(positionProfile = 'CrossPosition') {
+  const profileGroups = COMPARISON_GROUPS[positionProfile] || COMPARISON_GROUPS.CrossPosition;
   const rows = [];
 
   Object.entries(profileGroups).forEach(([category, statKeys]) => {

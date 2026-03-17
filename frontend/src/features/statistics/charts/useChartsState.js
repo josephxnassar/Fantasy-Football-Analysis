@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useSessionStorageObject } from '../../../shared/hooks/useSessionStorageObject';
-import { DEFAULT_STAT } from './chartsConfig';
+import { DEFAULT_STAT } from './ChartsMeta';
 
 const CHART_UI_STORAGE_KEY = 'chartsUi';
 
@@ -33,31 +33,15 @@ export function useChartsState() {
   };
 }
 
-export function useChartsStateValidation({
-  view,
-  stat,
-  setStat,
-  availableStatOptions,
-  trendPlayer,
-  setTrendPlayer,
-  rankedTrendPlayers,
-  trendPlayerOptions,
-}) {
-  useEffect(() => {
-    if (!availableStatOptions.length) return;
-    if (!availableStatOptions.includes(stat)) {
-      setStat(availableStatOptions[0]);
-    }
-  }, [availableStatOptions, stat, setStat]);
+export function getNextChartStat(stat, defaultStat, availableStatOptions) {
+  if (!availableStatOptions.length || availableStatOptions.includes(stat)) return stat;
+  if (availableStatOptions.includes(defaultStat)) return defaultStat;
+  return availableStatOptions[0];
+}
 
-  useEffect(() => {
-    if (view !== 'trend') return;
-    if (!trendPlayerOptions.length) {
-      if (trendPlayer) setTrendPlayer('');
-      return;
-    }
-    if (!trendPlayer || !trendPlayerOptions.includes(trendPlayer)) {
-      setTrendPlayer(rankedTrendPlayers[0] || trendPlayerOptions[0]);
-    }
-  }, [view, trendPlayerOptions, rankedTrendPlayers, trendPlayer, setTrendPlayer]);
+export function getNextTrendPlayer(view, trendPlayer, trendPlayerOptions, trendPlayerOptionsLoading = false) {
+  if (view !== 'trend' || trendPlayerOptionsLoading) return trendPlayer;
+  if (!trendPlayerOptions.length) return '';
+  if (trendPlayer && trendPlayerOptions.includes(trendPlayer)) return trendPlayer;
+  return trendPlayerOptions[0];
 }

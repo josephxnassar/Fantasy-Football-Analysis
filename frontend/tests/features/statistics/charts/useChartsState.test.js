@@ -1,8 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { DEFAULT_STAT } from '../../../../src/features/statistics/charts/chartsConfig';
-import { useChartsState } from '../../../../src/features/statistics/charts/useChartsState';
+import { DEFAULT_STAT } from '../../../../src/features/statistics/charts/ChartsMeta';
+import { getNextChartStat, getNextTrendPlayer, useChartsState } from '../../../../src/features/statistics/charts/useChartsState';
 
 describe('useChartsState', () => {
   beforeEach(() => {
@@ -57,5 +57,23 @@ describe('useChartsState', () => {
         }),
       );
     });
+  });
+});
+
+describe('chart selection helpers', () => {
+  it('keeps a valid stat selection unchanged', () => {
+    expect(getNextChartStat('rush_yds', 'fp_ppr', ['fp_ppr', 'rush_yds'])).toBe('rush_yds');
+  });
+
+  it('falls back to the default stat when the current stat is unavailable', () => {
+    expect(getNextChartStat('pass_td', 'rec_yds', ['fp_ppr', 'rec_yds'])).toBe('rec_yds');
+  });
+
+  it('keeps the stored trend player while trend options are still loading', () => {
+    expect(getNextTrendPlayer('trend', 'Josh Allen', [], true)).toBe('Josh Allen');
+  });
+
+  it('clears the stored trend player once loading is done and no options remain', () => {
+    expect(getNextTrendPlayer('trend', 'Josh Allen', [], false)).toBe('');
   });
 });

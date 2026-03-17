@@ -1,5 +1,3 @@
-// Stats whose lower values should score as better.
-
 const LOWER_IS_BETTER_TOKENS = [
   'interception',
   '_int',

@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { RANKING_GROUPS } from '../../../../src/features/statistics/rankings/rankingGroups';
+import { OVERALL_RANKING_GROUPS } from '../../../../src/shared/utils/statMeta';
 import { buildRankings, getRankableGroups } from '../../../../src/features/statistics/rankings/rankingsHelpers';
 
 describe('rankingsHelpers', () => {
   it('filters unavailable stats from rankable groups', () => {
-    const groups = getRankableGroups('RB', ['fp_ppr', 'rush_yds', 'rush_att_rank'], RANKING_GROUPS);
+    const groups = getRankableGroups(OVERALL_RANKING_GROUPS, ['fp_ppr', 'exp_fp', 'rush_td_rank']);
 
-    expect(groups).toEqual([{ category: 'Rushing Production', stats: ['rush_yds'] }]);
+    expect(groups).toEqual([
+      { category: 'Fantasy Output', stats: ['fp_ppr', 'exp_fp'] },
+      { category: 'Touchdown Dominance', stats: ['rush_td_rank'] },
+    ]);
   });
 
   it('ranks players with sample-size thresholds applied', () => {
@@ -84,11 +87,7 @@ describe('rankingsHelpers', () => {
   });
 
   it('includes touchdown rank category when TD rank stats are available for Overall', () => {
-    const groups = getRankableGroups(
-      'Overall',
-      ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
-      RANKING_GROUPS,
-    );
+    const groups = getRankableGroups(OVERALL_RANKING_GROUPS, ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank']);
 
     expect(groups).toEqual([
       { category: 'Positional Dominance', stats: ['fp_ppr_rank', 'exp_fp_rank'] },
