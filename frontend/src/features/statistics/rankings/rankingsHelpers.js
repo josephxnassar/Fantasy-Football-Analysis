@@ -1,5 +1,6 @@
 import { meetsStatThreshold } from '../../../shared/utils/statThresholds';
 import { isLowerBetterStat } from '../../../shared/utils/statDirection';
+import { PLAYER_DISPLAY_LIMIT } from '../statisticsOptions';
 
 export const DEFAULT_CATEGORY_WEIGHT = 1;
 export const DEFAULT_STAT_WEIGHT = 0;
@@ -25,7 +26,7 @@ export function getRankableGroups(position, statColumns = [], rankingGroups) {
     .filter(({ stats }) => stats.length > 0);
 }
 
-export function buildRankings(players = [], rankableGroups, categoryWeights = {}, statWeights = {}, topN = 20) {
+export function buildRankings(players = [], rankableGroups, categoryWeights = {}, statWeights = {}, limit = PLAYER_DISPLAY_LIMIT) {
   if (!Array.isArray(players) || players.length === 0) return [];
 
   const weightedStats = rankableGroups.flatMap(({ category, stats }) =>
@@ -85,7 +86,7 @@ export function buildRankings(players = [], rankableGroups, categoryWeights = {}
     })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score)
-    .slice(0, topN)
+    .slice(0, limit)
     .map((player, index) => ({ ...player, rank: index + 1 }));
 
   return ranked;

@@ -3,17 +3,18 @@
 import { useEffect, useState } from 'react';
 
 import { getConsistencyData } from '../../../api';
+import { PLAYER_DISPLAY_LIMIT } from '../statisticsOptions';
 
 const consistencyCache = new Map();
 const consistencyInFlight = new Map();
 
-function getCacheKey(position, season, topN) {
-  return `${position}:${season ?? 'latest'}:${topN}`;
+function getCacheKey(position, season) {
+  return `${position}:${season ?? 'latest'}`;
 }
 
-async function fetchConsistencyPayload(position, season, topN, key) {
+async function fetchConsistencyPayload(position, season, key) {
   if (!consistencyInFlight.has(key)) {
-    const request = getConsistencyData(position, season, topN)
+    const request = getConsistencyData(position, season, PLAYER_DISPLAY_LIMIT)
       .then((response) => {
         consistencyCache.set(key, response.data);
         return response.data;
@@ -26,7 +27,7 @@ async function fetchConsistencyPayload(position, season, topN, key) {
   return consistencyInFlight.get(key);
 }
 
-export function useConsistencyData(position, season, topN, enabled) {
+export function useConsistencyData(position, season, enabled) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(Boolean(enabled));
   const [error, setError] = useState(null);
@@ -42,7 +43,7 @@ export function useConsistencyData(position, season, topN, enabled) {
       };
     }
 
-    const cacheKey = getCacheKey(position, season, topN);
+    const cacheKey = getCacheKey(position, season);
     const cached = consistencyCache.get(cacheKey);
     if (cached) {
       setData(cached);
@@ -56,7 +57,7 @@ export function useConsistencyData(position, season, topN, enabled) {
     const fetchData = async () => {
       try {
         if (!cancelled) setLoading(true);
-        const payload = await fetchConsistencyPayload(position, season, topN, cacheKey);
+        const payload = await fetchConsistencyPayload(position, season, cacheKey);
         if (!cancelled) {
           setData(payload);
           setError(null);
@@ -73,7 +74,7 @@ export function useConsistencyData(position, season, topN, enabled) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, position, season, topN]);
+  }, [enabled, position, season]);
 
   return { data, loading, error };
 }

@@ -13,12 +13,11 @@ export function useChartsState() {
   const [position, setPosition] = useState(initialPosition);
   const [season, setSeason] = useState(null);
   const [stat, setStat] = useState(chartUiState.stat || DEFAULT_STAT[initialPosition] || DEFAULT_STAT.Overall);
-  const [topN, setTopN] = useState(chartUiState.topN || 20);
   const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
 
   useEffect(() => {
-    setChartUiState({ view, position, topN, stat, trendPlayer });
-  }, [view, position, topN, stat, trendPlayer, setChartUiState]);
+    setChartUiState({ view, position, stat, trendPlayer });
+  }, [view, position, stat, trendPlayer, setChartUiState]);
 
   return {
     view,
@@ -29,8 +28,6 @@ export function useChartsState() {
     setSeason,
     stat,
     setStat,
-    topN,
-    setTopN,
     trendPlayer,
     setTrendPlayer,
   };

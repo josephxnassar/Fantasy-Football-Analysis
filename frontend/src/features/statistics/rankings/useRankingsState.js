@@ -12,13 +12,12 @@ export function useRankingsState() {
   const [weightProfiles, setWeightProfiles] = useSessionStorageObject(STORAGE_KEY, {});
   const [position, setPosition] = useState(uiState.position || 'Overall');
   const [season, setSeason] = useState(null);
-  const [topN, setTopN] = useState(uiState.topN || 20);
   const [selectedPreset, setSelectedPreset] = useState(uiState.selectedPreset || 'balanced');
   const [expandedCategories, setExpandedCategories] = useState({});
 
   useEffect(() => {
-    setUiState({ position, topN, selectedPreset });
-  }, [position, topN, selectedPreset, setUiState]);
+    setUiState({ position, selectedPreset });
+  }, [position, selectedPreset, setUiState]);
 
   const currentProfile = weightProfiles[position] || {};
   const categoryWeights = currentProfile.categoryWeights || EMPTY_WEIGHTS;
@@ -63,8 +62,6 @@ export function useRankingsState() {
     setPosition,
     season,
     setSeason,
-    topN,
-    setTopN,
     selectedPreset,
     expandedCategories,
     categoryWeights,

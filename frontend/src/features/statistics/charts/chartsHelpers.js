@@ -1,5 +1,6 @@
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { meetsStatThreshold } from '../../../shared/utils/statThresholds';
+import { PLAYER_DISPLAY_LIMIT } from '../statisticsOptions';
 
 export function getStatOptions(position, statColumns = [], positionStatGroups) {
   const groups = positionStatGroups[position];
@@ -9,7 +10,7 @@ export function getStatOptions(position, statColumns = [], positionStatGroups) {
     .filter(({ stats }) => stats.length > 0);
 }
 
-export function buildBarData(players = [], stat, topN) {
+export function buildBarData(players = [], stat, limit = PLAYER_DISPLAY_LIMIT) {
   if (!Array.isArray(players)) return [];
   return players
     .filter((player) => player.stats[stat] != null && meetsStatThreshold(player, stat))
@@ -23,7 +24,7 @@ export function buildBarData(players = [], stat, topN) {
       statLabel: getStatLabel(stat),
     }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, topN);
+    .slice(0, limit);
 }
 
 export function getChartHeight(rowCount) {

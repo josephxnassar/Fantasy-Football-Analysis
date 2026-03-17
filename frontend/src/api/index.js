@@ -30,8 +30,8 @@ export const getChartData = (position, season = null) => {
   return api.get('/chart-data', { params: { position, ...(season && { season }) } });
 };
 
-export const getConsistencyData = (position, season = null, topN = 40) => {
-  return api.get('/consistency-data', { params: { position, top_n: topN, ...(season && { season }) } });
+export const getConsistencyData = (position, season = null, limit = 50) => {
+  return api.get('/consistency-data', { params: { position, top_n: limit, ...(season && { season }) } });
 };
 
 export const getPlayerTrendData = (playerName, position, stat) => {

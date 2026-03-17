@@ -15,11 +15,11 @@ describe('useSessionStorageObject', () => {
   });
 
   it('loads stored object when JSON is valid', () => {
-    window.sessionStorage.setItem('chartsUi', JSON.stringify({ view: 'trend', topN: 30 }));
+    window.sessionStorage.setItem('chartsUi', JSON.stringify({ view: 'trend', position: 'WR' }));
 
     const { result } = renderHook(() => useSessionStorageObject('chartsUi', { view: 'leaderboard' }));
 
-    expect(result.current[0]).toEqual({ view: 'trend', topN: 30 });
+    expect(result.current[0]).toEqual({ view: 'trend', position: 'WR' });
   });
 
   it('falls back to default when stored JSON is invalid or not an object', () => {
@@ -34,11 +34,11 @@ describe('useSessionStorageObject', () => {
     const { result } = renderHook(() => useSessionStorageObject('chartsUi', { view: 'leaderboard' }));
 
     act(() => {
-      result.current[1]({ view: 'trend', topN: 15 });
+      result.current[1]({ view: 'trend', stat: 'pass_td' });
     });
 
     await waitFor(() => {
-      expect(window.sessionStorage.getItem('chartsUi')).toBe(JSON.stringify({ view: 'trend', topN: 15 }));
+      expect(window.sessionStorage.getItem('chartsUi')).toBe(JSON.stringify({ view: 'trend', stat: 'pass_td' }));
     });
   });
 });

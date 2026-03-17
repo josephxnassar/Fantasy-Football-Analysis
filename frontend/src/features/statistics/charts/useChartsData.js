@@ -6,15 +6,15 @@ import { buildBarData, getStatOptions } from './chartsHelpers';
 import { useConsistencyData } from './useConsistencyData';
 import { useSeasonChartData } from './useSeasonChartData';
 
-export function useChartsData({ view, position, season, stat, topN, trendPlayer }) {
+export function useChartsData({ view, position, season, stat, trendPlayer }) {
   const effectiveSeason = view === 'trend' ? null : season;
   const { chartData, loading, error } = useChartData(position, effectiveSeason);
   const consistencyEnabled = view === 'consistency-upside';
   const trendEnabled = view === 'trend';
-  const consistency = useConsistencyData(position, effectiveSeason, topN, consistencyEnabled);
+  const consistency = useConsistencyData(position, effectiveSeason, consistencyEnabled);
   const trend = useSeasonChartData(position, trendPlayer, stat, trendEnabled);
 
-  const barData = useMemo(() => buildBarData(chartData?.players, stat, topN), [chartData?.players, stat, topN]);
+  const barData = useMemo(() => buildBarData(chartData?.players, stat), [chartData?.players, stat]);
   const statOptions = useMemo(
     () => getStatOptions(position, chartData?.stat_columns || [], PRODUCTION_GROUPS_NO_RANKS),
     [position, chartData?.stat_columns],

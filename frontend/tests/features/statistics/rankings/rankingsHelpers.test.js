@@ -46,7 +46,7 @@ describe('rankingsHelpers', () => {
 
     const rankableGroups = [{ category: 'Route & Separation', stats: ['ng_rec_avg_separation'] }];
 
-    const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 2 }, {}, 10);
+    const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 2 }, {});
 
     expect(ranked.map((row) => row.name)).toEqual(['Qualified A', 'Qualified B']);
     expect(ranked[0].age).toBe(24);
@@ -77,7 +77,7 @@ describe('rankingsHelpers', () => {
 
     const rankableGroups = [{ category: 'Receiving Efficiency', stats: ['pfr_rec_drop_pct'] }];
 
-    const ranked = buildRankings(players, rankableGroups, { 'Receiving Efficiency': 1 }, {}, 10);
+    const ranked = buildRankings(players, rankableGroups, { 'Receiving Efficiency': 1 }, {});
 
     expect(ranked[0].name).toBe('Lower Drop');
     expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
@@ -94,5 +94,22 @@ describe('rankingsHelpers', () => {
       { category: 'Positional Dominance', stats: ['fp_ppr_rank', 'exp_fp_rank'] },
       { category: 'Touchdown Dominance', stats: ['pass_td_rank', 'rush_td_rank', 'rec_td_rank'] },
     ]);
+  });
+
+  it('caps ranking results at 50 players by default', () => {
+    const players = Array.from({ length: 55 }, (_, index) => ({
+      name: `Player ${index + 1}`,
+      position: 'WR',
+      age: 24,
+      team: 'MIN',
+      stats: { targets: 90, ng_rec_avg_separation: 5 - index * 0.01 },
+    }));
+    const rankableGroups = [{ category: 'Route & Separation', stats: ['ng_rec_avg_separation'] }];
+
+    const ranked = buildRankings(players, rankableGroups, { 'Route & Separation': 1 }, {});
+
+    expect(ranked).toHaveLength(50);
+    expect(ranked[0].name).toBe('Player 1');
+    expect(ranked.at(-1)?.name).toBe('Player 50');
   });
 });

@@ -20,7 +20,7 @@ const VIEW_LOADING_MESSAGES = {
 };
 
 export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
-  const { view, setView, position, setPosition, season, setSeason, stat, setStat, topN, setTopN, trendPlayer, setTrendPlayer } =
+  const { view, setView, position, setPosition, season, setSeason, stat, setStat, trendPlayer, setTrendPlayer } =
     useChartsState();
   const {
     chartData,
@@ -40,7 +40,7 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
     trendPlayerOptions,
     trendSeries,
     chartSeason,
-  } = useChartsData({ view, position, season, stat, topN, trendPlayer });
+  } = useChartsData({ view, position, season, stat, trendPlayer });
   useChartsStateValidation({
     view,
     stat,
@@ -91,9 +91,6 @@ export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
             setTrendPlayer={setTrendPlayer}
             trendPlayerOptions={trendPlayerOptions}
             showTrendPlayerControl={view === 'trend'}
-            topN={topN}
-            setTopN={setTopN}
-            showTopNControl={view !== 'trend'}
           />
         </div>
 

@@ -25,7 +25,7 @@ describe('buildBarData', () => {
       },
     ];
 
-    expect(buildBarData(players, 'ng_rec_avg_separation', 10)).toEqual([
+    expect(buildBarData(players, 'ng_rec_avg_separation')).toEqual([
       expect.objectContaining({
         name: 'Qualified Receiver',
         value: 3.1,
@@ -55,11 +55,26 @@ describe('buildBarData', () => {
       },
     ];
 
-    expect(buildBarData(players, 'pfr_rec_yac_r', 10)).toEqual([
+    expect(buildBarData(players, 'pfr_rec_yac_r')).toEqual([
       expect.objectContaining({
         name: 'Qualified Starter',
         value: 6.4,
       }),
     ]);
+  });
+
+  it('caps leaderboard rows at 50 players by default', () => {
+    const players = Array.from({ length: 55 }, (_, index) => ({
+      name: `Player ${index + 1}`,
+      position: 'RB',
+      team: 'DET',
+      stats: { fp_ppr: 400 - index },
+    }));
+
+    const rows = buildBarData(players, 'fp_ppr');
+
+    expect(rows).toHaveLength(50);
+    expect(rows[0].name).toBe('Player 1');
+    expect(rows.at(-1)?.name).toBe('Player 50');
   });
 });

@@ -1,7 +1,7 @@
-import { TOP_N_OPTIONS, POSITION_OPTIONS } from '../statisticsOptions';
+import { POSITION_OPTIONS } from '../statisticsOptions';
 import { StatTooltip } from '../../../shared/ui';
 
-export default function RankingsHeader({ position, setPosition, season, setSeason, topN, setTopN, availableSeasons, currentSeason }) {
+export default function RankingsHeader({ position, setPosition, season, setSeason, availableSeasons, currentSeason }) {
   return (
     <div className="rankings-panel rankings-panel--header">
       <div className="rankings-copy">
@@ -46,17 +46,6 @@ export default function RankingsHeader({ position, setPosition, season, setSeaso
             </select>
           </div>
         )}
-
-        <div className="control-group">
-          <label>Show:</label>
-          <select value={topN} onChange={(e) => setTopN(Number(e.target.value))}>
-            {TOP_N_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                Top {option}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
     </div>
   );

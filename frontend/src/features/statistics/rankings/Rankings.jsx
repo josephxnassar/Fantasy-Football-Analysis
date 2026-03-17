@@ -18,8 +18,6 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
     setPosition,
     season,
     setSeason,
-    topN,
-    setTopN,
     selectedPreset,
     expandedCategories,
     categoryWeights,
@@ -36,8 +34,8 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
     [position, chartData?.stat_columns],
   );
   const rankedPlayers = useMemo(
-    () => buildRankings(chartData?.players || [], rankableGroups, categoryWeights, statWeights, topN),
-    [chartData?.players, rankableGroups, categoryWeights, statWeights, topN],
+    () => buildRankings(chartData?.players || [], rankableGroups, categoryWeights, statWeights),
+    [chartData?.players, rankableGroups, categoryWeights, statWeights],
   );
   const selectedSeason = season ?? chartData?.season ?? null;
 
@@ -52,8 +50,6 @@ export default function Rankings({ onPlayerClick, onPlayerSeasonClick }) {
           setPosition={setPosition}
           season={season}
           setSeason={setSeason}
-          topN={topN}
-          setTopN={setTopN}
           availableSeasons={chartData?.available_seasons}
           currentSeason={chartData?.season}
         />

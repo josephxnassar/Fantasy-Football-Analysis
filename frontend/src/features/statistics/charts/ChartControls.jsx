@@ -1,5 +1,5 @@
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
-import { POSITION_OPTIONS, TOP_N_OPTIONS } from '../statisticsOptions';
+import { POSITION_OPTIONS } from '../statisticsOptions';
 import { CHART_VIEW_OPTIONS } from './chartsConfig';
 
 export default function ChartControls({
@@ -20,9 +20,6 @@ export default function ChartControls({
   setTrendPlayer,
   trendPlayerOptions = [],
   showTrendPlayerControl = false,
-  topN,
-  setTopN,
-  showTopNControl = true,
 }) {
   return (
     <div className="charts-controls">
@@ -92,19 +89,6 @@ export default function ChartControls({
                   </option>
                 ))}
               </optgroup>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {showTopNControl && (
-        <div className="control-group">
-          <label>Show:</label>
-          <select value={topN} onChange={(e) => setTopN(Number(e.target.value))}>
-            {TOP_N_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                Top {option}
-              </option>
             ))}
           </select>
         </div>
