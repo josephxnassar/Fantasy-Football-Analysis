@@ -1,3 +1,7 @@
+/**
+ * File overview: Utility helpers for stat Thresholds used across the frontend.
+ */
+
 export const STAT_THRESHOLDS = {
   'Yds/Rush': { volumeStats: ['rush_att', 'carries'], minVolume: 100 },
   'Yds/Rec': { volumeStats: ['rec', 'receptions'], minVolume: 50 },

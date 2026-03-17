@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Error Boundary within the shared UI layer.
+ */
+
 import React from 'react';
 import './ErrorBoundary.css';
 

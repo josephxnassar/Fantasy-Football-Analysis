@@ -1,3 +1,7 @@
+/**
+ * File overview: Hook for App Info within the home feature.
+ */
+
 // Hook for loading application overview metadata from /api/app-info.
 
 import { useState, useEffect } from 'react';

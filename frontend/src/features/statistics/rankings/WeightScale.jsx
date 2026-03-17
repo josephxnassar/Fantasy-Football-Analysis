@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Weight Scale within the rankings feature.
+ */
+
 import { WEIGHT_LABELS, WEIGHT_STEPS } from './rankingsHelpers';
 
 export default function WeightScale({ value, onChange, compact = false, ariaLabel }) {

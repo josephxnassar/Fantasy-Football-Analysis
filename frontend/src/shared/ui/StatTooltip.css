@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Stat Tooltip within the shared UI layer.
+ */
+
 .stat-tooltip-wrap {
   position: relative;
   display: inline-flex;

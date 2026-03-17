@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Rankings within the rankings feature.
+ */
+
 import { useMemo } from 'react';
 
 import { OVERALL_RANKING_GROUPS } from '../../../shared/utils/statMeta';

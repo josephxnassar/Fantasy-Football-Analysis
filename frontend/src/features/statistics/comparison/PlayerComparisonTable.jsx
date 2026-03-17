@@ -1,4 +1,9 @@
+/**
+ * File overview: Component for Player Comparison Table within the player comparison feature.
+ */
+
 import { EmptyStateMessage } from '../../../shared/ui';
+import { openPlayerSelection } from '../playerSelection';
 import PlayerComparisonPlayerHeaderCell from './PlayerComparisonPlayerHeaderCell';
 import PlayerComparisonStatRow from './PlayerComparisonStatRow';
 import PlayerComparisonWeeksRow from './PlayerComparisonWeeksRow';
@@ -12,15 +17,8 @@ export default function PlayerComparisonTable({
   onPlayerClick,
   onPlayerSeasonClick,
 }) {
-  const handlePlayerHeaderClick = (slot) => {
-    if (!slot?.playerName) return;
-    const selectedSeason = Number(slot.season);
-    if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
-      onPlayerSeasonClick(slot.playerName, selectedSeason);
-      return;
-    }
-    onPlayerClick?.(slot.playerName);
-  };
+  const handlePlayerHeaderClick = (slot) =>
+    openPlayerSelection({ playerName: slot?.playerName, season: slot?.season, onPlayerClick, onPlayerSeasonClick });
 
   if (selectedPlayers.length === 0) return <EmptyStateMessage message="Select at least one player to compare." />;
 

@@ -1,3 +1,7 @@
+/**
+ * File overview: Re-export surface for shared UI building blocks used across the frontend.
+ */
+
 export { default as ModalBackdrop } from './ModalBackdrop';
 export { default as SelectablePlayerCard } from './SelectablePlayerCard';
 export { default as RookieBadge } from './RookieBadge';

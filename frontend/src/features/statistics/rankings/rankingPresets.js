@@ -1,3 +1,7 @@
+/**
+ * File overview: Module for ranking Presets within the rankings feature.
+ */
+
 export const RANKING_PRESETS = [
   { id: 'balanced', label: 'Balanced' },
   { id: 'volume', label: 'Volume' },

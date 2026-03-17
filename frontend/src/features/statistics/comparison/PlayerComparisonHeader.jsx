@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Header within the player comparison feature.
+ */
+
 export default function PlayerComparisonHeader({ comparisonProfileLabel, selectedCount, maxPlayers }) {
   return (
     <div className="direct-comparison-panel direct-comparison-panel--header">

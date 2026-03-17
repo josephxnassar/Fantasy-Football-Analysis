@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Stats View Mode Toggle within the player details feature.
+ */
+
 export default function StatsViewModeToggle({ viewMode, setViewMode, hasWeeklyData }) {
   if (!hasWeeklyData) return null;
 

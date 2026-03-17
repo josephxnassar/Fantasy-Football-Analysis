@@ -1,3 +1,7 @@
+/**
+ * File overview: Top-level application shell that switches between the main product tabs.
+ */
+
 import { Suspense, lazy, useState } from 'react';
 import './App.css';
 import './shell/Shell.css';

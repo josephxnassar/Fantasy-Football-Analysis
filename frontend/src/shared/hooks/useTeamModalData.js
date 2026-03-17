@@ -1,3 +1,7 @@
+/**
+ * File overview: Shared hook for team-based modal fetches with stale-request protection.
+ */
+
 import { useEffect, useState } from 'react';
 
 export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
@@ -6,6 +10,8 @@ export function useTeamModalData(team, fetchFn, defaultErrorMessage) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Team modals can switch quickly between teams or tabs, so ignore any late
+    // response once the current effect has been replaced.
     let cancelled = false;
 
     const fetchTeamData = async () => {

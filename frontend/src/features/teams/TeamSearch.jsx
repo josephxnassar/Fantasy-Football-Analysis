@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Team Search within the teams feature.
+ */
+
 import { useState } from 'react';
 import { getTeamColorVars } from '../../shared/utils/teamColors';
 import './TeamSearch.css';

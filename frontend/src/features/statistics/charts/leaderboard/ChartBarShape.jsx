@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Chart Bar Shape within the leaderboard chart view.
+ */
+
 import { Rectangle } from 'recharts';
 
 export default function ChartBarShape(props) {

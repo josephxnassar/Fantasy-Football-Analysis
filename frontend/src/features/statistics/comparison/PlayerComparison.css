@@ -1,3 +1,8 @@
+/*
+ * File overview: Styles for Player Comparison within the player comparison feature.
+ */
+
+/* Shared comparison page shell */
 .direct-comparison-container {
   width: 100%;
 }
@@ -28,6 +33,7 @@
     linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
 }
 
+/* Header copy and profile summary */
 .direct-comparison-copy {
   display: flex;
   flex-direction: column;
@@ -115,6 +121,7 @@
   color: var(--color-text-primary);
 }
 
+/* Player slot controls */
 .direct-comparison-slot-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -216,6 +223,7 @@
   color: var(--color-danger);
 }
 
+/* Comparison table */
 .direct-comparison-table-wrapper {
   overflow-x: auto;
 }

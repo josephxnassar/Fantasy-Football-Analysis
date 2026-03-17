@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Team Schedule Modal within the teams feature.
+ */
+
 import { useCallback, useRef, useState } from 'react';
 import { getTeamSchedule } from '../../api';
 import { useTeamModalData } from '../../shared/hooks/useTeamModalData';

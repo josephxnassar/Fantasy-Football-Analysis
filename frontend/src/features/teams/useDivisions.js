@@ -1,3 +1,7 @@
+/**
+ * File overview: Hook for Divisions within the teams feature.
+ */
+
 // Hook for loading and caching divisions data across consumers.
 
 import { useState, useEffect, useMemo } from 'react';

@@ -1,6 +1,6 @@
 # Frontend
 
-Last verified: 2026-03-16
+Last verified: 2026-03-17
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](package.json)
 [![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](vite.config.js)
@@ -87,7 +87,7 @@ Charts tab views in [`src/features/statistics/charts/Charts.jsx`](src/features/s
 - Average vs Upside scatter
 - Season Trends line (single selected player)
 
-Charts and Rankings remember key control selections for the current browser session (for example, chart view, position/top-N, selected stat, trend player, and ranking weights) via `sessionStorage`. Individual chart views are loaded on demand from the charts feature folder rather than bundled into one large feature entry chunk.
+Charts and Rankings remember key control selections for the current browser session (for example, chart view, position, selected stat, trend player, and ranking weights) via `sessionStorage`. Individual chart views are loaded on demand from the charts feature folder rather than bundled into one large feature entry chunk.
 
 Schedules and Depth Charts share the same team navigation pattern via [`src/features/teams/TeamBrowser.jsx`](src/features/teams/TeamBrowser.jsx):
 
@@ -113,7 +113,7 @@ Schedules and Depth Charts share the same team navigation pattern via [`src/feat
 | Shared player modal flow    | [`src/app/App.jsx`](src/app/App.jsx), [`src/features/statistics/player-details/usePlayerDetails.js`](src/features/statistics/player-details/usePlayerDetails.js), [`src/features/statistics/player-details/PlayerDetailsModal.jsx`](src/features/statistics/player-details/PlayerDetailsModal.jsx) |
 | Player modal sub-components | [`src/features/statistics/player-details/`](src/features/statistics/player-details)                                                                                                                                                                                                                |
 | Team browser feature        | [`src/features/teams/`](src/features/teams)                                                                                                                                                                                                                                                        |
-| Feature config              | [`src/features/statistics/statisticsOptions.js`](src/features/statistics/statisticsOptions.js), [`src/features/statistics/rankings/rankingGroups.js`](src/features/statistics/rankings/rankingGroups.js)                                                                                           |
+| Feature config              | [`src/features/statistics/statisticsOptions.js`](src/features/statistics/statisticsOptions.js), [`src/features/statistics/charts/ChartsMeta.js`](src/features/statistics/charts/ChartsMeta.js), [`src/shared/utils/statMeta.js`](src/shared/utils/statMeta.js)                                     |
 | Tests                       | [`tests/app/`](tests/app), [`tests/features/`](tests/features), [`tests/shared/`](tests/shared), [`tests/support/setup.js`](tests/support/setup.js)                                                                                                                                                |
 | Global styles/tokens        | [`src/index.css`](src/index.css)                                                                                                                                                                                                                                                                   |
 

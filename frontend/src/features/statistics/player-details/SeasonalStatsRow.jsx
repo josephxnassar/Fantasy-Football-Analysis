@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Seasonal Stats Row within the player details feature.
+ */
+
 import StatsCategoryGrid from './StatsCategoryGrid';
 
 function hasSeasonCategories(groupedStats) {

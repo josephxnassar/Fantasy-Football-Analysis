@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Depth Charts within the teams feature.
+ */
+
 import DepthChartModal from './DepthChartModal';
 import TeamBrowser from './TeamBrowser';
 

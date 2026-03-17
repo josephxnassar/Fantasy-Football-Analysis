@@ -1,3 +1,7 @@
+/**
+ * File overview: Chart UI state hook that persists view selections and keeps chart controls in sync with session storage.
+ */
+
 import { useEffect, useState } from 'react';
 
 import { useSessionStorageObject } from '../../../shared/hooks/useSessionStorageObject';
@@ -16,6 +20,8 @@ export function useChartsState() {
   const [trendPlayer, setTrendPlayer] = useState(chartUiState.trendPlayer || '');
 
   useEffect(() => {
+    // Persist only the chart controls that matter across visits. Data validation
+    // stays in the Charts screen where the current option lists are available.
     setChartUiState({ view, position, stat, trendPlayer });
   }, [view, position, stat, trendPlayer, setChartUiState]);
 
@@ -40,6 +46,8 @@ export function getNextChartStat(stat, defaultStat, availableStatOptions) {
 }
 
 export function getNextTrendPlayer(view, trendPlayer, trendPlayerOptions, trendPlayerOptionsLoading = false) {
+  // While trend player options are still resolving, preserve the stored choice so
+  // a tab switch does not clear the selection before the player list is ready.
   if (view !== 'trend' || trendPlayerOptionsLoading) return trendPlayer;
   if (!trendPlayerOptions.length) return '';
   if (trendPlayer && trendPlayerOptions.includes(trendPlayer)) return trendPlayer;

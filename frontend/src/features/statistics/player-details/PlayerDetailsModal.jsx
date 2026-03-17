@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Details Modal within the player details feature.
+ */
+
 import { useState } from 'react';
 import { getTeamDepthChart } from '../../../api';
 import { useTeamModalData } from '../../../shared/hooks/useTeamModalData';

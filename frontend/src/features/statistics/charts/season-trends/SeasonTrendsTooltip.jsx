@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Season Trends Tooltip within the season trends chart view.
+ */
+
 import { formatStatForDisplay } from '../../../../shared/utils/statDefinitions';
 
 export default function SeasonTrendsTooltip({ active, label, payload, playerName, stat, statLabel }) {

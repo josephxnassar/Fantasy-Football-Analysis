@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Player Header Cell within the player comparison feature.
+ */
+
 export default function PlayerComparisonPlayerHeaderCell({ slot, wins, onPlayerHeaderClick }) {
   return (
     <th>

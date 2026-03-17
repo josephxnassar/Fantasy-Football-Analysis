@@ -1,3 +1,7 @@
+/**
+ * File overview: Utility helpers for stat Color Helpers used across the frontend.
+ */
+
 import { isLowerBetterStat } from './statDirection';
 
 const STAT_THRESHOLDS = {

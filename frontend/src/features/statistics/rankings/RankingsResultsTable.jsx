@@ -1,12 +1,12 @@
+/**
+ * File overview: Component for Rankings Results Table within the rankings feature.
+ */
+
+import { openPlayerSelection } from '../playerSelection';
+
 export default function RankingsResultsTable({ rankedPlayers, selectedSeason, onPlayerClick, onPlayerSeasonClick }) {
-  const handlePlayerResultClick = (playerName) => {
-    const seasonNumber = Number(selectedSeason);
-    if (onPlayerSeasonClick && Number.isFinite(seasonNumber)) {
-      onPlayerSeasonClick(playerName, seasonNumber);
-      return;
-    }
-    onPlayerClick?.(playerName);
-  };
+  const handlePlayerResultClick = (playerName) =>
+    openPlayerSelection({ playerName, season: selectedSeason, onPlayerClick, onPlayerSeasonClick });
 
   return (
     <div className="rankings-panel rankings-panel--results">

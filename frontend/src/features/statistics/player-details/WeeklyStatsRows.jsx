@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Weekly Stats Rows within the player details feature.
+ */
+
 import StatsCategoryGrid from './StatsCategoryGrid';
 
 function getWeekMatchupLabel(week) {

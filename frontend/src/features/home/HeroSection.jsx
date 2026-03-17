@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Hero Section within the home feature.
+ */
+
 // Hero banner at the top of the home page.
 
 import '../../app/brand/brand.css';

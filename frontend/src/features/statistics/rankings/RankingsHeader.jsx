@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Rankings Header within the rankings feature.
+ */
+
 import { StatTooltip } from '../../../shared/ui';
 
 export default function RankingsHeader({ season, setSeason, availableSeasons, currentSeason }) {

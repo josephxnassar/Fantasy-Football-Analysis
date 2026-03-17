@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Stat Row within the player details feature.
+ */
+
 import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../../shared/utils/statDefinitions';
 import { getStatColorClass } from '../../../shared/utils/statColorHelpers';
 import { StatTooltip } from '../../../shared/ui';

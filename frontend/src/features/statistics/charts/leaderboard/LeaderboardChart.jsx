@@ -1,7 +1,12 @@
+/**
+ * File overview: Component for Leaderboard Chart within the leaderboard chart view.
+ */
+
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { StatTooltip } from '../../../../shared/ui';
 import { formatStatForDisplay, getStatDefinition } from '../../../../shared/utils/statDefinitions';
+import { openPlayerSelection } from '../../playerSelection';
 import ChartBarShape from './ChartBarShape';
 import { getChartHeight } from '../chartsHelpers';
 import LeaderboardTooltip from './LeaderboardTooltip';
@@ -10,15 +15,8 @@ export default function LeaderboardChart({ data, stat, season, onPlayerClick, on
   const statAxisLabel = data?.[0]?.statLabel || 'Selected Stat';
   const statDescription = getStatDefinition(stat);
 
-  const handlePlayerSelection = (playerName) => {
-    if (!playerName) return;
-    const selectedSeason = Number(season);
-    if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
-      onPlayerSeasonClick(playerName, selectedSeason);
-      return;
-    }
-    onPlayerClick?.(playerName);
-  };
+  const handlePlayerSelection = (playerName) =>
+    openPlayerSelection({ playerName, season, onPlayerClick, onPlayerSeasonClick });
 
   if (!data.length)
     return (

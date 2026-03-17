@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Home Page within the home feature.
+ */
+
 import PlayerSearch from '../statistics/player-search/PlayerSearch';
 import AtAGlance from './AtAGlance';
 import DataSources from './DataSources';

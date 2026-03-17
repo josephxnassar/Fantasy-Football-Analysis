@@ -1,3 +1,7 @@
+/**
+ * File overview: Rankings state hook that stores one overall weights profile, preset choice, and expanded UI state.
+ */
+
 import { useEffect, useState } from 'react';
 
 import { useSessionStorageObject } from '../../../shared/hooks/useSessionStorageObject';
@@ -12,10 +16,9 @@ function isObject(value) {
 }
 
 function normalizeStoredWeights(storedWeights) {
-  const source = isObject(storedWeights?.Overall) ? storedWeights.Overall : storedWeights;
   return {
-    categoryWeights: isObject(source?.categoryWeights) ? source.categoryWeights : EMPTY_WEIGHTS,
-    statWeights: isObject(source?.statWeights) ? source.statWeights : EMPTY_WEIGHTS,
+    categoryWeights: isObject(storedWeights?.categoryWeights) ? storedWeights.categoryWeights : EMPTY_WEIGHTS,
+    statWeights: isObject(storedWeights?.statWeights) ? storedWeights.statWeights : EMPTY_WEIGHTS,
   };
 }
 
@@ -35,14 +38,11 @@ export function useRankingsState() {
     setUiState({ selectedPreset });
   }, [selectedPreset, setUiState]);
 
-  useEffect(() => {
-    if (!isObject(storedWeights?.Overall)) return;
-    setStoredWeights(toStoredWeights(normalizeStoredWeights(storedWeights)));
-  }, [storedWeights, setStoredWeights]);
-
   const { categoryWeights, statWeights } = normalizeStoredWeights(storedWeights);
 
   const updateWeights = (updater) => {
+    // Rankings now has one flat overall weights object, so keep updates local to
+    // category/stat weights instead of re-introducing profile indirection.
     setStoredWeights((previous) => toStoredWeights(updater(normalizeStoredWeights(previous))));
   };
 

@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Stats Category Grid within the player details feature.
+ */
+
 import StatRow from './StatRow';
 
 export default function StatsCategoryGrid({ groupedStats }) {

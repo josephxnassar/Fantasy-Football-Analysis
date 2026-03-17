@@ -1,3 +1,7 @@
+/**
+ * File overview: Utility helpers for team Colors used across the frontend.
+ */
+
 const DEFAULT_TEAM_COLOR = '#2563eb';
 
 export const TEAM_COLORS = {

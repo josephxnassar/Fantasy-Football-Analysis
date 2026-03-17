@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Team Browser within the teams feature.
+ */
+
 import { useState } from 'react';
 import DivisionBrowser from './DivisionBrowser';
 import TeamSearch from './TeamSearch';

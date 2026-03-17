@@ -1,3 +1,8 @@
+/*
+ * File overview: Styles for Team Schedule Modal within the teams feature.
+ */
+
+/* Modal shell */
 .schedule-modal-content {
   background: white;
   padding: 2rem;
@@ -40,6 +45,7 @@
   border-bottom: 1px solid var(--color-border-light);
 }
 
+/* Header and season controls */
 .team-title {
   font-size: 36px;
   font-weight: 700;
@@ -85,6 +91,7 @@
   margin-left: 12px;
 }
 
+/* Schedule grid and game cards */
 .schedule-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -198,6 +205,7 @@
   color: var(--color-text-secondary);
 }
 
+/* Expanded score details */
 .game-details {
   width: 100%;
   margin-top: var(--spacing-sm);

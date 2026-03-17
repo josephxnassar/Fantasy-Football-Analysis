@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Feature Cards within the home feature.
+ */
+
 // Navigation cards for the three main app sections.
 
 import './FeatureCards.css';

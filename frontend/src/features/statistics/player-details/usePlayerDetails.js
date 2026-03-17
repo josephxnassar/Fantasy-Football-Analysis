@@ -1,3 +1,7 @@
+/**
+ * File overview: Hook for Player Details within the player details feature.
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPlayer } from '../../../api';
 
@@ -10,6 +14,8 @@ export function usePlayerDetails() {
   const [currentSeason, setCurrentSeason] = useState(null);
   const [currentPlayerName, setCurrentPlayerName] = useState(null);
 
+  // Separate request ids let us ignore stale player and season fetches when the
+  // modal is reopened quickly or the season selector is changed repeatedly.
   const playerRequestIdRef = useRef(0);
   const seasonRequestIdRef = useRef(0);
 

@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison within the player comparison feature.
+ */
+
 import PlayerComparisonHeader from './PlayerComparisonHeader';
 import PlayerComparisonSlotsPanel from './PlayerComparisonSlotsPanel';
 import PlayerComparisonTable from './PlayerComparisonTable';

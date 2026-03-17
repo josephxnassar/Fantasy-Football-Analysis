@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Modal Backdrop within the shared UI layer.
+ */
+
 .modal-overlay {
   position: fixed;
   top: 0;

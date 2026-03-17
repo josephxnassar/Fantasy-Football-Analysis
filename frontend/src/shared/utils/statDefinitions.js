@@ -1,3 +1,7 @@
+/**
+ * File overview: Formatting and label helpers that translate raw stat keys into UI-ready display content.
+ */
+
 import { STAT_META } from './statMeta';
 import { groupStatsByCategoryMap, hasDisplayValue } from './statGrouping';
 

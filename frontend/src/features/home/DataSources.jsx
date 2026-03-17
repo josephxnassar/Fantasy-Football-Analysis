@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Data Sources within the home feature.
+ */
+
 // Attribution links for the data sources powering the app.
 
 import './DataSources.css';

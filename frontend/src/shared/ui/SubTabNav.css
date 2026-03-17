@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Sub Tab Nav within the shared UI layer.
+ */
+
 .sub-tab-nav {
   display: flex;
   justify-content: center;

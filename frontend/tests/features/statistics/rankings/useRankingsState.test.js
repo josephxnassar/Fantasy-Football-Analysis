@@ -8,14 +8,12 @@ describe('useRankingsState', () => {
     window.sessionStorage.clear();
   });
 
-  it('hydrates legacy overall-only weight storage and rewrites it to the flat shape', async () => {
+  it('hydrates flat stored weights', () => {
     window.sessionStorage.setItem(
       'rankingsWeights',
       JSON.stringify({
-        Overall: {
-          categoryWeights: { 'Fantasy Output': 2 },
-          statWeights: { fp_ppr: 1 },
-        },
+        categoryWeights: { 'Fantasy Output': 2 },
+        statWeights: { fp_ppr: 1 },
       }),
     );
 
@@ -23,15 +21,6 @@ describe('useRankingsState', () => {
 
     expect(result.current.categoryWeights).toEqual({ 'Fantasy Output': 2 });
     expect(result.current.statWeights).toEqual({ fp_ppr: 1 });
-
-    await waitFor(() => {
-      expect(window.sessionStorage.getItem('rankingsWeights')).toBe(
-        JSON.stringify({
-          categoryWeights: { 'Fantasy Output': 2 },
-          statWeights: { fp_ppr: 1 },
-        }),
-      );
-    });
   });
 
   it('persists flat weight storage for new updates', async () => {

@@ -1,5 +1,10 @@
+/**
+ * File overview: Component for Average Vs Upside Chart within the Average vs Upside chart view.
+ */
+
 import { ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
 
+import { openPlayerSelection } from '../../playerSelection';
 import AverageVsUpsideTooltip from './AverageVsUpsideTooltip';
 
 export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPlayerSeasonClick }) {
@@ -33,15 +38,7 @@ export default function AverageVsUpsideChart({ data, season, onPlayerClick, onPl
             stroke="var(--color-primary-dark)"
             onClick={(point) => {
               const playerName = point?.payload?.name || point?.name;
-              if (!playerName) return;
-
-              const selectedSeason = Number(season);
-              if (onPlayerSeasonClick && Number.isFinite(selectedSeason)) {
-                onPlayerSeasonClick(playerName, selectedSeason);
-                return;
-              }
-
-              onPlayerClick?.(playerName);
+              openPlayerSelection({ playerName, season, onPlayerClick, onPlayerSeasonClick });
             }}
           />
         </ScatterChart>

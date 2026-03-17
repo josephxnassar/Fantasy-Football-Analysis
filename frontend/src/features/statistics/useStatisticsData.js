@@ -1,7 +1,13 @@
+/**
+ * File overview: Shared statistics data hook that caches and de-duplicates chart payload requests across statistics features.
+ */
+
 import { useEffect, useState } from 'react';
 
 import { getChartData } from '../../api';
 
+// Statistics views share the same payload shape, so cache by position/season and
+// de-duplicate in-flight requests to avoid repeated network work during view changes.
 const statisticsDataCache = new Map();
 const statisticsDataInFlight = new Map();
 
@@ -37,6 +43,8 @@ export function useStatisticsData(position, season, enabled = true) {
   useEffect(() => {
     let cancelled = false;
 
+    // Disabled views should behave as fully idle, which keeps inactive tabs from
+    // briefly rendering stale loading states while another view is active.
     if (!enabled) {
       setStatisticsData(null);
       setLoading(false);
@@ -59,6 +67,7 @@ export function useStatisticsData(position, season, enabled = true) {
     const fetchData = async () => {
       try {
         if (!cancelled) setLoading(true);
+        // fetchStatisticsPayload handles both cache population and in-flight sharing.
         const payload = await fetchStatisticsPayload(position, season, cacheKey);
         if (!cancelled) {
           setStatisticsData(payload);

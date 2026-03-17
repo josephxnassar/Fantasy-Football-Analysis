@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Header within the player details feature.
+ */
+
 import { RookieBadge } from '../../../shared/ui';
 
 export default function PlayerHeader({ playerDetails }) {

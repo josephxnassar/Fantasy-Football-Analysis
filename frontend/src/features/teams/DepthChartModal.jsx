@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Depth Chart Modal within the teams feature.
+ */
+
 import { getTeamDepthChart } from '../../api';
 import { useTeamModalData } from '../../shared/hooks/useTeamModalData';
 import { getTeamColor } from '../../shared/utils/teamColors';

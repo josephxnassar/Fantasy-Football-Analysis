@@ -1,3 +1,8 @@
+/*
+ * File overview: Styles for Player Details Modal within the player details feature.
+ */
+
+/* Modal shell and player chrome */
 .player-details-modal-content {
   background: var(--color-bg-white);
   padding: 1rem 1.1rem 1.05rem;
@@ -17,6 +22,7 @@
   gap: 0.8rem;
 }
 
+/* Header layout */
 .player-dashboard-header {
   display: flex;
   align-items: center;
@@ -141,6 +147,7 @@
   color: var(--color-text-primary);
 }
 
+/* Modal body */
 .player-details-body {
   min-width: 0;
 }

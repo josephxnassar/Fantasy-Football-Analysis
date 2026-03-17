@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Value Cell within the player comparison feature.
+ */
+
 function getValueClassName(displayValue, isWinner) {
   return [
     'direct-comparison-value-chip',

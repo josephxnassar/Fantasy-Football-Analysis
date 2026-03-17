@@ -1,3 +1,7 @@
+/**
+ * File overview: Average vs Upside hook that combines shared player data with consistency-specific chart data.
+ */
+
 import { useEffect, useState } from 'react';
 
 import { getConsistencyData } from '../../../../api';

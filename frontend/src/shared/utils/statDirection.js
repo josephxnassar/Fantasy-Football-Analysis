@@ -1,3 +1,7 @@
+/**
+ * File overview: Utility helpers for stat Direction used across the frontend.
+ */
+
 const LOWER_IS_BETTER_TOKENS = [
   'interception',
   '_int',

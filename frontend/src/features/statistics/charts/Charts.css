@@ -1,3 +1,8 @@
+/*
+ * File overview: Styles for Charts within the statistics charts feature.
+ */
+
+/* Shared charts page shell */
 .charts-container {
   width: 100%;
 }
@@ -32,6 +37,7 @@
     linear-gradient(135deg, #eef3fb 0%, #f8fafe 52%, var(--color-bg-white) 100%);
 }
 
+/* Header copy and control rail */
 .charts-copy {
   display: flex;
   flex-direction: column;
@@ -60,6 +66,7 @@
   font-size: 1.65rem;
 }
 
+/* Control layout */
 .charts-controls {
   display: flex;
   flex-wrap: nowrap;

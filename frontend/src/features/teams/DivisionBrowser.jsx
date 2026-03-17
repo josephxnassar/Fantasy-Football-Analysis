@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Division Browser within the teams feature.
+ */
+
 import { useState, useEffect } from 'react';
 import { getTeamColorVars } from '../../shared/utils/teamColors';
 import './DivisionBrowser.css';

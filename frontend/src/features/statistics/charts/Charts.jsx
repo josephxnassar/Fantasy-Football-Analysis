@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Charts within the statistics charts feature.
+ */
+
 import { Suspense, lazy, useEffect, useMemo } from 'react';
 
 import { getStatLabel } from '../../../shared/utils/statDefinitions';

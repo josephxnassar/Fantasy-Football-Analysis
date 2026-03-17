@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Selectable Player Card within the shared UI layer.
+ */
+
 import './SelectablePlayerCard.css';
 import RookieBadge from './RookieBadge';
 import DetailBadge from './DetailBadge';

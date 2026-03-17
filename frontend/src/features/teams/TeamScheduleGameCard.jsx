@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Team Schedule Game Card within the teams feature.
+ */
+
 import { getTeamColor } from '../../shared/utils/teamColors';
 
 function getResultLabel(game, team) {

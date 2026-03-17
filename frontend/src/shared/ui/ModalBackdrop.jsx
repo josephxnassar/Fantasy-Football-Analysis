@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Modal Backdrop within the shared UI layer.
+ */
+
 import './ModalBackdrop.css';
 
 export default function ModalBackdrop({ onClose, className = '', children }) {

@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Statistics within the statistics feature.
+ */
+
 import { Suspense, lazy, useState } from 'react';
 import { LoadingMessage, SubTabNav } from '../../shared/ui';
 import './Statistics.css';

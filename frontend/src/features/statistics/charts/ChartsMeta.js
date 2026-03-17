@@ -1,9 +1,15 @@
+/**
+ * File overview: Chart-view metadata and default selections for the statistics charts feature.
+ */
+
 export const CHART_VIEW_OPTIONS = [
   { value: 'leaderboard', label: 'Leaderboard' },
   { value: 'consistency-upside', label: 'Average vs Upside' },
   { value: 'trend', label: 'Season Trends' },
 ];
 
+// Only leaderboard and season trends expose a stat selector. Average vs Upside
+// has a fixed axis pairing, so the screen hides that control for the view.
 export const VIEWS_USING_STAT = new Set(['leaderboard', 'trend']);
 
 export const VIEW_META = {

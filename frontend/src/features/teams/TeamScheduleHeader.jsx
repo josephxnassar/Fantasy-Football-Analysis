@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Team Schedule Header within the teams feature.
+ */
+
 export default function TeamScheduleHeader({ schedule, selectedSeason, onSeasonChange, teamHeaderColor }) {
   return (
     <div className="schedule-header">

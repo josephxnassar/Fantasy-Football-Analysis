@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Chart Controls within the statistics charts feature.
+ */
+
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { POSITION_OPTIONS } from '../statisticsOptions';
 import { CHART_VIEW_OPTIONS } from './ChartsMeta';

@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Leaderboard Tooltip within the leaderboard chart view.
+ */
+
 import { formatStatForDisplay } from '../../../../shared/utils/statDefinitions';
 
 export default function LeaderboardTooltip({ active, payload }) {

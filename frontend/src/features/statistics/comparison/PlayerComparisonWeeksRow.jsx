@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Weeks Row within the player comparison feature.
+ */
+
 import { StatTooltip } from '../../../shared/ui';
 import PlayerComparisonValueCell from './PlayerComparisonValueCell';
 

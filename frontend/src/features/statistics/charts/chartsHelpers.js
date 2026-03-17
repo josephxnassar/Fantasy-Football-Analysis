@@ -1,3 +1,7 @@
+/**
+ * File overview: Module for charts Helpers within the statistics charts feature.
+ */
+
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { meetsStatThreshold } from '../../../shared/utils/statThresholds';
 import { PLAYER_DISPLAY_LIMIT } from '../statisticsOptions';

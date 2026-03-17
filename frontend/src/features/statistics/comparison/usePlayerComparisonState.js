@@ -1,10 +1,17 @@
+/**
+ * File overview: Comparison view hook that derives player options, profile labels, rows, and winners for the comparison UI.
+ */
+
 import { useMemo } from 'react';
 
+import { POSITION_OPTIONS } from '../statisticsOptions';
 import { useStatisticsData } from '../useStatisticsData';
 import { buildComparisonRows, buildComparisonWins, getWinningSlotIdsForStat, getWinningSlotIdsForWeeks } from './comparisonHelpers';
 import { useComparisonSlots } from './useComparisonSlots';
 
 export { MAX_COMPARE_PLAYERS } from './useComparisonSlots';
+
+const COMPARISON_POSITIONS = POSITION_OPTIONS.filter((position) => position !== 'Overall');
 
 function getComparisonProfileLabel(profile, selectedPlayers) {
   if (selectedPlayers.length === 0) return 'Select players';
@@ -13,7 +20,7 @@ function getComparisonProfileLabel(profile, selectedPlayers) {
 }
 
 function isComparisonPosition(position) {
-  return position === 'QB' || position === 'RB' || position === 'WR' || position === 'TE';
+  return COMPARISON_POSITIONS.includes(position);
 }
 
 function getComparisonProfile(selectedPlayers) {
@@ -23,6 +30,8 @@ function getComparisonProfile(selectedPlayers) {
 
 export function usePlayerComparisonState() {
   const { comparisonSlots, selectionError, handlePlayerSelect, handleSeasonChange, handleRemovePlayer } = useComparisonSlots();
+  // Comparison always starts from the overall player pool so users can mix any
+  // positions without first picking a cohort.
   const { statisticsData, loading: playerOptionsLoading, error: playerOptionsError } = useStatisticsData('Overall', null);
 
   const playerOptions = useMemo(() => {

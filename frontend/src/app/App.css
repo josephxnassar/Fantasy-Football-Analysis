@@ -1,9 +1,15 @@
+/*
+ * File overview: App-level layout and main tab navigation styles for the top-level shell.
+ */
+
 /* App-level layout and tab navigation only. */
 
+/* Top-level shell */
 .App {
   min-height: 100vh;
 }
 
+/* Primary tab navigation */
 .app-nav {
   background: var(--color-bg-white);
   box-shadow: var(--shadow-sm);

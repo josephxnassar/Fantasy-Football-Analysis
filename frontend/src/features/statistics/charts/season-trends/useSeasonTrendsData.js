@@ -1,11 +1,17 @@
+/**
+ * File overview: Season trends hook that starts from the overall player pool, auto-detects the selected player profile, and loads trend data.
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 
 import { getPlayerTrendData } from '../../../../api';
-import { PRODUCTION_GROUPS } from '../../../../shared/utils/statMeta';
+import { getProductionGroupsWithoutRankings, PRODUCTION_GROUPS } from '../../../../shared/utils/statMeta';
 import { useStatisticsData } from '../../useStatisticsData';
 import { DEFAULT_STAT } from '../ChartsMeta';
 import { getStatOptions } from '../chartsHelpers';
 
+// Trend requests are keyed by player + detected profile + stat so the season
+// chart can be revisited without re-fetching identical history.
 const playerTrendCache = new Map();
 const playerTrendInFlight = new Map();
 
@@ -29,12 +35,9 @@ async function fetchPlayerTrendData(playerName, position, stat, key) {
   return playerTrendInFlight.get(key);
 }
 
-function getChartGroups(position) {
-  const { Rankings: _rankings, ...groups } = PRODUCTION_GROUPS[position] || PRODUCTION_GROUPS.Overall;
-  return groups;
-}
-
 function getTrendPosition(player) {
+  // The player picker comes from the overall pool, but the chart categories should
+  // snap back to the player’s real position once a selection exists.
   return PRODUCTION_GROUPS[player?.position] ? player.position : 'Overall';
 }
 
@@ -48,7 +51,7 @@ export function useSeasonTrendsData({ stat, trendPlayer, enabled = true }) {
     [statisticsData?.players, trendPlayer],
   );
   const trendPosition = getTrendPosition(trendPlayerRecord);
-  const statGroups = useMemo(() => getChartGroups(trendPosition), [trendPosition]);
+  const statGroups = useMemo(() => getProductionGroupsWithoutRankings(trendPosition), [trendPosition]);
   const statOptions = useMemo(
     () => getStatOptions(statGroups, statisticsData?.stat_columns || []),
     [statGroups, statisticsData?.stat_columns],
@@ -82,6 +85,9 @@ export function useSeasonTrendsData({ stat, trendPlayer, enabled = true }) {
       };
     }
 
+    // Wait until the overall player pool resolves the selected record before
+    // requesting trend data; otherwise we can issue a request with the wrong
+    // profile or clear a still-valid stored selection too early.
     if (!trendPlayerRecord) {
       setTrendData(null);
       setTrendLoading(false);

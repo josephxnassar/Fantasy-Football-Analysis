@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Slots Panel within the player comparison feature.
+ */
+
 import { ErrorMessage, LoadingMessage } from '../../../shared/ui';
 import PlayerComparisonSlotCard from './PlayerComparisonSlotCard';
 

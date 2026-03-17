@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for State Messages within the shared UI layer.
+ */
+
 import './StateMessages.css';
 
 export function LoadingMessage({ message = 'Loading...' }) {

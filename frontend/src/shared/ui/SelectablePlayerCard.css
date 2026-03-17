@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Selectable Player Card within the shared UI layer.
+ */
+
 .player-card {
   background: var(--color-bg-white);
   padding: 18px;

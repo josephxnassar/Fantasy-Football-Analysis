@@ -1,6 +1,6 @@
 # Fantasy Football Analysis
 
-Last verified: 2026-03-13
+Last verified: 2026-03-17
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](backend/api/api.py)
@@ -14,7 +14,7 @@ Full-stack NFL fantasy analysis app with a FastAPI backend and React frontend fo
 - Advanced stat exploration (EPA, air-yards share, WOPR, etc.)
 - Team schedules and depth charts
 - Chart-ready seasonal stat exploration
-- Weighted custom rankings by position/season
+- Weighted custom rankings by season
 - Direct side-by-side player comparison (up to 3 players, with per-player season selection)
 - Stats-backed canonical player naming in search/player lists
 

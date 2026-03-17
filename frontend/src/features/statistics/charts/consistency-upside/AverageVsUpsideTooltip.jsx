@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Average Vs Upside Tooltip within the Average vs Upside chart view.
+ */
+
 export default function AverageVsUpsideTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const point = payload[0].payload;

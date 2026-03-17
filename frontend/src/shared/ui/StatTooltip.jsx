@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Stat Tooltip within the shared UI layer.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './StatTooltip.css';

@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Stat Row within the player comparison feature.
+ */
+
 import { formatStatForDisplay, getStatDefinition, getStatLabel } from '../../../shared/utils/statDefinitions';
 import { StatTooltip } from '../../../shared/ui';
 import PlayerComparisonValueCell from './PlayerComparisonValueCell';

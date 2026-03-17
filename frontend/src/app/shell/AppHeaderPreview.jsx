@@ -1,4 +1,6 @@
-// Specific tab previews that are used in AppHeader
+/**
+ * File overview: Component for App Header Preview within the application shell.
+ */
 
 export default function AppHeaderPreview({ activeTab, activeTabLabel }) {
   return (

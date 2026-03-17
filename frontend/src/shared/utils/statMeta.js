@@ -1,3 +1,7 @@
+/**
+ * File overview: Shared stat metadata plus the production and ranking group definitions used across statistics views.
+ */
+
 export const STAT_META = {
   // Fantasy summary.
   fp_ppr: {
@@ -327,6 +331,15 @@ export const PRODUCTION_GROUPS = {
     Rankings: ['fp_ppr_rank', 'exp_fp_rank', 'pass_td_rank', 'rush_td_rank', 'rec_td_rank'],
   },
 };
+
+export function getProductionGroups(position) {
+  return PRODUCTION_GROUPS[position] || PRODUCTION_GROUPS.Overall;
+}
+
+export function getProductionGroupsWithoutRankings(position) {
+  const { Rankings: _rankings, ...groups } = getProductionGroups(position);
+  return groups;
+}
 
 // Rankings use a separate weighting surface from production display groupings.
 export const OVERALL_RANKING_GROUPS = {

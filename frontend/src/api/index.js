@@ -1,9 +1,13 @@
-// API client for the Fantasy Football backend.
+/**
+ * File overview: API client wrappers for every backend endpoint used by the frontend.
+ */
 
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Keep one shared client so timeout, base URL, and headers stay consistent across
+// every feature-specific request helper below.
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 15_000, headers: { 'Content-Type': 'application/json' } });
 
 export const getPlayer = (playerName, season = null) => {

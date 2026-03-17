@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Depth Chart Table within the shared UI layer.
+ */
+
 import './DepthChartTable.css';
 
 function DepthChartTable({ entries, variant = 'full', highlightName = null, onPlayerClick }) {

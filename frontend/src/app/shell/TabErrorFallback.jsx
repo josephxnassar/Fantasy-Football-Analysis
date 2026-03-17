@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Tab Error Fallback within the application shell.
+ */
+
 export default function TabErrorFallback({ onGoToDefault, onRetry }) {
   return (
     <div className="tab-error-fallback">

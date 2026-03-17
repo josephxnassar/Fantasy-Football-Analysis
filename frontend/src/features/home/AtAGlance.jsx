@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for At A Glance within the home feature.
+ */
+
 // Summary stat tiles showing app data coverage.
 
 import { ErrorMessage, LoadingMessage } from '../../shared/ui';

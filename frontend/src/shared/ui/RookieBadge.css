@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Rookie Badge within the shared UI layer.
+ */
+
 .rookie-badge {
   display: inline-flex;
   align-items: center;

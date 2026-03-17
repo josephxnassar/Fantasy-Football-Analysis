@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Schedules within the teams feature.
+ */
+
 import TeamBrowser from './TeamBrowser';
 import TeamScheduleModal from './TeamScheduleModal';
 

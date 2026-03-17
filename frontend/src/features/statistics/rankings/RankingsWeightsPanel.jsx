@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Rankings Weights Panel within the rankings feature.
+ */
+
 import { getStatLabel } from '../../../shared/utils/statDefinitions';
 import { DEFAULT_CATEGORY_WEIGHT, DEFAULT_STAT_WEIGHT } from './rankingsHelpers';
 import { RANKING_PRESETS } from './rankingPresets';

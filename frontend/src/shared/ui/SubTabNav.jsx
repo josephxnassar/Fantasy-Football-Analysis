@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Sub Tab Nav within the shared UI layer.
+ */
+
 import './SubTabNav.css';
 
 function SubTabNav({ tabs, activeTab, onTabChange, variant = 'default', className }) {

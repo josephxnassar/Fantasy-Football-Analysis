@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Comparison Slot Card within the player comparison feature.
+ */
+
 export default function PlayerComparisonSlotCard({
   slot,
   playerOptions,

@@ -1,3 +1,7 @@
+/*
+ * File overview: Styles for Error Boundary within the shared UI layer.
+ */
+
 .error-boundary {
   max-width: 720px;
   margin: 32px auto;

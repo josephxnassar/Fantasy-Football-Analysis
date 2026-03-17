@@ -1,4 +1,6 @@
-// Header section for specific tab
+/**
+ * File overview: Component for App Header within the application shell.
+ */
 
 import '../brand/brand.css';
 import AppHeaderPreview from './AppHeaderPreview';

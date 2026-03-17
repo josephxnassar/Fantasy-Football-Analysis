@@ -1,3 +1,7 @@
+/**
+ * File overview: Comparison slot hook that loads per-slot player seasons and guards against stale async updates.
+ */
+
 import { useRef, useState } from 'react';
 
 import { getPlayer } from '../../../api';
@@ -28,6 +32,8 @@ function getWeeksPlayedForSeason(weeklyStats, season) {
 export function useComparisonSlots() {
   const [comparisonSlots, setComparisonSlots] = useState(createInitialSlots);
   const [selectionError, setSelectionError] = useState(null);
+  // Track request ids per slot so a slower player/season response cannot overwrite
+  // a newer selection made in that same slot.
   const requestIdsBySlotRef = useRef({});
 
   const updateSlot = (slotId, updater) => {

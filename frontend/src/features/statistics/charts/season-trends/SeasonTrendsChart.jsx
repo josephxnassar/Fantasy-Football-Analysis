@@ -1,4 +1,9 @@
+/**
+ * File overview: Component for Season Trends Chart within the season trends chart view.
+ */
+
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { openPlayerSelection } from '../../playerSelection';
 import { formatStatForDisplay } from '../../../../shared/utils/statDefinitions';
 import SeasonTrendsTooltip from './SeasonTrendsTooltip';
 
@@ -7,15 +12,8 @@ export default function SeasonTrendsChart({ data, playerName, stat, statLabel, o
 
   const hasPointClickAction = Boolean(onPlayerSeasonClick || onPlayerClick);
   const trendColor = 'var(--color-primary)';
-  const handleTrendPointClick = (payload) => {
-    const clickedSeason = Number(payload?.season);
-    if (onPlayerSeasonClick && Number.isFinite(clickedSeason)) {
-      onPlayerSeasonClick(playerName, clickedSeason);
-      return;
-    }
-
-    onPlayerClick?.(playerName);
-  };
+  const handleTrendPointClick = (payload) =>
+    openPlayerSelection({ playerName, season: payload?.season, onPlayerClick, onPlayerSeasonClick });
   const renderDot = (dotProps) => {
     const { cx, cy, payload } = dotProps;
     if (cx == null || cy == null) return null;

@@ -1,16 +1,17 @@
-import { PRODUCTION_GROUPS } from '../../../shared/utils/statMeta';
+/**
+ * File overview: Comparison-specific grouping and winner-calculation helpers for the player comparison feature.
+ */
+
+import { getProductionGroupsWithoutRankings } from '../../../shared/utils/statMeta';
 import { isLowerBetterStat } from '../../../shared/utils/statDirection';
 
-function withoutRankings(profile) {
-  const { Rankings: _rankings, ...groups } = PRODUCTION_GROUPS[profile] || PRODUCTION_GROUPS.Overall;
-  return groups;
-}
-
+// Mixed-position comparisons use one explicit cross-position surface instead of
+// trying to blend per-position production groups at runtime.
 const COMPARISON_GROUPS = {
-  QB: withoutRankings('QB'),
-  RB: withoutRankings('RB'),
-  WR: withoutRankings('WR'),
-  TE: withoutRankings('TE'),
+  QB: getProductionGroupsWithoutRankings('QB'),
+  RB: getProductionGroupsWithoutRankings('RB'),
+  WR: getProductionGroupsWithoutRankings('WR'),
+  TE: getProductionGroupsWithoutRankings('TE'),
   CrossPosition: {
     Fantasy: ['fp_ppr', 'fp_std', 'exp_fp'],
     Volume: ['pass_att', 'rush_att', 'targets', 'sc_offense_pct'],
@@ -43,6 +44,8 @@ function toFiniteNumber(value) {
 function getWinningSlotIdsFromEntries(entries, lowerIsBetter) {
   if (entries.length < 2) return new Set();
 
+  // Treat ties as shared wins so the table can highlight equal leaders instead of
+  // arbitrarily picking one player.
   const values = entries.map((entry) => entry.value);
   const allEqual = values.every((value) => value === values[0]);
   if (allEqual) return new Set(entries.map((entry) => entry.id));

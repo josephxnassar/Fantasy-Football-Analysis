@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Search within the player search feature.
+ */
+
 import { useState } from 'react';
 import { searchPlayers } from '../../../api';
 import { ErrorMessage, EmptyStateMessage, SelectablePlayerCard } from '../../../shared/ui';

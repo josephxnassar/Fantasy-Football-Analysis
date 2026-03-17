@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Stats Season Selector within the player details feature.
+ */
+
 import { useId } from 'react';
 
 export default function StatsSeasonSelector({ availableSeasons, currentSeason, onSeasonChange }) {

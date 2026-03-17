@@ -1,3 +1,7 @@
+/**
+ * File overview: Component for Player Depth Chart Tab within the player details feature.
+ */
+
 import { DepthChartTable, ErrorMessage } from '../../../shared/ui';
 
 export default function PlayerDepthChartTab({ depthChartLoading, depthChartError, teamDepthChart, playerName }) {

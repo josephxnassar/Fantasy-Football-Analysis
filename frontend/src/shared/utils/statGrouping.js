@@ -1,3 +1,7 @@
+/**
+ * File overview: Utility helpers for stat Grouping used across the frontend.
+ */
+
 import { STAT_META } from './statMeta';
 
 export function hasDisplayValue(value) {

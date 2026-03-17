@@ -1,11 +1,14 @@
+/**
+ * File overview: Component for Player Overview Tab within the player details feature.
+ */
+
 import { groupStatsByCategoryMap } from '../../../shared/utils/statDefinitions';
-import { PRODUCTION_GROUPS } from '../../../shared/utils/statMeta';
+import { getProductionGroups } from '../../../shared/utils/statMeta';
 import SeasonalStatsRow from './SeasonalStatsRow';
 import WeeklyStatsRows from './WeeklyStatsRows';
 
 function groupProductionStats(record, position) {
-  const groups = PRODUCTION_GROUPS[position] || PRODUCTION_GROUPS.Overall;
-  return groupStatsByCategoryMap(record, groups);
+  return groupStatsByCategoryMap(record, getProductionGroups(position));
 }
 
 export default function PlayerOverviewTab({ statsContext }) {
