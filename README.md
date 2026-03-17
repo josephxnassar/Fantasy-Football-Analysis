@@ -143,6 +143,12 @@ Run full local quality gate (recommended before PR/deploy):
 .\scripts\quality-gate.ps1
 ```
 
+Apply auto-fixable backend/frontend lint and formatting changes:
+
+```powershell
+.\scripts\autofix.ps1
+```
+
 Optional fast pass (skip frontend build):
 
 ```powershell
@@ -252,6 +258,8 @@ frontend/
   public/         static assets
 backend/tests/    Pytest tests grouped into unit, integration, and e2e
 scripts/dev-startup.ps1    Windows bootstrap/start script
+scripts/backend-static-checks.ps1   Backend ruff + mypy shortcut
+scripts/autofix.ps1   Backend Ruff + frontend ESLint/Prettier autofix shortcut
 scripts/quality-gate.ps1   Full local lint/type/test/build gate
 scripts/clean.ps1          Local cache/build cleanup script
 pyproject.toml    Python deps/project metadata
