@@ -1,0 +1,36 @@
+/* Home page shared layout; section-specific styles live in features/home/*.css. */
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Shared section container ── */
+.landing-section {
+  width: 100%;
+  max-width: 1000px;
+  padding: 40px 24px 0;
+}
+
+.section-heading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+
+/* ── Footer ── */
+.landing-footer {
+  width: 100%;
+  max-width: 1000px;
+  padding: 32px 24px 48px;
+  text-align: center;
+}
+
+.landing-footer p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+}
