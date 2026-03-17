@@ -24,8 +24,7 @@ const VIEW_LOADING_MESSAGES = {
 };
 
 export default function Charts({ onPlayerClick, onPlayerSeasonClick }) {
-  const { view, setView, position, setPosition, season, setSeason, stat, setStat, trendPlayer, setTrendPlayer } =
-    useChartsState();
+  const { view, setView, position, setPosition, season, setSeason, stat, setStat, trendPlayer, setTrendPlayer } = useChartsState();
   const leaderboardData = useLeaderboardData({
     position,
     season,

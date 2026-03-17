@@ -9,8 +9,8 @@ export default function PlayerComparisonHeader({ comparisonProfileLabel, selecte
         <p className="direct-comparison-kicker">Player Comparison</p>
         <h1>Player Comparison</h1>
         <p className="direct-comparison-subtitle">
-          Pick up to {maxPlayers} players, then select each player&apos;s season. The comparison categories adapt automatically
-          to the selected positions.
+          Pick up to {maxPlayers} players, then select each player&apos;s season. The comparison categories adapt automatically to the
+          selected positions.
         </p>
       </div>
 

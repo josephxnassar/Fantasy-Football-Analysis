@@ -58,7 +58,9 @@ export default function PlayerComparisonSlotCard({
         </select>
       </div>
 
-      <p className="direct-comparison-slot-meta">{slot.playerName ? [slot.position, slot.team].filter(Boolean).join(' • ') : 'No player selected'}</p>
+      <p className="direct-comparison-slot-meta">
+        {slot.playerName ? [slot.position, slot.team].filter(Boolean).join(' • ') : 'No player selected'}
+      </p>
       {slot.loading && <p className="direct-comparison-player-status">Loading player data...</p>}
       {slot.error && <p className="direct-comparison-player-error">{slot.error}</p>}
     </article>

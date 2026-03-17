@@ -43,10 +43,7 @@ export function usePlayerComparisonState() {
   }, [statisticsData?.players]);
 
   const selectedPlayers = comparisonSlots.filter((slot) => Boolean(slot.playerName));
-  const comparisonProfile = useMemo(
-    () => getComparisonProfile(selectedPlayers),
-    [selectedPlayers],
-  );
+  const comparisonProfile = useMemo(() => getComparisonProfile(selectedPlayers), [selectedPlayers]);
   const comparisonProfileLabel = getComparisonProfileLabel(comparisonProfile, selectedPlayers);
   const comparisonRows = useMemo(() => buildComparisonRows(comparisonProfile), [comparisonProfile]);
   const statWinnersByKey = useMemo(

@@ -16,12 +16,7 @@ export default function TeamScheduleGameCard({ game, team, teamColor, expanded, 
   const opponentColor = isByeWeek ? null : getTeamColor(game.opponent);
   const resultLabel = getResultLabel(game, team);
   const gameTileStyle = isHomeGame ? { '--home-corner-color': teamColor } : undefined;
-  const className = [
-    'schedule-game',
-    isByeWeek ? 'bye' : 'interactive',
-    isHomeGame ? 'home-game' : '',
-    expanded ? 'expanded' : '',
-  ]
+  const className = ['schedule-game', isByeWeek ? 'bye' : 'interactive', isHomeGame ? 'home-game' : '', expanded ? 'expanded' : '']
     .filter(Boolean)
     .join(' ');
 

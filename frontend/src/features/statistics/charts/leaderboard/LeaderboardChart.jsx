@@ -15,8 +15,7 @@ export default function LeaderboardChart({ data, stat, season, onPlayerClick, on
   const statAxisLabel = data?.[0]?.statLabel || 'Selected Stat';
   const statDescription = getStatDefinition(stat);
 
-  const handlePlayerSelection = (playerName) =>
-    openPlayerSelection({ playerName, season, onPlayerClick, onPlayerSeasonClick });
+  const handlePlayerSelection = (playerName) => openPlayerSelection({ playerName, season, onPlayerClick, onPlayerSeasonClick });
 
   if (!data.length)
     return (

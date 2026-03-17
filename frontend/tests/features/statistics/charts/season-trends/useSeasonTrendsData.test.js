@@ -3,7 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../support/deferred';
 import { getPlayerTrendData } from '../../../../../src/api';
-import { __resetSeasonTrendsDataCache, useSeasonTrendsData } from '../../../../../src/features/statistics/charts/season-trends/useSeasonTrendsData';
+import {
+  __resetSeasonTrendsDataCache,
+  useSeasonTrendsData,
+} from '../../../../../src/features/statistics/charts/season-trends/useSeasonTrendsData';
 import { useStatisticsData } from '../../../../../src/features/statistics/useStatisticsData';
 
 vi.mock('../../../../../src/api', () => ({
