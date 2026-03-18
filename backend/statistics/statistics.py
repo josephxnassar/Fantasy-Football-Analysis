@@ -258,5 +258,5 @@ class Statistics(base_source.BaseSource):
             raise DataProcessingError(f"Failed to build statistics payloads: {e}", source="Statistics") from e
 
         self.set_cache({constants.STATS["ALL_PLAYERS"]: all_players,
-                        constants.STATS["BY_YEAR"]: seasonal_player_stats,
-                        constants.STATS["PLAYER_WEEKLY_STATS"]: weekly_player_stats})
+                        constants.STATS["SEASONAL"]: seasonal_player_stats,
+                        constants.STATS["WEEKLY_PLAYER_STATS"]: weekly_player_stats})

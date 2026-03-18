@@ -7,8 +7,6 @@ import logging
 from time import perf_counter
 from typing import Any, Callable, TypeVar, cast
 
-from backend.config.settings import TIMING_ENABLED
-
 F = TypeVar("F", bound=Callable[..., Any])
 
 
@@ -21,14 +19,10 @@ class Timer:
         self._start = 0.0
 
     def __enter__(self) -> "Timer":
-        if not TIMING_ENABLED:
-            return self
         self._start = perf_counter()
         return self
 
     def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
-        if not TIMING_ENABLED:
-            return
         elapsed = perf_counter() - self._start
         status = "failed" if exc_type is not None else "completed"
         self.logger.info("timer=%s | status=%s | elapsed=%.3fs", self.name, status, elapsed)

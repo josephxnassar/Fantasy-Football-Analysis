@@ -12,12 +12,6 @@ __pycache__/
 backend/depth_chart/espn.py
 *.xlsm
 
-# Frontend / Node
-node_modules/
-dist/
-.vite/
-.eslintcache/
-
 # AI project intelligence
 claude.md
 AGENTS.md

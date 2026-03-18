@@ -16,8 +16,8 @@ CACHE = {
 # Statistics cache keys
 STATS = {
     "ALL_PLAYERS": "all_players",
-    "BY_YEAR": "by_year",
-    "PLAYER_WEEKLY_STATS": "player_weekly_stats",
+    "SEASONAL": "seasonal",
+    "WEEKLY_PLAYER_STATS": "weekly_player_stats",
 }
 
 # Important fantasy skill positions
