@@ -8,9 +8,9 @@ logs/
 
 # Backend / Python
 __pycache__/
-.pytest_cache/
+.venv/
+.ruff_cache/
 backend/depth_chart/espn.py
-*.xlsm
 
 # AI project intelligence
 claude.md
