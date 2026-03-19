@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 
-def setup_logging(level: int = logging.INFO, timing_enabled: bool = True) -> None:
+def setup_logging(level: int = logging.INFO) -> None:
     """Configure basic console logging plus simple error and timing files."""
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
@@ -34,14 +34,13 @@ def setup_logging(level: int = logging.INFO, timing_enabled: bool = True) -> Non
     timing_logger.handlers.clear()
     timing_logger.propagate = False
 
-    if timing_enabled:
-        timing_handler = logging.FileHandler(log_root / "timing.log", encoding="utf-8")
-        timing_handler.setLevel(logging.INFO)
-        timing_handler.setFormatter(
-            logging.Formatter(
-                "%(asctime)s | %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
-            )
+    timing_handler = logging.FileHandler(log_root / "timing.log", encoding="utf-8")
+    timing_handler.setLevel(logging.INFO)
+    timing_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
-        timing_logger.addHandler(timing_handler)
+    )
+    timing_logger.addHandler(timing_handler)
 

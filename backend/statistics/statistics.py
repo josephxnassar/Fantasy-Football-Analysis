@@ -177,7 +177,7 @@ class Statistics(base_source.BaseSource):
         return names
 
     @timed("Statistics._build_statistics_data")
-    def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_names: set[str]) -> Tuple[Dict[int, Dict[str, pd.DataFrame]], Dict[str, List[Dict]], List[Dict]]:
+    def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_names: set[str]) -> Tuple[Dict[int, Dict[str, Dict[str, Dict]]], Dict[int, Dict[str, Dict[str, List[Dict]]]], List[Dict]]:
         """Build seasonal stats, weekly stats, and all players in parallel."""
         results: Dict[str, object] = {}
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -189,42 +189,45 @@ class Statistics(base_source.BaseSource):
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
 
-        return (cast(Dict[int, Dict[str, pd.DataFrame]], results["seasonal_player_stats"]),
-                cast(Dict[str, List[Dict]], results["weekly_player_stats"]),
+        return (cast(Dict[int, Dict[str, Dict[str, Dict]]], results["seasonal_player_stats"]),
+                cast(Dict[int, Dict[str, Dict[str, List[Dict]]]], results["weekly_player_stats"]),
                 cast(List[Dict], results["all_players"]))
 
     @timed("Statistics._build_seasonal_player_stats")
-    def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, pd.DataFrame]]:
-        """Build season -> position -> DataFrame view for chart endpoints."""
-        allowed_positions = set(constants.POSITIONS)
-        drop_cols = ["base_season", "base_pos", "base_player_id", "base_player_name", "base_pos_group"]
-        return {
-            int(season): by_position
-            for season, season_group in seasonal_df.groupby("base_season")
-            if (
-                by_position := {
-                    position: stats_helpers.clean_numeric_stats(
-                        group.drop_duplicates(
-                            subset=["base_player_id" if "base_player_id" in group.columns else "base_player_display_name"]
-                        )
-                        .drop(columns=drop_cols, errors="ignore")
-                        .set_index("base_player_display_name")
-                    )
-                    for position, group in season_group.groupby("base_pos")
-                    if position in allowed_positions
-                }
-            )
-        }
+    def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Dict[int, Dict[str, Dict[str, Dict]]]:
+        """Build season -> position -> player -> record view for app/API consumption."""
+        seasonal_stats: Dict[int, Dict[str, Dict[str, Dict]]] = {}
+        for season, season_group in seasonal_df.groupby("base_season", sort=False):
+            season_map: Dict[str, Dict[str, Dict]] = {}
+            for position, position_group in season_group.groupby("base_pos", sort=False):
+                player_map: Dict[str, Dict] = {}
+                for player_name, player_group in position_group.groupby("base_player_display_name", sort=False):
+                    records = player_group.drop(columns=["base_season", "base_pos", "base_player_display_name"], errors="ignore").to_dict("records")
+                    if records:
+                        player_map[str(player_name)] = records[0]
+                if player_map:
+                    season_map[str(position)] = player_map
+            if season_map:
+                seasonal_stats[int(season)] = season_map
+        return seasonal_stats
 
     @timed("Statistics._build_weekly_player_stats")
-    def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Dict[str, List[Dict]]:
-        """Build player -> weekly record list view for player modal."""
-        ordered = weekly_df.sort_values(["base_season", "base_week", "base_player_display_name"])
-        ordered = stats_helpers.clean_weekly_records(ordered)
-        return {
-            player_name: group.drop(columns=["base_player_display_name"], errors="ignore").to_dict("records")
-            for player_name, group in ordered.groupby("base_player_display_name", sort=False)
-        }
+    def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Dict[int, Dict[str, Dict[str, List[Dict]]]]:
+        """Build season -> position -> player -> weekly record list view for app/API consumption."""
+        weekly_stats: Dict[int, Dict[str, Dict[str, List[Dict]]]] = {}
+        for season, season_group in weekly_df.groupby("base_season", sort=False):
+            season_map: Dict[str, Dict[str, List[Dict]]] = {}
+            for position, position_group in season_group.groupby("base_pos", sort=False):
+                player_map: Dict[str, List[Dict]] = {}
+                for player_name, player_group in position_group.groupby("base_player_display_name", sort=False):
+                    records = player_group.drop(columns=["base_season", "base_pos", "base_player_display_name"], errors="ignore").to_dict("records")
+                    if records:
+                        player_map[str(player_name)] = records
+                if player_map:
+                    season_map[str(position)] = player_map
+            if season_map:
+                weekly_stats[int(season)] = season_map
+        return weekly_stats
 
     @timed("Statistics._build_all_players")
     def _build_all_players(self, roster_data: RosterData, valid_player_names: set[str] | None = None) -> List[Dict]:

@@ -67,7 +67,7 @@ def prepare_pfr_source(source: pd.DataFrame, base: pd.DataFrame | None = None, j
                 source_index = source_deduped.set_index(join_keys).index
                 unmatched_names = sorted(set(source_deduped.loc[~source_index.isin(base_index), "base_player_display_name"].dropna().astype(str)))
                 if unmatched_names:
-                    logger.info("%s unmatched player names (%s): %s", source_name, len(unmatched_names), ", ".join(unmatched_names))
+                    logger.warning("%s unmatched player names (%s): %s", source_name, len(unmatched_names), ", ".join(unmatched_names))
     return source
 
 def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
@@ -138,17 +138,3 @@ def add_group_ranks(df: pd.DataFrame, group_cols: List[str], rank_metrics: List[
         numeric = pd.to_numeric(ranked[metric], errors="coerce")
         ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
     return ranked
-
-def clean_numeric_stats(df: pd.DataFrame) -> pd.DataFrame:
-    """Replace non-finite numeric values with 0 for JSON-safe chart payloads."""
-    cleaned = df.copy()
-    numeric_cols = cleaned.select_dtypes(include="number").columns
-    text_cols = [col for col in cleaned.columns if col not in numeric_cols]
-    cleaned.loc[:, numeric_cols] = cleaned.loc[:, numeric_cols].replace([float("inf"), -float("inf")], 0).fillna(0)
-    cleaned.loc[:, text_cols] = cleaned.loc[:, text_cols].where(pd.notna(cleaned.loc[:, text_cols]), None)
-    return cleaned
-
-def clean_weekly_records(df: pd.DataFrame) -> pd.DataFrame:
-    """Replace non-finite/NaN values with None for JSON-safe weekly record lists."""
-    cleaned = df.replace([float("inf"), -float("inf")], pd.NA)
-    return cleaned.astype(object).where(pd.notna(cleaned), None)
