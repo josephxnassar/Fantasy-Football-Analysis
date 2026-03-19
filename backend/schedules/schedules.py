@@ -67,12 +67,17 @@ class Schedules(BaseSource):
     def run(self) -> None:
         """Process schedules for all teams"""
         self.master_schedule = self._load_schedules()
+        combined_schedule = self._create_combined_schedule()
         schedules_by_year: Dict[int, Dict[str, pd.DataFrame]] = {}
-        for (season, team), group in self._create_combined_schedule().groupby(['season', 'team']):
-            try:
-                total_weeks = int(self.weeks_by_season.get(season, 18))
-                team_schedule = self._fill_bye_weeks(group.drop(columns=['team', 'season']).set_index('week').sort_index(), total_weeks)
-                schedules_by_year.setdefault(int(season), {})[team] = team_schedule
-            except Exception as e:
-                logger.warning("Skipping team '%s' season '%s': %s", team, season, e)
+        for season, season_group in combined_schedule.groupby("season", sort=False):
+            season_map: Dict[str, pd.DataFrame] = {}
+            total_weeks = int(self.weeks_by_season.get(season, 18))
+            for team, team_group in season_group.groupby("team", sort=False):
+                try:
+                    team_schedule = self._fill_bye_weeks(team_group.drop(columns=["team", "season"]).set_index("week").sort_index(), total_weeks)
+                    season_map[str(team)] = team_schedule
+                except Exception as e:
+                    logger.warning("Skipping team '%s' season '%s': %s", team, season, e)
+            if season_map:
+                schedules_by_year[int(season)] = season_map
         self.set_cache(schedules_by_year)

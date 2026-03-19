@@ -52,22 +52,19 @@ class NRPDepthChart(BaseSource):
     def _create_depth_chart(self, team_rows: pd.DataFrame) -> pd.DataFrame:
         """Create ESPN-style depth chart dataframe for one team."""
         try:
-            rows: List[Dict[str, str | None]] = []
             deduped = team_rows.drop_duplicates(subset=["pos_abb", "pos_slot", "pos_rank", "player_name"])
             grouped = deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)
-
+            position_map: Dict[str, Dict[str, str | None]] = {}
             for (position, _), group in grouped:
                 depth_players = group["player_name"].drop_duplicates().tolist()[:4]
                 depth_players += [None] * (4 - len(depth_players))
-                rows.append({"position": position,
-                             "starter": depth_players[0],
-                             "2nd": depth_players[1],
-                             "3rd": depth_players[2],
-                             "4th": depth_players[3]})
-
-            if not rows:
+                position_map[position] = {"starter": depth_players[0],
+                                          "2nd": depth_players[1],
+                                          "3rd": depth_players[2],
+                                          "4th": depth_players[3]}
+            if not position_map:
                 return pd.DataFrame(columns=["starter", "2nd", "3rd", "4th"]).rename_axis("position")
-            return pd.DataFrame(rows).set_index("position")
+            return pd.DataFrame.from_dict(position_map, orient="index").rename_axis("position")
         except Exception as e:
             logger.error("Failed to create NRP depth chart dataframe: %s", e)
             raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
@@ -75,15 +72,13 @@ class NRPDepthChart(BaseSource):
     def run(self) -> None:
         """Build depth-chart cache keyed by team abbreviation."""
         depth_rows = self._load_depth_charts()
-        team_depth_charts: Dict[str, pd.DataFrame] = {}
         latest_rows = self._latest_team_rows(depth_rows)
         rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
-
+        team_depth_charts: Dict[str, pd.DataFrame] = {}
         for team in constants.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
                 logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)
                 continue
             team_depth_charts[team] = self._create_depth_chart(team_rows).rename_axis(team)
-
         self.set_cache(team_depth_charts)
