@@ -87,16 +87,13 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
         return seasonal_df
 
     group_keys = [key for key in ["base_season", "base_pos", "base_player_display_name"] if key in seasonal_df.columns and key in weekly_df.columns]
-
     if not group_keys:
         return seasonal_df
 
     aggregate_frames = [frame for frame in [_aggregate_weekly_metrics(weekly_df, group_keys, summed_metrics, "sum"),
                                             _aggregate_weekly_metrics(weekly_df, group_keys, averaged_metrics, "mean")] if frame is not None]
-
     if not aggregate_frames:
         return seasonal_df
-
     aggregates = aggregate_frames[0]
     for frame in aggregate_frames[1:]:
         aggregates = aggregates.merge(frame, on=group_keys, how="outer")

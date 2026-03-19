@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 
-def setup_logging(log_dir: str | Path = "logs", level: int = logging.INFO, timing_enabled: bool = True) -> None:
+def setup_logging(level: int = logging.INFO, timing_enabled: bool = True) -> None:
     """Configure basic console logging plus simple error and timing files."""
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
@@ -16,7 +16,7 @@ def setup_logging(log_dir: str | Path = "logs", level: int = logging.INFO, timin
     console_handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
     root_logger.addHandler(console_handler)
 
-    log_root = Path(log_dir)
+    log_root = Path("backend/logs")
     log_root.mkdir(parents=True, exist_ok=True)
 
     error_handler = logging.FileHandler(log_root / "errors.log", encoding="utf-8")

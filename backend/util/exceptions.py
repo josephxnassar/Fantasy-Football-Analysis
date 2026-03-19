@@ -16,11 +16,9 @@ class FantasyFootballError(Exception):
         self.source: str = source
         super().__init__(message)
 
-
 class DataLoadError(FantasyFootballError):
     """Failed to load data from an external source (nflreadpy, file system)"""
     pass
-
 
 class DataProcessingError(FantasyFootballError):
     """Failed during data transformation, aggregation, or computation"""
@@ -29,7 +27,6 @@ class DataProcessingError(FantasyFootballError):
 class CacheNotLoadedError(FantasyFootballError):
     """Required cache data is not loaded or is empty"""
     pass
-
 
 class PlayerNotFoundError(FantasyFootballError):
     """Player could not be found in any data source"""
