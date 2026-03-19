@@ -1,11 +1,11 @@
 """Helper functions for statistics transformations and cache shaping."""
 
 import logging
-import re
-from typing import Dict, List, Mapping
+from typing import List, Mapping
 
 import pandas as pd
 
+from backend.statistics.column_maps import PFR_NAME_MAP
 from backend.util import constants
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
     """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
     return [s for s in seasons if s >= min_year]
 
-def select_columns(source: pd.DataFrame, column_map: Mapping[str, str], required_columns: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
+def select_and_rename_columns(source: pd.DataFrame, column_map: Mapping[str, str], required_columns: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
     """Return only mapped columns present in source, renamed to target names."""
     present = [column for column in column_map if column in source.columns]
     selected = source[present].rename(columns=column_map)
@@ -39,58 +39,36 @@ def team_normalization(source: pd.DataFrame) -> pd.DataFrame:
         source["base_opp_team"] = source["base_opp_team"].replace(constants.TEAM_ABBR_NORMALIZATION)
     return source
 
+def filter_regular_season(source: pd.DataFrame) -> pd.DataFrame:
+    """Filter to regular-season rows when a season-type field is available."""
+    if "base_season_type" not in source.columns:
+        return source
+    return source.loc[source["base_season_type"] == "REG"]
+
+def filter_positions(source: pd.DataFrame) -> pd.DataFrame:
+    """Filter to the supported fantasy positions when a position field is available."""
+    if "base_pos" not in source.columns:
+        return source
+    return source.loc[source["base_pos"].isin(constants.POSITIONS)]
+
 def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
-    filtered = source
-    if "base_season_type" in filtered.columns:
-        filtered = filtered.loc[filtered["base_season_type"] == "REG"]
-    return filtered.loc[filtered["base_pos"].isin(constants.POSITIONS)]
+    return filter_positions(filter_regular_season(source))
 
-def align_pfr_seasonal_names(pfr_df: pd.DataFrame, base_df: pd.DataFrame) -> pd.DataFrame:
-    """Map PFR seasonal short names to base full names for merge compatibility."""
-    col = "base_player_display_name"
-    if col not in pfr_df.columns or col not in base_df.columns:
-        return pfr_df.copy()
-    
-    full_names = _build_unique_normalized_name_lookup(base_df[col])
-    if not full_names:
-        return pfr_df.copy()
-
-    name_map: Dict[str, str] = {}
-    for name in pfr_df[col].dropna().unique():
-        if not isinstance(name, str):
-            continue
-        match = full_names.get(_normalize_name(name))
-        if match:
-            name_map[name] = match
-
-    if not name_map:
-        return pfr_df.copy()
-
-    aligned = pfr_df.copy()
-    aligned[col] = aligned[col].map(name_map).fillna(pfr_df[col])
-    return aligned
-
-def _build_unique_normalized_name_lookup(base_names: pd.Series) -> Dict[str, str]:
-    """Build normalized name lookup and remove ambiguous matches."""
-    full_names: Dict[str, str] = {}
-    ambiguous: set[str] = set()
-    for name in base_names.dropna().unique():
-        if not isinstance(name, str):
-            continue
-        normalized = _normalize_name(name)
-        if normalized in full_names and full_names[normalized] != name:
-            ambiguous.add(normalized)
-            continue
-        full_names[normalized] = name
-    for normalized in ambiguous:
-        full_names.pop(normalized, None)
-    return full_names
-
-def _normalize_name(name: str, suffix_re: re.Pattern[str] = re.compile(r"\s+(?:Jr\.?|Sr\.?|II|III|IV|V)$")) -> str:
-    """Reduce a player name to a normalized form for fuzzy matching."""
-    n = suffix_re.sub("", name.strip())
-    return n.replace("'", "").replace(".", "").lower()
+def prepare_pfr_source(source: pd.DataFrame, base: pd.DataFrame | None = None, join_candidates: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
+    """Apply the explicit PFR name map and optionally log unmatched names."""
+    if "base_player_display_name" in source.columns:
+        source["base_player_display_name"] = source["base_player_display_name"].replace(PFR_NAME_MAP)
+        if base is not None and join_candidates and source_name:
+            join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
+            if join_keys:
+                source_deduped = source.drop_duplicates(subset=join_keys)
+                base_index = base.drop_duplicates(subset=join_keys).set_index(join_keys).index
+                source_index = source_deduped.set_index(join_keys).index
+                unmatched_names = sorted(set(source_deduped.loc[~source_index.isin(base_index), "base_player_display_name"].dropna().astype(str)))
+                if unmatched_names:
+                    logger.info("%s unmatched player names (%s): %s", source_name, len(unmatched_names), ", ".join(unmatched_names))
+    return source
 
 def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
     """Left-join source onto base and use merge order to fill overlapping stats."""

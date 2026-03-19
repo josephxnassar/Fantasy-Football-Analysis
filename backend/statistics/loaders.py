@@ -26,7 +26,7 @@ class StatisticsSourceLoader:
         """Load roster data from nflreadpy."""
         try:
             source = nfl.load_rosters(seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['rosters'], REQUIRED_COLUMNS['rosters'], 'rosters')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['rosters'], REQUIRED_COLUMNS['rosters'], 'rosters')
             source = stats_helpers.team_normalization(source)
             return source
         except Exception as e:
@@ -38,9 +38,10 @@ class StatisticsSourceLoader:
         """Load and normalize weekly regular-season player stats."""
         try:
             source = nfl.load_player_stats(summary_level="week", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['player_weekly'], REQUIRED_COLUMNS['player_weekly'], 'player_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['player_weekly'], REQUIRED_COLUMNS['player_weekly'], 'player_weekly')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load player weekly stats: %s", e)
@@ -51,9 +52,10 @@ class StatisticsSourceLoader:
         """Load and normalize seasonal regular-season player stats."""
         try:
             source = nfl.load_player_stats(summary_level="reg", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['player_seasonal'], REQUIRED_COLUMNS['player_seasonal'], 'player_seasonal')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['player_seasonal'], REQUIRED_COLUMNS['player_seasonal'], 'player_seasonal')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load player seasonal stats: %s", e)
@@ -64,12 +66,13 @@ class StatisticsSourceLoader:
         """Load weekly fantasy opportunity stats from nflreadpy."""
         try:
             source = nfl.load_ff_opportunity(stat_type="weekly", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['ff_opp_weekly'], REQUIRED_COLUMNS['ff_opp_weekly'], 'ff_opp_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['ff_opp_weekly'], REQUIRED_COLUMNS['ff_opp_weekly'], 'ff_opp_weekly')
             source = stats_helpers.team_normalization(source)
             source["base_season"] = pd.to_numeric(source["base_season"], errors="coerce")
             source["base_week"] = pd.to_numeric(source["base_week"], errors="coerce")
             source = source.dropna(subset=["base_season", "base_week"]).astype({"base_season": "int32", "base_week": "int32"})
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load weekly fantasy opportunity stats: %s", e)
@@ -80,9 +83,10 @@ class StatisticsSourceLoader:
         """Load Next Gen passing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="passing", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['nextgen_pass_weekly'], REQUIRED_COLUMNS['nextgen_pass_weekly'], 'nextgen_pass_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['nextgen_pass_weekly'], REQUIRED_COLUMNS['nextgen_pass_weekly'], 'nextgen_pass_weekly')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load Next Gen passing stats: %s", e)
@@ -93,9 +97,10 @@ class StatisticsSourceLoader:
         """Load Next Gen receiving stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="receiving", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['nextgen_rec_weekly'], REQUIRED_COLUMNS['nextgen_rec_weekly'], 'nextgen_rec_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['nextgen_rec_weekly'], REQUIRED_COLUMNS['nextgen_rec_weekly'], 'nextgen_rec_weekly')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load Next Gen receiving stats: %s", e)
@@ -106,9 +111,10 @@ class StatisticsSourceLoader:
         """Load Next Gen rushing stats from nflreadpy."""
         try:
             source = nfl.load_nextgen_stats(stat_type="rushing", seasons=self.seasons).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['nextgen_rush_weekly'], REQUIRED_COLUMNS['nextgen_rush_weekly'], 'nextgen_rush_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['nextgen_rush_weekly'], REQUIRED_COLUMNS['nextgen_rush_weekly'], 'nextgen_rush_weekly')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load Next Gen rushing stats: %s", e)
@@ -119,7 +125,7 @@ class StatisticsSourceLoader:
         """Load weekly PFR advanced passing stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="pass", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_pass_weekly'], REQUIRED_COLUMNS['pfr_pass_weekly'], 'pfr_pass_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_pass_weekly'], REQUIRED_COLUMNS['pfr_pass_weekly'], 'pfr_pass_weekly')
             source = stats_helpers.team_normalization(source)
             return source
         except Exception as e:
@@ -131,7 +137,7 @@ class StatisticsSourceLoader:
         """Load weekly PFR advanced rushing stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="rush", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_rush_weekly'], REQUIRED_COLUMNS['pfr_rush_weekly'], 'pfr_rush_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_rush_weekly'], REQUIRED_COLUMNS['pfr_rush_weekly'], 'pfr_rush_weekly')
             source = stats_helpers.team_normalization(source)
             return source
         except Exception as e:
@@ -143,7 +149,7 @@ class StatisticsSourceLoader:
         """Load weekly PFR advanced receiving stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="rec", summary_level="week", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_rec_weekly'], REQUIRED_COLUMNS['pfr_rec_weekly'], 'pfr_rec_weekly')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_rec_weekly'], REQUIRED_COLUMNS['pfr_rec_weekly'], 'pfr_rec_weekly')
             source = stats_helpers.team_normalization(source)
             return source
         except Exception as e:
@@ -155,7 +161,7 @@ class StatisticsSourceLoader:
         """Load seasonal PFR advanced passing stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="pass", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_pass_season'], REQUIRED_COLUMNS['pfr_pass_season'], 'pfr_pass_season')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_pass_season'], REQUIRED_COLUMNS['pfr_pass_season'], 'pfr_pass_season')
             source = stats_helpers.team_normalization(source)
             return source
         except Exception as e:
@@ -167,8 +173,9 @@ class StatisticsSourceLoader:
         """Load seasonal PFR advanced rushing stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="rush", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_rush_season'], REQUIRED_COLUMNS['pfr_rush_season'], 'pfr_rush_season')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_rush_season'], REQUIRED_COLUMNS['pfr_rush_season'], 'pfr_rush_season')
             source = stats_helpers.team_normalization(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced rush stats: %s", e)
@@ -179,8 +186,9 @@ class StatisticsSourceLoader:
         """Load seasonal PFR advanced receiving stats from nflreadpy."""
         try:
             source = nfl.load_pfr_advstats(stat_type="rec", summary_level="season", seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['pfr_rec_season'], REQUIRED_COLUMNS['pfr_rec_season'], 'pfr_rec_season')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['pfr_rec_season'], REQUIRED_COLUMNS['pfr_rec_season'], 'pfr_rec_season')
             source = stats_helpers.team_normalization(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load seasonal PFR advanced receiving stats: %s", e)
@@ -191,9 +199,10 @@ class StatisticsSourceLoader:
         """Load and normalize weekly regular-season snap counts."""
         try:
             source = nfl.load_snap_counts(seasons=stats_helpers.pfr_seasons(self.seasons)).to_pandas()
-            source = stats_helpers.select_columns(source, COLUMN_MAPS['snap_counts'], REQUIRED_COLUMNS['snap_counts'], 'snap_counts')
+            source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['snap_counts'], REQUIRED_COLUMNS['snap_counts'], 'snap_counts')
             source = stats_helpers.team_normalization(source)
-            source = stats_helpers.filter_regular_and_position(source)
+            source = stats_helpers.filter_regular_season(source)
+            source = stats_helpers.filter_positions(source)
             return source.drop_duplicates(subset=['base_season', 'base_week', 'base_player_display_name', 'base_pos'])
         except Exception as e:
             logger.error("Failed to load snap counts: %s", e)
