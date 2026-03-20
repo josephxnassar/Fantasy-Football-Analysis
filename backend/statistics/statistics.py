@@ -120,7 +120,7 @@ class Statistics(base_source.BaseSource):
         return weekly_keys
 
     @timed("Statistics._build_statistics_data")
-    def _build_statistics_data(self, rosters: pd.DataFrame, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, stats_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], List[Dict], List[Dict], Dict[str, int], Dict[str, int], Dict[str, int]]:
+    def _build_statistics_data(self, rosters: pd.DataFrame, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, stats_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], List[Dict], List[Dict], Dict[str, int]]:
         """Build seasonal stats, weekly stats, all players, and their meta in parallel."""
         results: Dict[str, object] = {}
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -138,9 +138,7 @@ class Statistics(base_source.BaseSource):
         return (seasonal_player_stats,
                 weekly_player_stats,
                 all_players,
-                roster_meta,
-                seasonal_meta,
-                weekly_meta)
+                {**roster_meta, **seasonal_meta, **weekly_meta})
 
     @timed("Statistics._build_seasonal_player_stats")
     def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Tuple[List[Dict], Dict[str, int]]:
@@ -191,18 +189,10 @@ class Statistics(base_source.BaseSource):
     @timed("Statistics.run")
     def run(self) -> None:
         """Load data, process statistics, and store cache data."""
-        loaders = {
-            "rosters": self._source_loader.load_rosters,
-            "sources": self._source_loader.load_statistics_sources,
-        }
-        results: Dict[str, object] = {}
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            futures = {executor.submit(loader): name for name, loader in loaders.items()}
-            for future in as_completed(futures):
-                results[futures[future]] = future.result()
+        import_data = self._source_loader.load_import_data()
 
-        rosters = cast(pd.DataFrame, results["rosters"])
-        sources = cast(Dict[str, pd.DataFrame], results["sources"])
+        rosters = import_data["rosters"]
+        sources = {name: frame for name, frame in import_data.items() if name != "rosters"}
 
         try:
             weekly_df, seasonal_df = self._merge_statistics_data(sources)
@@ -213,7 +203,7 @@ class Statistics(base_source.BaseSource):
 
         try:
             stats_player_keys = self._collect_stats_player_keys(seasonal_df, weekly_df)
-            seasonal_player_stats, weekly_player_stats, all_players, roster_meta, seasonal_meta, weekly_meta = self._build_statistics_data(rosters, weekly_df, seasonal_df, stats_player_keys)
+            seasonal_player_stats, weekly_player_stats, all_players, meta = self._build_statistics_data(rosters, weekly_df, seasonal_df, stats_player_keys)
         except Exception as e:
             logger.exception("Failed to build statistics payloads")
             raise DataProcessingError(f"Failed to build statistics payloads: {e}", source="Statistics") from e
@@ -221,4 +211,4 @@ class Statistics(base_source.BaseSource):
         self.set_cache({constants.STATS["ALL_PLAYERS"]: all_players,
                         constants.STATS["SEASONAL_PLAYER_STATS"]: seasonal_player_stats,
                         constants.STATS["WEEKLY_PLAYER_STATS"]: weekly_player_stats,
-                        constants.STATS["META"]: {**roster_meta, **seasonal_meta, **weekly_meta}})
+                        constants.STATS["META"]: meta})

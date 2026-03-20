@@ -209,20 +209,21 @@ class StatisticsSourceLoader:
             logger.error("Failed to load snap counts: %s", e)
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
-    @timed("StatisticsSourceLoader.load_statistics_sources")
-    def load_statistics_sources(self) -> dict[str, pd.DataFrame]:
-        """Load all statistics data sources in parallel."""
-        loaders = self._build_loader_map()
+    @timed("StatisticsSourceLoader.load_import_data")
+    def load_import_data(self) -> dict[str, pd.DataFrame]:
+        """Load all import dataframes, including rosters, in parallel."""
+        loaders = self._build_import_loader_map()
         results: dict[str, pd.DataFrame] = {}
-        with ThreadPoolExecutor(max_workers=min(len(loaders), 8)) as executor:
+        with ThreadPoolExecutor(max_workers=min(len(loaders), 9)) as executor:
             futures = {executor.submit(loader): name for name, loader in loaders.items()}
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
         return results
 
-    def _build_loader_map(self) -> dict[str, Callable[[], pd.DataFrame]]:
-        """Return the source-name to loader-function mapping."""
+    def _build_import_loader_map(self) -> dict[str, Callable[[], pd.DataFrame]]:
+        """Return the import-name to loader-function mapping."""
         return {
+            "rosters": self.load_rosters,
             "player_weekly": self.load_player_weekly_stats,
             "player_seasonal": self.load_player_seasonal_stats,
             "ff_opp_weekly": self.load_ff_opportunity_weekly,
