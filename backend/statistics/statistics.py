@@ -2,7 +2,7 @@
 
 import logging
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
-from typing import Dict, List, NamedTuple, Tuple, cast
+from typing import Dict, List, Tuple, cast
 
 import pandas as pd
 
@@ -16,16 +16,6 @@ from backend.util.timing import timed
 logger = logging.getLogger(__name__)
 
 
-class RosterData(NamedTuple):
-    """Extracted roster-level lookups produced by _extract_all_roster_data."""
-    player_positions: Dict[Tuple[str, str], str]
-    player_ages: Dict[Tuple[str, str], int]
-    eligible_players: set[Tuple[str, str]]
-    player_headshots: Dict[Tuple[str, str], str]
-    player_teams: Dict[Tuple[str, str], str]
-    rookie_players: set[Tuple[str, str]]
-
-
 class Statistics(base_source.BaseSource):
     """Processes player statistics and builds stat caches."""
 
@@ -33,45 +23,6 @@ class Statistics(base_source.BaseSource):
         """Initialize with seasons"""
         super().__init__(seasons)
         self._source_loader = StatisticsSourceLoader(self.seasons)
-
-    @timed("Statistics._extract_all_roster_data")
-    def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[RosterData, Dict[str, int]]:
-        """Extract roster-based lookups with vectorized pandas operations."""
-        roster_view = rosters.loc[rosters["base_player_display_name"].notna() & rosters["base_player_id"].notna()].copy()
-        roster_view["player_key"] = list(zip(roster_view["base_player_display_name"], roster_view["base_player_id"]))
-        roster_view["base_entry_year"] = pd.to_numeric(roster_view["base_entry_year"], errors="coerce")
-
-        player_positions = dict(zip(roster_view["player_key"], roster_view["base_pos"]))
-
-        today = pd.Timestamp.now().normalize()
-        birth_dates = roster_view["base_birth_date"]
-        ages = ((today - birth_dates).dt.days // 365).where(lambda values: values > 0)
-        age_rows = roster_view.loc[ages.notna(), ["player_key"]].copy()
-        age_rows["age"] = ages.loc[ages.notna()].astype(int).to_numpy()
-        player_ages = dict(zip(age_rows["player_key"], age_rows["age"]))
-
-        headshot_rows = roster_view.loc[roster_view["base_headshot_url"].fillna("").ne("") & roster_view["base_season"].notna(), ["player_key", "base_season", "base_headshot_url"]].sort_values("base_season")
-        headshot_rows = headshot_rows.drop_duplicates(subset="player_key", keep="last")
-        player_headshots = dict(zip(headshot_rows["player_key"], headshot_rows["base_headshot_url"]))
-
-        current_season = constants.CURRENT_SEASON
-        current_rows = roster_view.loc[roster_view["base_season"].eq(current_season)]
-        eligible_players = set(current_rows.loc[current_rows["base_status"] != "RET", "player_key"])
-
-        team_rows = current_rows.loc[current_rows["base_team"].fillna("").ne(""), ["player_key", "base_team"]]
-        player_teams = dict(zip(team_rows["player_key"], team_rows["base_team"]))
-
-        rookies = set(current_rows.loc[current_rows["base_entry_year"].eq(current_season), "player_key"])
-
-        roster_meta = {"player_positions_count": len(player_positions),
-                       "player_ages_count": len(player_ages),
-                       "eligible_player_count": len(eligible_players),
-                       "headshot_player_count": len(player_headshots),
-                       "player_teams_count": len(player_teams),
-                       "rookie_player_count": len(rookies)}
-        
-        logger.info("Player-Positions: %s | Player-Ages: %s | Eligible-Players: %s | Headshot-Players: %s | Player-Teams: %s | Rookie-Players: %s", roster_meta["player_positions_count"], roster_meta["player_ages_count"], roster_meta["eligible_player_count"], roster_meta["headshot_player_count"], roster_meta["player_teams_count"], roster_meta["rookie_player_count"])
-        return RosterData(player_positions, player_ages, eligible_players, player_headshots, player_teams, rookies), roster_meta
 
     @timed("Statistics._merge_statistics_data")
     def _merge_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -169,24 +120,25 @@ class Statistics(base_source.BaseSource):
         return weekly_keys
 
     @timed("Statistics._build_statistics_data")
-    def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], List[Dict], List[Dict], Dict[str, int], Dict[str, int]]:
-        """Build seasonal stats, weekly stats, and all players in parallel."""
+    def _build_statistics_data(self, rosters: pd.DataFrame, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, stats_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], List[Dict], List[Dict], Dict[str, int], Dict[str, int], Dict[str, int]]:
+        """Build seasonal stats, weekly stats, all players, and their meta in parallel."""
         results: Dict[str, object] = {}
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures: Dict[Future[object], str] = {
                 executor.submit(self._build_seasonal_player_stats, seasonal_df): "seasonal_player_stats",
                 executor.submit(self._build_weekly_player_stats, weekly_df): "weekly_player_stats",
-                executor.submit(self._build_all_players, roster_data, stats_player_keys): "all_players",
+                executor.submit(self._build_all_players, rosters, stats_player_keys): "all_players",
             }
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
 
         seasonal_player_stats, seasonal_meta = cast(Tuple[List[Dict], Dict[str, int]], results["seasonal_player_stats"])
         weekly_player_stats, weekly_meta = cast(Tuple[List[Dict], Dict[str, int]], results["weekly_player_stats"])
-        all_players = cast(List[Dict], results["all_players"])
+        all_players, roster_meta = cast(Tuple[List[Dict], Dict[str, int]], results["all_players"])
         return (seasonal_player_stats,
                 weekly_player_stats,
                 all_players,
+                roster_meta,
                 seasonal_meta,
                 weekly_meta)
 
@@ -194,6 +146,7 @@ class Statistics(base_source.BaseSource):
     def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Tuple[List[Dict], Dict[str, int]]:
         """Build flat seasonal record list for app/API consumption."""
         seasonal_stats = cast(List[Dict], seasonal_df.to_dict("records"))
+        
         seasonal_meta = {"seasonal_record_count": len(seasonal_df)}
         
         logger.info("Seasonal-Records: %s", seasonal_meta["seasonal_record_count"])
@@ -203,24 +156,37 @@ class Statistics(base_source.BaseSource):
     def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Tuple[List[Dict], Dict[str, int]]:
         """Build flat weekly record list for app/API consumption."""
         weekly_stats = cast(List[Dict], weekly_df.to_dict("records"))
+
         weekly_meta = {"weekly_record_count": len(weekly_df)}
 
         logger.info("Weekly-Records: %s", weekly_meta["weekly_record_count"])
         return weekly_stats, weekly_meta
 
     @timed("Statistics._build_all_players")
-    def _build_all_players(self, roster_data: RosterData, valid_player_keys: set[Tuple[str, str]]) -> List[Dict]:
-        """Build pre-assembled player list with player metadata for API consumption."""
-        return [{
+    def _build_all_players(self, rosters: pd.DataFrame, valid_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], Dict[str, int]]:
+        """Build pre-assembled player list and roster-derived meta for app/API consumption."""
+        player_positions, player_ages, eligible_players, player_headshots, player_teams, rookie_players = stats_helpers.build_all_players_lookups(rosters, constants.CURRENT_SEASON)
+
+        all_players = [{
             "name": player_key[0],
             "player_id": player_key[1],
-            "position": roster_data.player_positions.get(player_key),
-            "age": roster_data.player_ages.get(player_key),
-            "headshot_url": roster_data.player_headshots.get(player_key),
-            "team": roster_data.player_teams.get(player_key),
-            "is_rookie": player_key in roster_data.rookie_players,
-            "is_eligible": player_key in roster_data.eligible_players,
-        } for player_key in roster_data.player_positions if player_key in valid_player_keys]
+            "position": player_positions.get(player_key),
+            "age": player_ages.get(player_key),
+            "headshot_url": player_headshots.get(player_key),
+            "team": player_teams.get(player_key),
+            "is_rookie": player_key in rookie_players,
+            "is_eligible": player_key in eligible_players,
+        } for player_key in player_positions if player_key in valid_player_keys]
+
+        roster_meta = {"player_positions_count": len(player_positions),
+                       "player_ages_count": len(player_ages),
+                       "eligible_player_count": len(eligible_players),
+                       "headshot_player_count": len(player_headshots),
+                       "player_teams_count": len(player_teams),
+                       "rookie_player_count": len(rookie_players)}
+
+        logger.info("All-Players: %s | Player-Positions: %s | Player-Ages: %s | Eligible-Players: %s | Headshot-Players: %s | Player-Teams: %s | Rookie-Players: %s", len(all_players), roster_meta["player_positions_count"], roster_meta["player_ages_count"], roster_meta["eligible_player_count"], roster_meta["headshot_player_count"], roster_meta["player_teams_count"], roster_meta["rookie_player_count"])
+        return all_players, roster_meta
 
     @timed("Statistics.run")
     def run(self) -> None:
@@ -239,12 +205,6 @@ class Statistics(base_source.BaseSource):
         sources = cast(Dict[str, pd.DataFrame], results["sources"])
 
         try:
-            roster_data, roster_meta = self._extract_all_roster_data(rosters)
-        except Exception as e:
-            logger.exception("Failed to extract roster data")
-            raise DataProcessingError(f"Failed to extract roster data: {e}", source="Statistics") from e
-
-        try:
             weekly_df, seasonal_df = self._merge_statistics_data(sources)
             weekly_df, seasonal_df = self._shape_statistics_data(weekly_df, seasonal_df)
         except Exception as e:
@@ -253,7 +213,7 @@ class Statistics(base_source.BaseSource):
 
         try:
             stats_player_keys = self._collect_stats_player_keys(seasonal_df, weekly_df)
-            seasonal_player_stats, weekly_player_stats, all_players, seasonal_meta, weekly_meta = self._build_statistics_data(weekly_df, seasonal_df, roster_data, stats_player_keys)
+            seasonal_player_stats, weekly_player_stats, all_players, roster_meta, seasonal_meta, weekly_meta = self._build_statistics_data(rosters, weekly_df, seasonal_df, stats_player_keys)
         except Exception as e:
             logger.exception("Failed to build statistics payloads")
             raise DataProcessingError(f"Failed to build statistics payloads: {e}", source="Statistics") from e

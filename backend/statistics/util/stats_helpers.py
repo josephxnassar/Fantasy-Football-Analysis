@@ -132,3 +132,30 @@ def add_group_ranks(df: pd.DataFrame, group_cols: List[str], rank_metrics: List[
         numeric = pd.to_numeric(ranked[metric], errors="coerce")
         ranked[f"{metric}_rank"] = numeric.groupby(groups).rank(ascending=False, method="min").astype("Int64")
     return ranked
+
+def build_all_players_lookups(rosters: pd.DataFrame, current_season: int) -> tuple[dict[tuple[str, str], str], dict[tuple[str, str], int], set[tuple[str, str]], dict[tuple[str, str], str], dict[tuple[str, str], str], set[tuple[str, str]]]:
+    """Build the roster-derived lookups used by the all-players builder."""
+    roster_view = rosters.loc[rosters["base_player_display_name"].notna() & rosters["base_player_id"].notna()].copy()
+    roster_view["player_key"] = list(zip(roster_view["base_player_display_name"], roster_view["base_player_id"]))
+    roster_view["base_entry_year"] = pd.to_numeric(roster_view["base_entry_year"], errors="coerce")
+
+    player_positions = dict(zip(roster_view["player_key"], roster_view["base_pos"]))
+
+    today = pd.Timestamp.now().normalize()
+    birth_dates = pd.to_datetime(roster_view["base_birth_date"], errors="coerce")
+    ages = ((today - birth_dates).dt.days // 365).where(lambda values: values > 0)
+    age_rows = roster_view.loc[ages.notna(), ["player_key"]].copy()
+    age_rows["age"] = ages.loc[ages.notna()].astype(int).to_numpy()
+    player_ages = dict(zip(age_rows["player_key"], age_rows["age"]))
+
+    headshot_rows = roster_view.loc[roster_view["base_headshot_url"].fillna("").ne("") & roster_view["base_season"].notna(), ["player_key", "base_season", "base_headshot_url"]].sort_values("base_season").drop_duplicates(subset="player_key", keep="last")
+    player_headshots = dict(zip(headshot_rows["player_key"], headshot_rows["base_headshot_url"]))
+
+    current_rows = roster_view.loc[roster_view["base_season"].eq(current_season)]
+    eligible_players = set(current_rows.loc[current_rows["base_status"] != "RET", "player_key"])
+
+    team_rows = current_rows.loc[current_rows["base_team"].fillna("").ne(""), ["player_key", "base_team"]]
+    player_teams = dict(zip(team_rows["player_key"], team_rows["base_team"]))
+
+    rookie_players = set(current_rows.loc[current_rows["base_entry_year"].eq(current_season), "player_key"])
+    return player_positions, player_ages, eligible_players, player_headshots, player_teams, rookie_players
