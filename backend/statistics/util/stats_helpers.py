@@ -61,7 +61,7 @@ def apply_name_map(source: pd.DataFrame) -> pd.DataFrame:
         source["base_player_display_name"] = source["base_player_display_name"].replace(PLAYER_NAME_MAP)
     return source
 
-def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str], source_name: str | None = None) -> pd.DataFrame:
+def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
     """Left-join source onto base and use merge order to fill overlapping stats."""
     join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
     if not join_keys:
@@ -70,15 +70,6 @@ def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List
     base_indexed = base.set_index(join_keys)
     source_deduped = source.drop_duplicates(subset=join_keys)
     source_indexed = source_deduped.set_index(join_keys)
-
-    if source_name and "base_player_display_name" in base.columns and "base_player_display_name" in source.columns:
-        unmatched = source_deduped.loc[~source_indexed.index.isin(base_indexed.index)]
-        if "base_pos" in unmatched.columns:
-            unmatched = unmatched.loc[unmatched["base_pos"].isin(constants.POSITIONS)]
-        base_names = set(base["base_player_display_name"].dropna().astype(str))
-        missing_names = sorted(set(unmatched["base_player_display_name"].dropna().astype(str)) - base_names)
-        if missing_names:
-            logger.warning("%s missing player names (%s): %s", source_name, len(missing_names), ", ".join(missing_names))
 
     source_aligned = source_indexed.reindex(base_indexed.index)
     combined = base_indexed.combine_first(source_aligned).copy()
@@ -89,7 +80,7 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
     if seasonal_df.empty or weekly_df.empty:
         return seasonal_df
 
-    group_keys = [key for key in ["base_season", "base_pos", "base_player_display_name"] if key in seasonal_df.columns and key in weekly_df.columns]
+    group_keys = [key for key in ["base_season", "base_pos", "base_player_display_name", "base_player_id"] if key in seasonal_df.columns and key in weekly_df.columns]
     if not group_keys:
         return seasonal_df
 

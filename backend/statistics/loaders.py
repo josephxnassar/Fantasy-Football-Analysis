@@ -28,6 +28,7 @@ class StatisticsSourceLoader:
             source = nfl.load_rosters(seasons=self.seasons).to_pandas()
             source = stats_helpers.select_and_rename_columns(source, COLUMN_MAPS['rosters'], REQUIRED_COLUMNS['rosters'], 'rosters')
             source = stats_helpers.team_normalization(source)
+            source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
             logger.error("Failed to load rosters: %s", e)

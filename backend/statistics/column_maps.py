@@ -699,7 +699,7 @@ PLAYER_NAME_MAP = {
     "WanDale Robinson": "Wan'Dale Robinson",
 }
 
-ROSTER_REQUIRED_COLUMNS = ['base_player_display_name', 'base_season', 'base_pos', 'base_birth_date', 'base_headshot_url', 'base_status', 'base_team', 'base_entry_year']
+ROSTER_REQUIRED_COLUMNS = ['base_player_id', 'base_player_display_name', 'base_season', 'base_pos', 'base_birth_date', 'base_headshot_url', 'base_status', 'base_team', 'base_entry_year']
 PLAYER_WEEKLY_REQUIRED_COLUMNS = ['base_season', 'base_week', 'base_player_id', 'base_player_display_name', 'base_pos', 'base_team']
 PLAYER_SEASONAL_REQUIRED_COLUMNS = ['base_season', 'base_player_id', 'base_player_display_name', 'base_pos', 'base_team']
 FF_OPPORTUNITY_WEEKLY_REQUIRED_COLUMNS = ['base_season', 'base_week', 'base_player_id', 'base_pos']

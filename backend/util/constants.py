@@ -16,7 +16,7 @@ CACHE = {
 # Statistics cache keys
 STATS = {
     "ALL_PLAYERS": "all_players",
-    "SEASONAL": "seasonal",
+    "SEASONAL_PLAYER_STATS": "seasonal_player_stats",
     "WEEKLY_PLAYER_STATS": "weekly_player_stats",
     "META" : "meta",
 }
