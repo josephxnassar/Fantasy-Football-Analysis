@@ -36,10 +36,10 @@ Season guards used in loaders:
 
 **`all_players`**
 
-shape: `(player_name, player_id) -> player_record`
+shape: `list[player_record]`
 
 ```python
-all_players[("Amon-Ra St. Brown", "00-0036963")] = {
+all_players[0] = {
     "name": "Amon-Ra St. Brown",
     "player_id": "00-0036963",
     "position": "WR",
@@ -53,10 +53,14 @@ all_players[("Amon-Ra St. Brown", "00-0036963")] = {
 
 **`seasonal_player_stats`**
 
-shape: `season -> position -> (player_name, player_id) -> seasonal_record`
+shape: `list[seasonal_record]`
 
 ```python
-seasonal_player_stats[2024]["WR"][("Amon-Ra St. Brown", "00-0036963")] = {
+seasonal_player_stats[0] = {
+    "base_season": 2024,
+    "base_pos": "WR",
+    "base_player_display_name": "Amon-Ra St. Brown",
+    "base_player_id": "00-0036963",
     "rec_recs": 115,
     "rec_yds": 1263,
     "rec_tds": 12,
@@ -68,21 +72,22 @@ seasonal_player_stats[2024]["WR"][("Amon-Ra St. Brown", "00-0036963")] = {
 
 **`weekly_player_stats`**
 
-shape: `season -> position -> (player_name, player_id) -> [weekly_records]`
+shape: `list[weekly_record]`
 
 ```python
-weekly_player_stats[2024]["WR"][("Amon-Ra St. Brown", "00-0036963")] = [
-    {
-        "base_week": 1,
-        "rec_recs": 6,
-        "rec_yds": 95,
-        "rec_tds": 1,
-        "fantasy_fp_ppr": 21.5,
-        "fantasy_fp_ppr_rank": 8,
-        ...
-    },
+weekly_player_stats[0] = {
+    "base_season": 2024,
+    "base_week": 1,
+    "base_pos": "WR",
+    "base_player_display_name": "Amon-Ra St. Brown",
+    "base_player_id": "00-0036963",
+    "rec_recs": 6,
+    "rec_yds": 95,
+    "rec_tds": 1,
+    "fantasy_fp_ppr": 21.5,
+    "fantasy_fp_ppr_rank": 8,
     ...
-]
+}
 ```
 
 **`meta`**

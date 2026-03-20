@@ -37,32 +37,28 @@ class Statistics(base_source.BaseSource):
     @timed("Statistics._extract_all_roster_data")
     def _extract_all_roster_data(self, rosters: pd.DataFrame) -> Tuple[RosterData, Dict[str, int]]:
         """Extract roster-based lookups with vectorized pandas operations."""
-        current_season = constants.CURRENT_SEASON
-        today = pd.Timestamp.now().normalize()
         roster_view = rosters.loc[rosters["base_player_display_name"].notna() & rosters["base_player_id"].notna()].copy()
-
-        roster_view["base_player_display_name"] = roster_view["base_player_display_name"].astype(str)
-        roster_view["base_player_id"] = roster_view["base_player_id"].astype(str)
         roster_view["player_key"] = list(zip(roster_view["base_player_display_name"], roster_view["base_player_id"]))
-        roster_view["base_season"] = pd.to_numeric(roster_view["base_season"], errors="coerce")
         roster_view["base_entry_year"] = pd.to_numeric(roster_view["base_entry_year"], errors="coerce")
 
         player_positions = dict(zip(roster_view["player_key"], roster_view["base_pos"]))
 
-        birth_dates = pd.to_datetime(roster_view["base_birth_date"], errors="coerce")
+        today = pd.Timestamp.now().normalize()
+        birth_dates = roster_view["base_birth_date"]
         ages = ((today - birth_dates).dt.days // 365).where(lambda values: values > 0)
         age_rows = roster_view.loc[ages.notna(), ["player_key"]].copy()
         age_rows["age"] = ages.loc[ages.notna()].astype(int).to_numpy()
         player_ages = dict(zip(age_rows["player_key"], age_rows["age"]))
 
-        headshot_rows = roster_view.loc[roster_view["base_headshot_url"].fillna("").astype(str).ne("") & roster_view["base_season"].notna(), ["player_key", "base_season", "base_headshot_url"]].sort_values("base_season")
+        headshot_rows = roster_view.loc[roster_view["base_headshot_url"].fillna("").ne("") & roster_view["base_season"].notna(), ["player_key", "base_season", "base_headshot_url"]].sort_values("base_season")
         headshot_rows = headshot_rows.drop_duplicates(subset="player_key", keep="last")
         player_headshots = dict(zip(headshot_rows["player_key"], headshot_rows["base_headshot_url"]))
 
+        current_season = constants.CURRENT_SEASON
         current_rows = roster_view.loc[roster_view["base_season"].eq(current_season)]
         eligible_players = set(current_rows.loc[current_rows["base_status"] != "RET", "player_key"])
 
-        team_rows = current_rows.loc[current_rows["base_team"].fillna("").astype(str).ne(""), ["player_key", "base_team"]]
+        team_rows = current_rows.loc[current_rows["base_team"].fillna("").ne(""), ["player_key", "base_team"]]
         player_teams = dict(zip(team_rows["player_key"], team_rows["base_team"]))
 
         rookies = set(current_rows.loc[current_rows["base_entry_year"].eq(current_season), "player_key"])
@@ -173,7 +169,7 @@ class Statistics(base_source.BaseSource):
         return weekly_keys
 
     @timed("Statistics._build_statistics_data")
-    def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_keys: set[Tuple[str, str]]) -> Tuple[Dict[int, Dict[str, Dict[Tuple[str, str], Dict]]], Dict[int, Dict[str, Dict[Tuple[str, str], List[Dict]]]], Dict[Tuple[str, str], Dict], Dict[str, int], Dict[str, int]]:
+    def _build_statistics_data(self, weekly_df: pd.DataFrame, seasonal_df: pd.DataFrame, roster_data: RosterData, stats_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], List[Dict], List[Dict], Dict[str, int], Dict[str, int]]:
         """Build seasonal stats, weekly stats, and all players in parallel."""
         results: Dict[str, object] = {}
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -185,9 +181,9 @@ class Statistics(base_source.BaseSource):
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
 
-        seasonal_player_stats, seasonal_meta = cast(Tuple[Dict[int, Dict[str, Dict[Tuple[str, str], Dict]]], Dict[str, int]], results["seasonal_player_stats"])
-        weekly_player_stats, weekly_meta = cast(Tuple[Dict[int, Dict[str, Dict[Tuple[str, str], List[Dict]]]], Dict[str, int]], results["weekly_player_stats"])
-        all_players = cast(Dict[Tuple[str, str], Dict], results["all_players"])
+        seasonal_player_stats, seasonal_meta = cast(Tuple[List[Dict], Dict[str, int]], results["seasonal_player_stats"])
+        weekly_player_stats, weekly_meta = cast(Tuple[List[Dict], Dict[str, int]], results["weekly_player_stats"])
+        all_players = cast(List[Dict], results["all_players"])
         return (seasonal_player_stats,
                 weekly_player_stats,
                 all_players,
@@ -195,64 +191,36 @@ class Statistics(base_source.BaseSource):
                 weekly_meta)
 
     @timed("Statistics._build_seasonal_player_stats")
-    def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Tuple[Dict[int, Dict[str, Dict[Tuple[str, str], Dict]]], Dict[str, int]]:
-        """Build season -> position -> player -> record view for app/API consumption."""
-        seasonal_stats: Dict[int, Dict[str, Dict[Tuple[str, str], Dict]]] = {}
-        for season, season_group in seasonal_df.groupby("base_season", sort=False):
-            season_map: Dict[str, Dict[Tuple[str, str], Dict]] = {}
-            for position, position_group in season_group.groupby("base_pos", sort=False):
-                player_map: Dict[Tuple[str, str], Dict] = {}
-                for (player_name, player_id), player_group in position_group.groupby(["base_player_display_name", "base_player_id"], sort=False):
-                    records = player_group.drop(columns=["base_season", "base_pos", "base_player_display_name"], errors="ignore").to_dict("records")
-                    if records:
-                        player_map[(str(player_name), str(player_id))] = records[0]
-                if player_map:
-                    season_map[str(position)] = player_map
-            if season_map:
-                seasonal_stats[int(season)] = season_map
-
+    def _build_seasonal_player_stats(self, seasonal_df: pd.DataFrame) -> Tuple[List[Dict], Dict[str, int]]:
+        """Build flat seasonal record list for app/API consumption."""
+        seasonal_stats = cast(List[Dict], seasonal_df.to_dict("records"))
         seasonal_meta = {"seasonal_record_count": len(seasonal_df)}
         
         logger.info("Seasonal-Records: %s", seasonal_meta["seasonal_record_count"])
         return seasonal_stats, seasonal_meta
 
     @timed("Statistics._build_weekly_player_stats")
-    def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Tuple[Dict[int, Dict[str, Dict[Tuple[str, str], List[Dict]]]], Dict[str, int]]:
-        """Build season -> position -> player -> weekly record list view for app/API consumption."""
-        weekly_stats: Dict[int, Dict[str, Dict[Tuple[str, str], List[Dict]]]] = {}
-        for season, season_group in weekly_df.groupby("base_season", sort=False):
-            season_map: Dict[str, Dict[Tuple[str, str], List[Dict]]] = {}
-            for position, position_group in season_group.groupby("base_pos", sort=False):
-                player_map: Dict[Tuple[str, str], List[Dict]] = {}
-                for (player_name, player_id), player_group in position_group.groupby(["base_player_display_name", "base_player_id"], sort=False):
-                    records = player_group.drop(columns=["base_season", "base_pos", "base_player_display_name"], errors="ignore").to_dict("records")
-                    if records:
-                        player_map[(str(player_name), str(player_id))] = records
-                if player_map:
-                    season_map[str(position)] = player_map
-            if season_map:
-                weekly_stats[int(season)] = season_map
-
+    def _build_weekly_player_stats(self, weekly_df: pd.DataFrame) -> Tuple[List[Dict], Dict[str, int]]:
+        """Build flat weekly record list for app/API consumption."""
+        weekly_stats = cast(List[Dict], weekly_df.to_dict("records"))
         weekly_meta = {"weekly_record_count": len(weekly_df)}
 
         logger.info("Weekly-Records: %s", weekly_meta["weekly_record_count"])
         return weekly_stats, weekly_meta
 
     @timed("Statistics._build_all_players")
-    def _build_all_players(self, roster_data: RosterData, valid_player_keys: set[Tuple[str, str]]) -> Dict[Tuple[str, str], Dict]:
-        """Build pre-assembled player map with player metadata for API consumption."""
-        return {
-            player_key: {
-                "name": player_key[0],
-                "player_id": player_key[1],
-                "position": roster_data.player_positions.get(player_key),
-                "age": roster_data.player_ages.get(player_key),
-                "headshot_url": roster_data.player_headshots.get(player_key),
-                "team": roster_data.player_teams.get(player_key),
-                "is_rookie": player_key in roster_data.rookie_players,
-                "is_eligible": player_key in roster_data.eligible_players,
-            } for player_key in roster_data.player_positions if player_key in valid_player_keys
-        }
+    def _build_all_players(self, roster_data: RosterData, valid_player_keys: set[Tuple[str, str]]) -> List[Dict]:
+        """Build pre-assembled player list with player metadata for API consumption."""
+        return [{
+            "name": player_key[0],
+            "player_id": player_key[1],
+            "position": roster_data.player_positions.get(player_key),
+            "age": roster_data.player_ages.get(player_key),
+            "headshot_url": roster_data.player_headshots.get(player_key),
+            "team": roster_data.player_teams.get(player_key),
+            "is_rookie": player_key in roster_data.rookie_players,
+            "is_eligible": player_key in roster_data.eligible_players,
+        } for player_key in roster_data.player_positions if player_key in valid_player_keys]
 
     @timed("Statistics.run")
     def run(self) -> None:
