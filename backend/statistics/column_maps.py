@@ -572,7 +572,7 @@ SNAP_COUNTS_COLUMN_MAP = {
     'st_pct': 'snap_spec_pct',
 }
 
-PFR_NAME_MAP = {
+PLAYER_NAME_MAP = {
     "A.J. McCarron": "AJ McCarron",
     "AJ Brown": "A.J. Brown",
     "AJ Derby": "A.J. Derby",

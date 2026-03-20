@@ -5,7 +5,7 @@ from typing import List, Mapping
 
 import pandas as pd
 
-from backend.statistics.column_maps import PFR_NAME_MAP
+from backend.statistics.column_maps import PLAYER_NAME_MAP
 from backend.util import constants
 
 logger = logging.getLogger(__name__)
@@ -55,28 +55,31 @@ def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular season and fantasy positions when available."""
     return filter_positions(filter_regular_season(source))
 
-def prepare_pfr_source(source: pd.DataFrame, base: pd.DataFrame | None = None, join_candidates: List[str] | None = None, source_name: str | None = None) -> pd.DataFrame:
-    """Apply the explicit PFR name map and optionally log unmatched names."""
+def apply_name_map(source: pd.DataFrame) -> pd.DataFrame:
+    """Apply the explicit player name alias map to a source dataframe."""
     if "base_player_display_name" in source.columns:
-        source["base_player_display_name"] = source["base_player_display_name"].replace(PFR_NAME_MAP)
-        if base is not None and join_candidates and source_name:
-            join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
-            if join_keys:
-                source_deduped = source.drop_duplicates(subset=join_keys)
-                base_index = base.drop_duplicates(subset=join_keys).set_index(join_keys).index
-                source_index = source_deduped.set_index(join_keys).index
-                unmatched_names = sorted(set(source_deduped.loc[~source_index.isin(base_index), "base_player_display_name"].dropna().astype(str)))
-                if unmatched_names:
-                    logger.warning("%s unmatched player names (%s): %s", source_name, len(unmatched_names), ", ".join(unmatched_names))
+        source["base_player_display_name"] = source["base_player_display_name"].replace(PLAYER_NAME_MAP)
     return source
 
-def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
+def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str], source_name: str | None = None) -> pd.DataFrame:
     """Left-join source onto base and use merge order to fill overlapping stats."""
     join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
     if not join_keys:
         return base
+
     base_indexed = base.set_index(join_keys)
-    source_indexed = source.drop_duplicates(subset=join_keys).set_index(join_keys)
+    source_deduped = source.drop_duplicates(subset=join_keys)
+    source_indexed = source_deduped.set_index(join_keys)
+
+    if source_name and "base_player_display_name" in base.columns and "base_player_display_name" in source.columns:
+        unmatched = source_deduped.loc[~source_indexed.index.isin(base_indexed.index)]
+        if "base_pos" in unmatched.columns:
+            unmatched = unmatched.loc[unmatched["base_pos"].isin(constants.POSITIONS)]
+        base_names = set(base["base_player_display_name"].dropna().astype(str))
+        missing_names = sorted(set(unmatched["base_player_display_name"].dropna().astype(str)) - base_names)
+        if missing_names:
+            logger.warning("%s missing player names (%s): %s", source_name, len(missing_names), ", ".join(missing_names))
+
     source_aligned = source_indexed.reindex(base_indexed.index)
     combined = base_indexed.combine_first(source_aligned).copy()
     return combined.reset_index()

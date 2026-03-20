@@ -18,6 +18,7 @@ STATS = {
     "ALL_PLAYERS": "all_players",
     "SEASONAL": "seasonal",
     "WEEKLY_PLAYER_STATS": "weekly_player_stats",
+    "META" : "meta",
 }
 
 # Important fantasy skill positions
