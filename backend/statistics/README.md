@@ -8,6 +8,8 @@ Generates the statistics cache used by the backend: `all_players`, `seasonal_pla
 
 ## Known Issues
 
+- Data serialization takes too long and doesn't work with NAN or INF.
+
 ### Merge Conflicts
 
 - Weeks in which players are inactive do not create a record.
