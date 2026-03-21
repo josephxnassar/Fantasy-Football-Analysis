@@ -107,7 +107,7 @@ class Statistics(base_source.BaseSource):
             "rush_att", "rush_yds", "rush_tds", "rush_epa",
             "rec_recs", "rec_tgts", "rec_yds", "rec_tds", "rec_epa",
         ]
-        seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, summed_metrics, averaged_metrics)
+        seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, ["base_season", "base_pos", "base_player_display_name", "base_player_id"], summed_metrics, averaged_metrics)
         weekly_df = stats_helpers.add_group_ranks(weekly_df, ["base_season", "base_pos", "base_week"], rank_metrics)
         seasonal_df = stats_helpers.add_group_ranks(seasonal_df, ["base_season", "base_pos"], rank_metrics)
         return weekly_df, seasonal_df

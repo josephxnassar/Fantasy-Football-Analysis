@@ -64,8 +64,6 @@ def apply_name_map(source: pd.DataFrame) -> pd.DataFrame:
 def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
     """Left-join source onto base and use merge order to fill overlapping stats."""
     join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
-    if not join_keys:
-        return base
 
     base_indexed = base.set_index(join_keys)
     source_deduped = source.drop_duplicates(subset=join_keys)
@@ -75,31 +73,18 @@ def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List
     combined = base_indexed.combine_first(source_aligned).copy()
     return combined.reset_index()
 
-def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, summed_metrics: list[str], averaged_metrics: list[str]) -> pd.DataFrame:
+def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, group_keys: list[str], summed_metrics: list[str], averaged_metrics: list[str]) -> pd.DataFrame:
     """Merge weekly-derived season aggregates into seasonal rows, filling only missing values."""
-    if seasonal_df.empty or weekly_df.empty:
-        return seasonal_df
+    summed = _aggregate_weekly_metrics(weekly_df, group_keys, summed_metrics, "sum")
+    averaged = _aggregate_weekly_metrics(weekly_df, group_keys, averaged_metrics, "mean")
+    aggregate = summed.merge(averaged, on=group_keys, how="outer")
 
-    group_keys = [key for key in ["base_season", "base_pos", "base_player_display_name", "base_player_id"] if key in seasonal_df.columns and key in weekly_df.columns]
-    if not group_keys:
-        return seasonal_df
-
-    aggregate_frames = [frame for frame in [_aggregate_weekly_metrics(weekly_df, group_keys, summed_metrics, "sum"),
-                                            _aggregate_weekly_metrics(weekly_df, group_keys, averaged_metrics, "mean")] if frame is not None]
-    if not aggregate_frames:
-        return seasonal_df
-    aggregates = aggregate_frames[0]
-    for frame in aggregate_frames[1:]:
-        aggregates = aggregates.merge(frame, on=group_keys, how="outer")
-
-    metric_cols = [col for col in aggregates.columns if col not in group_keys]
-    return _merge_aggregates_and_fill_missing(seasonal_df, aggregates, group_keys, metric_cols)
+    metric_cols = [col for col in aggregate.columns if col not in group_keys]
+    return _merge_aggregates_with_seasonal(seasonal_df, aggregate, group_keys, metric_cols)
 
 def _aggregate_weekly_metrics(weekly_df: pd.DataFrame, group_keys: list[str], metrics: list[str], reducer: str) -> pd.DataFrame | None:
     """Reduce available weekly metrics by player-season using the requested reducer."""
     available_metrics = [metric for metric in metrics if metric in weekly_df.columns]
-    if not group_keys or not available_metrics:
-        return None
 
     grouped_input = weekly_df[group_keys + available_metrics].copy()
     grouped_input[available_metrics] = grouped_input[available_metrics].apply(pd.to_numeric, errors="coerce")
@@ -108,11 +93,8 @@ def _aggregate_weekly_metrics(weekly_df: pd.DataFrame, group_keys: list[str], me
     reduced = grouped.sum(min_count=1) if reducer == "sum" else grouped.mean()
     return reduced.reset_index()
 
-def _merge_aggregates_and_fill_missing(seasonal_df: pd.DataFrame, aggregates_df: pd.DataFrame, group_keys: list[str], metric_cols: list[str]) -> pd.DataFrame:
+def _merge_aggregates_with_seasonal(seasonal_df: pd.DataFrame, aggregates_df: pd.DataFrame, group_keys: list[str], metric_cols: list[str]) -> pd.DataFrame:
     """Merge aggregate metrics and backfill only missing seasonal values."""
-    if not metric_cols:
-        return seasonal_df
-
     seasonal_indexed = seasonal_df.set_index(group_keys)
     aggregates_indexed = aggregates_df[group_keys + metric_cols].set_index(group_keys)
     aggregates_aligned = aggregates_indexed.reindex(seasonal_indexed.index)
@@ -121,11 +103,7 @@ def _merge_aggregates_and_fill_missing(seasonal_df: pd.DataFrame, aggregates_df:
 def add_group_ranks(df: pd.DataFrame, group_cols: List[str], rank_metrics: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""
     ranked = df.copy()
-
     groups = [ranked[col] for col in group_cols if col in ranked.columns]
-    if not groups:
-        return ranked
-
     for metric in rank_metrics:
         if metric not in ranked.columns:
             continue
