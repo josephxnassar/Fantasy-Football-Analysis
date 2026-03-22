@@ -2,7 +2,6 @@
 
 from typing import Any, Callable
 
-
 class CacheDao:
     """Raw SQL access for cache tables."""
 

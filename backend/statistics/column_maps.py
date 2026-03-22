@@ -1,5 +1,3 @@
-"""Expanded raw-to-normalized column maps for the statistics rework."""
-
 ROSTER_COLUMN_MAP = {
     'birth_date': 'base_birth_date',
     'college': 'base_college',

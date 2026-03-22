@@ -2,7 +2,6 @@
 
 from backend.db.dao import CacheDao
 
-
 class CacheService:
     """Thin service layer over cache DAO operations."""
 
