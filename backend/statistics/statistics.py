@@ -42,37 +42,35 @@ class Statistics(base_source.BaseSource):
     def _merge_weekly_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Merge weekly source tables into base weekly dataframe."""
         weekly_df = sources["player_weekly"]
-        weekly_join_specs: List[Tuple[str, List[str]]] = [
-            ("snap_counts", ["base_season", "base_week", "base_player_display_name", "base_team"]),
-            ("ff_opp_weekly", ["base_season", "base_week", "base_player_id"]),
-            ("nextgen_pass_weekly", ["base_season", "base_week", "base_player_id"]),
-            ("nextgen_rec_weekly", ["base_season", "base_week", "base_player_id"]),
-            ("nextgen_rush_weekly", ["base_season", "base_week", "base_player_id"]),
-            ("pfr_pass_weekly", ["base_season", "base_week", "base_player_display_name", "base_team"]),
-            ("pfr_rush_weekly", ["base_season", "base_week", "base_player_display_name", "base_team"]),
-            ("pfr_rec_weekly", ["base_season", "base_week", "base_player_display_name", "base_team"]),
+        weekly_join_keys = ["base_season", "base_week", "base_player_id"]
+        weekly_sources = [
+            "snap_counts",
+            "ff_opp_weekly",
+            "nextgen_pass_weekly",
+            "nextgen_rec_weekly",
+            "nextgen_rush_weekly",
+            "pfr_pass_weekly",
+            "pfr_rush_weekly",
+            "pfr_rec_weekly",
         ]
-        for source_key, join_keys in weekly_join_specs:
+        for source_key in weekly_sources:
             source_df = stats_helpers.apply_name_map(sources[source_key])
-            weekly_df = stats_helpers.merge_source(weekly_df, source_df, join_keys)
+            weekly_df = stats_helpers.left_merge_fill(weekly_df, source_df, weekly_join_keys)
         return weekly_df
 
     @timed("Statistics._merge_seasonal_statistics_data")
     def _merge_seasonal_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Merge seasonal source tables into base seasonal dataframe."""
         seasonal_df = sources["player_seasonal"]
-        seasonal_join_specs: List[Tuple[str, List[str]]] = [
-            ("pfr_pass_season", ["base_season", "base_player_display_name", "base_team"]),
-            ("pfr_rush_season", ["base_season", "base_player_display_name"]),
-            ("pfr_rec_season", ["base_season", "base_player_display_name"]),
+        seasonal_join_keys = ["base_season", "base_player_id"]
+        seasonal_sources = [
+            "pfr_pass_season",
+            "pfr_rush_season",
+            "pfr_rec_season",
         ]
-
-        for source_key, join_keys in seasonal_join_specs:
-            aligned = stats_helpers.apply_name_map(sources[source_key])
-            # Only seasonal PFR rush/rec need this: weekly rows stay team-specific, but seasonal rows can be 2TM/3TM for traded players.
-            if "base_team" in aligned.columns and "base_team" not in join_keys:
-                aligned = aligned.drop(columns=["base_team"])
-            seasonal_df = stats_helpers.merge_source(seasonal_df, aligned, join_keys)
+        for source_key in seasonal_sources:
+            source_df = stats_helpers.apply_name_map(sources[source_key])
+            seasonal_df = stats_helpers.left_merge_fill(seasonal_df, source_df, seasonal_join_keys)
 
         return seasonal_df
 
@@ -107,7 +105,7 @@ class Statistics(base_source.BaseSource):
             "rush_att", "rush_yds", "rush_tds", "rush_epa",
             "rec_recs", "rec_tgts", "rec_yds", "rec_tds", "rec_epa",
         ]
-        seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, ["base_season", "base_pos", "base_player_display_name", "base_player_id"], summed_metrics, averaged_metrics)
+        seasonal_df = stats_helpers.merge_weekly_aggregates_into_seasonal(seasonal_df, weekly_df, ["base_season", "base_player_id"], summed_metrics, averaged_metrics)
         weekly_df = stats_helpers.add_group_ranks(weekly_df, ["base_season", "base_pos", "base_week"], rank_metrics)
         seasonal_df = stats_helpers.add_group_ranks(seasonal_df, ["base_season", "base_pos"], rank_metrics)
         return weekly_df, seasonal_df

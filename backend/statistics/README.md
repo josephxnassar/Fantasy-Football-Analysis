@@ -19,3 +19,18 @@ Generates the statistics cache used by the backend: `all_players`, `seasonal_pla
     - Renamed players
     - Players not in our alias map
     - PFR/snap imports that do not expose a player id (for example, players with the same name and position)
+
+- Current dropped source-key counts:
+```text
+snap_counts: 7,810
+ff_opp_weekly: 2,544
+nextgen_pass_weekly: 327
+nextgen_rec_weekly: 998
+nextgen_rush_weekly: 403
+pfr_pass_weekly: 312
+pfr_rush_weekly: 1,151
+pfr_rec_weekly: 2,138
+pfr_pass_season: 62
+pfr_rush_season: 24
+pfr_rec_season: 33
+```

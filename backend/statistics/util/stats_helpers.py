@@ -39,6 +39,12 @@ def team_normalization(source: pd.DataFrame) -> pd.DataFrame:
         source["base_opp_team"] = source["base_opp_team"].replace(constants.TEAM_ABBR_NORMALIZATION)
     return source
 
+def apply_pfr_playerid_map(source: pd.DataFrame, ff_playerid_map: Mapping[str, str] | None = None) -> pd.DataFrame:
+    """Attach player ids to PFR sources when a PFR->GSIS map is available."""
+    if ff_playerid_map and "base_pfr_id" in source.columns:
+        source["base_player_id"] = source["base_pfr_id"].map(ff_playerid_map)
+    return source
+
 def filter_regular_season(source: pd.DataFrame) -> pd.DataFrame:
     """Filter to regular-season rows when a season-type field is available."""
     if "base_season_type" not in source.columns:
@@ -51,26 +57,24 @@ def filter_positions(source: pd.DataFrame) -> pd.DataFrame:
         return source
     return source.loc[source["base_pos"].isin(constants.POSITIONS)]
 
-def filter_regular_and_position(source: pd.DataFrame) -> pd.DataFrame:
-    """Filter to regular season and fantasy positions when available."""
-    return filter_positions(filter_regular_season(source))
-
 def apply_name_map(source: pd.DataFrame) -> pd.DataFrame:
     """Apply the explicit player name alias map to a source dataframe."""
     if "base_player_display_name" in source.columns:
         source["base_player_display_name"] = source["base_player_display_name"].replace(PLAYER_NAME_MAP)
     return source
 
-def merge_source(base: pd.DataFrame, source: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
-    """Left-join source onto base and use merge order to fill overlapping stats."""
-    join_keys = [key for key in join_candidates if key in base.columns and key in source.columns]
+def left_merge_fill(base: pd.DataFrame, df: pd.DataFrame, join_candidates: List[str]) -> pd.DataFrame:
+    """Left-join df onto base and fill overlapping columns from right to left."""
+    join_keys = [key for key in join_candidates if key in base.columns and key in df.columns]
+
+    # Guard for when merge_weekly calls because it has no team col
+    if "base_team" in df.columns and "base_team" not in join_keys:
+        df = df.sort_values(join_keys + ["base_team"], na_position="last")
 
     base_indexed = base.set_index(join_keys)
-    source_deduped = source.drop_duplicates(subset=join_keys)
-    source_indexed = source_deduped.set_index(join_keys)
-
-    source_aligned = source_indexed.reindex(base_indexed.index)
-    combined = base_indexed.combine_first(source_aligned).copy()
+    df_indexed = df.drop_duplicates(subset=join_keys).set_index(join_keys)
+    df_aligned = df_indexed.reindex(base_indexed.index)
+    combined = base_indexed.combine_first(df_aligned).copy()
     return combined.reset_index()
 
 def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: pd.DataFrame, group_keys: list[str], summed_metrics: list[str], averaged_metrics: list[str]) -> pd.DataFrame:
@@ -78,27 +82,16 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
     summed = _aggregate_weekly_metrics(weekly_df, group_keys, summed_metrics, "sum")
     averaged = _aggregate_weekly_metrics(weekly_df, group_keys, averaged_metrics, "mean")
     aggregate = summed.merge(averaged, on=group_keys, how="outer")
-
-    metric_cols = [col for col in aggregate.columns if col not in group_keys]
-    return _merge_aggregates_with_seasonal(seasonal_df, aggregate, group_keys, metric_cols)
+    return left_merge_fill(seasonal_df, aggregate, group_keys)
 
 def _aggregate_weekly_metrics(weekly_df: pd.DataFrame, group_keys: list[str], metrics: list[str], reducer: str) -> pd.DataFrame | None:
     """Reduce available weekly metrics by player-season using the requested reducer."""
     available_metrics = [metric for metric in metrics if metric in weekly_df.columns]
-
     grouped_input = weekly_df[group_keys + available_metrics].copy()
     grouped_input[available_metrics] = grouped_input[available_metrics].apply(pd.to_numeric, errors="coerce")
     grouped = grouped_input.groupby(group_keys, dropna=False, sort=False)[available_metrics]
-
     reduced = grouped.sum(min_count=1) if reducer == "sum" else grouped.mean()
     return reduced.reset_index()
-
-def _merge_aggregates_with_seasonal(seasonal_df: pd.DataFrame, aggregates_df: pd.DataFrame, group_keys: list[str], metric_cols: list[str]) -> pd.DataFrame:
-    """Merge aggregate metrics and backfill only missing seasonal values."""
-    seasonal_indexed = seasonal_df.set_index(group_keys)
-    aggregates_indexed = aggregates_df[group_keys + metric_cols].set_index(group_keys)
-    aggregates_aligned = aggregates_indexed.reindex(seasonal_indexed.index)
-    return seasonal_indexed.combine_first(aggregates_aligned).reset_index().copy()
 
 def add_group_ranks(df: pd.DataFrame, group_cols: List[str], rank_metrics: List[str]) -> pd.DataFrame:
     """Add positional rank columns for metrics within contextual groups (1 = best)."""
