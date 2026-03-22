@@ -10,7 +10,6 @@ from backend.util import constants
 
 logger = logging.getLogger(__name__)
 
-
 def pfr_seasons(seasons: List[int], min_year: int = 2018) -> List[int]:
     """Filter self.seasons to those >= min_year (PFR/snap data availability guard)."""
     return [s for s in seasons if s >= min_year]

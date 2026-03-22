@@ -12,7 +12,6 @@ from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
 
-
 class NRPDepthChart(BaseSource):
     """Build team depth charts from nflreadpy depth chart data."""
 
@@ -54,15 +53,15 @@ class NRPDepthChart(BaseSource):
             deduped = team_rows.drop_duplicates(subset=["pos_abb", "pos_slot", "pos_rank", "player_name"])
             grouped = {(position, int(position_slot)): group for (position, position_slot), group in deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)}
 
-            flat_rows: List[Dict[str, object]] = []
+            rows: List[Dict[str, object]] = []
             for position in constants.POSITIONS:
                 slot_numbers = sorted(slot for pos, slot in grouped if pos == position)
                 for slot in slot_numbers:
                     players = grouped[(position, slot)]["player_name"].drop_duplicates().tolist()[:4]
                     players += [None] * (4 - len(players))
-                    flat_rows.append({"team": team, "position": position, "position_slot": slot, "starter": players[0], "2nd": players[1], "3rd": players[2], "4th": players[3]})
+                    rows.append({"team": team, "position": position, "position_slot": slot, "starter": players[0], "2nd": players[1], "3rd": players[2], "4th": players[3]})
 
-            return flat_rows
+            return rows
         except Exception as e:
             logger.error("Failed to create NRP depth chart dataframe: %s", e)
             raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
@@ -73,12 +72,13 @@ class NRPDepthChart(BaseSource):
         latest_rows = self._latest_team_rows(depth_rows)
         rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
 
-        flat_depth_charts: List[Dict[str, object]] = []
+        depth_charts: List[Dict[str, object]] = []
         for team in constants.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
                 logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)
                 continue
-            flat_depth_charts.extend(self._build_team_rows(team, team_rows))
+            rows = self._build_team_rows(team, team_rows)
+            depth_charts.extend(rows)
 
-        self.set_cache(flat_depth_charts)
+        self.set_cache(depth_charts)

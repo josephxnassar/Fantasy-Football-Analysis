@@ -10,7 +10,6 @@ from backend.util import constants
 
 logger = logging.getLogger(__name__)
 
-
 class App:
     """Orchestrates data fetching, caching, and loading for all sources"""
     

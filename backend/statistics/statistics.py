@@ -15,7 +15,6 @@ from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
-
 class Statistics(base_source.BaseSource):
     """Processes player statistics and builds stat caches."""
 

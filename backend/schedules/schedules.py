@@ -11,7 +11,6 @@ from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
 
-
 class Schedules(BaseSource):
     """Build flat team schedules with bye weeks."""
 
@@ -65,7 +64,7 @@ class Schedules(BaseSource):
         schedule = self._load_schedules()
         combined_schedule = self._create_combined_schedule(schedule)
 
-        flat_schedules: list[dict[str, object]] = []
+        schedules: list[dict[str, object]] = []
         for season, season_group in combined_schedule.groupby("season", sort=False):
             total_weeks = int(self.weeks_by_season.get(season, 18))
             for team, team_group in season_group.groupby("team", sort=False):
@@ -74,8 +73,8 @@ class Schedules(BaseSource):
                     team_rows = team_schedule.reset_index()
                     team_rows["season"] = int(season)
                     team_rows["team"] = str(team)
-                    flat_schedules.extend(team_rows[["season", "team", "week", "opponent", "home_away", "team_score", "opponent_score"]].to_dict("records"))
+                    schedules.extend(team_rows[["season", "team", "week", "opponent", "home_away", "team_score", "opponent_score"]].to_dict("records"))
                 except Exception as e:
                     logger.warning("Skipping team '%s' season '%s': %s", team, season, e)
 
-        self.set_cache(flat_schedules)
+        self.set_cache(schedules)

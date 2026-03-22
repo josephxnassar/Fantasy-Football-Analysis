@@ -14,7 +14,6 @@ from backend.util.timing import timed
 
 logger = logging.getLogger(__name__)
 
-
 class StatisticsSourceLoader:
     """Loads and normalizes raw source tables for the statistics pipeline."""
 
