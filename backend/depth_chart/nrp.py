@@ -1,4 +1,4 @@
-"""NRP depth chart loading and processing via nflreadpy."""
+"""Flat NRP depth chart cache draft."""
 
 import logging
 from typing import Dict, List
@@ -38,7 +38,6 @@ class NRPDepthChart(BaseSource):
         try:
             depth = raw.copy()
             depth = depth.dropna(subset=["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"])
-            depth = depth.dropna(subset=["dt", "pos_rank", "pos_slot"])
             depth["player_name"] = depth["player_name"].astype(str).str.strip()
             depth = depth.loc[depth["player_name"] != ""]
             depth = depth.loc[depth["dt"].eq(depth.groupby("team")["dt"].transform("max"))]
@@ -49,36 +48,37 @@ class NRPDepthChart(BaseSource):
             logger.error("Failed to normalize nflreadpy depth chart rows: %s", e)
             raise DataProcessingError(f"Failed to normalize nflreadpy depth chart rows: {e}", source="NRPDepthChart") from e
 
-    def _create_depth_chart(self, team_rows: pd.DataFrame) -> pd.DataFrame:
-        """Create ESPN-style depth chart dataframe for one team."""
+    def _build_team_rows(self, team: str, team_rows: pd.DataFrame) -> List[Dict[str, object]]:
+        """Build one flat row per position slot for one team."""
         try:
             deduped = team_rows.drop_duplicates(subset=["pos_abb", "pos_slot", "pos_rank", "player_name"])
-            grouped = deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)
-            position_map: Dict[str, Dict[str, str | None]] = {}
-            for (position, _), group in grouped:
-                depth_players = group["player_name"].drop_duplicates().tolist()[:4]
-                depth_players += [None] * (4 - len(depth_players))
-                position_map[position] = {"starter": depth_players[0],
-                                          "2nd": depth_players[1],
-                                          "3rd": depth_players[2],
-                                          "4th": depth_players[3]}
-            if not position_map:
-                return pd.DataFrame(columns=["starter", "2nd", "3rd", "4th"]).rename_axis("position")
-            return pd.DataFrame.from_dict(position_map, orient="index").rename_axis("position")
+            grouped = {(position, int(position_slot)): group for (position, position_slot), group in deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)}
+
+            flat_rows: List[Dict[str, object]] = []
+            for position in constants.POSITIONS:
+                slot_numbers = sorted(slot for pos, slot in grouped if pos == position)
+                for slot in slot_numbers:
+                    players = grouped[(position, slot)]["player_name"].drop_duplicates().tolist()[:4]
+                    players += [None] * (4 - len(players))
+                    flat_rows.append({"team": team, "position": position, "position_slot": slot, "starter": players[0], "2nd": players[1], "3rd": players[2], "4th": players[3]})
+
+            return flat_rows
         except Exception as e:
             logger.error("Failed to create NRP depth chart dataframe: %s", e)
             raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
 
     def run(self) -> None:
-        """Build depth-chart cache keyed by team abbreviation."""
+        """Build a flat depth-chart cache across all teams."""
         depth_rows = self._load_depth_charts()
         latest_rows = self._latest_team_rows(depth_rows)
         rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
-        team_depth_charts: Dict[str, pd.DataFrame] = {}
+
+        flat_depth_charts: List[Dict[str, object]] = []
         for team in constants.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
                 logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)
                 continue
-            team_depth_charts[team] = self._create_depth_chart(team_rows).rename_axis(team)
-        self.set_cache(team_depth_charts)
+            flat_depth_charts.extend(self._build_team_rows(team, team_rows))
+
+        self.set_cache(flat_depth_charts)
