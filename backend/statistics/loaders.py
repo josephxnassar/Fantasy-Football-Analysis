@@ -28,7 +28,7 @@ class StatisticsSourceLoader:
             source = source.sort_values("db_season").dropna(subset=["pfr_id", "base_player_id"]).drop_duplicates(subset=["pfr_id"], keep="last")
             return source.set_index("pfr_id")["base_player_id"].to_dict()
         except Exception as e:
-            logger.error("Failed to load ff_playerids map: %s", e)
+            logger.error(f"Failed to load ff_playerids map: {e}")
             raise DataLoadError(f"Failed to load ff_playerids map: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_rosters")
@@ -41,7 +41,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load rosters: %s", e)
+            logger.error(f"Failed to load rosters: {e}")
             raise DataLoadError(f"Failed to load rosters: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_player_weekly_stats")
@@ -55,7 +55,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load player weekly stats: %s", e)
+            logger.error(f"Failed to load player weekly stats: {e}")
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_player_seasonal_stats")
@@ -69,7 +69,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load player seasonal stats: %s", e)
+            logger.error(f"Failed to load player seasonal stats: {e}")
             raise DataLoadError(f"Failed to load player stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_ff_opportunity_weekly")
@@ -86,7 +86,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load weekly fantasy opportunity stats: %s", e)
+            logger.error(f"Failed to load weekly fantasy opportunity stats: {e}")
             raise DataLoadError(f"Failed to load weekly fantasy opportunity stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_nextgen_passing_stats")
@@ -100,7 +100,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load Next Gen passing stats: %s", e)
+            logger.error(f"Failed to load Next Gen passing stats: {e}")
             raise DataLoadError(f"Failed to load Next Gen passing stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_nextgen_receiving_stats")
@@ -114,7 +114,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load Next Gen receiving stats: %s", e)
+            logger.error(f"Failed to load Next Gen receiving stats: {e}")
             raise DataLoadError(f"Failed to load Next Gen receiving stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_nextgen_rushing_stats")
@@ -128,7 +128,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load Next Gen rushing stats: %s", e)
+            logger.error(f"Failed to load Next Gen rushing stats: {e}")
             raise DataLoadError(f"Failed to load Next Gen rushing stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_pass_weekly")
@@ -141,7 +141,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.apply_pfr_playerid_map(source, ff_playerid_map)
             return source
         except Exception as e:
-            logger.error("Failed to load weekly PFR advanced pass stats: %s", e)
+            logger.error(f"Failed to load weekly PFR advanced pass stats: {e}")
             raise DataLoadError(f"Failed to load weekly PFR advanced pass stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_rush_weekly")
@@ -154,7 +154,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.apply_pfr_playerid_map(source, ff_playerid_map)
             return source
         except Exception as e:
-            logger.error("Failed to load weekly PFR advanced rush stats: %s", e)
+            logger.error(f"Failed to load weekly PFR advanced rush stats: {e}")
             raise DataLoadError(f"Failed to load weekly PFR advanced rush stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_rec_weekly")
@@ -167,7 +167,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.apply_pfr_playerid_map(source, ff_playerid_map)
             return source
         except Exception as e:
-            logger.error("Failed to load weekly PFR advanced receiving stats: %s", e)
+            logger.error(f"Failed to load weekly PFR advanced receiving stats: {e}")
             raise DataLoadError(f"Failed to load weekly PFR advanced receiving stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_pass_season")
@@ -180,7 +180,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.apply_pfr_playerid_map(source, ff_playerid_map)
             return source
         except Exception as e:
-            logger.error("Failed to load seasonal PFR advanced pass stats: %s", e)
+            logger.error(f"Failed to load seasonal PFR advanced pass stats: {e}")
             raise DataLoadError(f"Failed to load seasonal PFR advanced pass stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_rush_season")
@@ -194,7 +194,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load seasonal PFR advanced rush stats: %s", e)
+            logger.error(f"Failed to load seasonal PFR advanced rush stats: {e}")
             raise DataLoadError(f"Failed to load seasonal PFR advanced rush stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_pfr_adv_rec_season")
@@ -208,7 +208,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source
         except Exception as e:
-            logger.error("Failed to load seasonal PFR advanced receiving stats: %s", e)
+            logger.error(f"Failed to load seasonal PFR advanced receiving stats: {e}")
             raise DataLoadError(f"Failed to load seasonal PFR advanced receiving stats: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_snap_counts")
@@ -223,7 +223,7 @@ class StatisticsSourceLoader:
             source = stats_helpers.filter_positions(source)
             return source.drop_duplicates(subset=['base_season', 'base_week', 'base_player_id'])
         except Exception as e:
-            logger.error("Failed to load snap counts: %s", e)
+            logger.error(f"Failed to load snap counts: {e}")
             raise DataLoadError(f"Failed to load snap counts: {e}", source="Statistics") from e
 
     @timed("StatisticsSourceLoader.load_import_data")

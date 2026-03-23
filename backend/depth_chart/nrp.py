@@ -29,7 +29,7 @@ class NRPDepthChart(BaseSource):
             depth["pos_slot"] = pd.to_numeric(depth["pos_slot"], errors="coerce")
             return depth.loc[depth["team"].isin(constants.TEAM_METADATA) & depth["pos_abb"].isin(constants.POSITIONS)]
         except Exception as e:
-            logger.error("Failed to load depth charts from nflreadpy: %s", e)
+            logger.error(f"Failed to load depth charts from nflreadpy: {e}")
             raise DataLoadError(f"Failed to load depth charts from nflreadpy: {e}", source="NRPDepthChart") from e
 
     def _latest_team_rows(self, raw: pd.DataFrame) -> pd.DataFrame:
@@ -44,7 +44,7 @@ class NRPDepthChart(BaseSource):
             depth["pos_slot"] = depth["pos_slot"].astype(int)
             return depth
         except Exception as e:
-            logger.error("Failed to normalize nflreadpy depth chart rows: %s", e)
+            logger.error(f"Failed to normalize nflreadpy depth chart rows: {e}")
             raise DataProcessingError(f"Failed to normalize nflreadpy depth chart rows: {e}", source="NRPDepthChart") from e
 
     def _build_team_rows(self, team: str, team_rows: pd.DataFrame) -> List[Dict[str, object]]:
@@ -63,7 +63,7 @@ class NRPDepthChart(BaseSource):
 
             return rows
         except Exception as e:
-            logger.error("Failed to create NRP depth chart dataframe: %s", e)
+            logger.error(f"Failed to create NRP depth chart dataframe: {e}")
             raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
 
     def run(self) -> None:
@@ -76,7 +76,7 @@ class NRPDepthChart(BaseSource):
         for team in constants.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
-                logger.warning("No NRP depth chart rows found for team '%s' in season(s) %s.", team, self.seasons)
+                logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
                 continue
             rows = self._build_team_rows(team, team_rows)
             depth_charts.extend(rows)

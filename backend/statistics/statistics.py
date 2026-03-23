@@ -144,7 +144,7 @@ class Statistics(base_source.BaseSource):
         
         seasonal_meta = {"seasonal_record_count": len(seasonal_df)}
         
-        logger.info("Seasonal-Records: %s", seasonal_meta["seasonal_record_count"])
+        logger.info(f"Seasonal-Records: {seasonal_meta['seasonal_record_count']}")
         return seasonal_stats, seasonal_meta
 
     @timed("Statistics._build_weekly_player_stats")
@@ -154,7 +154,7 @@ class Statistics(base_source.BaseSource):
 
         weekly_meta = {"weekly_record_count": len(weekly_df)}
 
-        logger.info("Weekly-Records: %s", weekly_meta["weekly_record_count"])
+        logger.info(f"Weekly-Records: {weekly_meta['weekly_record_count']}")
         return weekly_stats, weekly_meta
 
     @timed("Statistics._build_all_players")
@@ -180,7 +180,12 @@ class Statistics(base_source.BaseSource):
                        "player_teams_count": len(player_teams),
                        "rookie_player_count": len(rookie_players)}
 
-        logger.info("All-Players: %s | Player-Positions: %s | Player-Ages: %s | Eligible-Players: %s | Headshot-Players: %s | Player-Teams: %s | Rookie-Players: %s", len(all_players), roster_meta["player_positions_count"], roster_meta["player_ages_count"], roster_meta["eligible_player_count"], roster_meta["headshot_player_count"], roster_meta["player_teams_count"], roster_meta["rookie_player_count"])
+        logger.info(
+            f"All-Players: {len(all_players)} | Player-Positions: {roster_meta['player_positions_count']} | "
+            f"Player-Ages: {roster_meta['player_ages_count']} | Eligible-Players: {roster_meta['eligible_player_count']} | "
+            f"Headshot-Players: {roster_meta['headshot_player_count']} | Player-Teams: {roster_meta['player_teams_count']} | "
+            f"Rookie-Players: {roster_meta['rookie_player_count']}"
+        )
         return all_players, roster_meta
 
     @timed("Statistics.run")

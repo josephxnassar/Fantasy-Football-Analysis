@@ -26,7 +26,7 @@ class Schedules(BaseSource):
             self.weeks_by_season = schedule.groupby("season")["week"].nunique().to_dict()
             return schedule
         except Exception as e:
-            logger.error("Failed to load schedules: %s", e)
+            logger.error(f"Failed to load schedules: {e}")
             raise DataLoadError(f"Failed to load schedules: {e}", source="Schedules") from e
 
     def _create_combined_schedule(self, schedule: pd.DataFrame) -> pd.DataFrame:
@@ -45,7 +45,7 @@ class Schedules(BaseSource):
             combined = pd.concat([home_games, away_games], ignore_index=True)
             return combined[["season", "week", "team", "opponent", "home_away", "team_score", "opponent_score"]]
         except Exception as e:
-            logger.error("Failed to create combined schedule: %s", e)
+            logger.error(f"Failed to create combined schedule: {e}")
             raise DataProcessingError(f"Failed to create combined schedule: {e}", source="Schedules") from e
 
     def _fill_bye_weeks(self, schedule: pd.DataFrame, total_weeks: int) -> pd.DataFrame:
@@ -56,7 +56,7 @@ class Schedules(BaseSource):
             filled.loc[filled["opponent"] == "BYE", "home_away"] = None
             return filled
         except Exception as e:
-            logger.error("Failed to fill bye weeks: %s", e)
+            logger.error(f"Failed to fill bye weeks: {e}")
             raise DataProcessingError(f"Failed to fill bye weeks: {e}", source="Schedules") from e
 
     def run(self) -> None:
@@ -75,6 +75,6 @@ class Schedules(BaseSource):
                     team_rows["team"] = str(team)
                     schedules.extend(team_rows[["season", "team", "week", "opponent", "home_away", "team_score", "opponent_score"]].to_dict("records"))
                 except Exception as e:
-                    logger.warning("Skipping team '%s' season '%s': %s", team, season, e)
+                    logger.warning(f"Skipping team '{team}' season '{season}': {e}")
 
         self.set_cache(schedules)

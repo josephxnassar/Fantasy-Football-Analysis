@@ -1,33 +1,31 @@
 """Raw database access helpers."""
 
-from typing import Any, Callable
+from psycopg import sql
+
+from backend.db.connection import get_connection
+
+DATA_TYPE_MAP = {
+    int: "INTEGER",
+    float: "DOUBLE PRECISION",
+    str: "TEXT",
+    bool: "BOOLEAN",
+}
 
 class CacheDao:
     """Raw SQL access for cache tables."""
 
-    def __init__(self, connection_factory: Callable[[], Any]) -> None:
-        self.connection_factory = connection_factory
+    def __init__(self) -> None:
+        """Opens DB connection."""
+        self.connection = get_connection()
 
-    def create_table(self, table_name: str, columns_sql: list[str], primary_key_sql: str | None = None, indexes_sql: list[str] | None = None) -> None:
-        """Create one cache table."""
-        raise NotImplementedError
+    def create_table(self, name: str, columns: list[str], column_types: list[type], primary_key: list[str]) -> None:
+        """Creates table in DB with given parameters."""
+        pass
 
-    def replace_table(self, table_name: str, rows: list[dict[str, object]], columns: list[str]) -> None:
-        """Replace cache rows in one table."""
-        raise NotImplementedError
+    def get_data_types(self, columns: list[str], column_types: list[type]) -> list[sql.Composable]:
+        """Converts datatypes into native SQL using the map."""
+        return [sql.SQL("{} {}").format(sql.Identifier(column), sql.SQL(DATA_TYPE_MAP[column_type])) for column, column_type in zip(columns, column_types)]
 
-    def load_table(self, table_name: str, filters: dict[str, object] | None = None, order_by: list[str] | None = None) -> list[dict[str, object]]:
-        """Load cache rows from one table."""
-        raise NotImplementedError
-
-    def create_meta(self, table_name: str, columns_sql: list[str], primary_key_sql: str | None = None) -> None:
-        """Create the meta table."""
-        raise NotImplementedError
-
-    def replace_meta(self, table_name: str, row: dict[str, object]) -> None:
-        """Replace the meta row."""
-        raise NotImplementedError
-
-    def load_meta(self, table_name: str) -> dict[str, object]:
-        """Load the meta row."""
-        raise NotImplementedError
+    def close(self) -> None:
+        """Closes DB connection."""
+        self.connection.close()
