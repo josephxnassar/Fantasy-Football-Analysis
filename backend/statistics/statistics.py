@@ -9,7 +9,7 @@ import pandas as pd
 from backend import base_source
 from backend.statistics.loaders import StatisticsSourceLoader
 from backend.statistics.util import stats_helpers
-from backend.util import constants
+from backend.util import cache_keys
 from backend.util.exceptions import DataProcessingError
 from backend.util.timing import timed
 
@@ -22,6 +22,8 @@ class Statistics(base_source.BaseSource):
         """Initialize with seasons"""
         super().__init__(seasons)
         self._source_loader = StatisticsSourceLoader(self.seasons)
+        self.current_season = max(self.seasons)
+        self.primary_keys = {cache_keys.STATS["ALL"]: ["name", "player_id"], cache_keys.STATS["META"]: ["key"]}
 
     @timed("Statistics._merge_statistics_data")
     def _merge_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -42,6 +44,7 @@ class Statistics(base_source.BaseSource):
         """Merge weekly source tables into base weekly dataframe."""
         weekly_df = sources["player_weekly"]
         weekly_join_keys = ["base_season", "base_week", "base_player_id"]
+        self.primary_keys[cache_keys.STATS["WEEKLY"]] = weekly_join_keys
         weekly_sources = [
             "snap_counts",
             "ff_opp_weekly",
@@ -62,6 +65,7 @@ class Statistics(base_source.BaseSource):
         """Merge seasonal source tables into base seasonal dataframe."""
         seasonal_df = sources["player_seasonal"]
         seasonal_join_keys = ["base_season", "base_player_id"]
+        self.primary_keys[cache_keys.STATS["SEASONAL"]] = seasonal_join_keys
         seasonal_sources = [
             "pfr_pass_season",
             "pfr_rush_season",
@@ -160,7 +164,7 @@ class Statistics(base_source.BaseSource):
     @timed("Statistics._build_all_players")
     def _build_all_players(self, rosters: pd.DataFrame, valid_player_keys: set[Tuple[str, str]]) -> Tuple[List[Dict], Dict[str, int]]:
         """Build pre-assembled player list and roster-derived meta for app/API consumption."""
-        player_positions, player_ages, eligible_players, player_headshots, player_teams, rookie_players = stats_helpers.build_all_players_lookups(rosters, constants.CURRENT_SEASON)
+        player_positions, player_ages, eligible_players, player_headshots, player_teams, rookie_players = stats_helpers.build_all_players_lookups(rosters, self.current_season)
 
         all_players = [{
             "name": player_key[0],
@@ -210,7 +214,7 @@ class Statistics(base_source.BaseSource):
             logger.exception("Failed to build statistics payloads")
             raise DataProcessingError(f"Failed to build statistics payloads: {e}", source="Statistics") from e
 
-        self.set_cache({constants.STATS["ALL_PLAYERS"]: all_players,
-                        constants.STATS["SEASONAL_PLAYER_STATS"]: seasonal_player_stats,
-                        constants.STATS["WEEKLY_PLAYER_STATS"]: weekly_player_stats,
-                        constants.STATS["META"]: meta})
+        self.set_cache({cache_keys.STATS["ALL"]: all_players,
+                        cache_keys.STATS["SEASONAL"]: seasonal_player_stats,
+                        cache_keys.STATS["WEEKLY"]: weekly_player_stats,
+                        cache_keys.STATS["META"]: meta})

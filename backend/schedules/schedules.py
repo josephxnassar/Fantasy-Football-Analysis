@@ -17,6 +17,7 @@ class Schedules(BaseSource):
     def __init__(self, seasons: list[int]) -> None:
         super().__init__(seasons)
         self.weeks_by_season: dict[int, int] = {}
+        self.primary_keys = ["season", "team", "week"]
 
     def _load_schedules(self) -> pd.DataFrame:
         """Load regular-season schedules from nflreadpy."""

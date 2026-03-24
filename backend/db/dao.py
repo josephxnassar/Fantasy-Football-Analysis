@@ -1,16 +1,11 @@
 """Raw database access helpers."""
 
+from typing import Any
+
 from psycopg import sql
 from psycopg.rows import dict_row
 
 from backend.db.connection import get_connection
-
-DATA_TYPE_MAP = {
-    int: "INTEGER",
-    float: "DOUBLE PRECISION",
-    str: "TEXT",
-    bool: "BOOLEAN",
-}
 
 class CacheDao:
     """Raw SQL access for cache tables."""
@@ -19,76 +14,57 @@ class CacheDao:
         """Opens DB connection."""
         self.connection = get_connection()
 
-    def create_table(self, name: str, columns: list[str], column_types: list[type], primary_key: list[str]) -> None:
+    def table_exists(self, table_name: str) -> bool:
+        """Return whether one table exists."""
+        select_string = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %s)"
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(select_string, [table_name])
+                return bool(cursor.fetchone()[0])
+        except Exception:
+            self.connection.rollback()
+            raise
+
+    def create_table(self, table_name: str, columns: list[str], data_types: list[str], primary_keys: list[str]) -> None:
         """Create one table."""
-        columns_sql = [sql.SQL("{} {}").format(sql.Identifier(column), sql.SQL(DATA_TYPE_MAP[column_type])) for column, column_type in zip(columns, column_types)]
-        primary_key_sql = [sql.SQL("PRIMARY KEY ({})").format(sql.SQL(", ").join(sql.Identifier(column) for column in primary_key))]
-        create_sql = sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(sql.Identifier(name), sql.SQL(", ").join(columns_sql + primary_key_sql))
+        create_string = sql.SQL("CREATE TABLE IF NOT EXISTS {} ({}, PRIMARY KEY ({}))").format(sql.Identifier(table_name), sql.SQL(", ").join(sql.SQL("{} {}").format(sql.Identifier(column), sql.SQL(data_type)) for column, data_type in zip(columns, data_types)), sql.SQL(", ").join(sql.Identifier(column) for column in primary_keys))
         try:
             with self.connection.cursor() as cursor:
-                cursor.execute(create_sql)
+                cursor.execute(create_string)
             self.connection.commit()
         except Exception:
             self.connection.rollback()
             raise
 
-    def insert_rows(self, name: str, columns: list[str], rows: list[dict]) -> None:
+    def insert_rows(self, table_name: str, columns: list[str], data: list[list[Any]]) -> None:
         """Insert rows into one table."""
-        data = [[row[column] for column in columns] for row in rows]
-        insert_sql = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(sql.Identifier(name), sql.SQL(", ").join(sql.Identifier(column) for column in columns), sql.SQL(", ").join(sql.Placeholder() for _ in columns))
+        insert_string = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(sql.Identifier(table_name), sql.SQL(", ").join(sql.Identifier(column) for column in columns), sql.SQL(", ").join(sql.Placeholder() for _ in columns))
         try:
             with self.connection.cursor() as cursor:
-                cursor.executemany(insert_sql, data)
+                cursor.executemany(insert_string, data)
             self.connection.commit()
         except Exception:
             self.connection.rollback()
             raise
 
-    def replace_rows(self, name: str, columns: list[str], rows: list[dict]) -> None:
-        """Replace all rows in one table."""
-        data = [[row[column] for column in columns] for row in rows]
-        truncate_sql = sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(name))
-        insert_sql = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(sql.Identifier(name), sql.SQL(", ").join(sql.Identifier(column) for column in columns), sql.SQL(", ").join(sql.Placeholder() for _ in columns))
-        try:
-            with self.connection.cursor() as cursor:
-                cursor.execute(truncate_sql)
-                if data:
-                    cursor.executemany(insert_sql, data)
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
-
-    def select_rows(self, name: str) -> list[dict]:
-        """Select all rows from one table."""
-        select_sql = sql.SQL("SELECT * FROM {}").format(sql.Identifier(name))
-        try:
-            with self.connection.cursor(row_factory=dict_row) as cursor:
-                cursor.execute(select_sql)
-                return list(cursor.fetchall())
-        except Exception:
-            self.connection.rollback()
-            raise
-
-    def select_meta(self, name: str) -> dict:
-        """Select one meta row from one table."""
-        select_sql = sql.SQL("SELECT * FROM {} LIMIT 1").format(sql.Identifier(name))
-        try:
-            with self.connection.cursor(row_factory=dict_row) as cursor:
-                cursor.execute(select_sql)
-                row = cursor.fetchone()
-                return row if row else {}
-        except Exception:
-            self.connection.rollback()
-            raise
-
-    def truncate_table(self, name: str) -> None:
+    def truncate_table(self, table_name: str) -> None:
         """Remove all rows from one table."""
-        truncate_sql = sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(name))
+        truncate_string = sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(table_name))
         try:
             with self.connection.cursor() as cursor:
-                cursor.execute(truncate_sql)
+                cursor.execute(truncate_string)
             self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
+
+    def load_table(self, table_name: str) -> list[dict]:
+        """Load one table."""
+        select_string = sql.SQL("SELECT * FROM {}").format(sql.Identifier(table_name))
+        try:
+            with self.connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(select_string)
+                return list(cursor.fetchall())
         except Exception:
             self.connection.rollback()
             raise

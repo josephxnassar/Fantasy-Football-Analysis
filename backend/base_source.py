@@ -12,10 +12,15 @@ class BaseSource(ABC):
     def __init__(self, seasons: list[int]) -> None:
         self.cache: Any = None
         self.seasons = seasons
+        self.primary_keys: Any = None
 
     def get_cache(self) -> Any:
         """Return cached data."""
         return self.cache
+
+    def get_primary_keys(self) -> Any:
+        """Return primary keys for cached data."""
+        return self.primary_keys
 
     def set_cache(self, cache: Any) -> None:
         """Set cached data."""

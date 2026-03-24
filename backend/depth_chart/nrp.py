@@ -15,14 +15,16 @@ logger = logging.getLogger(__name__)
 class NRPDepthChart(BaseSource):
     """Build team depth charts from nflreadpy depth chart data."""
 
-    def __init__(self) -> None:
-        super().__init__([constants.CURRENT_SEASON])
+    def __init__(self, seasons: list[int]) -> None:
+        super().__init__(seasons)
+        self.current_season = max(self.seasons)
+        self.primary_keys = ["team", "position", "position_slot"]
 
     def _load_depth_charts(self) -> pd.DataFrame:
         """Load seasonal depth chart snapshots from nflreadpy."""
         try:
             required_columns = ["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"]
-            depth = nfl.load_depth_charts(seasons=self.seasons).to_pandas().loc[:, required_columns].copy()
+            depth = nfl.load_depth_charts(seasons=self.current_season).to_pandas().loc[:, required_columns].copy()
             depth["team"] = depth["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
             depth["pos_rank"] = pd.to_numeric(depth["pos_rank"], errors="coerce")
