@@ -45,3 +45,7 @@ class App:
         """Save all caches to database."""
         for name, cache in self.caches.items():
             self.db.save_to_db(name, cache, self.primary_keys[name])
+
+    def close(self) -> None:
+        """Close app resources."""
+        self.db.close()

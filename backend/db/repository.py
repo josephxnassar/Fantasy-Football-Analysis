@@ -2,6 +2,8 @@
 
 from typing import Any
 
+import pandas as pd
+
 from backend.db.dao import CacheDao
 from backend.util import cache_keys
 
@@ -10,6 +12,7 @@ DATA_TYPE_MAP = {
     float: "DOUBLE PRECISION",
     str: "TEXT",
     bool: "BOOLEAN",
+    pd.Timestamp: "TIMESTAMP",
 }
 
 class Repository:
@@ -41,7 +44,7 @@ class Repository:
         else:
             self.dao.create_table(cache_name, columns, data_types, primary_keys)
         
-        rows = [[row[column] for column in columns] for row in data]
+        rows = [[None if row[column] is pd.NaT else row[column] for column in columns] for row in data]
         self.dao.insert_rows(cache_name, columns, rows)
 
     def load_from_db(self, cache_name: str):

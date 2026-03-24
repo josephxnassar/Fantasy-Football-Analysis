@@ -20,7 +20,9 @@ class CacheDao:
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute(select_string, [table_name])
-                return bool(cursor.fetchone()[0])
+                exists = bool(cursor.fetchone()[0])
+            self.connection.commit()
+            return exists
         except Exception:
             self.connection.rollback()
             raise
@@ -64,7 +66,9 @@ class CacheDao:
         try:
             with self.connection.cursor(row_factory=dict_row) as cursor:
                 cursor.execute(select_string)
-                return list(cursor.fetchall())
+                rows = list(cursor.fetchall())
+            self.connection.commit()
+            return rows
         except Exception:
             self.connection.rollback()
             raise
