@@ -12,7 +12,7 @@ def setup_logging() -> None:
     console_handler = _build_console_handler(logging.INFO)
     root_logger.addHandler(console_handler)
 
-    log_root = Path("backend/logs")
+    log_root = Path("logs")
     log_root.mkdir(parents=True, exist_ok=True)
 
     warning_handler = _build_file_handler(log_root / "warnings.log", logging.WARNING, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")

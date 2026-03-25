@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 class Statistics(base_source.BaseSource):
     """Processes player statistics and builds stat caches."""
 
-    def __init__(self, seasons: List[int]) -> None:
+    def __init__(self, seasons: List[int], positions: list[str] | None = None) -> None:
         """Initialize with seasons"""
-        super().__init__(seasons)
-        self._source_loader = StatisticsSourceLoader(self.seasons)
+        super().__init__(seasons, positions)
+        self._source_loader = StatisticsSourceLoader(self.seasons, self.positions)
         self.current_season = max(self.seasons)
         self.primary_keys = {cache_keys.STATS["ALL"]: ["name", "player_id"], cache_keys.STATS["META"]: ["key"]}
 

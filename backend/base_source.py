@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 class BaseSource(ABC):
     """Abstract base for all data sources (Statistics, Schedules, DepthChart)."""
 
-    def __init__(self, seasons: list[int]) -> None:
+    def __init__(self, seasons: list[int], positions: list[str] | None = None) -> None:
         self.cache: Any = None
         self.seasons = seasons
+        self.positions = positions
         self.primary_keys: Any = None
 
     def get_cache(self) -> Any:

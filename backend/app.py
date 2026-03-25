@@ -2,11 +2,11 @@
 
 from typing import Any
 
+from backend.config.settings import get_positions, get_seasons
 from backend.db.repository import Repository
 from backend.depth_chart.nrp import NRPDepthChart
 from backend.schedules.schedules import Schedules
 from backend.statistics.statistics import Statistics
-from backend.util import constants
 from backend.util import cache_keys
 
 class App:
@@ -16,7 +16,8 @@ class App:
         self.db = Repository()
         self.caches: dict[str, Any] = {}
         self.primary_keys: dict[str, Any] = {}
-        self.seasons = constants.SEASONS
+        self.seasons = get_seasons()
+        self.positions = get_positions()
 
     def run(self, refresh: bool = False) -> None:
         """Load from database or fetch fresh data."""
@@ -24,9 +25,9 @@ class App:
             self.load()
             return
 
-        instances = [(cache_keys.CACHE["DEPTHCHART"], NRPDepthChart(self.seasons)),
+        instances = [(cache_keys.CACHE["DEPTHCHART"], NRPDepthChart(self.seasons, self.positions)),
                      (cache_keys.CACHE["SCHEDULES"], Schedules(self.seasons)),
-                     (cache_keys.CACHE["STATISTICS"], Statistics(self.seasons))]
+                     (cache_keys.CACHE["STATISTICS"], Statistics(self.seasons, self.positions))]
         
         for cache_name, instance in instances:
             instance.run()

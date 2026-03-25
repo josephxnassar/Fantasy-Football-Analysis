@@ -5,7 +5,7 @@ from typing import List, Mapping
 
 import pandas as pd
 
-from backend.util import constants
+from backend.util import teams
 
 PLAYER_NAME_MAP = {
     "A.J. McCarron": "AJ McCarron",
@@ -159,9 +159,9 @@ def select_and_rename_columns(source: pd.DataFrame, column_map: Mapping[str, str
 
 def team_normalization(source: pd.DataFrame) -> pd.DataFrame:
     if "base_team" in source.columns:
-        source["base_team"] = source["base_team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+        source["base_team"] = source["base_team"].replace(teams.TEAM_ABBR_NORMALIZATION)
     if "base_opp_team" in source.columns:
-        source["base_opp_team"] = source["base_opp_team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+        source["base_opp_team"] = source["base_opp_team"].replace(teams.TEAM_ABBR_NORMALIZATION)
     return source
 
 def apply_pfr_playerid_map(source: pd.DataFrame, ff_playerid_map: Mapping[str, str] | None = None) -> pd.DataFrame:
@@ -176,11 +176,11 @@ def filter_regular_season(source: pd.DataFrame) -> pd.DataFrame:
         return source
     return source.loc[source["base_season_type"] == "REG"]
 
-def filter_positions(source: pd.DataFrame) -> pd.DataFrame:
+def filter_positions(source: pd.DataFrame, positions: list[str]) -> pd.DataFrame:
     """Filter to the supported fantasy positions when a position field is available."""
     if "base_pos" not in source.columns:
         return source
-    return source.loc[source["base_pos"].isin(constants.POSITIONS)]
+    return source.loc[source["base_pos"].isin(positions)]
 
 def apply_name_map(source: pd.DataFrame) -> pd.DataFrame:
     """Apply the explicit player name alias map to a source dataframe."""

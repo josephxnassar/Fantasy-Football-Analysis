@@ -1,11 +1,5 @@
 """Application constants and configuration"""
 
-# Available seasons
-SEASONS = list(range(2018, 2026))
-
-# Important fantasy skill positions
-POSITIONS = ['QB', 'RB', 'WR', 'TE']
-
 # Canonical team metadata (single source of truth for team lists/names/divisions).
 TEAM_METADATA = {
     "ARI": {"name": "Arizona Cardinals",     "conference": "NFC", "division": "West" },

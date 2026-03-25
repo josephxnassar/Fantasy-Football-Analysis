@@ -7,7 +7,7 @@ import nflreadpy as nfl
 import pandas as pd
 
 from backend.base_source import BaseSource
-from backend.util import constants
+from backend.util import teams
 from backend.util.exceptions import DataLoadError, DataProcessingError
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class NRPDepthChart(BaseSource):
     """Build team depth charts from nflreadpy depth chart data."""
 
-    def __init__(self, seasons: list[int]) -> None:
-        super().__init__(seasons)
+    def __init__(self, seasons: list[int], positions: list[str] | None = None) -> None:
+        super().__init__(seasons, positions)
         self.current_season = max(self.seasons)
         self.primary_keys = ["team", "position", "position_slot"]
 
@@ -25,11 +25,11 @@ class NRPDepthChart(BaseSource):
         try:
             required_columns = ["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"]
             depth = nfl.load_depth_charts(seasons=self.current_season).to_pandas().loc[:, required_columns].copy()
-            depth["team"] = depth["team"].replace(constants.TEAM_ABBR_NORMALIZATION)
+            depth["team"] = depth["team"].replace(teams.TEAM_ABBR_NORMALIZATION)
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
             depth["pos_rank"] = pd.to_numeric(depth["pos_rank"], errors="coerce")
             depth["pos_slot"] = pd.to_numeric(depth["pos_slot"], errors="coerce")
-            return depth.loc[depth["team"].isin(constants.TEAM_METADATA) & depth["pos_abb"].isin(constants.POSITIONS)]
+            return depth.loc[depth["team"].isin(teams.TEAM_METADATA) & depth["pos_abb"].isin(self.positions)]
         except Exception as e:
             logger.error(f"Failed to load depth charts from nflreadpy: {e}")
             raise DataLoadError(f"Failed to load depth charts from nflreadpy: {e}", source="NRPDepthChart") from e
@@ -56,7 +56,7 @@ class NRPDepthChart(BaseSource):
             grouped = {(position, int(position_slot)): group for (position, position_slot), group in deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)}
 
             rows: List[Dict[str, object]] = []
-            for position in constants.POSITIONS:
+            for position in self.positions:
                 slot_numbers = sorted(slot for pos, slot in grouped if pos == position)
                 for slot in slot_numbers:
                     players = grouped[(position, slot)]["player_name"].drop_duplicates().tolist()[:4]
@@ -75,7 +75,7 @@ class NRPDepthChart(BaseSource):
         rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
 
         depth_charts: List[Dict[str, object]] = []
-        for team in constants.TEAM_METADATA:
+        for team in teams.TEAM_METADATA:
             team_rows = rows_by_team.get(team)
             if team_rows is None or team_rows.empty:
                 logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
