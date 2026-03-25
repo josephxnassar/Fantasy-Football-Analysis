@@ -28,13 +28,13 @@ class Repository:
             for name, table in cache.items():
                 if name == cache_keys.STATS["META"]:
                     meta_table = [{"key": name, **table}]
-                    self.save_table(name, meta_table, primary_keys[name], meta_table)
+                    self.save_table(name, meta_table, primary_keys[name])
                 else:
-                    self.save_table(name, cache[name], primary_keys[name], cache[name])
+                    self.save_table(name, cache[name], primary_keys[name])
         else:
-            self.save_table(cache_name, cache, primary_keys, cache)
+            self.save_table(cache_name, cache, primary_keys)
 
-    def save_table(self, cache_name: str, cache: Any, primary_keys: Any, data: Any) -> None:
+    def save_table(self, cache_name: str, cache: Any, primary_keys: Any) -> None:
         """Save one cache to the database."""
         columns = list(cache[0].keys())
         data_types = [DATA_TYPE_MAP[type(next((row[column] for row in cache if row[column] is not None), ""))] for column in columns]
@@ -44,7 +44,7 @@ class Repository:
         else:
             self.dao.create_table(cache_name, columns, data_types, primary_keys)
         
-        rows = [[None if row[column] is pd.NaT else row[column] for column in columns] for row in data]
+        rows = [[None if row[column] is pd.NaT else row[column] for column in columns] for row in cache]
         self.dao.insert_rows(cache_name, columns, rows)
 
     def load_from_db(self, cache_name: str):

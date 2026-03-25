@@ -1,7 +1,9 @@
 """Very simple logging setup for console, errors, and timing."""
 
 import logging
+import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 def setup_logging() -> None:
@@ -14,18 +16,19 @@ def setup_logging() -> None:
 
     log_root = Path("logs")
     log_root.mkdir(parents=True, exist_ok=True)
+    run_id = _build_run_id()
 
-    warning_handler = _build_file_handler(log_root / "warnings.log", logging.WARNING, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    warning_handler = _build_file_handler(log_root / f"{run_id}-warnings.log", logging.WARNING, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     warning_handler.addFilter(lambda record: record.levelno == logging.WARNING)
     root_logger.addHandler(warning_handler)
 
-    error_handler = _build_file_handler(log_root / "errors.log", logging.ERROR, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    error_handler = _build_file_handler(log_root / f"{run_id}-errors.log", logging.ERROR, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     root_logger.addHandler(error_handler)
 
     # Timing logging stays separate so timing entries only go to timing.log.
     timing_logger = _reset_logger("backend.timing", logging.INFO, propagate=False)
 
-    timing_handler = _build_file_handler(log_root / "timing.log", logging.INFO, "%(asctime)s | %(message)s")
+    timing_handler = _build_file_handler(log_root / f"{run_id}-timing.log", logging.INFO, "%(asctime)s | %(message)s")
     timing_logger.addHandler(timing_handler)
 
 def _reset_logger(name: str | None, level: int, propagate: bool = True) -> logging.Logger:
@@ -42,6 +45,10 @@ def _build_console_handler(level: int) -> logging.StreamHandler:
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
     return handler
+
+def _build_run_id() -> str:
+    """Build a unique log run id from timestamp and pid."""
+    return f"{datetime.now():%Y%m%d-%H%M%S-%f}-pid{os.getpid()}"
 
 def _build_file_handler(path: Path, level: int, message_format: str) -> logging.FileHandler:
     """Create a basic file handler with the shared timestamp format."""
