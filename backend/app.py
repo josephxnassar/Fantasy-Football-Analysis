@@ -19,7 +19,7 @@ class App:
         self.seasons = get_seasons()
         self.positions = get_positions()
 
-    def run(self, refresh: bool = False) -> None:
+    def run(self, refresh: bool = True) -> None:
         """Load from database or fetch fresh data."""
         if not refresh:
             self.load()
@@ -31,8 +31,12 @@ class App:
         
         for cache_name, instance in instances:
             instance.run()
-            self.caches[cache_name] = instance.get_cache()
-            self.primary_keys[cache_name] = instance.get_primary_keys()
+            if cache_name == cache_keys.CACHE["STATISTICS"]:
+                self.caches[cache_name] = dict(zip(cache_keys.STATS.values(), instance.get_cache()))
+                self.primary_keys[cache_name] = dict(zip(cache_keys.STATS.values(), instance.get_primary_keys()))
+            else:
+                self.caches[cache_name] = instance.get_cache()
+                self.primary_keys[cache_name] = instance.get_primary_keys()
 
         self.save()
 

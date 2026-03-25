@@ -9,7 +9,6 @@ import pandas as pd
 from backend import base_source
 from backend.statistics.loaders import StatisticsSourceLoader
 from backend.statistics.util import stats_helpers
-from backend.util import cache_keys
 from backend.util.exceptions import DataProcessingError
 from backend.util.timing import timed
 
@@ -23,7 +22,7 @@ class Statistics(base_source.BaseSource):
         super().__init__(seasons, positions)
         self._source_loader = StatisticsSourceLoader(self.seasons, self.positions)
         self.current_season = max(self.seasons)
-        self.primary_keys = {cache_keys.STATS["ALL"]: ["name", "player_id"], cache_keys.STATS["META"]: ["key"]}
+        self.primary_keys = [["name", "player_id"], ["key"], ["base_season", "base_player_id"], ["base_season", "base_week", "base_player_id"]]
 
     @timed("Statistics._merge_statistics_data")
     def _merge_statistics_data(self, sources: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -44,7 +43,6 @@ class Statistics(base_source.BaseSource):
         """Merge weekly source tables into base weekly dataframe."""
         weekly_df = sources["player_weekly"]
         weekly_join_keys = ["base_season", "base_week", "base_player_id"]
-        self.primary_keys[cache_keys.STATS["WEEKLY"]] = weekly_join_keys
         weekly_sources = [
             "snap_counts",
             "ff_opp_weekly",
@@ -65,7 +63,6 @@ class Statistics(base_source.BaseSource):
         """Merge seasonal source tables into base seasonal dataframe."""
         seasonal_df = sources["player_seasonal"]
         seasonal_join_keys = ["base_season", "base_player_id"]
-        self.primary_keys[cache_keys.STATS["SEASONAL"]] = seasonal_join_keys
         seasonal_sources = [
             "pfr_pass_season",
             "pfr_rush_season",
@@ -214,7 +211,4 @@ class Statistics(base_source.BaseSource):
             logger.exception("Failed to build statistics payloads")
             raise DataProcessingError(f"Failed to build statistics payloads: {e}", source="Statistics") from e
 
-        self.set_cache({cache_keys.STATS["ALL"]: all_players,
-                        cache_keys.STATS["SEASONAL"]: seasonal_player_stats,
-                        cache_keys.STATS["WEEKLY"]: weekly_player_stats,
-                        cache_keys.STATS["META"]: meta})
+        self.set_cache([all_players, meta, seasonal_player_stats, weekly_player_stats])
