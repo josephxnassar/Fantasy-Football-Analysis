@@ -66,16 +66,15 @@ class Schedules(BaseSource):
         combined_schedule = self._create_combined_schedule(schedule)
 
         schedules: list[dict[str, object]] = []
-        for season, season_group in combined_schedule.groupby("season", sort=False):
-            total_weeks = int(self.weeks_by_season.get(season, 18))
-            for team, team_group in season_group.groupby("team", sort=False):
-                try:
-                    team_schedule = self._fill_bye_weeks(team_group.drop(columns=["season", "team"]).set_index("week").sort_index(), total_weeks)
-                    team_rows = team_schedule.reset_index()
-                    team_rows["season"] = int(season)
-                    team_rows["team"] = str(team)
-                    schedules.extend(team_rows[["season", "team", "week", "opponent", "home_away", "team_score", "opponent_score"]].to_dict("records"))
-                except Exception as e:
-                    logger.warning(f"Skipping team '{team}' season '{season}': {e}")
+        for (season, team), team_group in combined_schedule.groupby(["season", "team"], sort=False):
+            try:
+                total_weeks = int(self.weeks_by_season.get(season, 18))
+                team_schedule = self._fill_bye_weeks(team_group.drop(columns=["season", "team"]).set_index("week").sort_index(), total_weeks)
+                team_rows = team_schedule.reset_index()
+                team_rows["season"] = int(season)
+                team_rows["team"] = str(team)
+                schedules.extend(team_rows[["season", "team", "week", "opponent", "home_away", "team_score", "opponent_score"]].to_dict("records"))
+            except Exception as e:
+                logger.warning(f"Skipping team '{team}' season '{season}': {e}")
 
         self.set_cache(schedules)
