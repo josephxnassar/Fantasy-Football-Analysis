@@ -24,63 +24,65 @@ class NRPDepthChart(BaseSource):
         """Load seasonal depth chart snapshots from nflreadpy."""
         try:
             required_columns = ["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"]
-            depth = nfl.load_depth_charts(seasons=self.current_season).to_pandas().loc[:, required_columns].copy()
+            depth = nfl.load_depth_charts(seasons=self.current_season).to_pandas()
+            depth = depth[required_columns].copy()
             depth["team"] = depth["team"].replace(teams.TEAM_ABBR_NORMALIZATION)
             depth["dt"] = pd.to_datetime(depth["dt"], errors="coerce", utc=True)
             depth["pos_rank"] = pd.to_numeric(depth["pos_rank"], errors="coerce")
             depth["pos_slot"] = pd.to_numeric(depth["pos_slot"], errors="coerce")
-            return depth.loc[depth["team"].isin(teams.TEAM_METADATA) & depth["pos_abb"].isin(self.positions)]
+            depth = depth[depth["team"].isin(teams.TEAM_METADATA)]
+            depth = depth[depth["pos_abb"].isin(self.positions)]
+            return depth
         except Exception as e:
             logger.error(f"Failed to load depth charts from nflreadpy: {e}")
             raise DataLoadError(f"Failed to load depth charts from nflreadpy: {e}", source="NRPDepthChart") from e
 
-    def _latest_team_rows(self, raw: pd.DataFrame) -> pd.DataFrame:
-        """Clean rows and keep the latest snapshot per team."""
+    def _clean_depth_charts(self, depth: pd.DataFrame) -> pd.DataFrame:
+        """Clean raw depth chart rows."""
         try:
-            depth = raw.copy()
             depth = depth.dropna(subset=["dt", "team", "pos_abb", "player_name", "pos_rank", "pos_slot"])
             depth["player_name"] = depth["player_name"].astype(str).str.strip()
-            depth = depth.loc[depth["player_name"] != ""]
-            depth = depth.loc[depth["dt"].eq(depth.groupby("team")["dt"].transform("max"))]
+            depth = depth[depth["player_name"] != ""]
             depth["pos_rank"] = depth["pos_rank"].astype(int)
             depth["pos_slot"] = depth["pos_slot"].astype(int)
-            return depth
+            depth = depth.drop_duplicates(subset=["team", "pos_abb", "pos_slot", "pos_rank", "player_name"])
+            return depth.sort_values(["team", "pos_abb", "pos_slot", "pos_rank", "player_name"])
         except Exception as e:
-            logger.error(f"Failed to normalize nflreadpy depth chart rows: {e}")
-            raise DataProcessingError(f"Failed to normalize nflreadpy depth chart rows: {e}", source="NRPDepthChart") from e
+            logger.error(f"Failed to clean depth charts: {e}")
+            raise DataProcessingError(f"Failed to clean depth charts: {e}", source="NRPDepthChart") from e
 
-    def _build_team_rows(self, team: str, team_rows: pd.DataFrame) -> List[Dict[str, object]]:
-        """Build one flat row per position slot for one team."""
+    def _group_depth_charts(self, depth: pd.DataFrame) -> Dict[str, Dict[str, Dict[int, List[str]]]]:
+        """Group latest rows by team, position, and slot."""
         try:
-            deduped = team_rows.drop_duplicates(subset=["pos_abb", "pos_slot", "pos_rank", "player_name"])
-            grouped = {(position, int(position_slot)): group for (position, position_slot), group in deduped.sort_values(["pos_abb", "pos_slot", "pos_rank", "player_name"]).groupby(["pos_abb", "pos_slot"], sort=False)}
-
-            rows: List[Dict[str, object]] = []
-            for position in self.positions:
-                slot_numbers = sorted(slot for pos, slot in grouped if pos == position)
-                for slot in slot_numbers:
-                    players = grouped[(position, slot)]["player_name"].drop_duplicates().tolist()[:4]
-                    players += [None] * (4 - len(players))
-                    rows.append({"team": team, "position": position, "position_slot": slot, "starter": players[0], "2nd": players[1], "3rd": players[2], "4th": players[3]})
-
-            return rows
+            slots_by_team: Dict[str, Dict[str, Dict[int, List[str]]]] = {}
+            for (team, position, slot), group in depth.groupby(["team", "pos_abb", "pos_slot"], sort=False):
+                players = group["player_name"].drop_duplicates().tolist()[:4]
+                slots_by_team.setdefault(team, {}).setdefault(position, {})[int(slot)] = players
+            return slots_by_team
         except Exception as e:
-            logger.error(f"Failed to create NRP depth chart dataframe: {e}")
-            raise DataProcessingError(f"Failed to create NRP depth chart dataframe: {e}", source="NRPDepthChart") from e
+            logger.error(f"Failed to group depth charts: {e}")
+            raise DataProcessingError(f"Failed to group depth charts: {e}", source="NRPDepthChart") from e
 
     def run(self) -> None:
-        """Build a flat depth-chart cache across all teams."""
-        depth_rows = self._load_depth_charts()
-        latest_rows = self._latest_team_rows(depth_rows)
-        rows_by_team = {team: group for team, group in latest_rows.groupby("team")}
+        """Build depth-chart cache across all teams."""
+        try:
+            depth = self._load_depth_charts()
+            depth = self._clean_depth_charts(depth)
+            depth = depth[depth["dt"].eq(depth.groupby("team")["dt"].transform("max"))] # latest snapshot from import
+            slots_by_team = self._group_depth_charts(depth)
 
-        depth_charts: List[Dict[str, object]] = []
-        for team in teams.TEAM_METADATA:
-            team_rows = rows_by_team.get(team)
-            if team_rows is None or team_rows.empty:
-                logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
-                continue
-            rows = self._build_team_rows(team, team_rows)
-            depth_charts.extend(rows)
+            depth_charts: List[Dict[str, object]] = []
+            for team in teams.TEAM_METADATA:
+                team_slots = slots_by_team.get(team)
+                if not team_slots:
+                    logger.warning(f"No NRP depth chart rows found for team '{team}' in season(s) {self.seasons}.")
+                    continue
+                for position in self.positions:
+                    for slot in sorted(team_slots.get(position, {})):
+                        players = team_slots[position][slot] + [None] * (4 - len(team_slots[position][slot]))
+                        depth_charts.append({"team": team, "position": position, "position_slot": slot, "starter": players[0], "2nd": players[1], "3rd": players[2], "4th": players[3]})
 
-        self.set_cache(depth_charts)
+            self.set_cache(depth_charts)
+        except Exception as e:
+            logger.error(f"Failed to build depth charts: {e}")
+            raise DataProcessingError(f"Failed to build depth charts: {e}", source="NRPDepthChart") from e
