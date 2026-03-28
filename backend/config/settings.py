@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SEASONS = list(range(2018, 2026))
 DEFAULT_POSITIONS = ["QB", "RB", "WR", "TE"]
+DEFAULT_API_REFRESH = False
 
 load_dotenv(ROOT / ".env")
 
@@ -31,3 +32,10 @@ def get_positions() -> list[str]:
     if not positions:
         return DEFAULT_POSITIONS
     return [position.strip() for position in positions.split(",") if position.strip()]
+
+def get_api_refresh() -> bool:
+    """Return whether API startup should refresh source data."""
+    refresh = os.getenv("API_REFRESH")
+    if refresh is None:
+        return DEFAULT_API_REFRESH
+    return refresh.strip().lower() in {"1", "true", "yes", "on"}
