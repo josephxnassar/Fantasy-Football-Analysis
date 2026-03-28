@@ -6,6 +6,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
+
 def setup_logging() -> None:
     """Configure basic console logging plus simple error and timing files."""
     # Root logging captures normal module loggers, so warnings/errors naturally flow here.
@@ -14,21 +16,25 @@ def setup_logging() -> None:
     console_handler = _build_console_handler(logging.INFO)
     root_logger.addHandler(console_handler)
 
-    log_root = Path("logs")
-    log_root.mkdir(parents=True, exist_ok=True)
+    warning_root = ROOT / "logs" / "warnings"
+    error_root = ROOT / "logs" / "errors"
+    timing_root = ROOT / "logs" / "timing"
+    warning_root.mkdir(parents=True, exist_ok=True)
+    error_root.mkdir(parents=True, exist_ok=True)
+    timing_root.mkdir(parents=True, exist_ok=True)
     run_id = _build_run_id()
 
-    warning_handler = _build_file_handler(log_root / f"{run_id}-warnings.log", logging.WARNING, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    warning_handler = _build_file_handler(warning_root / f"{run_id}-warnings.log", logging.WARNING, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     warning_handler.addFilter(lambda record: record.levelno == logging.WARNING)
     root_logger.addHandler(warning_handler)
 
-    error_handler = _build_file_handler(log_root / f"{run_id}-errors.log", logging.ERROR, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    error_handler = _build_file_handler(error_root / f"{run_id}-errors.log", logging.ERROR, "%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     root_logger.addHandler(error_handler)
 
     # Timing logging stays separate so timing entries only go to timing.log.
     timing_logger = _reset_logger("backend.timing", logging.INFO, propagate=False)
 
-    timing_handler = _build_file_handler(log_root / f"{run_id}-timing.log", logging.INFO, "%(asctime)s | %(message)s")
+    timing_handler = _build_file_handler(timing_root / f"{run_id}-timing.log", logging.INFO, "%(asctime)s | %(message)s")
     timing_logger.addHandler(timing_handler)
 
 def _reset_logger(name: str | None, level: int, propagate: bool = True) -> logging.Logger:

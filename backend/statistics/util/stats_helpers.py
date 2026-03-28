@@ -151,7 +151,7 @@ def select_and_rename_columns(source: pd.DataFrame, column_map: Mapping[str, str
         missing = ", ".join(sorted(missing_required))
         raise ValueError(f"{source_name or 'source'} missing required columns: {missing}")
 
-    missing_optional = [column for column in column_map if column not in selected.columns]
+    missing_optional = [column for column in column_map.values() if column not in selected.columns]
     if missing_optional:
         logger.warning(f"{source_name} missing optional columns: {', '.join(sorted(missing_optional))}")
     return selected
