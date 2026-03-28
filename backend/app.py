@@ -19,7 +19,7 @@ class App:
         self.seasons = get_seasons()
         self.positions = get_positions()
 
-    def run(self, refresh: bool = True) -> None:
+    def run(self, refresh: bool = False) -> None:
         """Load from database or fetch fresh data."""
         if not refresh:
             self.load()

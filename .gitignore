@@ -1,5 +1,6 @@
 # IDE & Editors
 .vscode/
+.DS_Store
 
 # Environment & Logs
 .env
@@ -10,6 +11,11 @@ logs/
 __pycache__/
 .venv/
 .ruff_cache/
+
+# Frontend / Node
+node_modules/
+dist/
+.vite/
 
 # AI project intelligence
 claude.md
