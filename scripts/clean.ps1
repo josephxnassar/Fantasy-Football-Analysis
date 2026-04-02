@@ -3,8 +3,9 @@ $venvRoot = Join-Path $repoRoot ".venv"
 $venvPattern = "$venvRoot\*"
 $targets = @(
     "__pycache__"
-    ".ruff_cache"
+    ".pytest_cache"
     ".mypy_cache"
+    ".ruff_cache"
     ".uv-cache"
 )
 
@@ -12,7 +13,11 @@ $directories = Get-ChildItem -LiteralPath $repoRoot -Directory -Recurse -Force |
     Where-Object { $targets -contains $_.Name -and $_.FullName -notlike $venvPattern } |
     Sort-Object { $_.FullName.Length } -Descending
 
-Write-Host "Cleaning temp directories from $repoRoot" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Cleaning Temp Directories" -ForegroundColor Cyan
+Write-Host "Repo: $repoRoot" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
 
 if (-not $directories) {
     Write-Host "No temp directories found." -ForegroundColor Yellow

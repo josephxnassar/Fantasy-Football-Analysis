@@ -9,8 +9,11 @@ logs/
 
 # Backend / Python
 __pycache__/
-.venv/
+.pytest_cache
+.mypy_cache
 .ruff_cache/
+.uv-cache/
+.venv/
 
 # Frontend / Node
 node_modules/
