@@ -4,6 +4,7 @@ import pytest
 
 from backend.statistics.loaders import StatisticsSourceLoader
 
+
 @pytest.fixture
 def statistics_loader() -> StatisticsSourceLoader:
     """Create a statistics source loader for unit tests."""

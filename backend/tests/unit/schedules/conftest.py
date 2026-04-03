@@ -4,6 +4,7 @@ import pytest
 
 from backend.schedules.schedules import Schedules
 
+
 @pytest.fixture
 def schedules() -> Schedules:
     """Create a schedules instance for unit tests."""

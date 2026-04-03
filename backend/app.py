@@ -9,6 +9,7 @@ from backend.schedules.schedules import Schedules
 from backend.statistics.statistics import Statistics
 from backend.util import cache_keys
 
+
 class App:
     """Orchestrates data fetching, caching, and loading for all sources."""
     

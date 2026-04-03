@@ -4,6 +4,7 @@ import pytest
 
 from backend.depth_chart.nrp import NRPDepthChart
 
+
 @pytest.fixture
 def nrp_depth_chart() -> NRPDepthChart:
     """Create an NRP depth chart instance for unit tests."""

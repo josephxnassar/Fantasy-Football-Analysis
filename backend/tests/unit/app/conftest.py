@@ -7,6 +7,7 @@ import pytest
 from backend import app as app_module
 from backend.app import App
 
+
 @pytest.fixture
 def app(monkeypatch: pytest.MonkeyPatch) -> App:
     """Create an App instance with a mocked repository and fixed settings."""

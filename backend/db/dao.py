@@ -7,6 +7,7 @@ from psycopg.rows import dict_row
 
 from backend.db.connection import get_connection
 
+
 class CacheDao:
     """Raw SQL access for cache tables."""
 

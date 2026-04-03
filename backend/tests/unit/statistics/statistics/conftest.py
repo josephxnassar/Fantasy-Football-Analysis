@@ -4,6 +4,7 @@ import pytest
 
 from backend.statistics.statistics import Statistics
 
+
 @pytest.fixture
 def statistics() -> Statistics:
     """Create a statistics instance for unit tests."""
