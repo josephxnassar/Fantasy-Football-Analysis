@@ -19,8 +19,9 @@ class Statistics(base_source.BaseSource):
 
     def __init__(self, seasons: List[int], positions: list[str] | None = None) -> None:
         """Initialize with seasons"""
-        super().__init__(seasons, positions)
-        self._source_loader = StatisticsSourceLoader(self.seasons, self.positions)
+        resolved_positions = positions or []
+        super().__init__(seasons, resolved_positions)
+        self._source_loader = StatisticsSourceLoader(self.seasons, resolved_positions)
         self.current_season = max(self.seasons)
         self.primary_keys = [["name", "player_id"], ["key"], ["base_season", "base_player_id"], ["base_season", "base_week", "base_player_id"]]
 

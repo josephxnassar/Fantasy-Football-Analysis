@@ -50,7 +50,7 @@ class Repository:
     def load_from_db(self, cache_name: str):
         """Load one top-level cache from the database."""
         if cache_name == cache_keys.CACHE["STATISTICS"]:
-            stats = {}
+            stats: dict[str, Any] = {}
             for name in cache_keys.STATS.values():
                 if name == cache_keys.STATS["META"]:
                     meta = self.load_table(name)

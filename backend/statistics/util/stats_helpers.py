@@ -208,7 +208,7 @@ def merge_weekly_aggregates_into_seasonal(seasonal_df: pd.DataFrame, weekly_df: 
     aggregate = summed.merge(averaged, on=group_keys, how="outer")
     return left_merge_fill(seasonal_df, aggregate, group_keys)
 
-def _aggregate_weekly_metrics(weekly_df: pd.DataFrame, group_keys: list[str], metrics: list[str], reducer: str) -> pd.DataFrame | None:
+def _aggregate_weekly_metrics(weekly_df: pd.DataFrame, group_keys: list[str], metrics: list[str], reducer: str) -> pd.DataFrame:
     """Reduce available weekly metrics by player-season using the requested reducer."""
     available_metrics = [metric for metric in metrics if metric in weekly_df.columns]
     grouped_input = weekly_df[group_keys + available_metrics].copy()
