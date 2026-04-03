@@ -12,7 +12,7 @@ Write-Host "Target: backend\tests" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 Set-Location -LiteralPath $repoRoot
-uv run python -m pytest backend/tests
+uv run python -m pytest -v backend/tests
 $exitCode = $LASTEXITCODE
 
 if ($exitCode -ne 0) {

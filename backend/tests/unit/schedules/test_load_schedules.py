@@ -1,4 +1,4 @@
-"""Unit tests for schedules.py."""
+"""Unit tests for Schedules._load_schedules."""
 
 from unittest.mock import MagicMock
 
@@ -9,26 +9,15 @@ from backend.schedules import schedules as schedules_module
 from backend.schedules.schedules import Schedules
 from backend.util.exceptions import DataLoadError
 
-@pytest.fixture
-def schedules() -> Schedules:
-    """Create a schedules instance for unit tests."""
-    return Schedules(seasons=[2024, 2025])
+# normal
 
-@pytest.fixture
-def imported_schedule_df() -> pd.DataFrame:
-    """Create a tiny imported schedule dataframe."""
-    return pd.DataFrame([
+def test_load_schedules_filters_selects_and_normalizes(schedules: Schedules, monkeypatch: pytest.MonkeyPatch) -> None:
+    """_load_schedules keeps REG rows, selected columns, and normalized teams."""
+    imported_schedule_df = pd.DataFrame([
         {"season": 2024, "week": 1, "game_type": "REG", "away_team": "LA", "home_team": "WAS", "away_score": 17, "home_score": 24},
         {"season": 2024, "week": 2, "game_type": "REG", "away_team": "OAK", "home_team": "SD", "away_score": 10, "home_score": 14},
         {"season": 2025, "week": 1, "game_type": "PRE", "away_team": "BUF", "home_team": "MIA", "away_score": 7, "home_score": 3},
     ])
-
-# _load_schedules
-
-## happy_path
-
-def test_load_schedules_filters_selects_and_normalizes(schedules: Schedules, imported_schedule_df: pd.DataFrame, monkeypatch: pytest.MonkeyPatch) -> None:
-    """_load_schedules keeps REG rows, selected columns, and normalized teams."""
     mock_result = MagicMock()
     mock_result.to_pandas.return_value = imported_schedule_df
     monkeypatch.setattr(schedules_module.nfl, "load_schedules", lambda seasons: mock_result)
@@ -41,8 +30,13 @@ def test_load_schedules_filters_selects_and_normalizes(schedules: Schedules, imp
         {"season": 2024, "week": 2, "away_team": "LV", "home_team": "LAC", "away_score": 10, "home_score": 14},
     ]
 
-def test_load_schedules_sets_weeks_by_season(schedules: Schedules, imported_schedule_df: pd.DataFrame, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_schedules_sets_weeks_by_season(schedules: Schedules, monkeypatch: pytest.MonkeyPatch) -> None:
     """_load_schedules stores the distinct week count for each season."""
+    imported_schedule_df = pd.DataFrame([
+        {"season": 2024, "week": 1, "game_type": "REG", "away_team": "LA", "home_team": "WAS", "away_score": 17, "home_score": 24},
+        {"season": 2024, "week": 2, "game_type": "REG", "away_team": "OAK", "home_team": "SD", "away_score": 10, "home_score": 14},
+        {"season": 2025, "week": 1, "game_type": "PRE", "away_team": "BUF", "home_team": "MIA", "away_score": 7, "home_score": 3},
+    ])
     mock_result = MagicMock()
     mock_result.to_pandas.return_value = imported_schedule_df
     monkeypatch.setattr(schedules_module.nfl, "load_schedules", lambda seasons: mock_result)
@@ -51,7 +45,7 @@ def test_load_schedules_sets_weeks_by_season(schedules: Schedules, imported_sche
 
     assert schedules.weeks_by_season == {2024: 2}
 
-## edge
+# edge
 
 def test_load_schedules_counts_distinct_weeks_per_season(schedules: Schedules, monkeypatch: pytest.MonkeyPatch) -> None:
     """_load_schedules counts distinct weeks separately for each season."""
@@ -83,9 +77,3 @@ def test_load_schedules_raises_data_load_error_on_import_failure(schedules: Sche
         schedules._load_schedules()
 
     assert exc_info.value.source == "Schedules"
-
-# _create_combined_schedule
-
-# _fill_bye_weeks
-
-# run
