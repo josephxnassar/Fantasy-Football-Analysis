@@ -5,10 +5,8 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Running Backend Tests" -ForegroundColor Cyan
-Write-Host "Target: backend\tests" -ForegroundColor Cyan
+Write-Host "Running backend/tests" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 Set-Location -LiteralPath $repoRoot
