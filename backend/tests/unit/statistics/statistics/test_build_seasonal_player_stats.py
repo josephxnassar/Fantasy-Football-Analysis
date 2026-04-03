@@ -26,5 +26,3 @@ def test_build_seasonal_player_stats_returns_empty_output_for_empty_frame(statis
 
     assert seasonal_stats == []
     assert seasonal_meta == {"seasonal_record_count": 0}
-
-# exception
